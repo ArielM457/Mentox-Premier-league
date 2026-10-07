@@ -42,6 +42,18 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-17 · P1.** El sistema debe permitir comparar el momento actual con un tramo anterior del mismo partido cuando esa comparación mejore la explicación. Se verifica con un cambio claro de ritmo o presión.
 
+**RF-28 · P1.** El espectador debe poder pedir una explicación adicional de un momento mostrado. La respuesta debe usar los eventos y métricas que lo sustentan. Se verifica abriendo un momento y contrastando la respuesta con sus fuentes.
+
+**RF-29 · P1.** El sistema debe agrupar eventos relacionados en una jugada para explicar la secuencia completa. Se verifica con una recuperación, varios pases y un tiro que aparezcan como un solo momento sin perder sus eventos de origen.
+
+**RF-30 · P1.** El sistema debe identificar hitos de un jugador dentro del partido, como su mejor registro o un número de acciones alcanzado, cuando existan datos suficientes. Se verifica con una secuencia que alcanza el hito y otra que no lo alcanza.
+
+**RF-31 · P1.** El sistema debe permitir comparar el control de ambos equipos entre tramos del mismo partido mediante una medida definida. Se verifica con dos tramos de dominio opuesto y con el cálculo documentado.
+
+**RF-32 · P2.** El sistema puede mostrar un índice de caos calculado con cambios de posesión y otras transiciones disponibles. Se verifica con tramos estables y tramos de cambios frecuentes, sin presentar el índice como una estadística oficial.
+
+**RF-33 · P1.** El sistema debe reconocer patrones tácticos concretos solo cuando los eventos tengan posición y tiempo suficientes. Se verifica con una secuencia positiva y otra negativa para cada patrón elegido.
+
 ## **Narración y pantalla**
 
 **RF-18 · P0.** El sistema debe producir mensajes durante la reproducción de eventos sin esperar al final del partido. Se verifica observando una salida antes del último evento.
@@ -54,6 +66,10 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-22 · P0.** El sistema debe generar narraciones claras en más de un idioma, con nombres propios y cifras consistentes. Se verifica comparando mensajes del mismo momento en los idiomas elegidos.
 
+**RF-34 · P1.** El usuario debe poder hacer preguntas sobre el partido en curso y recibir respuestas basadas en el estado y los eventos disponibles. Se verifica con preguntas sobre equipo, jugador y comparación entre tramos, incluida una pregunta que los datos no permitan responder.
+
+**RF-35 · P1.** El resumen final debe poder enfocarse en un club o jugador seleccionado sin cambiar los hechos ni las cifras del partido. Se verifica generando resúmenes del mismo partido con preferencias distintas.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.
@@ -65,6 +81,8 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 **RF-26 · P0.** El sistema debe ofrecer un modo centrado en un jugador durante todo el partido y comunicar cuando no haya novedades sobre él. Se verifica durante una reproducción completa.
 
 **RF-27 · P0.** El sistema debe aplicar la preferencia de idioma a mensajes en directo y resúmenes. Se verifica cambiando el idioma y generando ambos tipos de salida.
+
+**RF-36 · P1.** El usuario debe poder elegir entre niveles simple, normal y avanzado de explicación para un mismo momento. Se verifica comparando longitud y detalle sin alterar los hechos.
 
 ## **Calidad y operación**
 

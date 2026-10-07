@@ -9,6 +9,7 @@ La documentación describe el alcance inicial. Todavía no hay aplicación, arqu
 - [Objetivos y alcance](01-objetivos-y-alcance.md): qué pide el reto, qué proponemos construir y qué sigue abierto.
 - [Responsabilidades del sistema](02-responsabilidades.md): tareas de cada parte del programa y límites entre ellas.
 - [Análisis de requisitos](03-requisitos.md): requisitos pequeños y verificables, con prioridad inicial.
+- [Casos de uso](Casos%20de%20Uso%20%E2%80%94%20Plataforma%20de%20Inteligencia%20de%20Partidos%20con%20IA.md): usuarios y recorridos concretos que complementan los requisitos.
 - [Evaluación y evidencias](04-evaluacion.md): cómo demostrar los cinco criterios de la rúbrica.
 - [Decisiones pendientes](05-decisiones-pendientes.md): elecciones que aún necesitan datos o acuerdos del equipo.
 
