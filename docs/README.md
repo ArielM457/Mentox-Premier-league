@@ -2,15 +2,20 @@
 
 Este proyecto nace de un reto de hackathon. La solución debe convertir eventos sintéticos de fútbol en información explicable para una transmisión en directo y en experiencias personalizadas para distintos aficionados.
 
-La documentación describe el alcance inicial. Todavía no hay aplicación, arquitectura elegida ni resultados de pruebas.
+La documentación distingue el alcance del reto, las decisiones del equipo y lo que ya existe en el repositorio. La estructura inicial del monorepo está creada; las funciones del partido todavía no están implementadas.
 
 ## **Documentos**
 
 - [Objetivos y alcance](01-objetivos-y-alcance.md): qué pide el reto, qué proponemos construir y qué sigue abierto.
 - [Responsabilidades del sistema](02-responsabilidades.md): tareas de cada parte del programa y límites entre ellas.
 - [Análisis de requisitos](03-requisitos.md): requisitos pequeños y verificables, con prioridad inicial.
-- [Casos de uso](Casos%20de%20Uso%20%E2%80%94%20Plataforma%20de%20Inteligencia%20de%20Partidos%20con%20IA.md): usuarios y recorridos concretos que complementan los requisitos.
+- [Casos de uso](06-Casos%20de%20Uso%20%E2%80%94%20Plataforma%20de%20Inteligencia%20de%20Partidos%20con%20IA.md): usuarios y recorridos concretos que complementan los requisitos.
 - [Evaluación y evidencias](04-evaluacion.md): cómo demostrar los cinco criterios de la rúbrica.
+- [Decisiones tomadas](07-decisiones-tomadas.md): tecnologías, arquitectura, agentes, datos e idiomas acordados.
+- [Formato de eventos](08-formato-de-eventos.md): contrato inicial para eventos y sincronización con vídeo.
+- [Investigación de métricas y herramientas](09-investigacion-metricas-y-herramientas.md): opciones compatibles con Python y límites de los datos.
+- [Equipo de agentes](10-arquitectura-agentes.md): responsabilidades, autonomía, verificación y revisión antes de publicar.
+- [Plan de desarrollo](plan-de-desarrollo/README.md): reparto entre cuatro personas de programación y una de UX/UI, con contratos para trabajar en paralelo.
 - [Decisiones pendientes](05-decisiones-pendientes.md): elecciones que aún necesitan datos o acuerdos del equipo.
 
 ## **Cómo leer el estado de cada punto**

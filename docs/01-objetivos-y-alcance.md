@@ -24,7 +24,7 @@ La misma información debe dar lugar a experiencias diferentes según las prefer
 
 **6.** Generamos un resumen final a partir de los eventos y el estado acumulado del mismo partido.
 
-Este resultado mínimo es una propuesta de trabajo para la demo. No fija todavía una tecnología ni un número de idiomas, partidos o métricas.
+Este resultado mínimo es una propuesta de trabajo para la demo. Las tecnologías y los dos idiomas iniciales están registrados en [decisiones tomadas](07-decisiones-tomadas.md). El número de partidos y las métricas finales siguen pendientes.
 
 ## **Alcance del reto**
 

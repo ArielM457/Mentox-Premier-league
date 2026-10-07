@@ -32,7 +32,7 @@ Debe seleccionar los momentos principales después del encuentro, reunir estadí
 
 ## **Observación y control editorial**
 
-Debe permitir revisar la salida, sus fuentes y los errores de procesamiento durante la demo. La necesidad de aprobación humana antes de publicar contenido real queda pendiente de definir con el caso de uso final.
+Debe permitir revisar la salida, sus fuentes y los errores de procesamiento durante la demo. Los análisis finales deben pasar por la revisión acordada antes de publicarse. El responsable y la interfaz de esa revisión quedan pendientes.
 
 ## **Responsabilidad humana del equipo**
 

@@ -5,7 +5,7 @@ description: Analiza, divide y mantiene los requisitos del proyecto de inteligen
 
 # Análisis de requisitos del proyecto
 
-Lee primero `docs/README.md`, `docs/01-objetivos-y-alcance.md` y `docs/03-requisitos.md`. Consulta `docs/05-decisiones-pendientes.md` si una decisión afecta el análisis.
+Lee primero `docs/README.md`, `docs/01-objetivos-y-alcance.md`, `docs/03-requisitos.md` y `docs/07-decisiones-tomadas.md`. Consulta `docs/05-decisiones-pendientes.md` si una decisión afecta el análisis. El contrato inicial está en `docs/08-formato-de-eventos.md`.
 
 Separa siempre tres cosas: exigencias del reto compartido por el usuario, propuestas iniciales del equipo y decisiones confirmadas. No conviertas características sugeridas en obligaciones sin explicarlo. Mantén los requisitos pequeños, verificables y vinculados a una etapa del flujo: ingesta, interpretación, explicación, salida para pantalla o personalización.
 

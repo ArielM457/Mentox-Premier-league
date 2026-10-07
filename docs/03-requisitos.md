@@ -60,15 +60,21 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-19 · P0.** Cada mensaje para pantalla debe ser legible por máquina e incluir identificador, tiempo de partido, idioma, modo, texto, prioridad, duración sugerida y eventos de origen. Se verifica leyendo la salida desde una interfaz sin extraer datos del texto libre.
 
-**RF-20 · P0.** La interfaz debe mostrar el mensaje junto al partido simulado y respetar su tiempo de aparición. Se verifica durante la reproducción de la demo.
+**RF-20 · P0.** La interfaz debe mostrar el mensaje junto al vídeo de ejemplo y respetar su tiempo de aparición. Se verifica durante la reproducción de la demo.
 
 **RF-21 · P0.** El sistema debe producir un resumen al finalizar el partido con momentos y cifras consistentes con el estado final. Se verifica comparándolo con el flujo de eventos.
 
-**RF-22 · P0.** El sistema debe generar narraciones claras en más de un idioma, con nombres propios y cifras consistentes. Se verifica comparando mensajes del mismo momento en los idiomas elegidos.
+**RF-22 · P0.** El sistema debe generar narraciones claras en español e inglés, con nombres propios y cifras consistentes. Se verifica comparando mensajes del mismo momento en ambos idiomas.
 
 **RF-34 · P1.** El usuario debe poder hacer preguntas sobre el partido en curso y recibir respuestas basadas en el estado y los eventos disponibles. Se verifica con preguntas sobre equipo, jugador y comparación entre tramos, incluida una pregunta que los datos no permitan responder.
 
 **RF-35 · P1.** El resumen final debe poder enfocarse en un club o jugador seleccionado sin cambiar los hechos ni las cifras del partido. Se verifica generando resúmenes del mismo partido con preferencias distintas.
+
+**RF-37 · P0.** El sistema debe sincronizar los eventos y mensajes con el tiempo del vídeo de ejemplo durante su reproducción. Se verifica adelantando y pausando el vídeo sin mostrar mensajes de un momento distinto.
+
+**RF-38 · P0.** El sistema debe retener los análisis finales hasta que se complete la revisión acordada. Se verifica intentando publicar un análisis sin revisión y otro aprobado.
+
+**RF-39 · P1.** Cuando un reporte señale un posible error de análisis, el sistema debe contrastarlo con sus eventos y métricas, registrar el resultado y corregir o retirar la conclusión si corresponde. Se verifica con un reporte válido y otro que no lo sea.
 
 ## **Personalización**
 

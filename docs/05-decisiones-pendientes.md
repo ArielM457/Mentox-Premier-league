@@ -1,23 +1,21 @@
 # **Decisiones pendientes**
 
-Estas decisiones no están resueltas por el texto del reto. Deben cerrarse antes de fijar arquitectura y criterios finales de aceptación.
+Las decisiones generales ya acordadas están en [decisiones tomadas](07-decisiones-tomadas.md). Aquí quedan los detalles que todavía deben cerrarse.
 
-**1. Formato de eventos.** Definir campos, unidades, coordenadas, reloj, identificadores y reglas para eventos tardíos. El esquema debe permitir calcular las métricas que elijamos.
+**1. Fuente sintética.** Elegir los generadores y los conjuntos de referencia concretos. Revisar licencias y evitar incorporar eventos reales de la Premier League al proyecto.
 
-**2. Fuente sintética.** Elegir si generamos partidos, adaptamos un conjunto sintético disponible o combinamos ambos. Revisar licencia y realismo antes de incorporarlo.
+**2. Proveedor de modelos para CrewAI.** Elegir modelo, credenciales, costes, límites y comportamiento cuando no haya conexión. No guardar claves en el repositorio.
 
-**3. Tecnologías principales.** Confirmar las tecnologías exigidas o premiadas por el hackathon y las credenciales disponibles. La rúbrica menciona tecnologías protagonistas, pero el texto compartido no las identifica.
+**3. Revisión antes de publicar.** Definir quién revisa los análisis finales, qué interfaz usa y si una narración breve en directo puede publicarse con una revisión automática previa. El análisis final no se publica sin la revisión acordada.
 
-**4. Forma de la IA.** Elegir tareas de agentes, herramientas, límites de decisión, validación de salida y manejo de errores. Comparar una orquestación simple con una de varios agentes según el valor de la demo.
+**4. Vídeo de ejemplo.** Elegir clips propios, sintéticos o con permiso de uso. Definir cómo se obtienen o sincronizan eventos durante su reproducción y cómo se mide el retraso.
 
-**5. Transmisión de la demo.** Decidir si usaremos un campo simulado, vídeo sintético o un reproductor con línea de tiempo. Definir cómo se sincroniza con los eventos.
+**5. Fórmulas y umbrales.** Seleccionar métricas iniciales, ventanas de tiempo y reglas para presión, ritmo, calidad de pase y momentos relevantes. La investigación está en `09-investigacion-metricas-y-herramientas.md`.
 
-**6. Idiomas y perfiles.** Elegir los idiomas iniciales y qué detalles cambian en los modos de analista, casual y centrado en un jugador.
+**6. Rendimiento.** Acordar una meta numérica para el tiempo entre evento, análisis y salida visible. Medirla con el hardware y el vídeo de la demo.
 
-**7. Métricas.** Definir fórmulas, umbrales y ventanas de tiempo para presión, ritmo, calidad de pase y selección de momentos.
+**7. Integración externa.** Confirmar si los organizadores entregan un contrato de superposiciones o una tecnología de renderizado. El contrato local puede adaptarse después.
 
-**8. Rendimiento.** Acordar una meta numérica de latencia y cómo medirla en el entorno de la demo.
+**8. Funciones opcionales.** Decidir si identificación automática de jugadores, velocidades y extracción desde vídeo alcanzan calidad suficiente para la demo.
 
-**9. Integración externa.** Confirmar si los organizadores entregan un contrato para superposiciones o una tecnología específica de renderizado. Hasta entonces, diseñar una salida estructurada propia.
-
-**10. Alcance opcional.** Decidir si identificación avanzada de jugadores, velocidades y análisis de vídeo aportan suficiente valor frente al tiempo disponible.
+**9. Idiomas.** Ya se acordaron inglés y español. Faltan criterios de revisión lingüística y reglas para nombres, unidades y términos futbolísticos.

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "match-intelligence-api"
+version = "0.1.0"
+description = "API inicial para eventos sintéticos de fútbol"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+]
+
+[project.optional-dependencies]
+agents = ["crewai"]
+dev = ["httpx>=0.27,<1", "pytest>=8,<10"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

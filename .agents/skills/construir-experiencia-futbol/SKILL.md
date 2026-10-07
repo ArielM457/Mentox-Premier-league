@@ -5,7 +5,9 @@ description: Guia la planificacion, implementacion y demostracion de la experien
 
 # Construcción de la experiencia de partido
 
-Lee `docs/README.md`, `docs/02-responsabilidades.md`, `docs/03-requisitos.md` y `docs/04-evaluacion.md` antes de definir una solución. Revisa `docs/05-decisiones-pendientes.md` antes de fijar datos, herramientas o arquitectura.
+Lee `docs/README.md`, `docs/02-responsabilidades.md`, `docs/03-requisitos.md`, `docs/04-evaluacion.md` y `docs/07-decisiones-tomadas.md` antes de definir una solución. Usa `docs/08-formato-de-eventos.md` como contrato inicial. Revisa `docs/05-decisiones-pendientes.md` antes de fijar detalles todavía abiertos y `docs/09-investigacion-metricas-y-herramientas.md` al seleccionar métricas o bibliotecas.
+
+Para trabajos del equipo, consulta `docs/plan-de-desarrollo/README.md` y el documento de la persona responsable antes de cambiar módulos compartidos.
 
 Construye un flujo comprobable desde eventos sintéticos hasta estado, métricas, explicación y mensaje temporizado. Conserva identificadores de origen en cada transformación. Calcula las cifras con lógica reproducible y usa IA para seleccionar, explicar o adaptar contenido cuando aporte valor. Comprueba que las narraciones no inventen hechos que los eventos no sostienen.
 
