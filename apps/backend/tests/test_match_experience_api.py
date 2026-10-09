@@ -1,6 +1,7 @@
 """Pruebas de la API de experiencia (Persona 4) con los adaptadores provisionales."""
 
 import json
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -287,3 +288,28 @@ def test_live_stream_sends_new_messages_with_timing(client: TestClient) -> None:
     assert names[0] == "ready" and names[-1] == "end"
     assert payloads and all(p["overlay"]["video_time_ms"] > 30_000 for p in payloads)
     assert all("emitted_at_ms" in p and "pipeline_ms" in p for p in payloads)
+
+
+EXAMPLES = Path(__file__).resolve().parents[3] / "docs" / "persona-4-api-y-frontend" / "ejemplos"
+
+
+@pytest.mark.parametrize(
+    ("name", "valid"),
+    [
+        ("overlay-message-v1.valido.json", True),
+        ("overlay-message-v1.sin-opcionales.json", True),
+        ("overlay-message-v1.invalido.json", False),
+    ],
+)
+def test_overlay_contract_examples(name: str, valid: bool) -> None:
+    """Ejemplos compartidos del contrato: válido, sin opcionales e inválido."""
+    from pydantic import ValidationError
+
+    from match_intelligence.domain.presentation import OverlayMessage
+
+    data = json.loads((EXAMPLES / name).read_text(encoding="utf-8"))
+    if valid:
+        OverlayMessage.model_validate(data)
+    else:
+        with pytest.raises(ValidationError):
+            OverlayMessage.model_validate(data)

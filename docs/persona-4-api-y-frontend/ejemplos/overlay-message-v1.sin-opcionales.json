@@ -1,0 +1,24 @@
+{
+  "message_id": "overlay-moment-evt-010-es-casual-normal",
+  "draft_id": "draft-moment-evt-010-es-casual-normal",
+  "candidate_id": "moment-evt-010",
+  "match_id": "synthetic-acceptance-001",
+  "period": 1,
+  "clock_ms": 32000,
+  "video_time_ms": 34000,
+  "show_for_ms": 7800,
+  "priority": 95,
+  "kind": "goal",
+  "language": "es",
+  "mode": "casual",
+  "level": "normal",
+  "headline": "¡Gol de Aurora FC! Marca M. Luz",
+  "explanation": "",
+  "source_event_ids": [
+    "evt-006",
+    "evt-007",
+    "evt-009",
+    "evt-010"
+  ],
+  "display_until_ms": 41800
+}

@@ -344,7 +344,12 @@ class ProvisionalNarrative:
 
         label_es = {"gol": "goles", "tiro": "tiros", "pase": "pases", "recuper": "recuperaciones", "presion": "presiones", "entrada": "entradas ganadas"}[key]
         label_en = {"gol": "goals", "tiro": "shots", "pase": "passes", "recuper": "recoveries", "presion": "pressures", "entrada": "tackles won"}[key]
+        one_es = {"gol": "gol", "tiro": "tiro", "pase": "pase", "recuper": "recuperación", "presion": "presión", "entrada": "entrada ganada"}[key]
+        one_en = {"gol": "goal", "tiro": "shot", "pase": "pass", "recuper": "recovery", "presion": "pressure", "entrada": "tackle won"}[key]
         label = label_es if es else label_en
+
+        def count(n: int) -> str:
+            return f"{n} {(one_es if es else one_en) if n == 1 else label}"
 
         if any(k in q for k in ("tramo", "mitad", "half", "compar", "periodo", "period")) and seen:
             middle = seen[0].clock_ms + (seen[-1].clock_ms - seen[0].clock_ms) // 2
@@ -352,8 +357,8 @@ class ProvisionalNarrative:
             second = [e for e in seen if matches(e) and e.clock_ms > middle]
             subject = (player.name if player else team.name if team else ("ambos equipos" if es else "both teams"))
             return draft(
-                (f"{subject}: {len(first)} {label} en el primer tramo y {len(second)} en el segundo"
-                 if es else f"{subject}: {len(first)} {label} in the first stretch and {len(second)} in the second"),
+                (f"{subject}: {count(len(first))} en el primer tramo y {len(second)} en el segundo"
+                 if es else f"{subject}: {count(len(first))} in the first stretch and {len(second)} in the second"),
                 (f"Tramos divididos en el reloj {_clock(middle)} del tiempo jugado hasta ahora."
                  if es else f"Stretches split at {_clock(middle)} of the time played so far."),
                 [e.event_id for e in first + second],
@@ -390,7 +395,7 @@ class ProvisionalNarrative:
                 if es
                 else f" {player.name} has not recorded this action yet."
             )
-        return draft(f"{subject}: {len(found)} {label}", explanation, [e.event_id for e in found])
+        return draft(f"{subject}: {count(len(found))}", explanation, [e.event_id for e in found])
 
     # ----- resumen -------------------------------------------------------
     def summary(
@@ -414,7 +419,7 @@ class ProvisionalNarrative:
             accuracy = metric("pass_accuracy", team.team_id)
             acc = f"{_num(accuracy.value)}%" if accuracy and accuracy.available else ("sin datos" if es else "no data")
             lines.append(
-                f"{team.name}: {_num(shots.value if shots else None)} {'tiros' if es else 'shots'}, "
+                f"{team.name}: {_num(shots.value if shots else None)} {('tiro' if es else 'shot') if shots and shots.value == 1 else ('tiros' if es else 'shots')}, "
                 f"{'precisión de pase' if es else 'pass accuracy'} {acc}."
             )
             for m in (shots, accuracy):
