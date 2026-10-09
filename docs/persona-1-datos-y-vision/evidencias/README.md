@@ -11,6 +11,16 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 | DV-US-03 · Recibir únicamente eventos válidos | Implementada y verificada localmente | [DV-US-03](DV-US-03.md) |
 | DV-US-04 · Evitar el doble conteo | Núcleo y memoria verificados localmente; Event Hubs pendiente | [DV-US-04](DV-US-04.md) |
 | DV-US-05 · Reconocer un evento tardío | Detección verificada; reconstrucción pendiente de acuerdo con Persona 2 | [DV-US-05](DV-US-05.md) |
+| DV-US-06 · Desplegar recursos en una cuenta propia | Bicep verificado localmente; despliegue Azure pendiente | [DV-US-06](DV-US-06.md) |
+| DV-US-07 · Publicar eventos en Event Hubs | Adaptadores verificados localmente; integración Azure pendiente | [DV-US-07](DV-US-07.md) |
+| DV-US-08 · Cambiar entre transporte local y Azure | Selección y equivalencia verificadas localmente; Azure real pendiente | [DV-US-08](DV-US-08.md) |
+| DV-US-09 · Conservar artefactos autorizados | Contrato y adaptador verificados localmente; Azure real pendiente | [DV-US-09](DV-US-09.md) |
+| DV-US-10 · Sincronizar eventos con vídeo | Coordinación temporal verificada localmente; vídeo e interfaz pendientes | [DV-US-10](DV-US-10.md) |
+| DV-US-11 · Evaluar modelos sin comprometer el MVP | Evaluador verificado; vídeo y ejecuciones reales pendientes | [DV-US-11](DV-US-11.md) |
+| DV-US-12 · No inventar identidad de jugadores | Regla y pruebas negativas verificadas localmente; asociación real pendiente | [DV-US-12](DV-US-12.md) |
+| DV-US-13 · Fusionar observaciones con trazabilidad | Política y servicio verificados localmente; vídeo real pendiente | [DV-US-13](DV-US-13.md) |
+
+DV-US-14 a DV-US-22 están pendientes y no tienen evidencia de ejecución. Sus criterios y orden se encuentran en [historias de usuario](../historias-de-usuario.md) y en el [plan de pruebas con servicios reales](../plan-pruebas-servicios-reales.md). La evidencia se creará al ejecutar cada historia; no se generarán informes vacíos que puedan confundirse con resultados.
 
 ## Contenido obligatorio
 

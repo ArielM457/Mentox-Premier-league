@@ -1,0 +1,45 @@
+{
+  "media": {
+    "media_id": "REEMPLAZAR",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "duration_ms": 10000,
+    "permission_basis": "project_generated",
+    "permission_reference": "REEMPLAZAR-CON-REFERENCIA-VERIFICABLE"
+  },
+  "model": {
+    "provider": "REEMPLAZAR",
+    "model_name": "REEMPLAZAR",
+    "model_version": "REEMPLAZAR",
+    "source_revision": "REEMPLAZAR-CON-COMMIT",
+    "task": "action_spotting",
+    "classes": ["pass", "shot"],
+    "parameters": {
+      "checkpoint": "REEMPLAZAR",
+      "device": "REEMPLAZAR"
+    },
+    "prediction_origin": "simulated_fixture"
+  },
+  "references": [
+    {
+      "observation_id": "manual-001",
+      "timestamp_ms": 1000,
+      "label": "pass"
+    }
+  ],
+  "predictions": [
+    {
+      "prediction_id": "example-not-a-real-model-result",
+      "timestamp_ms": 1200,
+      "label": "pass",
+      "confidence": 0.5
+    }
+  ],
+  "processing_time_ms": 1000,
+  "temporal_tolerance_ms": 1000,
+  "iou_threshold": 0.5,
+  "integration_thresholds": {
+    "minimum_precision": 0.8,
+    "minimum_recall": 0.8,
+    "maximum_realtime_factor": 1.0
+  }
+}

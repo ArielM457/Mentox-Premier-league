@@ -138,7 +138,7 @@ Event Hubs transportará el evento dentro de un sobre que permita observar la pu
 
 ### Infraestructura como código
 
-El repositorio incorporará posteriormente:
+El repositorio incorpora:
 
 ```text
 infra/
@@ -280,9 +280,10 @@ Una capacidad de esta parte está terminada cuando tiene:
 - Política exacta para eventos tardíos, corregidos o retirados.
 - Región de Azure recomendada y límites de coste del equipo.
 - Retención y particiones de Event Hubs.
-- Estructura definitiva de contenedores Blob.
-- Vídeo permitido para la demo.
+- Política de retención y versionado de Blob; DV-US-09 fija la estructura inicial `matches`, `authorized-videos` y `observations`.
+- Vídeo permitido para la demo; DV-US-10 ya define la sincronización local mediante `video_time_ms`, pero no decide el material.
 - Criterios mínimos para integrar Roboflow o SoccerNet.
-- Mecanismo verificable para asociar `track_id` con `player_id`.
+- Mecanismo operativo para producir y revisar evidencia de asociación; DV-US-12 ya exige confirmación manual o mapeo externo verificado antes de asignar `player_id`.
+- Tolerancias definitivas para vídeo real; DV-US-13 implementa una política configurable y exige coincidencia temporal, espacial, de partido, seguimiento y equipo.
 
 Estas decisiones no bloquean la Fase 1.

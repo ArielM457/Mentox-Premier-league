@@ -14,3 +14,4 @@ __pycache__/
 *.mov
 data/raw/
 apps/frontend/src/assets/hero.png
+infra/azure/*.bicepparam

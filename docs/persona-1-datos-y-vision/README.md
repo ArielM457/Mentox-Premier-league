@@ -7,6 +7,7 @@ Esta carpeta contiene el plan detallado de Persona 1. Su objetivo es entregar un
 - [Plan general](plan-general.md): alcance, arquitectura, fases, entregables y estrategia de Azure.
 - [Requisitos funcionales](requisitos-funcionales.md): capacidades verificables del módulo.
 - [Historias de usuario](historias-de-usuario.md): necesidades de los consumidores del módulo y criterios de aceptación.
+- [Plan de pruebas con servicios reales](plan-pruebas-servicios-reales.md): orden de despliegue, integración Azure, vídeo, modelos e interfaz mínima de comprobación.
 - [Evidencias técnicas](evidencias/README.md): implementación, criterios cubiertos, pruebas y limitaciones de cada historia.
 
 ## Fuentes de autoridad
@@ -23,4 +24,4 @@ Si existe una contradicción, se debe resolver en el documento general correspon
 
 ## Estado
 
-El contenido define el trabajo propuesto para comenzar la implementación. No afirma que los módulos, modelos de visión o recursos de Azure ya estén implementados.
+DV-US-01 a DV-US-13 tienen implementación y evidencia local en distintos niveles. Los recursos Azure, el vídeo permitido y las ejecuciones reales de Roboflow Sports y SoccerNet todavía no están verificados. DV-US-14 a DV-US-22 separan ese trabajo de integración de las capacidades comprobadas con dobles y datos sintéticos.

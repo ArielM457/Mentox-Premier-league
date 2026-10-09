@@ -1,0 +1,5 @@
+using './main.bicep'
+
+// Use entre 3 y 9 caracteres en minúsculas. Cambie este valor en cada cuenta.
+param projectPrefix = 'mentoxdev'
+param environmentName = 'dev'
