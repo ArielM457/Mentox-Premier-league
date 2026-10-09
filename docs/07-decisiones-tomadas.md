@@ -1,6 +1,6 @@
 # **Decisiones tomadas**
 
-Este documento registra lo acordado por el equipo el 6 de octubre de 2026. Describe elecciones de diseño, no funciones ya terminadas.
+Este documento registra lo acordado por el equipo el 6 y el 8 de octubre de 2026. Describe elecciones de diseño, no funciones ya terminadas.
 
 ## **Datos y eventos**
 
@@ -13,6 +13,8 @@ Este documento registra lo acordado por el equipo el 6 de octubre de 2026. Descr
 **3.** El proyecto es un monorepo. El frontend estará en `apps/frontend` con JavaScript y React. El backend estará en `apps/backend` con Python, FastAPI y Uvicorn. FastAPI expondrá su documentación OpenAPI mediante Swagger UI en `/docs`.
 
 **4.** Usaremos un monolito modular con límites hexagonales. El dominio del partido y sus reglas no deben depender de FastAPI, CrewAI, del origen de eventos ni de la interfaz. Los adaptadores conectarán vídeo, conjuntos sintéticos, agentes y API con el núcleo.
+
+**4.1.** El backend usará Python 3.12. La versión se fija mediante `.python-version`, el paquete declara compatibilidad `>=3.12,<3.14` y `uv.lock` conserva las dependencias resueltas. Python 3.14 queda excluido mientras CrewAI no lo admita.
 
 ## **Agentes y publicación**
 
@@ -35,6 +37,12 @@ Los análisis finales tendrán una revisión antes de publicarse. La persona o m
 **8.** Investigaremos qué métricas aportan valor, cómo se obtienen hoy y qué bibliotecas o modelos abiertos compatibles con Python pueden ayudarnos. Los primeros hallazgos están en [investigación de métricas y herramientas](09-investigacion-metricas-y-herramientas.md).
 
 **9.** La meta numérica de latencia, el contrato con sistemas externos y el alcance de funciones opcionales siguen pendientes. Se tratarán después de estabilizar el formato, el flujo de datos y la primera demo.
+
+## **Infraestructura Azure para datos e ingesta**
+
+**10.** El flujo integrado de datos usará Azure Event Hubs para transportar eventos normalizados y Azure Blob Storage para conservar partidos sintéticos, vídeos autorizados y observaciones de prueba. El flujo local seguirá funcionando sin Azure mediante adaptadores intercambiables.
+
+La infraestructura de esta parte se definirá con Bicep y se desplegará mediante Azure CLI. Los nombres, la región, el grupo de recursos y la suscripción serán configurables para que cada integrante pueda desplegar los servicios en su propia cuenta sin editar la plantilla ni compartir credenciales. El [plan detallado de datos y visión](persona-1-datos-y-vision/plan-general.md) describe el alcance inicial.
 
 ## **Estado actual**
 

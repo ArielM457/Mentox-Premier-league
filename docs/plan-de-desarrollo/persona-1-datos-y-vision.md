@@ -1,5 +1,7 @@
 # **Persona 1: datos sintéticos y visión**
 
+El [plan detallado de esta parte](../persona-1-datos-y-vision/README.md) contiene las fases, los requisitos funcionales, las historias de usuario y la integración reproducible con Azure.
+
 ## **Objetivo**
 
 Entregar un flujo de eventos con procedencia clara. El mismo contrato debe servir para partidos sintéticos generados por el equipo y para eventos inferidos desde vídeo. Esta persona es dueña de la entrada de datos; no calcula narraciones ni decide qué momento mostrar.

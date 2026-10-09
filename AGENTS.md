@@ -8,4 +8,8 @@ Para analizar o cambiar requisitos, usa `.agents/skills/analizar-requisitos-futb
 
 Para planear o implementar la solución, usa `.agents/skills/construir-experiencia-futbol/SKILL.md`.
 
+Al trabajar con una biblioteca o framework externo, usa Context7 para consultar su documentación vigente antes de asumir APIs, versiones o ejemplos. La configuración y activación están en `.codex/README.md`.
+
+Al implementar una historia de Persona 1, crea o actualiza su evidencia en `docs/persona-1-datos-y-vision/evidencias/`. Registra criterios cubiertos, archivos, decisiones, comandos, versiones, resultados, limitaciones y dependencias. No marques una historia como verificada sin evidencia reproducible.
+
 Mantén separados los requisitos del reto, las propuestas del equipo y las decisiones ya tomadas. No presentes una función propuesta como implementada. Trabaja con datos sintéticos y no redistribuyas datos reales de partidos de la Premier League.

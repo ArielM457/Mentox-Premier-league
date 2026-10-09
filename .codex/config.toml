@@ -1,0 +1,4 @@
+# Context7 ofrece documentación actualizada de bibliotecas y frameworks.
+# Cada integrante autentica su propia cuenta; no se guardan claves en Git.
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp/oauth"

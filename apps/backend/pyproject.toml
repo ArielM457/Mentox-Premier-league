@@ -6,9 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "match-intelligence-api"
 version = "0.1.0"
 description = "API inicial para eventos sintéticos de fútbol"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.12,<3.14"
 dependencies = [
   "fastapi>=0.115,<1",
+  "pydantic>=2.10,<3",
   "uvicorn[standard]>=0.30,<1",
 ]
 
