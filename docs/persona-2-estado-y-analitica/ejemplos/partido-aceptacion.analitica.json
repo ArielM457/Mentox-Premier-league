@@ -1,0 +1,3899 @@
+{
+  "match_id": "synthetic-acceptance-001",
+  "event_count": 10,
+  "final_snapshot": {
+    "contract_version": "1",
+    "match_id": "synthetic-acceptance-001",
+    "period": 1,
+    "clock_ms": 32000,
+    "video_time_ms": 34000,
+    "score": {
+      "team-aurora": 1,
+      "team-rio": 0
+    },
+    "possession_team_id": null,
+    "metrics": [
+      {
+        "key": "goals",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 4,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 4,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [
+          "evt-006"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 100.0,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "passes_completed",
+            "team_id": null,
+            "value": 4,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "passes_with_known_outcome",
+            "team_id": null,
+            "value": 4,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 4,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 4,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "final_third_entries",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "final_third_entry@1",
+        "source_event_ids": [
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 4,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "high_recoveries",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "high_recovery@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 19.3,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-007",
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 22.7,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [
+          "evt-001",
+          "evt-008"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
+        "components": []
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "final_third_entries",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "final_third_entry@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "high_recoveries",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "high_recovery@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 2,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "possession_changes",
+        "team_id": null,
+        "player_id": null,
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "possession@1",
+        "source_event_ids": [
+          "evt-004",
+          "evt-006"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "possession_won",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "possession@1",
+        "source_event_ids": [
+          "evt-006"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "possession_share",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 79.2,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "possession@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-006"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "possession_ms",
+            "team_id": "team-aurora",
+            "value": 19000,
+            "unit": "ms",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "attributed_ms",
+            "team_id": null,
+            "value": 24000,
+            "unit": "ms",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "possession_won",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "possession@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "possession_share",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 20.8,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "possession@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "possession_ms",
+            "team_id": "team-rio",
+            "value": 5000,
+            "unit": "ms",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "attributed_ms",
+            "team_id": null,
+            "value": 24000,
+            "unit": "ms",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "control_index",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 91.7,
+        "available": true,
+        "unit": "index_0_100",
+        "window_ms": 180000,
+        "formula_version": "control@1",
+        "source_event_ids": [
+          "evt-002",
+          "evt-003",
+          "evt-006",
+          "evt-007",
+          "evt-009",
+          "evt-010"
+        ],
+        "origin": "team_indicator",
+        "period": 1,
+        "window_start_clock_ms": -148000,
+        "window_end_clock_ms": 32000,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "possession_time_share",
+            "team_id": "team-aurora",
+            "value": 79.2,
+            "unit": "percent",
+            "weight": 0.4,
+            "reference": null,
+            "contribution": 31.7,
+            "source_event_ids": [
+              "evt-002",
+              "evt-006"
+            ]
+          },
+          {
+            "key": "completed_passes_share",
+            "team_id": "team-aurora",
+            "value": 100.0,
+            "unit": "percent",
+            "weight": 0.3,
+            "reference": null,
+            "contribution": 30.0,
+            "source_event_ids": [
+              "evt-002",
+              "evt-003",
+              "evt-007",
+              "evt-009"
+            ]
+          },
+          {
+            "key": "final_third_actions_share",
+            "team_id": "team-aurora",
+            "value": 100.0,
+            "unit": "percent",
+            "weight": 0.3,
+            "reference": null,
+            "contribution": 30.0,
+            "source_event_ids": [
+              "evt-010"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "control_index",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 8.3,
+        "available": true,
+        "unit": "index_0_100",
+        "window_ms": 180000,
+        "formula_version": "control@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "team_indicator",
+        "period": 1,
+        "window_start_clock_ms": -148000,
+        "window_end_clock_ms": 32000,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "possession_time_share",
+            "team_id": "team-rio",
+            "value": 20.8,
+            "unit": "percent",
+            "weight": 0.4,
+            "reference": null,
+            "contribution": 8.3,
+            "source_event_ids": [
+              "evt-004"
+            ]
+          },
+          {
+            "key": "completed_passes_share",
+            "team_id": "team-rio",
+            "value": 0.0,
+            "unit": "percent",
+            "weight": 0.3,
+            "reference": null,
+            "contribution": 0.0,
+            "source_event_ids": []
+          },
+          {
+            "key": "final_third_actions_share",
+            "team_id": "team-rio",
+            "value": 0.0,
+            "unit": "percent",
+            "weight": 0.3,
+            "reference": null,
+            "contribution": 0.0,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "momentum_index",
+        "team_id": "team-aurora",
+        "player_id": null,
+        "value": 100.0,
+        "available": true,
+        "unit": "index_0_100",
+        "window_ms": 600000,
+        "formula_version": "momentum@1",
+        "source_event_ids": [
+          "evt-007",
+          "evt-009",
+          "evt-002",
+          "evt-003",
+          "evt-010"
+        ],
+        "origin": "team_indicator",
+        "period": 1,
+        "window_start_clock_ms": -568000,
+        "window_end_clock_ms": 32000,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "final_third_entries",
+            "team_id": "team-aurora",
+            "value": 1.94,
+            "unit": "weighted_threat",
+            "weight": null,
+            "reference": null,
+            "contribution": 28.4,
+            "source_event_ids": [
+              "evt-007",
+              "evt-009"
+            ]
+          },
+          {
+            "key": "progressive_passes",
+            "team_id": "team-aurora",
+            "value": 0.88,
+            "unit": "weighted_threat",
+            "weight": null,
+            "reference": null,
+            "contribution": 12.9,
+            "source_event_ids": [
+              "evt-002",
+              "evt-003"
+            ]
+          },
+          {
+            "key": "shots",
+            "team_id": "team-aurora",
+            "value": 4.0,
+            "unit": "weighted_threat",
+            "weight": null,
+            "reference": null,
+            "contribution": 58.7,
+            "source_event_ids": [
+              "evt-010"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "momentum_index",
+        "team_id": "team-rio",
+        "player_id": null,
+        "value": 0.0,
+        "available": true,
+        "unit": "index_0_100",
+        "window_ms": 600000,
+        "formula_version": "momentum@1",
+        "source_event_ids": [],
+        "origin": "team_indicator",
+        "period": 1,
+        "window_start_clock_ms": -568000,
+        "window_end_clock_ms": 32000,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "chaos_index",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "index_0_100",
+        "window_ms": 180000,
+        "formula_version": "chaos@1",
+        "source_event_ids": [],
+        "origin": "team_indicator",
+        "period": 1,
+        "window_start_clock_ms": -148000,
+        "window_end_clock_ms": 32000,
+        "unavailable_reason": "La ventana todavía dura menos de 60 s",
+        "components": []
+      },
+      {
+        "key": "xt_added",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "xt",
+        "window_ms": null,
+        "formula_version": "xt@disabled",
+        "source_event_ids": [],
+        "origin": "value_model",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
+        "components": []
+      },
+      {
+        "key": "xg",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "xg",
+        "window_ms": null,
+        "formula_version": "xg@disabled",
+        "source_event_ids": [],
+        "origin": "value_model",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
+        "components": []
+      },
+      {
+        "key": "vaep",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "vaep",
+        "window_ms": null,
+        "formula_version": "vaep@disabled",
+        "source_event_ids": [],
+        "origin": "value_model",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 100.0,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "passes_completed",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "passes_with_known_outcome",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 14.8,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": 14.8,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-002"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-4",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 3,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-006",
+          "evt-007"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-007"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-007"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [
+          "evt-006"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 100.0,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-007"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "passes_completed",
+            "team_id": null,
+            "value": 2,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "passes_with_known_outcome",
+            "team_id": null,
+            "value": 2,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-007"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 2,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 19.8,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-003",
+          "evt-007"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": 21.7,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-007"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-8",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [
+          "evt-010"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": null,
+        "available": false,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
+        "components": []
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-9",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 100.0,
+        "available": true,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "passes_completed",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          },
+          {
+            "key": "passes_with_known_outcome",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": [
+          {
+            "key": "evaluated_events",
+            "team_id": null,
+            "value": 1,
+            "unit": "count",
+            "weight": null,
+            "reference": null,
+            "contribution": null,
+            "source_event_ids": []
+          }
+        ]
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 22.7,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": 22.7,
+        "available": true,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [
+          "evt-009"
+        ],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-aurora",
+        "player_id": "aurora-11",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-008"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [
+          "evt-008"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": null,
+        "available": false,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
+        "components": []
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-rio",
+        "player_id": "rio-5",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 2,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-004",
+          "evt-005"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [
+          "evt-004"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": null,
+        "available": false,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
+        "components": []
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-rio",
+        "player_id": "rio-6",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "involvement",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "involvement@1",
+        "source_event_ids": [
+          "evt-001"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "goals",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "goals@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "shots_on_target",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "shots_on_target@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_attempted",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_attempted@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "passes_completed",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "passes_completed@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "recoveries",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "recoveries@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "tackles_won",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 0,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "tackles_won@1",
+        "source_event_ids": [],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pressures",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": 1,
+        "available": true,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "pressures@1",
+        "source_event_ids": [
+          "evt-001"
+        ],
+        "origin": "event_count",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": null,
+        "components": []
+      },
+      {
+        "key": "pass_accuracy",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": null,
+        "available": false,
+        "unit": "percent",
+        "window_ms": null,
+        "formula_version": "pass_accuracy@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
+        "components": []
+      },
+      {
+        "key": "progressive_passes",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": null,
+        "available": false,
+        "unit": "count",
+        "window_ms": null,
+        "formula_version": "progressive_pass@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
+        "components": []
+      },
+      {
+        "key": "avg_pass_distance_m",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "longest_pass_m",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "pass_distance@1",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
+        "components": []
+      },
+      {
+        "key": "distance_covered_m",
+        "team_id": "team-rio",
+        "player_id": "rio-10",
+        "value": null,
+        "available": false,
+        "unit": "meters",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "ball_speed_kmh",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "km/h",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      },
+      {
+        "key": "shot_speed_kmh",
+        "team_id": null,
+        "player_id": null,
+        "value": null,
+        "available": false,
+        "unit": "km/h",
+        "window_ms": null,
+        "formula_version": "speed@0",
+        "source_event_ids": [],
+        "origin": "derived",
+        "period": null,
+        "window_start_clock_ms": null,
+        "window_end_clock_ms": null,
+        "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
+        "components": []
+      }
+    ],
+    "recent_event_ids": [
+      "evt-006",
+      "evt-007",
+      "evt-008",
+      "evt-009",
+      "evt-010"
+    ],
+    "engine_version": "match-state@1",
+    "event_count": 10,
+    "last_event_id": "evt-010",
+    "last_event_clock_ms": 32000,
+    "state_revision": 0,
+    "late_event_ids": [],
+    "corrected_event_ids": [],
+    "excluded_event_ids": []
+  },
+  "state_timeline": [
+    {
+      "event_id": "evt-001",
+      "period": 1,
+      "clock_ms": 5000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": null
+    },
+    {
+      "event_id": "evt-002",
+      "period": 1,
+      "clock_ms": 8000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-003",
+      "period": 1,
+      "clock_ms": 12000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-004",
+      "period": 1,
+      "clock_ms": 16000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-rio"
+    },
+    {
+      "event_id": "evt-005",
+      "period": 1,
+      "clock_ms": 16300,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-rio"
+    },
+    {
+      "event_id": "evt-006",
+      "period": 1,
+      "clock_ms": 21000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-007",
+      "period": 1,
+      "clock_ms": 24000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-008",
+      "period": 1,
+      "clock_ms": 27000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-009",
+      "period": 1,
+      "clock_ms": 29000,
+      "score": {
+        "team-aurora": 0,
+        "team-rio": 0
+      },
+      "possession_team_id": "team-aurora"
+    },
+    {
+      "event_id": "evt-010",
+      "period": 1,
+      "clock_ms": 32000,
+      "score": {
+        "team-aurora": 1,
+        "team-rio": 0
+      },
+      "possession_team_id": null
+    }
+  ],
+  "sequences": [
+    {
+      "sequence_id": "seq-evt-002",
+      "team_id": "team-aurora",
+      "period": 1,
+      "start_clock_ms": 8000,
+      "end_clock_ms": 12000,
+      "started_by": "pass",
+      "outcome": "lost",
+      "event_ids": [
+        "evt-002",
+        "evt-003"
+      ],
+      "context_event_ids": [],
+      "player_ids": [
+        "aurora-4",
+        "aurora-8"
+      ]
+    },
+    {
+      "sequence_id": "seq-evt-004",
+      "team_id": "team-rio",
+      "period": 1,
+      "start_clock_ms": 16000,
+      "end_clock_ms": 16300,
+      "started_by": "tackle",
+      "outcome": "lost",
+      "event_ids": [
+        "evt-004",
+        "evt-005"
+      ],
+      "context_event_ids": [],
+      "player_ids": [
+        "rio-6"
+      ]
+    },
+    {
+      "sequence_id": "seq-evt-006",
+      "team_id": "team-aurora",
+      "period": 1,
+      "start_clock_ms": 21000,
+      "end_clock_ms": 32000,
+      "started_by": "recovery",
+      "outcome": "goal",
+      "event_ids": [
+        "evt-006",
+        "evt-007",
+        "evt-009",
+        "evt-010"
+      ],
+      "context_event_ids": [
+        "evt-008"
+      ],
+      "player_ids": [
+        "aurora-8",
+        "aurora-11",
+        "aurora-9"
+      ]
+    }
+  ],
+  "detection_notes": [],
+  "candidates_neutral": [
+    {
+      "contract_version": "1",
+      "candidate_id": "moment-evt-009",
+      "match_id": "synthetic-acceptance-001",
+      "period": 1,
+      "clock_ms": 29000,
+      "kind": "fast_progression",
+      "priority": 68,
+      "team_id": "team-aurora",
+      "player_ids": [
+        "aurora-8",
+        "aurora-11"
+      ],
+      "facts": [
+        {
+          "key": "forward_progress",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 38.2,
+          "available": true,
+          "unit": "pitch_percent",
+          "window_ms": null,
+          "formula_version": "fast_progression@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-009"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "forward_progress_m",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 40.1,
+          "available": true,
+          "unit": "meters",
+          "window_ms": null,
+          "formula_version": "fast_progression@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-009"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "sequence_duration_s",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 8.0,
+          "available": true,
+          "unit": "seconds",
+          "window_ms": null,
+          "formula_version": "sequence@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-009"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "sequence_passes",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 2,
+          "available": true,
+          "unit": "count",
+          "window_ms": null,
+          "formula_version": "sequence@1",
+          "source_event_ids": [
+            "evt-007",
+            "evt-009"
+          ],
+          "origin": "event_count",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "pass_forward_gain_m",
+          "team_id": "team-aurora",
+          "player_id": "aurora-11",
+          "value": 20.3,
+          "available": true,
+          "unit": "meters",
+          "window_ms": null,
+          "formula_version": "progressive_pass@1",
+          "source_event_ids": [
+            "evt-009"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "pass_distance_m",
+          "team_id": "team-aurora",
+          "player_id": "aurora-11",
+          "value": 22.7,
+          "available": true,
+          "unit": "meters",
+          "window_ms": null,
+          "formula_version": "pass_distance@1",
+          "source_event_ids": [
+            "evt-009"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        }
+      ],
+      "source_event_ids": [
+        "evt-006",
+        "evt-007",
+        "evt-009"
+      ],
+      "evidence_limits": [
+        "El avance se mide con los puntos de inicio y fin de cada evento; no hay seguimiento continuo del balón."
+      ],
+      "video_time_ms": 31000,
+      "anchor_event_id": "evt-009",
+      "sequence_id": "seq-evt-006",
+      "signals": [
+        "fast_progression",
+        "progressive_pass"
+      ],
+      "reasons": [
+        {
+          "code": "base_kind",
+          "points": 50,
+          "detail": "Tipo de momento fast_progression",
+          "params": {
+            "rule": "fast_progression@1"
+          }
+        },
+        {
+          "code": "measured_fact",
+          "points": 3,
+          "detail": "avance 38.2 en 8.0 s",
+          "params": {}
+        },
+        {
+          "code": "combined_signals",
+          "points": 5,
+          "detail": "También cumple: progressive_pass",
+          "params": {}
+        },
+        {
+          "code": "novelty",
+          "points": 10,
+          "detail": "Primer momento de este tipo para este equipo",
+          "params": {}
+        }
+      ],
+      "attention_version": "attention@1"
+    },
+    {
+      "contract_version": "1",
+      "candidate_id": "moment-evt-010",
+      "match_id": "synthetic-acceptance-001",
+      "period": 1,
+      "clock_ms": 32000,
+      "kind": "goal",
+      "priority": 100,
+      "team_id": "team-aurora",
+      "player_ids": [
+        "aurora-9",
+        "aurora-8",
+        "aurora-11"
+      ],
+      "facts": [
+        {
+          "key": "goals",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 1,
+          "available": true,
+          "unit": "count",
+          "window_ms": null,
+          "formula_version": "goals@1",
+          "source_event_ids": [
+            "evt-010"
+          ],
+          "origin": "event_count",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "goals",
+          "team_id": "team-rio",
+          "player_id": null,
+          "value": 0,
+          "available": true,
+          "unit": "count",
+          "window_ms": null,
+          "formula_version": "goals@1",
+          "source_event_ids": [],
+          "origin": "event_count",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "shot_distance_m",
+          "team_id": "team-aurora",
+          "player_id": "aurora-9",
+          "value": 14.2,
+          "available": true,
+          "unit": "meters",
+          "window_ms": null,
+          "formula_version": "shot_geometry@1",
+          "source_event_ids": [
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "shot_angle_deg",
+          "team_id": "team-aurora",
+          "player_id": "aurora-9",
+          "value": 28.0,
+          "available": true,
+          "unit": "degrees",
+          "window_ms": null,
+          "formula_version": "shot_geometry@1",
+          "source_event_ids": [
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "sequence_passes",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 2,
+          "available": true,
+          "unit": "count",
+          "window_ms": null,
+          "formula_version": "sequence@1",
+          "source_event_ids": [
+            "evt-007",
+            "evt-009"
+          ],
+          "origin": "event_count",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "sequence_duration_s",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 11.0,
+          "available": true,
+          "unit": "seconds",
+          "window_ms": null,
+          "formula_version": "sequence@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "forward_progress",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 39.7,
+          "available": true,
+          "unit": "pitch_percent",
+          "window_ms": null,
+          "formula_version": "fast_progression@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "forward_progress_m",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 41.7,
+          "available": true,
+          "unit": "meters",
+          "window_ms": null,
+          "formula_version": "fast_progression@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": []
+        },
+        {
+          "key": "seconds_since_recovery",
+          "team_id": "team-aurora",
+          "player_id": null,
+          "value": 11.0,
+          "available": true,
+          "unit": "seconds",
+          "window_ms": null,
+          "formula_version": "recovery_to_shot@1",
+          "source_event_ids": [
+            "evt-006",
+            "evt-010"
+          ],
+          "origin": "derived",
+          "period": null,
+          "window_start_clock_ms": null,
+          "window_end_clock_ms": null,
+          "unavailable_reason": null,
+          "components": [
+            {
+              "key": "recovery_x",
+              "team_id": "team-aurora",
+              "value": 47.2,
+              "unit": "pitch_percent",
+              "weight": null,
+              "reference": null,
+              "contribution": null,
+              "source_event_ids": [
+                "evt-006"
+              ]
+            }
+          ]
+        }
+      ],
+      "source_event_ids": [
+        "evt-006",
+        "evt-007",
+        "evt-008",
+        "evt-009",
+        "evt-010"
+      ],
+      "evidence_limits": [
+        "El avance se mide con los puntos de inicio y fin de cada evento; no hay seguimiento continuo del balón.",
+        "Relación temporal entre ganar el balón y el tiro; los eventos no demuestran que una acción causara la otra."
+      ],
+      "video_time_ms": 34000,
+      "anchor_event_id": "evt-010",
+      "sequence_id": "seq-evt-006",
+      "signals": [
+        "goal",
+        "recovery_to_shot"
+      ],
+      "reasons": [
+        {
+          "code": "base_kind",
+          "points": 80,
+          "detail": "Tipo de momento goal",
+          "params": {
+            "rule": "shot@1"
+          }
+        },
+        {
+          "code": "measured_fact",
+          "points": 13,
+          "detail": "gol +10, a menos de 16,5 m +3",
+          "params": {}
+        },
+        {
+          "code": "combined_signals",
+          "points": 5,
+          "detail": "También cumple: recovery_to_shot",
+          "params": {}
+        },
+        {
+          "code": "novelty",
+          "points": 10,
+          "detail": "Primer momento de este tipo para este equipo",
+          "params": {}
+        },
+        {
+          "code": "decisive_fact",
+          "points": 0,
+          "detail": "Los goles se emiten siempre, también los del rival",
+          "params": {}
+        }
+      ],
+      "attention_version": "attention@1"
+    }
+  ],
+  "profiles": {
+    "neutral": {
+      "profile": "mode=neutral",
+      "emitted": [
+        {
+          "candidate_id": "moment-evt-009",
+          "kind": "fast_progression",
+          "priority": 68
+        },
+        {
+          "candidate_id": "moment-evt-010",
+          "kind": "goal",
+          "priority": 100
+        }
+      ],
+      "discarded": [
+        {
+          "candidate_id": "moment-evt-002",
+          "kind": "progressive_pass",
+          "priority": 35,
+          "threshold": 40,
+          "reasons": [
+            "base_kind:25",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-003",
+          "kind": "progressive_pass",
+          "priority": 36,
+          "threshold": 40,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:1",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-007",
+          "kind": "progressive_pass",
+          "priority": 37,
+          "threshold": 40,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:2",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        }
+      ]
+    },
+    "casual": {
+      "profile": "mode=casual",
+      "emitted": [
+        {
+          "candidate_id": "moment-evt-009",
+          "kind": "fast_progression",
+          "priority": 68
+        },
+        {
+          "candidate_id": "moment-evt-010",
+          "kind": "goal",
+          "priority": 100
+        }
+      ],
+      "discarded": [
+        {
+          "candidate_id": "moment-evt-002",
+          "kind": "progressive_pass",
+          "priority": 35,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-003",
+          "kind": "progressive_pass",
+          "priority": 36,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:1",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-007",
+          "kind": "progressive_pass",
+          "priority": 37,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:2",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        }
+      ]
+    },
+    "analyst": {
+      "profile": "mode=analyst",
+      "emitted": [
+        {
+          "candidate_id": "moment-evt-002",
+          "kind": "progressive_pass",
+          "priority": 45
+        },
+        {
+          "candidate_id": "moment-evt-009",
+          "kind": "fast_progression",
+          "priority": 78
+        },
+        {
+          "candidate_id": "moment-evt-010",
+          "kind": "goal",
+          "priority": 100
+        }
+      ],
+      "discarded": [
+        {
+          "candidate_id": "moment-evt-003",
+          "kind": "progressive_pass",
+          "priority": 16,
+          "threshold": 35,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:1",
+            "repetition:-20",
+            "analyst_mode:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-007",
+          "kind": "progressive_pass",
+          "priority": 17,
+          "threshold": 35,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:2",
+            "repetition:-20",
+            "analyst_mode:10",
+            "below_threshold:0"
+          ]
+        }
+      ]
+    },
+    "casual_rio": {
+      "profile": "mode=casual;team=team-rio",
+      "emitted": [
+        {
+          "candidate_id": "moment-evt-009",
+          "kind": "fast_progression",
+          "priority": 68
+        },
+        {
+          "candidate_id": "moment-evt-010",
+          "kind": "goal",
+          "priority": 100
+        }
+      ],
+      "discarded": [
+        {
+          "candidate_id": "moment-evt-002",
+          "kind": "progressive_pass",
+          "priority": 35,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-003",
+          "kind": "progressive_pass",
+          "priority": 36,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:1",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-007",
+          "kind": "progressive_pass",
+          "priority": 37,
+          "threshold": 50,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:2",
+            "novelty:10",
+            "below_threshold:0"
+          ]
+        }
+      ]
+    },
+    "player_aurora_8": {
+      "profile": "mode=player;player=aurora-8",
+      "emitted": [
+        {
+          "candidate_id": "moment-evt-003",
+          "kind": "progressive_pass",
+          "priority": 71
+        },
+        {
+          "candidate_id": "moment-evt-009",
+          "kind": "fast_progression",
+          "priority": 100
+        },
+        {
+          "candidate_id": "moment-evt-010",
+          "kind": "goal",
+          "priority": 100
+        }
+      ],
+      "discarded": [
+        {
+          "candidate_id": "moment-evt-002",
+          "kind": "progressive_pass",
+          "priority": 5,
+          "threshold": 45,
+          "reasons": [
+            "base_kind:25",
+            "novelty:10",
+            "player_mode_not_involved:-30",
+            "below_threshold:0"
+          ]
+        },
+        {
+          "candidate_id": "moment-evt-007",
+          "kind": "progressive_pass",
+          "priority": 42,
+          "threshold": 45,
+          "reasons": [
+            "base_kind:25",
+            "measured_fact:2",
+            "repetition:-20",
+            "favorite_player:15",
+            "player_mode_involved:20",
+            "below_threshold:0"
+          ]
+        }
+      ]
+    }
+  }
+}

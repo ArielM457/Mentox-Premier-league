@@ -1,0 +1,7 @@
+using './analytics.bicep'
+
+// Copie los valores de las salidas del despliegue de main.bicep:
+// az deployment group show --name "mentox-data-vision" --resource-group "<grupo>" --query properties.outputs
+param eventHubNamespaceName = '<eventHubNamespaceName>'
+param storageAccountName = '<storageAccountName>'
+param insightsRetentionDays = 1

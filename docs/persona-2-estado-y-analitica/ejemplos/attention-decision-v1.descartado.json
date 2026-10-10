@@ -1,0 +1,38 @@
+{
+  "candidate_id": "moment-sc-003",
+  "match_id": "synthetic-analytics-001",
+  "anchor_event_id": "sc-003",
+  "period": 1,
+  "clock_ms": 16000,
+  "kind": "progressive_pass",
+  "team_id": "team-aurora",
+  "outcome": "discarded",
+  "priority": 35,
+  "threshold": 50,
+  "profile": "mode=casual",
+  "reasons": [
+    {
+      "code": "base_kind",
+      "points": 25,
+      "detail": "Tipo de momento progressive_pass",
+      "params": {
+        "rule": "progressive_pass@1"
+      }
+    },
+    {
+      "code": "novelty",
+      "points": 10,
+      "detail": "Primer momento de este tipo para este equipo",
+      "params": {}
+    },
+    {
+      "code": "below_threshold",
+      "points": 0,
+      "detail": "Prioridad 35 menor que el umbral 50 del perfil",
+      "params": {
+        "threshold": 50
+      }
+    }
+  ],
+  "attention_version": "attention@1"
+}

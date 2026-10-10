@@ -171,3 +171,17 @@ La eliminación no es reversible.
 ## Límites de la verificación local
 
 Compilar Bicep localmente demuestra que la sintaxis y los tipos son válidos. `validate`, `what-if` y `create` requieren una suscripción autenticada y permisos. La historia no se considera verificada en Azure hasta ejecutar esos comandos y conservar sus resultados sin secretos.
+
+## Recursos de analítica (Persona 2)
+
+`analytics.bicep` añade, en el mismo grupo de recursos y sin modificar `main.bicep`, el event hub `match-insights` con los grupos `narrative`, `experience` y `diagnostics`, y los contenedores privados `analytics` y `models`. Reutiliza el namespace y la cuenta de Storage mediante sus nombres, tomados de las salidas de este despliegue:
+
+```bash
+cp infra/azure/analytics.bicepparam.example infra/azure/analytics.bicepparam
+az deployment group what-if \
+  --resource-group "<grupo>" \
+  --template-file infra/azure/analytics.bicep \
+  --parameters infra/azure/analytics.bicepparam
+```
+
+Los roles, las variables, el procesador continuo y la prueba de humo están en [integración de la analítica con Azure](../../docs/persona-2-estado-y-analitica/integracion-azure.md).

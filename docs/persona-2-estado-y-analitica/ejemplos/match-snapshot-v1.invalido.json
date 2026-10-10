@@ -1,0 +1,15 @@
+{
+  "contract_version": "1",
+  "match_id": "synthetic-acceptance-001",
+  "period": 1,
+  "clock_ms": 802000,
+  "metrics": [
+    {
+      "key": "pass_accuracy",
+      "team_id": "team-rio",
+      "value": null,
+      "available": true,
+      "unit": "percent"
+    }
+  ]
+}

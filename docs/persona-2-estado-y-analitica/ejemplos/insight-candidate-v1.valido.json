@@ -1,0 +1,257 @@
+{
+  "contract_version": "1",
+  "candidate_id": "moment-evt-010",
+  "match_id": "synthetic-acceptance-001",
+  "period": 1,
+  "clock_ms": 32000,
+  "kind": "goal",
+  "priority": 100,
+  "team_id": "team-aurora",
+  "player_ids": [
+    "aurora-9",
+    "aurora-8",
+    "aurora-11"
+  ],
+  "facts": [
+    {
+      "key": "goals",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 1,
+      "available": true,
+      "unit": "count",
+      "window_ms": null,
+      "formula_version": "goals@1",
+      "source_event_ids": [
+        "evt-010"
+      ],
+      "origin": "event_count",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "goals",
+      "team_id": "team-rio",
+      "player_id": null,
+      "value": 0,
+      "available": true,
+      "unit": "count",
+      "window_ms": null,
+      "formula_version": "goals@1",
+      "source_event_ids": [],
+      "origin": "event_count",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "shot_distance_m",
+      "team_id": "team-aurora",
+      "player_id": "aurora-9",
+      "value": 14.2,
+      "available": true,
+      "unit": "meters",
+      "window_ms": null,
+      "formula_version": "shot_geometry@1",
+      "source_event_ids": [
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "shot_angle_deg",
+      "team_id": "team-aurora",
+      "player_id": "aurora-9",
+      "value": 28.0,
+      "available": true,
+      "unit": "degrees",
+      "window_ms": null,
+      "formula_version": "shot_geometry@1",
+      "source_event_ids": [
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "sequence_passes",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 2,
+      "available": true,
+      "unit": "count",
+      "window_ms": null,
+      "formula_version": "sequence@1",
+      "source_event_ids": [
+        "evt-007",
+        "evt-009"
+      ],
+      "origin": "event_count",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "sequence_duration_s",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 11.0,
+      "available": true,
+      "unit": "seconds",
+      "window_ms": null,
+      "formula_version": "sequence@1",
+      "source_event_ids": [
+        "evt-006",
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "forward_progress",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 39.7,
+      "available": true,
+      "unit": "pitch_percent",
+      "window_ms": null,
+      "formula_version": "fast_progression@1",
+      "source_event_ids": [
+        "evt-006",
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "forward_progress_m",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 41.7,
+      "available": true,
+      "unit": "meters",
+      "window_ms": null,
+      "formula_version": "fast_progression@1",
+      "source_event_ids": [
+        "evt-006",
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": []
+    },
+    {
+      "key": "seconds_since_recovery",
+      "team_id": "team-aurora",
+      "player_id": null,
+      "value": 11.0,
+      "available": true,
+      "unit": "seconds",
+      "window_ms": null,
+      "formula_version": "recovery_to_shot@1",
+      "source_event_ids": [
+        "evt-006",
+        "evt-010"
+      ],
+      "origin": "derived",
+      "period": null,
+      "window_start_clock_ms": null,
+      "window_end_clock_ms": null,
+      "unavailable_reason": null,
+      "components": [
+        {
+          "key": "recovery_x",
+          "team_id": "team-aurora",
+          "value": 47.2,
+          "unit": "pitch_percent",
+          "weight": null,
+          "reference": null,
+          "contribution": null,
+          "source_event_ids": [
+            "evt-006"
+          ]
+        }
+      ]
+    }
+  ],
+  "source_event_ids": [
+    "evt-006",
+    "evt-007",
+    "evt-008",
+    "evt-009",
+    "evt-010"
+  ],
+  "evidence_limits": [
+    "El avance se mide con los puntos de inicio y fin de cada evento; no hay seguimiento continuo del balón.",
+    "Relación temporal entre ganar el balón y el tiro; los eventos no demuestran que una acción causara la otra."
+  ],
+  "video_time_ms": 34000,
+  "anchor_event_id": "evt-010",
+  "sequence_id": "seq-evt-006",
+  "signals": [
+    "goal",
+    "recovery_to_shot"
+  ],
+  "reasons": [
+    {
+      "code": "base_kind",
+      "points": 80,
+      "detail": "Tipo de momento goal",
+      "params": {
+        "rule": "shot@1"
+      }
+    },
+    {
+      "code": "measured_fact",
+      "points": 13,
+      "detail": "gol +10, a menos de 16,5 m +3",
+      "params": {}
+    },
+    {
+      "code": "combined_signals",
+      "points": 5,
+      "detail": "También cumple: recovery_to_shot",
+      "params": {}
+    },
+    {
+      "code": "novelty",
+      "points": 10,
+      "detail": "Primer momento de este tipo para este equipo",
+      "params": {}
+    },
+    {
+      "code": "decisive_fact",
+      "points": 0,
+      "detail": "Los goles se emiten siempre, también los del rival",
+      "params": {}
+    }
+  ],
+  "attention_version": "attention@1"
+}

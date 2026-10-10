@@ -1,0 +1,10 @@
+{
+  "contract_version": "1",
+  "candidate_id": "moment-evt-010",
+  "match_id": "synthetic-acceptance-001",
+  "period": 1,
+  "clock_ms": 32000,
+  "kind": "goal",
+  "priority": 120,
+  "source_event_ids": []
+}
