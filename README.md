@@ -37,7 +37,7 @@ En otra terminal, inicia el frontend:
 npm run dev:frontend
 ```
 
-La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. El formulario inicial valida un evento contra el formato `1.0`; todavía no guarda eventos. El backend incluye por separado la ingesta sintética, el estado y la analítica, y la narrativa. La experiencia completa aún necesita conectar esos módulos con la interfaz.
+La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. La interfaz reproduce el partido sintético con mensajes sincronizados, preferencias, preguntas, resumen y revisión editorial. La analítica y la narración usan adaptadores provisionales hasta integrar los módulos de Persona 2 y Persona 3; el detalle está en [Persona 4](docs/persona-4-api-y-frontend/README.md).
 
 CrewAI es una dependencia opcional del backend. Para usar la integración con Azure OpenAI, se puede instalar con `uv sync --project apps/backend --extra agents`.
 
