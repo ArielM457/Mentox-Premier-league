@@ -2,7 +2,7 @@
 
 Este proyecto nace de un reto de hackathon. La solución debe convertir eventos sintéticos de fútbol en información explicable para una transmisión en directo y en experiencias personalizadas para distintos aficionados.
 
-La documentación distingue el alcance del reto, las decisiones del equipo y lo que ya existe en el repositorio. La estructura inicial del monorepo está creada; las funciones del partido todavía no están implementadas.
+La documentación distingue el alcance del reto, las decisiones del equipo y lo que ya existe en el repositorio. La estructura inicial del monorepo y el módulo de narrativa con rutas de prueba están creados. La ingesta, el estado calculado y la experiencia completa del partido todavía deben integrarse.
 
 ## **Documentos**
 

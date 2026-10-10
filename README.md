@@ -33,4 +33,8 @@ npm run dev:frontend
 
 La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. El formulario inicial valida un evento contra el formato `1.0`; todavía no guarda eventos ni analiza partidos.
 
-CrewAI figura como dependencia opcional del backend. Cuando se implemente el equipo de agentes y se elija un proveedor de modelos, se podrá instalar con `pip install -e '.\apps\backend[agents]'`.
+CrewAI es una dependencia opcional del backend. Para usar la integración con Azure OpenAI, se puede instalar con `pip install -e '.\apps\backend[agents]'`.
+
+El módulo de la persona 3 ya tiene contratos, un flujo de narración y pruebas con un partido sintético. Consulta la [guía de agentes y narrativa](apps/backend/README-narrativa.md) para ejecutarlo. La API expone las operaciones de narrativa con un proveedor sintético de prueba o con Azure OpenAI si se configura el recurso y el despliegue. El frontend todavía no consume estas rutas.
+
+La [colección de Postman](postman/README.md) contiene peticiones y pruebas listas para importar.

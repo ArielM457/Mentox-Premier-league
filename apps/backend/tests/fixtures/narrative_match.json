@@ -1,0 +1,54 @@
+{
+  "events": [
+    {"schema_version": "1.0", "event_id": "evt-101", "match_id": "demo-001", "period": 1, "clock_ms": 720000, "type": "pressure", "team_id": "team-a", "player_id": "player-7", "outcome": "success", "source": "synthetic"},
+    {"schema_version": "1.0", "event_id": "evt-102", "match_id": "demo-001", "period": 1, "clock_ms": 750000, "type": "pressure", "team_id": "team-a", "player_id": "player-7", "outcome": "success", "source": "synthetic"},
+    {"schema_version": "1.0", "event_id": "evt-103", "match_id": "demo-001", "period": 1, "clock_ms": 780000, "type": "recovery", "team_id": "team-a", "player_id": "player-7", "outcome": "success", "source": "synthetic", "related_event_ids": ["evt-101", "evt-102"]},
+    {"schema_version": "1.0", "event_id": "evt-104", "match_id": "demo-001", "period": 1, "clock_ms": 840000, "type": "shot", "team_id": "team-a", "player_id": "player-7", "outcome": "saved", "source": "synthetic", "related_event_ids": ["evt-103"]},
+    {"schema_version": "1.0", "event_id": "evt-105", "match_id": "demo-001", "period": 1, "clock_ms": 900000, "type": "shot", "team_id": "team-a", "player_id": "player-7", "outcome": "goal", "source": "synthetic", "related_event_ids": ["evt-104"]}
+  ],
+  "snapshot": {
+    "contract_version": "1",
+    "match_id": "demo-001",
+    "period": 1,
+    "clock_ms": 900000,
+    "score": {"team-a": 1, "team-b": 0},
+    "metrics": [
+      {"key": "shots", "team_id": "team-a", "value": 1, "unit": "count", "formula_version": "1", "source_event_ids": ["evt-104"]},
+      {"key": "goals", "team_id": "team-a", "value": 1, "unit": "count", "formula_version": "1", "source_event_ids": ["evt-105"]}
+    ],
+    "recent_event_ids": ["evt-101", "evt-102", "evt-103", "evt-104", "evt-105"]
+  },
+  "candidates": [
+    {
+      "contract_version": "1",
+      "candidate_id": "moment-pressure",
+      "match_id": "demo-001",
+      "period": 1,
+      "clock_ms": 780000,
+      "kind": "pressure_shift",
+      "priority": 65,
+      "selection_reason": "Two pressures preceded a recovery",
+      "facts": [
+        {"key": "pressure", "team_id": "team-a", "value": 2, "unit": "count", "window_ms": 600000, "source_event_ids": ["evt-101", "evt-102"]},
+        {"key": "recoveries", "team_id": "team-a", "player_id": "player-7", "value": 1, "unit": "count", "window_ms": 600000, "source_event_ids": ["evt-103"]}
+      ],
+      "source_event_ids": ["evt-101", "evt-102", "evt-103"],
+      "evidence_limits": ["No opponent positions available"]
+    },
+    {
+      "contract_version": "1",
+      "candidate_id": "moment-goal",
+      "match_id": "demo-001",
+      "period": 1,
+      "clock_ms": 900000,
+      "kind": "goal",
+      "priority": 100,
+      "selection_reason": "Goal changed the score",
+      "facts": [
+        {"key": "shots", "team_id": "team-a", "player_id": "player-7", "value": 1, "unit": "count", "source_event_ids": ["evt-104"]},
+        {"key": "goals", "team_id": "team-a", "player_id": "player-7", "value": 1, "unit": "count", "source_event_ids": ["evt-105"]}
+      ],
+      "source_event_ids": ["evt-104", "evt-105"]
+    }
+  ]
+}

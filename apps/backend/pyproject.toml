@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-agents = ["crewai"]
+agents = ["crewai[azure-ai-inference]>=1.14,<2"]
 dev = ["httpx>=0.27,<1", "pytest>=8,<10"]
 
 [tool.setuptools.packages.find]
