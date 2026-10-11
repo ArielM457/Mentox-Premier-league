@@ -52,6 +52,7 @@ from match_intelligence.domain.analytics.signals import (
     Signal,
 )
 from match_intelligence.domain.analytics.state import MatchState, chronological
+from match_intelligence.domain.analytics.tracking import TrackingFrame, frames_until, tracking_metrics
 from match_intelligence.domain.analytics.statistics import (
     EventWindow,
     player_statistics,
@@ -64,6 +65,8 @@ from match_intelligence.domain.contracts import EventType, MatchEvent, MatchMeta
 from .value_models import ValueModelName, ValueModelRegistry
 
 RECENT_EVENTS = 5
+TRACKING_REPLACES = frozenset({"ball_speed_kmh", "shot_speed_kmh", "distance_covered_m"})
+TrackingProvider = Callable[[MatchMetadata], Sequence[TrackingFrame] | None]
 
 
 def default_detectors() -> list[Detector]:
@@ -227,8 +230,13 @@ def build_snapshot(
     state_revision: int = 0,
     late_event_ids: Sequence[str] = (),
     corrected_event_ids: Sequence[str] = (),
+    tracking: Sequence[TrackingFrame] | None = None,
 ) -> MatchSnapshot:
-    """``MatchSnapshot v1`` desde eventos en orden deportivo."""
+    """``MatchSnapshot v1`` desde eventos en orden deportivo.
+
+    Con ``tracking`` se calculan además las métricas de seguimiento con los cuadros
+    hasta el instante del snapshot; sin él, velocidad y distancia quedan no disponibles.
+    """
     frame = PitchFrame.from_metadata(metadata)
     registry = value_models or ValueModelRegistry()
     accepted: list[MatchEvent] = []
@@ -272,6 +280,13 @@ def build_snapshot(
     if last is not None and video_time_ms is not None and last.video_time_ms is not None:
         clock_ms = last.clock_ms + max(0, video_time_ms - last.video_time_ms)
 
+    if tracking is not None:
+        ordered_frames = sorted(tracking, key=lambda f: (f.period, f.clock_ms))
+        seen_frames = frames_until(ordered_frames, state.period, clock_ms)
+        if seen_frames:
+            metrics = [m for m in metrics if m.available or m.key not in TRACKING_REPLACES]
+            metrics.extend(tracking_metrics(seen_frames, frame.team_ids, accepted))
+
     return MatchSnapshot(
         match_id=metadata.match_id,
         period=state.period,
@@ -299,8 +314,10 @@ class MatchAnalytics:
         *,
         value_models: ValueModelRegistry | None = None,
         cache_size: int = 16,
+        tracking_provider: TrackingProvider | None = None,
     ) -> None:
         self._value_models = value_models or ValueModelRegistry()
+        self._tracking_provider = tracking_provider
         self._cache: OrderedDict[str, MatchAnalyzer] = OrderedDict()
         self._cache_size = cache_size
         self._lock = Lock()
@@ -316,8 +333,10 @@ class MatchAnalytics:
         *,
         video_time_ms: int | None = None,
     ) -> MatchSnapshot:
+        tracking = self._tracking_provider(metadata) if self._tracking_provider else None
         return build_snapshot(
-            metadata, events, video_time_ms=video_time_ms, value_models=self._value_models
+            metadata, events, video_time_ms=video_time_ms, value_models=self._value_models,
+            tracking=tracking,
         )
 
     def candidates(

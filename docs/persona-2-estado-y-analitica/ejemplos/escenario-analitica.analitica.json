@@ -30,7 +30,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -53,7 +54,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -73,7 +75,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -153,7 +156,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -218,7 +222,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -251,7 +256,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -271,7 +277,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -291,7 +298,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -315,7 +323,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -416,7 +425,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -457,7 +467,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "final_third_entries",
@@ -492,7 +503,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "high_recoveries",
@@ -523,7 +535,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -603,7 +616,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -622,7 +636,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -641,7 +656,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -666,7 +682,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -688,7 +705,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -757,7 +775,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -813,7 +832,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -848,7 +868,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -867,7 +888,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -886,7 +908,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -914,7 +937,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -1004,7 +1028,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -1044,7 +1069,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "final_third_entries",
@@ -1077,7 +1103,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "high_recoveries",
@@ -1111,7 +1138,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -1180,7 +1208,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -1199,7 +1228,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "possession_changes",
@@ -1256,7 +1286,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "possession_won",
@@ -1294,7 +1325,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "possession_share",
@@ -1355,7 +1387,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "possession_won",
@@ -1392,7 +1425,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "possession_share",
@@ -1452,7 +1486,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "control_index",
@@ -1521,7 +1556,8 @@
               "sc-178"
             ]
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "control_index",
@@ -1600,7 +1636,8 @@
               "sc-166"
             ]
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "momentum_index",
@@ -1662,7 +1699,8 @@
               "sc-178"
             ]
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "momentum_index",
@@ -1724,7 +1762,8 @@
               "sc-166"
             ]
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "chaos_index",
@@ -1784,7 +1823,8 @@
               "sc-175"
             ]
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "xt_added",
@@ -1801,7 +1841,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "xg",
@@ -1818,7 +1859,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "vaep",
@@ -1835,7 +1877,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No hay un modelo configurado y validado para este análisis",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -1859,7 +1902,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -1876,7 +1920,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -1893,7 +1938,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -1910,7 +1956,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -1932,7 +1979,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -1953,7 +2001,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -1973,7 +2022,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -1990,7 +2040,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -2007,7 +2058,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -2024,7 +2076,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -2067,7 +2120,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -2095,7 +2149,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -2117,7 +2172,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -2136,7 +2192,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -2146,14 +2203,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -2191,7 +2249,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -2208,7 +2267,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -2225,7 +2285,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -2242,7 +2303,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -2274,7 +2336,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -2303,7 +2366,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -2326,7 +2390,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -2343,7 +2408,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -2360,7 +2426,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -2379,7 +2446,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -2432,7 +2500,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -2464,7 +2533,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -2496,7 +2566,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -2515,7 +2586,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -2525,14 +2597,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -2565,7 +2638,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -2582,7 +2656,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -2599,7 +2674,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -2616,7 +2692,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -2644,7 +2721,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -2668,7 +2746,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -2690,7 +2769,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -2707,7 +2787,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -2724,7 +2805,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -2743,7 +2825,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -2792,7 +2875,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -2822,7 +2906,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -2850,7 +2935,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -2869,7 +2955,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -2879,14 +2966,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -2917,7 +3005,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -2934,7 +3023,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -2951,7 +3041,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -2968,7 +3059,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -2996,7 +3088,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -3024,7 +3117,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -3043,7 +3137,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -3062,7 +3157,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -3081,7 +3177,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -3100,7 +3197,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -3149,7 +3247,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -3181,7 +3280,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -3209,7 +3309,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -3228,7 +3329,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -3238,14 +3340,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -3281,7 +3384,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -3298,7 +3402,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -3315,7 +3420,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -3332,7 +3438,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -3363,7 +3470,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -3391,7 +3499,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -3411,7 +3520,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -3430,7 +3540,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -3449,7 +3560,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -3468,7 +3580,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -3520,7 +3633,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -3552,7 +3666,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -3583,7 +3698,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -3602,7 +3718,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -3612,14 +3729,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -3650,7 +3768,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -3667,7 +3786,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -3684,7 +3804,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -3701,7 +3822,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -3730,7 +3852,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -3755,7 +3878,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -3774,7 +3898,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -3791,7 +3916,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -3808,7 +3934,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -3827,7 +3954,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -3877,7 +4005,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -3908,7 +4037,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -3937,7 +4067,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -3956,7 +4087,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -3966,14 +4098,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -3997,7 +4130,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -4016,7 +4150,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -4039,7 +4174,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -4059,7 +4195,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -4076,7 +4213,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -4093,7 +4231,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -4110,7 +4249,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -4127,7 +4267,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -4144,7 +4285,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -4163,7 +4305,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -4180,7 +4323,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -4197,7 +4341,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -4214,7 +4359,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -4231,7 +4377,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -4241,14 +4388,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -4269,7 +4417,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -4286,7 +4435,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -4303,7 +4453,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -4320,7 +4471,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -4340,7 +4492,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -4360,7 +4513,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -4379,7 +4533,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -4396,7 +4551,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -4413,7 +4569,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -4430,7 +4587,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -4471,7 +4629,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -4501,7 +4660,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -4521,7 +4681,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -4540,7 +4701,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -4550,14 +4712,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -4591,7 +4754,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -4608,7 +4772,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -4625,7 +4790,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -4642,7 +4808,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -4668,7 +4835,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -4692,7 +4860,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -4716,7 +4885,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -4733,7 +4903,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -4750,7 +4921,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -4770,7 +4942,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -4817,7 +4990,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -4847,7 +5021,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -4873,7 +5048,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -4892,7 +5068,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -4902,14 +5079,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -4947,7 +5125,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -4964,7 +5143,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -4981,7 +5161,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -4998,7 +5179,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -5028,7 +5210,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -5054,7 +5237,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -5076,7 +5260,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -5095,7 +5280,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -5114,7 +5300,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -5134,7 +5321,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -5185,7 +5373,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -5218,7 +5407,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -5248,7 +5438,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -5267,7 +5458,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -5277,14 +5469,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -5320,7 +5513,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -5337,7 +5531,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -5354,7 +5549,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -5371,7 +5567,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -5402,7 +5599,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -5429,7 +5627,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -5451,7 +5650,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -5468,7 +5668,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -5485,7 +5686,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -5504,7 +5706,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -5556,7 +5759,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -5589,7 +5793,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -5620,7 +5825,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -5639,7 +5845,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -5649,14 +5856,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -5688,7 +5896,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -5705,7 +5914,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -5722,7 +5932,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -5739,7 +5950,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -5767,7 +5979,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -5793,7 +6006,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -5813,7 +6027,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -5830,7 +6045,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -5847,7 +6063,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -5867,7 +6084,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -5916,7 +6134,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -5944,7 +6163,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -5972,7 +6192,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -5991,7 +6212,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -6001,14 +6223,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -6034,7 +6257,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -6051,7 +6275,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -6070,7 +6295,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -6089,7 +6315,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -6113,7 +6340,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -6136,7 +6364,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -6153,7 +6382,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -6170,7 +6400,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -6187,7 +6418,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -6206,7 +6438,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -6251,7 +6484,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -6281,7 +6515,8 @@
             "contribution": null,
             "source_event_ids": []
           }
-        ]
+        ],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -6305,7 +6540,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -6324,7 +6560,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -6334,14 +6571,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "involvement",
@@ -6367,7 +6605,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "goals",
@@ -6386,7 +6625,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots",
@@ -6410,7 +6650,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shots_on_target",
@@ -6431,7 +6672,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_attempted",
@@ -6448,7 +6690,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "passes_completed",
@@ -6465,7 +6708,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "recoveries",
@@ -6482,7 +6726,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles",
@@ -6499,7 +6744,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "tackles_won",
@@ -6516,7 +6762,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pressures",
@@ -6536,7 +6783,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": null,
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "pass_accuracy",
@@ -6553,7 +6801,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si no hay pases con resultado conocido.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "progressive_passes",
@@ -6570,7 +6819,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase tiene posiciones y dirección de ataque.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "avg_pass_distance_m",
@@ -6587,7 +6837,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase tiene ambas posiciones.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "longest_pass_m",
@@ -6604,7 +6855,8 @@
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "No disponible si ningún pase success tiene ambas posiciones.",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "distance_covered_m",
@@ -6614,14 +6866,15 @@
         "available": false,
         "unit": "meters",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "ball_speed_kmh",
@@ -6631,14 +6884,15 @@
         "available": false,
         "unit": "km/h",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       },
       {
         "key": "shot_speed_kmh",
@@ -6648,14 +6902,15 @@
         "available": false,
         "unit": "km/h",
         "window_ms": null,
-        "formula_version": "speed@0",
+        "formula_version": "tracking@1",
         "source_event_ids": [],
         "origin": "derived",
         "period": null,
         "window_start_clock_ms": null,
         "window_end_clock_ms": null,
         "unavailable_reason": "MatchEvent 1.0 no trae posiciones sucesivas con tiempo; no se calcula velocidad ni distancia recorrida",
-        "components": []
+        "components": [],
+        "tracking_evidence": null
       }
     ],
     "recent_event_ids": [
@@ -9443,7 +9698,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -9462,7 +9718,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -9481,7 +9738,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -9506,7 +9764,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -9526,7 +9785,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -9546,7 +9806,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -9566,7 +9827,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -9656,7 +9918,8 @@
                 "sc-010"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         },
         {
           "key": "pass_forward_gain_m",
@@ -9675,7 +9938,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_distance_m",
@@ -9694,7 +9958,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -9772,7 +10037,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -9833,7 +10099,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -9895,7 +10162,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -9914,7 +10182,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -9933,7 +10202,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -9952,7 +10222,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -9972,7 +10243,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -9992,7 +10264,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -10012,7 +10285,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -10045,7 +10319,8 @@
                 "sc-047"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10126,7 +10401,8 @@
           "window_start_clock_ms": 100000,
           "window_end_clock_ms": 190000,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "ball_wins_opponent_half",
@@ -10146,7 +10422,8 @@
           "window_start_clock_ms": 100000,
           "window_end_clock_ms": 190000,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "defensive_actions_opponent_half",
@@ -10163,7 +10440,8 @@
           "window_start_clock_ms": 10000,
           "window_end_clock_ms": 100000,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_accuracy",
@@ -10215,7 +10493,8 @@
               "contribution": null,
               "source_event_ids": []
             }
-          ]
+          ],
+          "tracking_evidence": null
         },
         {
           "key": "high_recoveries",
@@ -10235,7 +10514,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10311,7 +10591,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10465,7 +10746,8 @@
                 "sc-103"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         },
         {
           "key": "recoveries",
@@ -10486,7 +10768,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10582,7 +10865,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -10601,7 +10885,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -10620,7 +10905,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -10637,7 +10923,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -10657,7 +10944,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -10677,7 +10965,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -10697,7 +10986,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -10730,7 +11020,8 @@
                 "sc-103"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10799,7 +11090,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -10867,7 +11159,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -10886,7 +11179,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -10905,7 +11199,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -10922,7 +11217,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -10942,7 +11238,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -10962,7 +11259,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -10982,7 +11280,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -11015,7 +11314,8 @@
                 "sc-120"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -11093,7 +11393,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -11112,7 +11413,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -11131,7 +11433,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -11148,7 +11451,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -11168,7 +11472,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -11188,7 +11493,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -11208,7 +11514,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -11241,7 +11548,8 @@
                 "sc-129"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -11325,7 +11633,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -11345,7 +11654,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -11365,7 +11675,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -11386,7 +11697,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -11461,7 +11773,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "goals",
@@ -11478,7 +11791,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -11497,7 +11811,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -11516,7 +11831,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -11537,7 +11853,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -11557,7 +11874,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -11577,7 +11895,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -11597,7 +11916,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -11630,7 +11950,8 @@
                 "sc-144"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -11720,7 +12041,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_forward_gain_m",
@@ -11739,7 +12061,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_distance_m",
@@ -11758,7 +12081,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -11923,7 +12247,8 @@
                 "sc-149"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         },
         {
           "key": "control_index",
@@ -12000,7 +12325,8 @@
                 "sc-036"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -12104,7 +12430,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "goals",
@@ -12123,7 +12450,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -12142,7 +12470,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -12161,7 +12490,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -12187,7 +12517,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -12207,7 +12538,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -12227,7 +12559,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -12247,7 +12580,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shots_on_target",
@@ -12268,7 +12602,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -12371,7 +12706,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "progressive_passes",
@@ -12392,7 +12728,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_forward_gain_m",
@@ -12411,7 +12748,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "pass_distance_m",
@@ -12430,7 +12768,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [
@@ -12517,7 +12856,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_distance_m",
@@ -12536,7 +12876,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "shot_angle_deg",
@@ -12555,7 +12896,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_passes",
@@ -12575,7 +12917,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "sequence_duration_s",
@@ -12595,7 +12938,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress",
@@ -12615,7 +12959,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "forward_progress_m",
@@ -12635,7 +12980,8 @@
           "window_start_clock_ms": null,
           "window_end_clock_ms": null,
           "unavailable_reason": null,
-          "components": []
+          "components": [],
+          "tracking_evidence": null
         },
         {
           "key": "seconds_since_recovery",
@@ -12668,7 +13014,8 @@
                 "sc-175"
               ]
             }
-          ]
+          ],
+          "tracking_evidence": null
         }
       ],
       "source_event_ids": [

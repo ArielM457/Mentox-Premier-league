@@ -46,6 +46,20 @@ class IndicatorComponent(BaseModel):
     source_event_ids: list[str] = Field(default_factory=list)
 
 
+class TrackingEvidence(BaseModel):
+    """Origen de una cifra calculada con posiciones de seguimiento, no con eventos."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source: str = Field(description="synthetic_mock o video_model")
+    track_ids: list[str] = Field(default_factory=list)
+    start_period: int | None = None
+    start_clock_ms: int | None = None
+    end_period: int | None = None
+    end_clock_ms: int | None = None
+    frames: int = 0
+
+
 class MetricValue(BaseModel):
     """Cifra trazable. Si faltan datos queda ``available=False`` y sin valor."""
 
@@ -68,6 +82,7 @@ class MetricValue(BaseModel):
     window_end_clock_ms: int | None = None
     unavailable_reason: str | None = None
     components: list[IndicatorComponent] = Field(default_factory=list)
+    tracking_evidence: TrackingEvidence | None = None
 
     @model_validator(mode="after")
     def _availability_matches_value(self) -> Self:

@@ -166,3 +166,37 @@ Las personas usuarias de este módulo son sobre todo Persona 3 (narración) y Pe
 - `MatchAnalytics` cumple el `AnalyticsPort` de Persona 4.
 
 **Requisitos relacionados:** contratos de trabajo, RNF-04.
+
+## Épica F: seguimiento y demostración
+
+### EA-US-10 · Medir velocidad y distancia desde posiciones
+
+**Como** espectador que sigue a un jugador,
+**quiero** ver su distancia recorrida, su velocidad y un aviso cuando supera un umbral,
+**para** entender su esfuerzo durante el partido.
+
+**Prioridad:** P2 (RF-12). **Estado:** verificada con trayectorias conocidas y seguimiento simulado; posiciones reales de vídeo pendientes. **Evidencia:** [EA-US-10](evidencias/EA-US-10.md).
+
+**Criterios de aceptación:**
+
+- Distancia y velocidad coinciden con trayectorias de resultado conocido.
+- Los saltos imposibles y las pistas perdidas no cuentan.
+- Los avisos por umbral se emiten una vez por episodio o hito.
+- Cada cifra indica si viene de seguimiento simulado o de un modelo de vídeo.
+- Las detecciones de Roboflow Sports se convierten sin inventar identidad.
+
+**Requisitos relacionados:** RF-11, RF-12 y la sugerencia del reto de indicadores de velocidad y distancia por umbral.
+
+### EA-US-11 · Presentar la analítica en un tablero
+
+**Como** equipo,
+**quiero** un tablero que reproduzca el partido con lo que calcula el motor,
+**para** presentar avances sin depender de la interfaz final.
+
+**Prioridad:** P1. **Estado:** verificada localmente. **Evidencia:** [EA-US-11](evidencias/EA-US-11.md).
+
+**Criterios de aceptación:**
+
+- Todas las cifras, momentos y motivos salen del motor real.
+- Lo simulado (posiciones y frases) está marcado en la página.
+- El archivo se regenera desde el código y una prueba detecta si quedó viejo.

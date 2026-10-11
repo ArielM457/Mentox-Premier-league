@@ -30,7 +30,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "goals",
@@ -47,7 +48,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "shot_distance_m",
@@ -66,7 +68,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "shot_angle_deg",
@@ -85,7 +88,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "sequence_passes",
@@ -105,7 +109,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "sequence_duration_s",
@@ -125,7 +130,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "forward_progress",
@@ -145,7 +151,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "forward_progress_m",
@@ -165,7 +172,8 @@
       "window_start_clock_ms": null,
       "window_end_clock_ms": null,
       "unavailable_reason": null,
-      "components": []
+      "components": [],
+      "tracking_evidence": null
     },
     {
       "key": "seconds_since_recovery",
@@ -198,7 +206,8 @@
             "evt-006"
           ]
         }
-      ]
+      ],
+      "tracking_evidence": null
     }
   ],
   "source_event_ids": [

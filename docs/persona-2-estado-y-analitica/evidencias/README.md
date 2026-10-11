@@ -15,6 +15,8 @@ Cada historia se da por verificada solo si sus criterios pasan con una prueba o 
 | EA-US-07 · Evaluar xT, VAEP y xG | Adaptadores verificados; modelos desactivados | [EA-US-07](EA-US-07.md) |
 | EA-US-08 · Procesar el flujo en Azure | Verificada con dobles de Azure; despliegue pendiente | [EA-US-08](EA-US-08.md) |
 | EA-US-09 · Entregar ejemplos e integrar con Persona 3 y 4 | Verificada localmente; integración probada en copia de la rama de Persona 4 | [EA-US-09](EA-US-09.md) |
+| EA-US-10 · Medir velocidad y distancia desde posiciones | Verificada con seguimiento simulado; vídeo real pendiente | [EA-US-10](EA-US-10.md) |
+| EA-US-11 · Presentar la analítica en un tablero | Verificada localmente | [EA-US-11](EA-US-11.md) |
 
 ## Entorno común de verificación
 
@@ -43,10 +45,10 @@ python -m venv .venv
 .venv/Scripts/python -m pytest apps/backend/tests -q
 ```
 
-Resultado del 9 de octubre de 2026:
+Resultado del 11 de octubre de 2026:
 
 ```text
-210 passed in 4.19s
+223 passed in 6.99s
 ```
 
-Son 134 pruebas previas y 76 nuevas de Persona 2, sin cambios en archivos existentes.
+Son 134 pruebas previas y 89 de Persona 2. Las 76 primeras se verificaron el 9 de octubre; el seguimiento y el tablero añadieron 13.

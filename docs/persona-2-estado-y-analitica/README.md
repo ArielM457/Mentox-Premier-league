@@ -4,7 +4,8 @@ Esta carpeta documenta el trabajo de Persona 2. El objetivo es convertir eventos
 
 - **Rama:** `persona-2/estado-analitica`.
 - **Estado:** implementado y verificado localmente con datos sintéticos y dobles de Azure. El despliegue y la prueba de humo en Azure están pendientes porque necesitan una suscripción.
-- **Última verificación:** 9 de octubre de 2026.
+- **Última verificación:** 11 de octubre de 2026.
+- **Tablero de demostración:** [`demo/tablero.html`](demo/tablero.html), con su [guion para presentar](demo/README.md#guion-sugerido-para-presentar-avances-5-minutos).
 
 ## Documentos
 
@@ -13,6 +14,8 @@ Esta carpeta documenta el trabajo de Persona 2. El objetivo es convertir eventos
 - [Reglas de jugadas, patrones y atención](reglas-de-patrones-y-atencion.md): detectores con ejemplos positivos y negativos, y cómo se calcula la prioridad.
 - [Informe de viabilidad de xT, VAEP y xG](informe-modelos-de-valor.md): qué se puede validar hoy y qué queda desactivado.
 - [Integración con Azure](integracion-azure.md): flujo en Event Hubs y Blob Storage, despliegue y prueba de humo.
+- [Analítica de seguimiento](analitica-de-seguimiento.md): velocidad, distancia, presión por cercanía y forma del equipo desde posiciones, con seguimiento simulado y conversión desde Roboflow Sports.
+- [Tablero de demostración](demo/README.md): reproducción del partido con todo lo que calcula el motor y un guion para presentar avances.
 - [Evidencias](evidencias/README.md): criterios cubiertos, archivos, comandos, versiones y limitaciones.
 - [Ejemplos de contrato](ejemplos/): `MatchSnapshot v1`, `InsightCandidate v1` y salidas completas de dos partidos.
 
@@ -57,6 +60,10 @@ MatchEvent 1.0
 | Azure Blob Storage `analytics` y `matches` | `adapters/storage/azure_analytics.py` |
 | Puente con la ingesta de Persona 1 | `adapters/messaging/analytics_bridge.py` |
 | Escenario sintético de Persona 2 | `adapters/sources/analytics_scenarios.py` |
+| Analítica de seguimiento (`TrackingFrame v1`) | `domain/analytics/tracking.py` |
+| Seguimiento simulado | `adapters/sources/tracking_mock.py` |
+| Conversión desde Roboflow Sports | `adapters/sources/roboflow_tracking.py` |
+| Datos del tablero | `adapters/sources/analytics_demo.py` y `scripts/export_analytics_demo.py` |
 | Infraestructura | `infra/azure/analytics.bicep` |
 
 Todas las rutas de código son relativas a `apps/backend/src/match_intelligence/` salvo la última. El dominio no importa FastAPI, Azure, CrewAI ni bibliotecas de modelos.
@@ -126,3 +133,4 @@ Estas decisiones están implementadas pero todavía deben confirmarse con el equ
 - Alojar el procesador continuo en Azure (propuesta: Azure Container Apps con identidad administrada, junto con la API de Persona 4).
 - Entrenar xT y xG con datos con licencia antes de activarlos.
 - Revisar umbrales con un partido sintético más largo de Persona 1.
+- Recibir posiciones reales de Roboflow Sports (DV-US-19) en el formato propuesto en [analítica de seguimiento](analitica-de-seguimiento.md#conexión-con-roboflow-sports).
