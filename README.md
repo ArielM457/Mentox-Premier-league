@@ -37,4 +37,6 @@ CrewAI es una dependencia opcional del backend. Para usar la integración con Az
 
 El módulo de la persona 3 ya tiene contratos, un flujo de narración y pruebas con un partido sintético. Consulta la [guía de agentes y narrativa](apps/backend/README-narrativa.md) para ejecutarlo. La API expone las operaciones de narrativa con un proveedor sintético de prueba o con Azure OpenAI si se configura el recurso y el despliegue. El frontend todavía no consume estas rutas.
 
+El backend también tiene una primera versión del filtro y el enrutamiento de agentes. La ruta `/api/v1/agent-routing/evaluate` separa eventos de solo métricas y solicitudes relevantes, reconoce dos patrones iniciales y prepara un despacho reproducible. Todavía no existe almacenamiento entre peticiones ni un canal durable.
+
 La [colección de Postman](postman/README.md) contiene peticiones y pruebas listas para importar.
