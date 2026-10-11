@@ -38,6 +38,9 @@ def request(name: str, path: str, body: dict, checks: list[str], description: st
 def main() -> None:
     collection = json.loads(COLLECTION.read_text(encoding="utf-8"))
     sample = json.loads((FIXTURES / "narrative_match.json").read_text(encoding="utf-8"))
+    routing_sample = json.loads(
+        (FIXTURES / "agent-routing-scenarios.json").read_text(encoding="utf-8")
+    )
     draft = json.loads((FIXTURES / "draft_valid.json").read_text(encoding="utf-8"))
     wrong_draft = copy.deepcopy(draft)
     wrong_draft["claims"][0]["value"] = 99
@@ -187,13 +190,57 @@ def main() -> None:
             "La cifra alterada se contrasta y genera un borrador corregido.",
         ),
     ]
-    collection["item"] = [
-        group for group in collection["item"] if group["name"] != "Narrativa"
+    routing_scenarios = {item["scenario_id"]: item for item in routing_sample["scenarios"]}
+    routine = routing_scenarios["metrics-only-pass"]
+    danger = routing_scenarios["immediate-danger-shot"]
+    routing_items = [
+        request(
+            "POST Filtro solo métricas",
+            "/api/v1/agent-routing/evaluate",
+            {
+                "match_id": routing_sample["match_id"],
+                "events": routine["input_events"],
+                "preferences": es_casual,
+            },
+            [
+                "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                "const body = pm.response.json();",
+                "pm.test('No llama agentes', () => { pm.expect(body.decision.route).to.equal('metrics_only'); pm.expect(body.agent_request).to.equal(null); pm.expect(body.dispatch).to.equal(null); });",
+                "pm.test('Actualiza métricas', () => pm.expect(body.metric_updates[0].key).to.equal('passes'));",
+            ],
+            "Un pase normal actualiza métricas sin crear trabajo para agentes.",
+        ),
+        request(
+            "POST Filtro de peligro",
+            "/api/v1/agent-routing/evaluate",
+            {
+                "match_id": routing_sample["match_id"],
+                "events": danger["input_events"],
+                "preferences": es_casual,
+            },
+            [
+                "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                "const body = pm.response.json();",
+                "pm.test('Activa peligro inmediato', () => pm.expect(body.decision.route).to.equal('danger_immediate'));",
+                "pm.test('Despacha al agente correcto', () => pm.expect(body.dispatch.target_agent).to.equal('danger_simulation'));",
+                "pm.test('Conserva trazabilidad', () => { pm.expect(body.agent_request.source_event_ids).to.include('evt-020'); pm.expect(body.agent_request.source_event_ids).to.include('evt-012'); });",
+            ],
+            "Un tiro desde una zona peligrosa crea una solicitud reducida y trazable.",
+        ),
     ]
+    collection["item"] = [
+        group
+        for group in collection["item"]
+        if group["name"] not in {"Narrativa", "Enrutamiento de agentes"}
+    ]
+    collection["item"].append(
+        {"name": "Enrutamiento de agentes", "item": routing_items}
+    )
     collection["item"].append({"name": "Narrativa", "item": items})
     collection["info"]["description"] = (
         "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. "
-        "Las rutas de narrativa usan provider=fixture y no llaman a Azure."
+        "El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa "
+        "usan provider=fixture y no llaman a Azure."
     )
     COLLECTION.write_text(
         json.dumps(collection, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

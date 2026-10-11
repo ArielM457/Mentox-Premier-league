@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Match Intelligence API",
-    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. Las rutas de narrativa usan provider=fixture y no llaman a Azure.",
+    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -164,6 +164,86 @@
                 "exec": [
                   "pm.test('HTTP 422', () => pm.response.to.have.status(422));",
                   "pm.test('Señala pitch_length_m', () => pm.expect(pm.response.json().detail.some(error => error.loc.includes('pitch_length_m'))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enrutamiento de agentes",
+      "item": [
+        {
+          "name": "POST Filtro solo métricas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/agent-routing/evaluate",
+            "description": "Un pase normal actualiza métricas sin crear trabajo para agentes.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"demo-routing-001\",\n  \"events\": [\n    {\n      \"schema_version\": \"1.0\",\n      \"event_id\": \"evt-001\",\n      \"match_id\": \"demo-routing-001\",\n      \"period\": 1,\n      \"clock_ms\": 60000,\n      \"video_time_ms\": 62000,\n      \"type\": \"pass\",\n      \"team_id\": \"team-a\",\n      \"player_id\": \"player-4\",\n      \"start\": {\n        \"x\": 18,\n        \"y\": 42\n      },\n      \"end\": {\n        \"x\": 29,\n        \"y\": 45\n      },\n      \"outcome\": \"success\",\n      \"source\": \"synthetic\",\n      \"confidence\": null,\n      \"related_event_ids\": []\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('No llama agentes', () => { pm.expect(body.decision.route).to.equal('metrics_only'); pm.expect(body.agent_request).to.equal(null); pm.expect(body.dispatch).to.equal(null); });",
+                  "pm.test('Actualiza métricas', () => pm.expect(body.metric_updates[0].key).to.equal('passes'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Filtro de peligro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/agent-routing/evaluate",
+            "description": "Un tiro desde una zona peligrosa crea una solicitud reducida y trazable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"demo-routing-001\",\n  \"events\": [\n    {\n      \"schema_version\": \"1.0\",\n      \"event_id\": \"evt-020\",\n      \"match_id\": \"demo-routing-001\",\n      \"period\": 1,\n      \"clock_ms\": 802000,\n      \"video_time_ms\": 805500,\n      \"type\": \"shot\",\n      \"team_id\": \"team-a\",\n      \"player_id\": \"player-9\",\n      \"start\": {\n        \"x\": 86,\n        \"y\": 50\n      },\n      \"end\": {\n        \"x\": 100,\n        \"y\": 50\n      },\n      \"outcome\": \"blocked\",\n      \"source\": \"synthetic\",\n      \"confidence\": null,\n      \"related_event_ids\": [\n        \"evt-010\",\n        \"evt-011\",\n        \"evt-012\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Activa peligro inmediato', () => pm.expect(body.decision.route).to.equal('danger_immediate'));",
+                  "pm.test('Despacha al agente correcto', () => pm.expect(body.dispatch.target_agent).to.equal('danger_simulation'));",
+                  "pm.test('Conserva trazabilidad', () => { pm.expect(body.agent_request.source_event_ids).to.include('evt-020'); pm.expect(body.agent_request.source_event_ids).to.include('evt-012'); });"
                 ]
               }
             }
