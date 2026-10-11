@@ -6,7 +6,7 @@ El marcador muestra el resultado, pero deja fuera el contexto del partido. El re
 
 ## **Objetivo principal**
 
-Construir una solución basada en IA que reciba eventos sintéticos a medida que ocurren, mantenga el contexto del partido y produzca narraciones en directo, información apta para pantalla y un resumen automático al terminar.
+Construir una solución basada en IA que reciba eventos sintéticos a medida que ocurren, mantenga el contexto del partido y produzca narraciones en directo, información apta para pantalla, un resumen de medio tiempo y un resumen final.
 
 La misma información debe dar lugar a experiencias diferentes según las preferencias del espectador. Un analista debe poder ver datos y contexto más detallados. Un aficionado ocasional debe recibir explicaciones breves y claras.
 
@@ -23,6 +23,8 @@ La misma información debe dar lugar a experiencias diferentes según las prefer
 **5.** Mostramos diferencias reales entre los modos de analista y aficionado casual, permitimos elegir idioma y club favorito, y seguimos a un jugador favorito durante el partido con los eventos disponibles.
 
 **6.** Generamos un resumen final a partir de los eventos y el estado acumulado del mismo partido.
+
+**7.** Generamos un resumen de medio tiempo y analizamos situaciones de peligro durante el partido sin enviar todos los eventos a los agentes.
 
 Este resultado mínimo es una propuesta de trabajo para la demo. Las tecnologías y los dos idiomas iniciales están registrados en [decisiones tomadas](07-decisiones-tomadas.md). El número de partidos y las métricas finales siguen pendientes.
 

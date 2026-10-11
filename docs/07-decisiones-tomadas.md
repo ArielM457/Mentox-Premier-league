@@ -14,11 +14,19 @@ Este documento registra lo acordado por el equipo el 6 de octubre de 2026. Descr
 
 **4.** Usaremos un monolito modular con límites hexagonales. El dominio del partido y sus reglas no deben depender de FastAPI, CrewAI, del origen de eventos ni de la interfaz. Los adaptadores conectarán vídeo, conjuntos sintéticos, agentes y API con el núcleo.
 
+Para el flujo continuo mantendremos esos límites y añadiremos comunicación por eventos. El filtro, refinador, orquestador y trabajadores podrán desplegarse en varias instancias. Podemos iniciar dentro del monorepo y separar procesos sin cambiar los contratos del dominio.
+
 ## **Agentes y publicación**
 
-**5.** Usaremos CrewAI en Python para coordinar un equipo de agentes con responsabilidades especializadas. Planteamos agentes de observación, análisis táctico, selección de momentos, narración, personalización, verificación y resumen. Los nombres y el número final pueden cambiar durante la implementación.
+**5.** Usaremos CrewAI en Python para coordinar tareas que necesiten interpretación. El 11 de octubre de 2026 refinamos el diseño: un servicio filtro, un catálogo de jugadas y un servicio de refinamiento prepararán la información antes de cualquier modelo. Un orquestador ligero enviará solo las solicitudes relevantes a agentes especializados mediante eventos.
+
+La personalización será una política compartida y no un agente independiente en la primera versión. Las métricas y el estado seguirán un camino directo sin llamar a la IA. Los agentes principales cubrirán peligro y simulación, selección de momentos, narración, preguntas, resúmenes e investigación previa. La validación será obligatoria antes de publicar.
 
 La distribución inicial de trabajo y el flujo de revisión están en [equipo de agentes](10-arquitectura-agentes.md).
+
+El 11 de octubre de 2026 acordamos una asignación por demanda. GPT-4.1 mini será la base para clasificación, selección breve y validación semántica. GPT-4.1 se usará en narración, explicación de peligro, redacción de simulaciones, respuestas complejas, resúmenes e investigación. Los servicios deterministas no usarán modelos. La política completa está en [política de modelos de IA](12-politica-modelos-ia.md).
+
+La investigación previa usará GPT-4.1 con una herramienta de búsqueda web. Los embeddings se reservan para recuperación semántica dentro de información aprobada y no reemplazan la búsqueda en Internet.
 
 Los agentes podrán proponer interpretaciones y deducir conclusiones desde evidencia disponible. Los cálculos de cifras y el estado del partido serán reproducibles. La verificación contrastará cualquier conclusión con eventos y métricas. Si detecta un error, el flujo debe registrar el reporte, corregir o retirar la conclusión y volver a verificarla.
 
@@ -38,4 +46,4 @@ Los análisis finales tendrán una revisión antes de publicarse. La persona o m
 
 ## **Estado actual**
 
-El monorepo y los proyectos iniciales de frontend y backend están preparados. El equipo de agentes, el procesamiento de partidos, la extracción desde vídeo y la revisión editorial todavía deben implementarse.
+El monorepo y los proyectos iniciales de frontend y backend están preparados. Existe un módulo de narrativa con un flujo CrewAI secuencial de cuatro tareas y un proveedor local de prueba. El nuevo filtro, el catálogo de jugadas, la orquestación por eventos, la investigación previa, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía deben implementarse.
