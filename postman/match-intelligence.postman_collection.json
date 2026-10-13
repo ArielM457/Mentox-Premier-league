@@ -1,0 +1,626 @@
+{
+  "info": {
+    "name": "Match Intelligence API",
+    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Sistema",
+      "item": [
+        {
+          "name": "GET Salud",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/health",
+            "description": "Comprueba que la API está disponible."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Salud correcta', () => pm.expect(pm.response.json()).to.deep.equal({ status: 'ok' }));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "item": [
+        {
+          "name": "POST Evento válido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/events/validate",
+            "description": "Valida un pase sintético. La ruta no guarda el evento.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schema_version\": \"1.0\",\n  \"event_id\": \"evt-104\",\n  \"match_id\": \"demo-001\",\n  \"period\": 1,\n  \"clock_ms\": 802000,\n  \"video_time_ms\": 805500,\n  \"type\": \"pass\",\n  \"team_id\": \"team-a\",\n  \"player_id\": \"player-7\",\n  \"start\": {\"x\": 43, \"y\": 51},\n  \"end\": {\"x\": 62, \"y\": 46},\n  \"outcome\": \"success\",\n  \"source\": \"synthetic\",\n  \"related_event_ids\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Contrato validado', () => pm.expect(body.valid).to.equal(true));",
+                  "pm.test('Conserva identificadores y tiempos', () => { pm.expect(body.event.event_id).to.equal('evt-104'); pm.expect(body.event.match_id).to.equal('demo-001'); pm.expect(body.event.clock_ms).to.equal(802000); pm.expect(body.event.video_time_ms).to.equal(805500); });",
+                  "pm.test('Conserva la procedencia', () => pm.expect(body.event.source).to.equal('synthetic'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Evento inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/events/validate",
+            "description": "Rechaza confianza fuera del intervalo permitido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schema_version\": \"1.0\",\n  \"event_id\": \"evt-bad\",\n  \"match_id\": \"demo-001\",\n  \"period\": 1,\n  \"clock_ms\": 802000,\n  \"type\": \"shot\",\n  \"team_id\": \"team-a\",\n  \"source\": \"video_model\",\n  \"confidence\": 1.5\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Señala confidence', () => pm.expect(pm.response.json().detail.some(error => error.loc.includes('confidence'))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Lote de eventos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/events/validate-batch",
+            "description": "Valida un lote sintético y devuelve cada rechazo con su causa.",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"schema_version\": \"1.0\",\n    \"event_id\": \"evt-104\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 802000,\n    \"video_time_ms\": 805500,\n    \"type\": \"pass\",\n    \"team_id\": \"team-a\",\n    \"player_id\": \"player-7\",\n    \"start\": {\n      \"x\": 43,\n      \"y\": 51\n    },\n    \"end\": {\n      \"x\": 62,\n      \"y\": 46\n    },\n    \"outcome\": \"success\",\n    \"source\": \"synthetic\",\n    \"related_event_ids\": []\n  },\n  {\n    \"schema_version\": \"1.0\",\n    \"event_id\": \"evt-104\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"video_time_ms\": 805500,\n    \"type\": \"pass\",\n    \"team_id\": \"team-a\",\n    \"player_id\": \"player-7\",\n    \"start\": {\n      \"x\": 43,\n      \"y\": 51\n    },\n    \"end\": {\n      \"x\": 62,\n      \"y\": 46\n    },\n    \"outcome\": \"success\",\n    \"source\": \"synthetic\",\n    \"related_event_ids\": []\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Acepta y rechaza por separado', () => { pm.expect(body.accepted_count).to.equal(1); pm.expect(body.rejected_count).to.equal(1); });",
+                  "pm.test('Conserva la causa del rechazo', () => pm.expect(body.rejected[0].issues.some(issue => issue.location.includes('clock_ms'))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Partidos",
+      "item": [
+        {
+          "name": "POST Partido válido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/validate",
+            "description": "Valida metadatos sintéticos. La ruta no crea el partido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schema_version\": \"1.0\",\n  \"match_id\": \"demo-001\",\n  \"home_team\": {\"team_id\": \"team-a\", \"name\": \"Equipo A\"},\n  \"away_team\": {\"team_id\": \"team-b\", \"name\": \"Equipo B\"},\n  \"pitch_length_m\": 105,\n  \"pitch_width_m\": 68,\n  \"players\": [{\"player_id\": \"player-7\", \"team_id\": \"team-a\", \"name\": \"Jugador 7\", \"shirt_number\": 7}],\n  \"attacking_directions\": [{\"period\": 1, \"team_id\": \"team-a\", \"direction\": \"left_to_right\"}]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Contrato validado', () => pm.expect(body.valid).to.equal(true));",
+                  "pm.test('Conserva equipos y jugador', () => { pm.expect(body.match.match_id).to.equal('demo-001'); pm.expect(body.match.home_team.team_id).to.equal('team-a'); pm.expect(body.match.away_team.team_id).to.equal('team-b'); pm.expect(body.match.players[0].player_id).to.equal('player-7'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Partido inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/validate",
+            "description": "Rechaza una longitud de campo negativa.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"schema_version\": \"1.0\",\n  \"match_id\": \"demo-001\",\n  \"home_team\": {\"team_id\": \"team-a\", \"name\": \"Equipo A\"},\n  \"away_team\": {\"team_id\": \"team-b\", \"name\": \"Equipo B\"},\n  \"pitch_length_m\": -105,\n  \"pitch_width_m\": 68\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Señala pitch_length_m', () => pm.expect(pm.response.json().detail.some(error => error.loc.includes('pitch_length_m'))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enrutamiento de agentes",
+      "item": [
+        {
+          "name": "POST Filtro solo métricas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/agent-routing/evaluate",
+            "description": "Un pase normal actualiza métricas sin crear trabajo para agentes.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"demo-routing-001\",\n  \"events\": [\n    {\n      \"schema_version\": \"1.0\",\n      \"event_id\": \"evt-001\",\n      \"match_id\": \"demo-routing-001\",\n      \"period\": 1,\n      \"clock_ms\": 60000,\n      \"video_time_ms\": 62000,\n      \"type\": \"pass\",\n      \"team_id\": \"team-a\",\n      \"player_id\": \"player-4\",\n      \"start\": {\n        \"x\": 18,\n        \"y\": 42\n      },\n      \"end\": {\n        \"x\": 29,\n        \"y\": 45\n      },\n      \"outcome\": \"success\",\n      \"source\": \"synthetic\",\n      \"confidence\": null,\n      \"related_event_ids\": []\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('No llama agentes', () => { pm.expect(body.decision.route).to.equal('metrics_only'); pm.expect(body.agent_request).to.equal(null); pm.expect(body.dispatch).to.equal(null); });",
+                  "pm.test('Actualiza métricas', () => pm.expect(body.metric_updates[0].key).to.equal('passes'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Filtro de peligro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/agent-routing/evaluate",
+            "description": "Un tiro desde una zona peligrosa crea una solicitud reducida y trazable.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_id\": \"demo-routing-001\",\n  \"events\": [\n    {\n      \"schema_version\": \"1.0\",\n      \"event_id\": \"evt-020\",\n      \"match_id\": \"demo-routing-001\",\n      \"period\": 1,\n      \"clock_ms\": 802000,\n      \"video_time_ms\": 805500,\n      \"type\": \"shot\",\n      \"team_id\": \"team-a\",\n      \"player_id\": \"player-9\",\n      \"start\": {\n        \"x\": 86,\n        \"y\": 50\n      },\n      \"end\": {\n        \"x\": 100,\n        \"y\": 50\n      },\n      \"outcome\": \"blocked\",\n      \"source\": \"synthetic\",\n      \"confidence\": null,\n      \"related_event_ids\": [\n        \"evt-010\",\n        \"evt-011\",\n        \"evt-012\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Activa peligro inmediato', () => pm.expect(body.decision.route).to.equal('danger_immediate'));",
+                  "pm.test('Despacha al agente correcto', () => pm.expect(body.dispatch.target_agent).to.equal('danger_simulation'));",
+                  "pm.test('Conserva trazabilidad', () => { pm.expect(body.agent_request.source_event_ids).to.include('evt-020'); pm.expect(body.agent_request.source_event_ids).to.include('evt-012'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Narrativa",
+      "item": [
+        {
+          "name": "POST En directo ES casual",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/live?provider=fixture",
+            "description": "Narración sintética local. provider=fixture no usa Azure ni un modelo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidate\": {\n    \"contract_version\": \"1\",\n    \"candidate_id\": \"moment-pressure\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 780000,\n    \"kind\": \"pressure_shift\",\n    \"priority\": 65,\n    \"selection_reason\": \"Two pressures preceded a recovery\",\n    \"facts\": [\n      {\n        \"key\": \"pressure\",\n        \"team_id\": \"team-a\",\n        \"value\": 2,\n        \"unit\": \"count\",\n        \"window_ms\": 600000,\n        \"source_event_ids\": [\n          \"evt-101\",\n          \"evt-102\"\n        ]\n      },\n      {\n        \"key\": \"recoveries\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"window_ms\": 600000,\n        \"source_event_ids\": [\n          \"evt-103\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\"\n    ],\n    \"evidence_limits\": [\n      \"No opponent positions available\"\n    ]\n  },\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Borrador verificado en español', () => { pm.expect(body.draft.verification_status).to.equal('approved'); pm.expect(body.draft.language).to.equal('es'); pm.expect(body.draft.content_kind).to.equal('live'); });",
+                  "pm.test('Eventos de origen trazables', () => pm.expect(body.draft.source_event_ids).to.deep.equal(['evt-101', 'evt-102']));",
+                  "pm.test('Sin causa táctica inventada', () => pm.expect(body.draft.explanation).to.include('No hay datos suficientes'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST En directo EN analista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/live?provider=fixture",
+            "description": "Compara el modo analista en inglés con la misma fuente sintética.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidate\": {\n    \"contract_version\": \"1\",\n    \"candidate_id\": \"moment-goal\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"kind\": \"goal\",\n    \"priority\": 100,\n    \"selection_reason\": \"Goal changed the score\",\n    \"facts\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"preferences\": {\n    \"language\": \"en\",\n    \"mode\": \"analyst\",\n    \"level\": \"advanced\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Modo e idioma aplicados', () => { pm.expect(body.draft.language).to.equal('en'); pm.expect(body.draft.mode).to.equal('analyst'); pm.expect(body.draft.level).to.equal('advanced'); });",
+                  "pm.test('Gol sustentado por evento', () => { pm.expect(body.draft.claims[0].key).to.equal('goals'); pm.expect(body.draft.source_event_ids).to.include('evt-105'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Jugador sin novedades",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/live?provider=fixture",
+            "description": "El jugador elegido no participa en este momento.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidate\": {\n    \"contract_version\": \"1\",\n    \"candidate_id\": \"moment-pressure\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 780000,\n    \"kind\": \"pressure_shift\",\n    \"priority\": 65,\n    \"selection_reason\": \"Two pressures preceded a recovery\",\n    \"facts\": [\n      {\n        \"key\": \"pressure\",\n        \"team_id\": \"team-a\",\n        \"value\": 2,\n        \"unit\": \"count\",\n        \"window_ms\": 600000,\n        \"source_event_ids\": [\n          \"evt-101\",\n          \"evt-102\"\n        ]\n      },\n      {\n        \"key\": \"recoveries\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"window_ms\": 600000,\n        \"source_event_ids\": [\n          \"evt-103\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\"\n    ],\n    \"evidence_limits\": [\n      \"No opponent positions available\"\n    ]\n  },\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"player\",\n    \"level\": \"normal\",\n    \"favorite_player_id\": \"player-9\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Comunica ausencia de novedades', () => { pm.expect(body.draft.headline).to.include('Sin novedades'); pm.expect(body.draft.claims).to.be.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Pregunta con evidencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/questions?provider=fixture",
+            "description": "Pregunta sobre una métrica que existe en los eventos sintéticos.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidates\": [\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-pressure\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 780000,\n      \"kind\": \"pressure_shift\",\n      \"priority\": 65,\n      \"selection_reason\": \"Two pressures preceded a recovery\",\n      \"facts\": [\n        {\n          \"key\": \"pressure\",\n          \"team_id\": \"team-a\",\n          \"value\": 2,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-101\",\n            \"evt-102\"\n          ]\n        },\n        {\n          \"key\": \"recoveries\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-103\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-101\",\n        \"evt-102\",\n        \"evt-103\"\n      ],\n      \"evidence_limits\": [\n        \"No opponent positions available\"\n      ]\n    },\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-goal\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 900000,\n      \"kind\": \"goal\",\n      \"priority\": 100,\n      \"selection_reason\": \"Goal changed the score\",\n      \"facts\": [\n        {\n          \"key\": \"shots\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-104\"\n          ]\n        },\n        {\n          \"key\": \"goals\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-105\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-104\",\n        \"evt-105\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  },\n  \"question\": \"¿Cuántas recuperaciones tiene player-7?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Responde con el dato solicitado', () => { pm.expect(body.draft.content_kind).to.equal('answer'); pm.expect(body.draft.claims[0].key).to.equal('recoveries'); pm.expect(body.draft.claims[0].value).to.equal(1); });",
+                  "pm.test('Cita el evento', () => pm.expect(body.draft.source_event_ids).to.deep.equal(['evt-103']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Pregunta sin evidencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/questions?provider=fixture",
+            "description": "No se inventa una velocidad que los eventos no permiten calcular.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidates\": [\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-pressure\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 780000,\n      \"kind\": \"pressure_shift\",\n      \"priority\": 65,\n      \"selection_reason\": \"Two pressures preceded a recovery\",\n      \"facts\": [\n        {\n          \"key\": \"pressure\",\n          \"team_id\": \"team-a\",\n          \"value\": 2,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-101\",\n            \"evt-102\"\n          ]\n        },\n        {\n          \"key\": \"recoveries\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-103\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-101\",\n        \"evt-102\",\n        \"evt-103\"\n      ],\n      \"evidence_limits\": [\n        \"No opponent positions available\"\n      ]\n    },\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-goal\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 900000,\n      \"kind\": \"goal\",\n      \"priority\": 100,\n      \"selection_reason\": \"Goal changed the score\",\n      \"facts\": [\n        {\n          \"key\": \"shots\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-104\"\n          ]\n        },\n        {\n          \"key\": \"goals\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-105\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-104\",\n        \"evt-105\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  },\n  \"question\": \"¿Cuál fue la velocidad del balón?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reconoce el límite', () => { pm.expect(body.draft.explanation).to.include('No se puede determinar'); pm.expect(body.draft.claims).to.be.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Resumen pendiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/summaries?provider=fixture",
+            "description": "El borrador final requiere revisión editorial antes de publicarse.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidates\": [\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-pressure\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 780000,\n      \"kind\": \"pressure_shift\",\n      \"priority\": 65,\n      \"selection_reason\": \"Two pressures preceded a recovery\",\n      \"facts\": [\n        {\n          \"key\": \"pressure\",\n          \"team_id\": \"team-a\",\n          \"value\": 2,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-101\",\n            \"evt-102\"\n          ]\n        },\n        {\n          \"key\": \"recoveries\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-103\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-101\",\n        \"evt-102\",\n        \"evt-103\"\n      ],\n      \"evidence_limits\": [\n        \"No opponent positions available\"\n      ]\n    },\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-goal\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 900000,\n      \"kind\": \"goal\",\n      \"priority\": 100,\n      \"selection_reason\": \"Goal changed the score\",\n      \"facts\": [\n        {\n          \"key\": \"shots\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-104\"\n          ]\n        },\n        {\n          \"key\": \"goals\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-105\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-104\",\n        \"evt-105\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  },\n  \"match_finished\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Resumen final retenido', () => { pm.expect(body.draft.content_kind).to.equal('final'); pm.expect(body.draft.editorial_status).to.equal('pending'); });",
+                  "pm.test('Marcador y gol consistentes', () => { pm.expect(body.draft.headline).to.include('team-a 1 - team-b 0'); pm.expect(body.draft.source_event_ids).to.include('evt-105'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Resumen antes del final",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/summaries?provider=fixture",
+            "description": "No permite pedir el análisis final sin indicar que terminó el partido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidates\": [\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-pressure\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 780000,\n      \"kind\": \"pressure_shift\",\n      \"priority\": 65,\n      \"selection_reason\": \"Two pressures preceded a recovery\",\n      \"facts\": [\n        {\n          \"key\": \"pressure\",\n          \"team_id\": \"team-a\",\n          \"value\": 2,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-101\",\n            \"evt-102\"\n          ]\n        },\n        {\n          \"key\": \"recoveries\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"window_ms\": 600000,\n          \"source_event_ids\": [\n            \"evt-103\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-101\",\n        \"evt-102\",\n        \"evt-103\"\n      ],\n      \"evidence_limits\": [\n        \"No opponent positions available\"\n      ]\n    },\n    {\n      \"contract_version\": \"1\",\n      \"candidate_id\": \"moment-goal\",\n      \"match_id\": \"demo-001\",\n      \"period\": 1,\n      \"clock_ms\": 900000,\n      \"kind\": \"goal\",\n      \"priority\": 100,\n      \"selection_reason\": \"Goal changed the score\",\n      \"facts\": [\n        {\n          \"key\": \"shots\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-104\"\n          ]\n        },\n        {\n          \"key\": \"goals\",\n          \"team_id\": \"team-a\",\n          \"player_id\": \"player-7\",\n          \"value\": 1,\n          \"unit\": \"count\",\n          \"source_event_ids\": [\n            \"evt-105\"\n          ]\n        }\n      ],\n      \"source_event_ids\": [\n        \"evt-104\",\n        \"evt-105\"\n      ]\n    }\n  ],\n  \"preferences\": {\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\"\n  },\n  \"match_finished\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 422', () => pm.response.to.have.status(422));",
+                  "pm.test('Exige partido finalizado', () => pm.expect(pm.response.json().detail.some(error => error.loc.includes('match_finished'))).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reporte falso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/reports/resolve",
+            "description": "La cifra original coincide con el evento y no necesita corrección.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_id\": \"report-false\",\n  \"draft\": {\n    \"contract_version\": \"1\",\n    \"draft_id\": \"draft-moment-goal-es-casual-normal-live\",\n    \"candidate_id\": \"moment-goal\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\",\n    \"content_kind\": \"live\",\n    \"headline\": \"Gol de player-7 - 15'\",\n    \"explanation\": \"player-7: 1 gol.\",\n    \"claims\": [\n      {\n        \"key\": \"goals\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-105\"\n    ],\n    \"applied_preferences\": {},\n    \"verification_status\": \"approved\",\n    \"editorial_status\": null\n  },\n  \"reason\": \"La cifra parece incorrecta\",\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidate\": {\n    \"contract_version\": \"1\",\n    \"candidate_id\": \"moment-goal\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"kind\": \"goal\",\n    \"priority\": 100,\n    \"selection_reason\": \"Goal changed the score\",\n    \"facts\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Mantiene la conclusión correcta', () => { pm.expect(body.status).to.equal('no_error'); pm.expect(body.correction).to.equal(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reporte válido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/narratives/reports/resolve",
+            "description": "La cifra alterada se contrasta y genera un borrador corregido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_id\": \"report-valid\",\n  \"draft\": {\n    \"contract_version\": \"1\",\n    \"draft_id\": \"draft-moment-goal-es-casual-normal-live\",\n    \"candidate_id\": \"moment-goal\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"language\": \"es\",\n    \"mode\": \"casual\",\n    \"level\": \"normal\",\n    \"content_kind\": \"live\",\n    \"headline\": \"Gol de player-7 - 15'\",\n    \"explanation\": \"player-7: 1 gol.\",\n    \"claims\": [\n      {\n        \"key\": \"goals\",\n        \"value\": 99,\n        \"unit\": \"count\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-105\"\n    ],\n    \"applied_preferences\": {},\n    \"verification_status\": \"approved\",\n    \"editorial_status\": null\n  },\n  \"reason\": \"La cifra del gol no coincide\",\n  \"snapshot\": {\n    \"contract_version\": \"1\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"score\": {\n      \"team-a\": 1,\n      \"team-b\": 0\n    },\n    \"metrics\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"formula_version\": \"1\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"recent_event_ids\": [\n      \"evt-101\",\n      \"evt-102\",\n      \"evt-103\",\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  },\n  \"candidate\": {\n    \"contract_version\": \"1\",\n    \"candidate_id\": \"moment-goal\",\n    \"match_id\": \"demo-001\",\n    \"period\": 1,\n    \"clock_ms\": 900000,\n    \"kind\": \"goal\",\n    \"priority\": 100,\n    \"selection_reason\": \"Goal changed the score\",\n    \"facts\": [\n      {\n        \"key\": \"shots\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-104\"\n        ]\n      },\n      {\n        \"key\": \"goals\",\n        \"team_id\": \"team-a\",\n        \"player_id\": \"player-7\",\n        \"value\": 1,\n        \"unit\": \"count\",\n        \"source_event_ids\": [\n          \"evt-105\"\n        ]\n      }\n    ],\n    \"source_event_ids\": [\n      \"evt-104\",\n      \"evt-105\"\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Confirma el error', () => pm.expect(body.status).to.equal('confirmed_error'));",
+                  "pm.test('Corrige con trazabilidad', () => { pm.expect(body.correction.original_draft_id).to.equal('draft-moment-goal-es-casual-normal-live'); pm.expect(body.correction.claims[0].value).to.equal(1); pm.expect(body.correction.source_event_ids).to.include('evt-105'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

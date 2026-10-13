@@ -1,0 +1,14 @@
+{
+  "contract_version": "1",
+  "draft_id": "summary-invalid",
+  "match_id": "demo-001",
+  "period": 1,
+  "clock_ms": 900000,
+  "language": "es",
+  "mode": "casual",
+  "level": "normal",
+  "content_kind": "final",
+  "headline": "Resumen",
+  "explanation": "Texto sin revisión.",
+  "verification_status": "approved"
+}

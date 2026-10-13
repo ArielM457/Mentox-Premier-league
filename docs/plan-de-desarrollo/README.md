@@ -34,6 +34,12 @@ Los campos y ejemplos iniciales están en [contratos de trabajo](contratos-de-tr
 
 **5. Salida pública.** Persona 4 transforma una narración aprobada en `OverlayMessage v1` con identificador, tiempo de vídeo, duración sugerida, prioridad y contenido legible por máquina. También define la respuesta de la API para estado, preguntas y resúmenes.
 
+**6. Decisión de ruta.** Persona 2 entrega `RoutingDecision v1` antes de cualquier agente. Los eventos de solo métricas no llegan al orquestador.
+
+**7. Solicitud de agente.** Persona 3 entrega `AgentRequest v1` y `AgentDispatch v1` con contexto reducido, vencimiento, destino y razón.
+
+**8. Contexto previo.** Persona 3 mantiene `PregameFact v1` con fuente, vigencia y aprobación para que el narrador solo use información autorizada.
+
 El contrato del evento ya tiene versión `1.0`. Los otros nombres son contratos de trabajo propuestos y se cerrarán antes de implementar la conexión entre módulos. Los cambios incompatibles requieren nueva versión y un ejemplo actualizado. No editamos al mismo tiempo el mismo archivo de contrato.
 
 ## **Límites de archivos**
@@ -46,13 +52,15 @@ Los archivos compartidos de configuración, contratos y documentación se cambia
 
 **1. Acordar contratos y ejemplos.** Usamos un partido sintético corto con pases, presión, recuperación, tiro y gol. Definimos reloj, identidad de jugadores, posiciones, estados sin datos y referencias de origen. Persona 5 entrega los primeros recorridos y bocetos.
 
-**2. Completar módulos con datos de prueba.** Persona 1 reproduce eventos. Persona 2 calcula estado y momentos con una secuencia fija. Persona 3 produce narraciones desde estados y momentos de ejemplo. Persona 4 muestra vídeo, estados y mensajes simulados. Persona 5 termina los diseños de los recorridos principales.
+**2. Completar el procesamiento rápido.** Persona 1 reproduce eventos. Persona 2 calcula estado, filtra rutas y reconoce jugadas. Persona 3 refina solicitudes y prueba el orquestador local. Persona 4 prepara los canales y mensajes simulados. Persona 5 termina los diseños de los recorridos principales.
 
-**3. Unir el flujo sintético.** Conectamos evento, estado, momento, narración verificada y superposición. Después unimos la aprobación del resumen y el reporte de errores. Este flujo completo es el primer hito demostrable.
+**3. Unir el flujo sintético por eventos.** Conectamos evento, filtro, estado, catálogo, refinamiento, orquestador, agente, validación y superposición. Después unimos el resumen de medio tiempo, el resumen final, la aprobación y los reportes. Este flujo completo es el primer hito demostrable.
 
 **4. Conectar vídeo y analítica avanzada.** Persona 1 prueba Roboflow Sports y SoccerNet por separado antes de fusionarlos. Persona 2 incorpora solo métricas cuyo cálculo pueda validar. Persona 4 mide sincronización y retraso visibles. Las funciones de vídeo se incorporan al flujo público cuando sus resultados y permisos sean suficientes.
 
-**5. Ensayar la demo.** Repetimos el mismo partido en inglés y español, en modos casual y analista, con club y jugador favoritos. Mostramos fuentes de cada explicación, un resumen revisado y un caso de error controlado.
+**5. Probar carga y fallos.** Medimos el filtro y los canales con el volumen esperado y un pico mayor. Detenemos una instancia, repetimos mensajes y simulamos un modelo caído sin detener las métricas.
+
+**6. Ensayar la demo.** Repetimos el mismo partido en inglés y español, en modos casual y analista, con club y jugador favoritos. Mostramos una ruta de solo métricas, una situación de peligro, una simulación marcada, contexto previo aprobado, ambos resúmenes y un fallo controlado.
 
 Este orden expresa hitos, no fechas. La duración del hackathon y la disponibilidad de modelos aún no están documentadas.
 

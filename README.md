@@ -37,6 +37,12 @@ En otra terminal, inicia el frontend:
 npm run dev:frontend
 ```
 
-La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. El formulario inicial valida un evento contra el formato `1.0`; todavía no guarda eventos ni analiza partidos.
+La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. El formulario inicial valida un evento contra el formato `1.0`; todavía no guarda eventos. El backend incluye por separado la ingesta sintética, el estado y la analítica, y la narrativa. La experiencia completa aún necesita conectar esos módulos con la interfaz.
 
-CrewAI figura como dependencia opcional del backend. Cuando se implemente el equipo de agentes y se elija un proveedor de modelos, se podrá instalar con `uv sync --project apps/backend --extra agents`.
+CrewAI es una dependencia opcional del backend. Para usar la integración con Azure OpenAI, se puede instalar con `uv sync --project apps/backend --extra agents`.
+
+El módulo de la persona 3 ya tiene contratos, un flujo de narración y pruebas con un partido sintético. Consulta la [guía de agentes y narrativa](apps/backend/README-narrativa.md) para ejecutarlo. La API expone las operaciones de narrativa con un proveedor sintético de prueba o con Azure OpenAI si se configura el recurso y el despliegue. El frontend todavía no consume estas rutas.
+
+El backend también tiene una primera versión del filtro y el enrutamiento de agentes. La ruta `/api/v1/agent-routing/evaluate` separa eventos de solo métricas y solicitudes relevantes, reconoce dos patrones iniciales y prepara un despacho reproducible. Todavía no existe almacenamiento entre peticiones ni un canal durable.
+
+La [colección de Postman](postman/README.md) contiene peticiones y pruebas listas para importar.
