@@ -39,7 +39,7 @@ El módulo `tracking@1` calcula distancia, distancia a alta intensidad, velocida
 | `domain/analytics/models.py` | `TrackingEvidence` en `MetricValue` |
 | `domain/analytics/catalog.py` | Claves de seguimiento con versión `tracking@1` |
 | `application/analytics/pipeline.py` | Seguimiento opcional en el snapshot y en `MatchAnalytics` |
-| `adapters/sources/tracking_mock.py` | Observaciones simuladas con el formato de Persona 1 |
+| `apps/backend/tests/tracking_mock.py` | Observaciones simuladas con el formato de Persona 1 (dato de prueba, fuera de `src`) |
 | `adapters/sources/roboflow_tracking.py` | Eliminado: la conversión desde Roboflow es de Persona 1 |
 
 ## Decisiones técnicas

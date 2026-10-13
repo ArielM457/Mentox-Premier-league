@@ -3,9 +3,9 @@
 import json
 from pathlib import Path
 
-from match_intelligence.adapters.sources.analytics_demo import build_demo_data
+from analytics_demo import build_demo_data
 from match_intelligence.application.analytics.pipeline import MatchAnalytics
-from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from analytics_scenarios import generate_analytics_scenario
 
 DEMO = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "demo"
 

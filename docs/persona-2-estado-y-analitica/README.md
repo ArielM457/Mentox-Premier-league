@@ -59,14 +59,21 @@ MatchEvent 1.0
 | Azure Event Hubs `match-insights` | `adapters/messaging/azure_insights.py` |
 | Azure Blob Storage `analytics` y `matches` | `adapters/storage/azure_analytics.py` |
 | Puente con la ingesta de Persona 1 | `adapters/messaging/analytics_bridge.py` |
-| Escenario sintético de Persona 2 | `adapters/sources/analytics_scenarios.py` |
 | Analítica de seguimiento | `domain/analytics/tracking.py` |
 | Entrada desde las observaciones de visión de Persona 1 | `application/analytics/tracking_input.py` |
-| Observaciones simuladas con el formato de Persona 1 | `adapters/sources/tracking_mock.py` |
-| Datos del tablero | `adapters/sources/analytics_demo.py` y `scripts/export_analytics_demo.py` |
 | Infraestructura | `infra/azure/analytics.bicep` |
 
-Todas las rutas de código son relativas a `apps/backend/src/match_intelligence/` salvo la última. El dominio no importa FastAPI, Azure, CrewAI ni bibliotecas de modelos.
+Las rutas de código son relativas a `apps/backend/src/match_intelligence/`, salvo la de la infraestructura. El dominio no importa FastAPI, Azure, CrewAI ni bibliotecas de modelos.
+
+Los datos de prueba no forman parte del código de producción y están en `apps/backend/tests/`:
+
+| Pieza | Archivo |
+|---|---|
+| Escenario sintético de 178 eventos para probar la analítica | `tests/analytics_scenarios.py` |
+| Observaciones de seguimiento simuladas con el formato de Persona 1 | `tests/tracking_mock.py` |
+| Generador de los ejemplos de contrato | `tests/analytics_examples.py` y `scripts/export_analytics_examples.py` |
+| Datos del tablero | `tests/analytics_demo.py` y `scripts/export_analytics_demo.py` |
+| Constructores de eventos para pruebas | `tests/analytics_builders.py` |
 
 ## Cómo probarlo
 

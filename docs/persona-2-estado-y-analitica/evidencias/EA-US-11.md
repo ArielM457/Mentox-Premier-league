@@ -16,7 +16,7 @@
 
 | Archivo | Cambio |
 |---|---|
-| `adapters/sources/analytics_demo.py` | Datos del tablero desde `MatchAnalytics`, `MatchAnalyzer`, `build_snapshot` y el seguimiento |
+| `apps/backend/tests/analytics_demo.py` | Datos del tablero desde `MatchAnalytics`, `MatchAnalyzer`, `build_snapshot` y el seguimiento |
 | `scripts/export_analytics_demo.py` | Inserta los datos en la plantilla y escribe el tablero |
 | `docs/persona-2-estado-y-analitica/demo/plantilla.html` | Página: HTML, CSS y JavaScript sin dependencias externas salvo las fuentes |
 | `docs/persona-2-estado-y-analitica/demo/tablero.html` | Tablero generado (unos 436 KB) |

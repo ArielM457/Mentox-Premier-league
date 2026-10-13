@@ -5,9 +5,13 @@ Desde la raíz del repositorio::
     python apps/backend/scripts/export_analytics_examples.py
 """
 
+import sys
 from pathlib import Path
 
-from match_intelligence.adapters.sources.analytics_examples import build_examples, render
+# Los escenarios y datos simulados son de prueba y viven en tests/.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
+
+from analytics_examples import build_examples, render
 
 TARGET = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "ejemplos"
 

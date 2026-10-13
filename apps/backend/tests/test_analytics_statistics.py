@@ -1,6 +1,6 @@
 from analytics_builders import A, B, KO, Events, metadata
 
-from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from analytics_scenarios import generate_analytics_scenario
 from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
 from match_intelligence.application.analytics.pipeline import MatchAnalytics, build_snapshot
 from match_intelligence.domain.analytics.catalog import METRIC_CATALOG

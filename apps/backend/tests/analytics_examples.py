@@ -8,7 +8,7 @@ si alguien cambia una regla sin regenerar los ejemplos, la prueba falla.
 import json
 from typing import Any
 
-from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from analytics_scenarios import generate_analytics_scenario
 from match_intelligence.adapters.sources.synthetic import SyntheticMatch, generate_acceptance_match
 from match_intelligence.domain.analytics.models import AttentionOutcome
 

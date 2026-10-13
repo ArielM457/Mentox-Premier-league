@@ -12,9 +12,13 @@ el envoltorio ``<html>`` para publicarla como artefacto.
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
-from match_intelligence.adapters.sources.analytics_demo import build_demo_data
+# Los escenarios y datos simulados son de prueba y viven en tests/.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
+
+from analytics_demo import build_demo_data
 
 DEMO = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "demo"
 WRAPPER = (

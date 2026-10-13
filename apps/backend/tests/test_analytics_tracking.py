@@ -3,8 +3,8 @@
 import pytest
 from analytics_builders import A, B, Events, metadata
 
-from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
-from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
+from analytics_scenarios import generate_analytics_scenario
+from tracking_mock import generate_mock_tracking
 from match_intelligence.application.analytics.pipeline import MatchAnalytics, build_snapshot
 from match_intelligence.application.analytics.tracking_input import (
     TrackingInput,

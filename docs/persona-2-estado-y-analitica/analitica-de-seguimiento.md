@@ -66,7 +66,7 @@ Cada aviso (`TrackingAlert v1`) lleva su cifra con evidencia, el origen y los l�
 
 ## Observaciones simuladas
 
-`adapters/sources/tracking_mock.py` produce, a 5 muestras por segundo, exactamente lo que entregará Persona 1:
+`apps/backend/tests/tracking_mock.py` produce, a 5 muestras por segundo, exactamente lo que entregará Persona 1:
 
 - `VisualTrackObservation` por pista e instante, con `detector_confidence = 1.0`.
 - Identidades resueltas con su propio `PlayerIdentityResolver`, con la referencia de evidencia «mock de Persona 2».

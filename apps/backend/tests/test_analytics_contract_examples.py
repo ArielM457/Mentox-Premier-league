@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from match_intelligence.adapters.sources.analytics_examples import build_examples, render
+from analytics_examples import build_examples, render
 from match_intelligence.domain.analytics.models import (
     AttentionDecision,
     InsightCandidate,
