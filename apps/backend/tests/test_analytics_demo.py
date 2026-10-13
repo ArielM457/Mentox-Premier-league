@@ -14,7 +14,7 @@ def test_demo_data_comes_from_the_engine_and_labels_the_mock() -> None:
     data = build_demo_data()
     match = generate_analytics_scenario()
 
-    assert data["tracking"]["source"] == "synthetic_mock"
+    assert data["tracking"]["source"] == "simulated_fixture"
     assert len(data["events"]) == len(data["timeline"]) == len(match.events)
     assert [p["key"] for p in data["profiles"]] == ["neutral", "casual", "analyst", "rio_fan", "player_sol"]
     casual = next(p for p in data["profiles"] if p["key"] == "casual")

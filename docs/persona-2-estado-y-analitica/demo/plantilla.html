@@ -647,7 +647,7 @@ footer { color: var(--muted); font-size: 12px; display: grid; gap: 4px; }
     $("detail").innerHTML = `<h3>${KIND[it.kind]} · ${at(it.p, it.c)}</h3>
       <p class="headline">${name(it.pid)} · ${it.kind === "speed_record" ? `${num(it.value, 1)} km/h` : `${num(it.value)} m`}</p>
       <section><span class="label">Regla</span><p style="margin:0">${it.kind === "speed_record" ? "Aviso al terminar cada episodio por encima de 30 km/h si su pico supera en al menos 1 km/h el último récord del partido (tracking_alert@1)." : "Aviso cuando un jugador alcanza cada 1.000 m recorridos (tracking_alert@1)."}</p></section>
-      <section><span class="label">Lo que los datos no permiten afirmar</span><ul class="limits"><li>Seguimiento simulado a partir de los eventos sintéticos: las velocidades y distancias son de ejemplo y no se midieron en un vídeo.</li><li>Con un vídeo permitido, Roboflow Sports entregaría estas mismas posiciones y la regla no cambia.</li></ul></section>`;
+      <section><span class="label">Lo que los datos no permiten afirmar</span><ul class="limits"><li>Seguimiento simulado a partir de los eventos sintéticos: las velocidades y distancias son de ejemplo y no se midieron en un vídeo.</li><li>Cuando Persona 1 entregue observaciones reales de vídeo con el mismo formato, la regla no cambia.</li></ul></section>`;
   }
 
   // ---------- Perfiles y estado ----------
@@ -663,7 +663,7 @@ footer { color: var(--muted); font-size: 12px; display: grid; gap: 4px; }
     ["done", "Estadísticas trazables", "Cada cifra con fórmula, unidad, versión y eventos de origen. Sin datos queda no disponible, nunca en cero."],
     ["done", "Jugadas y patrones", "Progresión rápida, recuperación y tiro, presión sostenida, hitos, cambio de control y fase de caos, con ejemplos positivos y negativos."],
     ["done", "Motor de atención", "Prioridad como suma visible de motivos; preferencias de modo, club y jugador sin cambiar los hechos."],
-    ["sim", "Seguimiento de posiciones", "Velocidad, distancia, sprints, presión por cercanía y forma del equipo, probados con trayectorias conocidas. Hoy con posiciones simuladas; listo para recibir Roboflow Sports."],
+    ["sim", "Seguimiento de posiciones", "Velocidad, distancia, sprints, presión por cercanía y forma del equipo, probados con trayectorias conocidas. Hoy con observaciones simuladas en el formato de Persona 1; listo para recibir sus observaciones reales de vídeo."],
     ["todo", "xT, xG y VAEP", "Adaptadores probados contra referencias. Desactivados hasta entrenarlos con datos con licencia."],
     ["sim", "Azure", "Event Hub match-insights y registros en Blob Storage, probados con clientes simulados. Despliegue en la suscripción pendiente."],
     ["sim", "Narración", "En este tablero, texto de ejemplo. La narración multilingüe con agentes es de Persona 3."],

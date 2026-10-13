@@ -1,18 +1,18 @@
-"""Analítica de seguimiento (``tracking@1``): posiciones por cuadro en metros.
+"""Analítica de seguimiento (``tracking@1``): posiciones sucesivas en metros.
 
-Complementa a los eventos: con posiciones sucesivas y su tiempo ya se pueden
-medir velocidad, distancia, sprints, velocidad del balón, presión por cercanía
-y forma del equipo, que con ``MatchEvent 1.0`` quedan no disponibles.
+Complementa a los eventos: con posiciones sucesivas y su tiempo se pueden medir
+velocidad, distancia, sprints, velocidad del balón, presión por cercanía y
+forma del equipo, que con ``MatchEvent 1.0`` quedan no disponibles.
 
-Las coordenadas usan el campo fijo de los eventos: ``x_m`` va de 0 a
-``pitch_length_m`` en el mismo sentido que ``x`` de ``MatchEvent`` y ``y_m`` de
-0 a ``pitch_width_m``. La fuente puede ser un seguimiento simulado
-(``synthetic_mock``) o un modelo de vídeo (``video_model``); las cifras siempre
-dicen de cuál vienen.
+La entrada son las observaciones de visión de Persona 1
+(``VisualTrackObservation`` con su identidad resuelta). El adaptador
+``application/analytics/tracking_input.py`` las convierte en un ``TrackSet``;
+este módulo solo calcula. Las coordenadas usan el campo fijo de los eventos en
+metros y el origen sigue el vocabulario de Persona 1: ``simulated_fixture``
+para datos de prueba y ``actual_model`` para un modelo real.
 """
 
-from bisect import bisect_left, bisect_right
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 from math import hypot
@@ -27,11 +27,13 @@ from .models import IndicatorComponent, MetricOrigin, MetricValue, TrackingEvide
 
 TRACKING_RULE = "tracking@1"
 ALERT_RULE = "tracking_alert@1"
+SIMULATED_ORIGIN = "simulated_fixture"
+MODEL_ORIGIN = "actual_model"
 
 PLAYER_MAX_SPEED_MS = 12.0
 BALL_MAX_SPEED_MS = 40.0  # 144 km/h
 SPEED_WINDOW_MS = 1_000
-MAX_SAMPLE_GAP_MS = 300  # pensado para 5 cuadros por segundo o más
+MAX_SAMPLE_GAP_MS = 300  # pensado para 5 muestras por segundo o más
 BALL_WINDOW_MS = 200
 HIGH_INTENSITY_MS = 5.5   # 19,8 km/h
 SPRINT_MS = 7.0           # 25,2 km/h, sostenida al menos 1 s
@@ -56,39 +58,8 @@ LIMIT_IDENTITY = "La pista no está asociada a un jugador confirmado; se informa
 class TrackedKind(StrEnum):
     PLAYER = "player"
     GOALKEEPER = "goalkeeper"
-    REFEREE = "referee"
+    UNASSIGNED = "unassigned"
     BALL = "ball"
-
-
-class TrackingSource(StrEnum):
-    SYNTHETIC_MOCK = "synthetic_mock"
-    VIDEO_MODEL = "video_model"
-
-
-class TrackedObject(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    track_id: str = Field(min_length=1)
-    kind: TrackedKind
-    team_id: str | None = None
-    player_id: str | None = None
-    x_m: float
-    y_m: float
-    confidence: float | None = Field(default=None, ge=0, le=1)
-
-
-class TrackingFrame(BaseModel):
-    """``TrackingFrame v1``: todas las posiciones conocidas en un instante."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    schema_version: Literal["1"] = "1"
-    match_id: str = Field(min_length=1)
-    period: int = Field(ge=1, le=4)
-    clock_ms: int = Field(ge=0)
-    video_time_ms: int | None = Field(default=None, ge=0)
-    source: TrackingSource
-    objects: list[TrackedObject] = Field(default_factory=list)
 
 
 class TrackingAlert(BaseModel):
@@ -107,7 +78,7 @@ class TrackingAlert(BaseModel):
     team_id: str | None = None
     player_id: str | None = None
     track_id: str
-    source: TrackingSource
+    origin: str
     facts: list[MetricValue]
     evidence_limits: list[str] = Field(default_factory=list)
 
@@ -116,6 +87,7 @@ class TrackingAlert(BaseModel):
 class Sample:
     period: int
     clock_ms: int
+    video_time_ms: int
     x: float
     y: float
 
@@ -129,17 +101,63 @@ class Track:
     samples: list[Sample] = field(default_factory=list)
 
     @property
-    def is_outfield(self) -> bool:
-        return self.kind is TrackedKind.PLAYER
-
-    @property
     def is_person(self) -> bool:
         return self.kind in {TrackedKind.PLAYER, TrackedKind.GOALKEEPER}
 
 
 @dataclass(frozen=True, slots=True)
+class Instant:
+    """Posiciones conocidas en un mismo instante."""
+
+    period: int
+    clock_ms: int
+    video_time_ms: int
+    positions: tuple[tuple[Track, float, float], ...]
+
+
+@dataclass(frozen=True, slots=True)
+class TrackSet:
+    """Pistas de un partido en orden deportivo, listas para calcular."""
+
+    match_id: str
+    origin: str
+    tracks: dict[str, Track]
+
+    @property
+    def is_simulated(self) -> bool:
+        return self.origin != MODEL_ORIGIN
+
+    @property
+    def ball(self) -> Track | None:
+        return next((t for t in self.tracks.values() if t.kind is TrackedKind.BALL), None)
+
+    def until(self, period: int, clock_ms: int) -> "TrackSet":
+        """Las mismas pistas sin muestras posteriores al instante (sin futuros)."""
+        limit = (period, clock_ms)
+        tracks = {}
+        for track_id, track in self.tracks.items():
+            samples = [s for s in track.samples if (s.period, s.clock_ms) <= limit]
+            if samples:
+                tracks[track_id] = Track(track.track_id, track.kind, track.team_id, track.player_id, samples)
+        return TrackSet(self.match_id, self.origin, tracks)
+
+    def instants(self) -> list[Instant]:
+        grouped: dict[tuple[int, int], list[tuple[Track, float, float]]] = {}
+        video: dict[tuple[int, int], int] = {}
+        for track in self.tracks.values():
+            for sample in track.samples:
+                key = (sample.period, sample.clock_ms)
+                grouped.setdefault(key, []).append((track, sample.x, sample.y))
+                video[key] = sample.video_time_ms
+        return [
+            Instant(period, clock, video[(period, clock)], tuple(grouped[(period, clock)]))
+            for period, clock in sorted(grouped)
+        ]
+
+
+@dataclass(frozen=True, slots=True)
 class Movement:
-    """Resumen de movimiento de una pista hasta un instante."""
+    """Resumen de movimiento de una pista."""
 
     track: Track
     distance_m: float
@@ -153,22 +171,10 @@ class Movement:
     end: tuple[int, int] | None
 
 
-def build_tracks(frames: Iterable[TrackingFrame]) -> dict[str, Track]:
-    tracks: dict[str, Track] = {}
-    for frame in sorted(frames, key=lambda f: (f.period, f.clock_ms)):
-        for item in frame.objects:
-            track = tracks.get(item.track_id)
-            if track is None:
-                track = Track(item.track_id, item.kind, item.team_id, item.player_id)
-                tracks[item.track_id] = track
-            track.samples.append(Sample(frame.period, frame.clock_ms, item.x_m, item.y_m))
-    return tracks
-
-
 def _segments(samples: Sequence[Sample], max_speed: float):
     """Tramos consecutivos del mismo período; los saltos imposibles se marcan como no válidos.
 
-    Un hueco de más de 0,3 s sin cuadros (la pista se perdió) no es un tramo.
+    Un hueco de más de 0,3 s sin muestras (la pista se perdió) no es un tramo.
     """
     for previous, current in zip(samples, samples[1:]):
         if current.period != previous.period:
@@ -258,11 +264,11 @@ def movement(track: Track) -> Movement:
 
 
 def _evidence(
-    track_ids: Sequence[str], source: TrackingSource, start: tuple[int, int] | None,
+    track_ids: Sequence[str], origin: str, start: tuple[int, int] | None,
     end: tuple[int, int] | None, frames: int,
 ) -> TrackingEvidence:
     return TrackingEvidence(
-        source=source.value,
+        source=origin,
         track_ids=list(track_ids),
         start_period=start[0] if start else None,
         start_clock_ms=start[1] if start else None,
@@ -288,21 +294,15 @@ def tracking_metric(
     )
 
 
-def frame_source(frames: Sequence[TrackingFrame]) -> TrackingSource:
-    sources = {frame.source for frame in frames}
-    return TrackingSource.VIDEO_MODEL if TrackingSource.VIDEO_MODEL in sources else TrackingSource.SYNTHETIC_MOCK
-
-
-def player_tracking_metrics(frames: Sequence[TrackingFrame]) -> list[MetricValue]:
-    """Distancia, distancia a alta intensidad, velocidad máxima y sprints por jugador."""
-    source = frame_source(frames)
+def player_tracking_metrics(tracks: TrackSet) -> list[MetricValue]:
+    """Distancia, distancia a alta intensidad, velocidad máxima y sprints por pista de persona."""
     results: list[MetricValue] = []
-    for track in build_tracks(frames).values():
+    for track in tracks.tracks.values():
         if not track.is_person:
             continue
         summary = movement(track)
-        evidence = _evidence([track.track_id], source, summary.start, summary.end, summary.frames)
-        owner = {"team_id": track.team_id, "player_id": track.player_id or None}
+        evidence = _evidence([track.track_id], tracks.origin, summary.start, summary.end, summary.frames)
+        owner = {"team_id": track.team_id, "player_id": track.player_id}
         discarded = [IndicatorComponent(key="discarded_segments", value=summary.discarded_segments, unit="count")]
         results.extend([
             tracking_metric("distance_covered_m", round(summary.distance_m, 1), evidence=evidence,
@@ -317,19 +317,16 @@ def player_tracking_metrics(frames: Sequence[TrackingFrame]) -> list[MetricValue
     return results
 
 
-def ball_tracking_metrics(
-    frames: Sequence[TrackingFrame], events: Sequence[MatchEvent] = ()
-) -> list[MetricValue]:
+def ball_tracking_metrics(tracks: TrackSet, events: Sequence[MatchEvent] = ()) -> list[MetricValue]:
     """Velocidad máxima del balón y velocidad de cada tiro (máximo en el segundo siguiente)."""
-    source = frame_source(frames)
-    ball = next((t for t in build_tracks(frames).values() if t.kind is TrackedKind.BALL), None)
+    ball = tracks.ball
     if ball is None:
         return [
-            tracking_metric("ball_speed_kmh", None, evidence=_evidence([], source, None, None, 0),
+            tracking_metric("ball_speed_kmh", None, evidence=_evidence([], tracks.origin, None, None, 0),
                             reason="El seguimiento no incluye el balón"),
         ]
     summary = movement(ball)
-    evidence = _evidence([ball.track_id], source, summary.start, summary.end, summary.frames)
+    evidence = _evidence([ball.track_id], tracks.origin, summary.start, summary.end, summary.frames)
     results = [
         tracking_metric(
             "ball_speed_kmh",
@@ -348,7 +345,7 @@ def ball_tracking_metrics(
             and end.clock_ms <= event.clock_ms + SHOT_WINDOW_MS
         ]
         shot_evidence = _evidence(
-            [ball.track_id], source, (event.period, event.clock_ms),
+            [ball.track_id], tracks.origin, (event.period, event.clock_ms),
             (event.period, event.clock_ms + SHOT_WINDOW_MS), len(in_window),
         )
         results.append(
@@ -362,40 +359,33 @@ def ball_tracking_metrics(
     return results
 
 
-def _frames_in(frames: Sequence[TrackingFrame], period: int, start_ms: int, end_ms: int) -> list[TrackingFrame]:
-    return [f for f in frames if f.period == period and start_ms < f.clock_ms <= end_ms]
-
-
-def team_shape_metrics(
-    frames: Sequence[TrackingFrame], team_ids: Sequence[str], *,
-    period: int | None = None, start_ms: int = -1, end_ms: int | None = None,
-) -> list[MetricValue]:
-    """Ancho, profundidad y compactación media de los jugadores de campo."""
-    source = frame_source(frames)
-    scoped = list(frames) if period is None else _frames_in(frames, period, start_ms, end_ms or 10**12)
+def team_shape_metrics(tracks: TrackSet, team_ids: Sequence[str]) -> list[MetricValue]:
+    """Ancho, profundidad y compactación media de los jugadores de campo del equipo."""
+    instants = tracks.instants()
     results = []
     for team_id in team_ids:
         widths, depths, spreads = [], [], []
         track_ids: set[str] = set()
-        for frame in scoped:
+        for instant in instants:
             points = [
-                o for o in frame.objects if o.team_id == team_id and o.kind is TrackedKind.PLAYER
+                (track, x, y) for track, x, y in instant.positions
+                if track.team_id == team_id and track.kind is TrackedKind.PLAYER
             ]
             if len(points) < 3:
                 continue
-            track_ids.update(o.track_id for o in points)
-            xs = [o.x_m for o in points]
-            ys = [o.y_m for o in points]
+            track_ids.update(track.track_id for track, _, _ in points)
+            xs = [x for _, x, _ in points]
+            ys = [y for _, _, y in points]
             cx, cy = sum(xs) / len(xs), sum(ys) / len(ys)
             widths.append(max(ys) - min(ys))
             depths.append(max(xs) - min(xs))
-            spreads.append(sum(hypot(o.x_m - cx, o.y_m - cy) for o in points) / len(points))
+            spreads.append(sum(hypot(x - cx, y - cy) for _, x, y in points) / len(points))
         evidence = _evidence(
-            sorted(track_ids), source,
-            (scoped[0].period, scoped[0].clock_ms) if scoped else None,
-            (scoped[-1].period, scoped[-1].clock_ms) if scoped else None, len(widths),
+            sorted(track_ids), tracks.origin,
+            (instants[0].period, instants[0].clock_ms) if instants else None,
+            (instants[-1].period, instants[-1].clock_ms) if instants else None, len(widths),
         )
-        reason = "Menos de 3 jugadores de campo seguidos por cuadro"
+        reason = "Menos de 3 jugadores de campo seguidos por instante"
         for key, values in (
             ("team_width_m", widths), ("team_depth_m", depths), ("team_compactness_m", spreads)
         ):
@@ -406,59 +396,54 @@ def team_shape_metrics(
     return results
 
 
-def ball_carrier(frame: TrackingFrame) -> tuple[TrackedObject, TrackedObject] | None:
-    """Jugador a menos de 2 m del balón más cercano a él, y el balón."""
-    ball = next((o for o in frame.objects if o.kind is TrackedKind.BALL), None)
+def ball_carrier(instant: Instant) -> tuple[Track, float, float] | None:
+    """Persona con equipo a menos de 2 m del balón y más cercana a él."""
+    ball = next(((x, y) for track, x, y in instant.positions if track.kind is TrackedKind.BALL), None)
     if ball is None:
         return None
-    people = [o for o in frame.objects if o.kind in {TrackedKind.PLAYER, TrackedKind.GOALKEEPER} and o.team_id]
+    people = [p for p in instant.positions if p[0].is_person and p[0].team_id]
     if not people:
         return None
-    nearest = min(people, key=lambda o: hypot(o.x_m - ball.x_m, o.y_m - ball.y_m))
-    if hypot(nearest.x_m - ball.x_m, nearest.y_m - ball.y_m) > CONTROL_RADIUS_M:
+    nearest = min(people, key=lambda p: hypot(p[1] - ball[0], p[2] - ball[1]))
+    if hypot(nearest[1] - ball[0], nearest[2] - ball[1]) > CONTROL_RADIUS_M:
         return None
-    return nearest, ball
+    return nearest
 
 
-def pressure_metrics(frames: Sequence[TrackingFrame], team_ids: Sequence[str]) -> list[MetricValue]:
-    """``pressure_proximity_share``: cuadros con el rival en control y un defensor a ≤ 5 m."""
-    source = frame_source(frames)
+def pressure_metrics(tracks: TrackSet, team_ids: Sequence[str]) -> list[MetricValue]:
+    """``pressure_proximity_share``: instantes con el rival en control y un defensor a ≤ 5 m."""
+    instants = tracks.instants()
     results = []
     for team_id in team_ids:
         controlled = 0
         pressed = 0
         nearest_distances: list[float] = []
-        tracks: set[str] = set()
-        for frame in frames:
-            carried = ball_carrier(frame)
+        pressing_tracks: set[str] = set()
+        for instant in instants:
+            carried = ball_carrier(instant)
             if carried is None or carried[0].team_id in {team_id, None}:
                 continue
-            carrier = carried[0]
-            defenders = [
-                o for o in frame.objects
-                if o.team_id == team_id and o.kind in {TrackedKind.PLAYER, TrackedKind.GOALKEEPER}
-            ]
+            _, cx, cy = carried
+            defenders = [p for p in instant.positions if p[0].team_id == team_id and p[0].is_person]
             if not defenders:
                 continue
             controlled += 1
-            distance, closest = min(
-                (hypot(o.x_m - carrier.x_m, o.y_m - carrier.y_m), o.track_id) for o in defenders
-            )
+            distance, closest = min((hypot(x - cx, y - cy), track.track_id) for track, x, y in defenders)
             nearest_distances.append(distance)
             if distance <= PRESSURE_RADIUS_M:
                 pressed += 1
-                tracks.add(closest)
-        evidence = _evidence(sorted(tracks), source,
-                             (frames[0].period, frames[0].clock_ms) if frames else None,
-                             (frames[-1].period, frames[-1].clock_ms) if frames else None, controlled)
-        reason = "El rival no tuvo el balón controlado en ningún cuadro"
+                pressing_tracks.add(closest)
+        evidence = _evidence(sorted(pressing_tracks), tracks.origin,
+                             (instants[0].period, instants[0].clock_ms) if instants else None,
+                             (instants[-1].period, instants[-1].clock_ms) if instants else None, controlled)
+        reason = "El rival no tuvo el balón controlado en ningún instante"
         share = round(100 * pressed / controlled, 1) if controlled else None
         results.append(
             tracking_metric(
                 "pressure_proximity_share", share, evidence=evidence, team_id=team_id, reason=reason,
                 components=[
-                    IndicatorComponent(key="frames_pressed", team_id=team_id, value=pressed, unit="count"),
-                    IndicatorComponent(key="frames_opponent_control", value=controlled, unit="count"),
+                    IndicatorComponent(key="instants_pressed", team_id=team_id, value=pressed, unit="count"),
+                    IndicatorComponent(key="instants_opponent_control", value=controlled, unit="count"),
                 ] if controlled else [],
             )
         )
@@ -473,37 +458,33 @@ def pressure_metrics(frames: Sequence[TrackingFrame], team_ids: Sequence[str]) -
 
 
 def tracking_metrics(
-    frames: Sequence[TrackingFrame], team_ids: Sequence[str], events: Sequence[MatchEvent] = ()
+    tracks: TrackSet, team_ids: Sequence[str], events: Sequence[MatchEvent] = ()
 ) -> list[MetricValue]:
-    ordered = sorted(frames, key=lambda f: (f.period, f.clock_ms))
     return [
-        *player_tracking_metrics(ordered),
-        *ball_tracking_metrics(ordered, events),
-        *team_shape_metrics(ordered, team_ids),
-        *pressure_metrics(ordered, team_ids),
+        *player_tracking_metrics(tracks),
+        *ball_tracking_metrics(tracks, events),
+        *team_shape_metrics(tracks, team_ids),
+        *pressure_metrics(tracks, team_ids),
     ]
 
 
-def tracking_alerts(frames: Sequence[TrackingFrame]) -> list[TrackingAlert]:
-    """Avisos por umbral, causales: cada uno se emite en el cuadro que cruza el umbral.
+def tracking_alerts(tracks: TrackSet) -> list[TrackingAlert]:
+    """Avisos por umbral, causales: cada uno se emite en la muestra que cruza el umbral.
 
     * ``speed_record``: al terminar un episodio sobre 30 km/h, si su pico supera en al
       menos 1 km/h el último récord avisado del partido.
     * ``distance_milestone``: un jugador alcanza cada 1 000 m recorridos.
     """
-    ordered = sorted(frames, key=lambda f: (f.period, f.clock_ms))
-    if not ordered:
-        return []
-    source = frame_source(ordered)
-    limits = [LIMIT_MOCK if source is TrackingSource.SYNTHETIC_MOCK else LIMIT_VIDEO]
-    match_id = ordered[0].match_id
-    video_by_time = {(f.period, f.clock_ms): f.video_time_ms for f in ordered}
+    limits = [LIMIT_MOCK if tracks.is_simulated else LIMIT_VIDEO]
+    video_by_time = {
+        (s.period, s.clock_ms): s.video_time_ms for t in tracks.tracks.values() for s in t.samples
+    }
     candidates: list[tuple[tuple[int, int], TrackingAlert]] = []
-    tracks = [t for t in build_tracks(ordered).values() if t.is_person]
+    people = [t for t in tracks.tracks.values() if t.is_person]
 
     # Récords de velocidad: un aviso por episodio sobre 30 km/h, al terminar, con su pico.
     peaks = []
-    for track in tracks:
+    for track in people:
         speeds = window_speeds(track.samples, window_ms=SPEED_WINDOW_MS, max_speed=PLAYER_MAX_SPEED_MS)
         for episode in episodes(speeds, SPEED_RECORD_KMH / 3.6):
             start, end, speed = max(episode, key=lambda item: item[2])
@@ -520,29 +501,29 @@ def tracking_alerts(frames: Sequence[TrackingFrame]) -> list[TrackingAlert]:
             if record is not None else []
         )
         record = kmh
-        evidence = _evidence([track.track_id], source, (start.period, start.clock_ms),
+        evidence = _evidence([track.track_id], tracks.origin, (start.period, start.clock_ms),
                              (end.period, end.clock_ms), 0)
         candidates.append((when, _alert(
-            "speed_record", match_id, when, video_by_time.get(when), track, source, limits,
+            "speed_record", tracks, when, video_by_time.get(when), track, limits,
             [tracking_metric("top_speed_kmh", round(kmh, 1), evidence=evidence, team_id=track.team_id,
                              player_id=track.player_id, components=components)],
         )))
 
     # Hitos de distancia por jugador.
-    for track in tracks:
+    for track in people:
         total = 0.0
         next_step = DISTANCE_STEP_M
         first = track.samples[0] if track.samples else None
-        for previous, current, length, _, ok in _segments(track.samples, PLAYER_MAX_SPEED_MS):
+        for _, current, length, _, ok in _segments(track.samples, PLAYER_MAX_SPEED_MS):
             if not ok:
                 continue
             total += length
             if total >= next_step:
                 when = (current.period, current.clock_ms)
-                evidence = _evidence([track.track_id], source,
+                evidence = _evidence([track.track_id], tracks.origin,
                                      (first.period, first.clock_ms) if first else None, when, 0)
                 candidates.append((when, _alert(
-                    "distance_milestone", match_id, when, video_by_time.get(when), track, source, limits,
+                    "distance_milestone", tracks, when, video_by_time.get(when), track, limits,
                     [tracking_metric("distance_covered_m", round(next_step), evidence=evidence,
                                      team_id=track.team_id, player_id=track.player_id)],
                 )))
@@ -552,30 +533,17 @@ def tracking_alerts(frames: Sequence[TrackingFrame]) -> list[TrackingAlert]:
 
 
 def _alert(
-    kind: str, match_id: str, when: tuple[int, int], video_time_ms: int | None, track: Track,
-    source: TrackingSource, limits: list[str], facts: list[MetricValue],
+    kind: str, tracks: TrackSet, when: tuple[int, int], video_time_ms: int | None, track: Track,
+    limits: list[str], facts: list[MetricValue],
 ) -> TrackingAlert:
     period, clock = when
     extra = [] if track.player_id else [LIMIT_IDENTITY]
     return TrackingAlert(
         alert_id=f"alert-{kind}-{track.track_id}-p{period}-{clock}",
-        match_id=match_id, kind=kind, period=period, clock_ms=clock, video_time_ms=video_time_ms,
+        match_id=tracks.match_id, kind=kind, period=period, clock_ms=clock, video_time_ms=video_time_ms,
         team_id=track.team_id, player_id=track.player_id, track_id=track.track_id,
-        source=source, facts=facts, evidence_limits=limits + extra,
+        origin=tracks.origin, facts=facts, evidence_limits=limits + extra,
     )
-
-
-def frames_until(frames: Sequence[TrackingFrame], period: int, clock_ms: int) -> list[TrackingFrame]:
-    """Cuadros hasta un instante, sin futuros; los cuadros deben venir ordenados."""
-    keys = [(f.period, f.clock_ms) for f in frames]
-    return list(frames[: bisect_right(keys, (period, clock_ms))])
-
-
-def frames_between(
-    frames: Sequence[TrackingFrame], period: int, start_ms: int, end_ms: int
-) -> list[TrackingFrame]:
-    keys = [(f.period, f.clock_ms) for f in frames]
-    return list(frames[bisect_left(keys, (period, start_ms)): bisect_right(keys, (period, end_ms))])
 
 
 def cumulative_distance(track: Track) -> list[tuple[int, int, float]]:

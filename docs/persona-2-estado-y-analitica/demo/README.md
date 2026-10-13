@@ -7,7 +7,7 @@
 | Parte | Origen |
 |---|---|
 | Estado, estadísticas, indicadores, jugadas, patrones, momentos, prioridades y motivos | Motor real (`MatchAnalytics`) sobre el escenario sintético |
-| Posiciones del campo, distancias, velocidades y avisos por umbral | Módulo de seguimiento real sobre **posiciones simuladas** (`tracking_mock`) |
+| Posiciones del campo, distancias, velocidades y avisos por umbral | Módulo de seguimiento real sobre **observaciones simuladas** (`tracking_mock`) con el formato de Persona 1 |
 | Frase de cada momento | **Texto de ejemplo**; la narración real es de Persona 3 |
 
 La página marca cada parte simulada.
@@ -29,5 +29,5 @@ python apps/backend/scripts/export_analytics_demo.py
 3. **Por qué importa (1 min).** Abrir el gol de Aurora (07:51). Mostrar la prioridad como suma de motivos, los hechos con fórmula y versión, los eventos de origen marcados en el campo y lo que los datos no permiten afirmar.
 4. **Ritmo (45 s).** Señalar en los gráficos el cambio de control hacia Río y la fase de caos con su umbral. Recordar que son indicadores propios del equipo, con sus componentes visibles.
 5. **Personalización (45 s).** Cambiar el perfil a casual, analista, afición de Río y modo jugador: los hechos son los mismos, pero cambian la selección y la prioridad. El bloque «El mismo partido para cada espectador» lo resume.
-6. **Seguimiento (30 s).** Mostrar distancias y velocidades por jugador y los avisos por umbral. Aclarar que hoy son posiciones simuladas y que el mismo módulo recibe las de Roboflow Sports.
-7. **Estado y próximos pasos (30 s).** Bloque «Qué está listo»: despliegue en Azure, vídeo permitido con Roboflow, entrenamiento de xT y xG con datos con licencia.
+6. **Seguimiento (30 s).** Mostrar distancias y velocidades por jugador y los avisos por umbral. Aclarar que hoy son observaciones simuladas y que el mismo módulo recibirá las observaciones reales de vídeo de Persona 1.
+7. **Estado y próximos pasos (30 s).** Bloque «Qué está listo»: despliegue en Azure, observaciones reales de vídeo de Persona 1, entrenamiento de xT y xG con datos con licencia.

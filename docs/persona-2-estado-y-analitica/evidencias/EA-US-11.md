@@ -33,7 +33,7 @@
 | Criterio | Evidencia | Estado |
 |---|---|---|
 | Cifras, momentos y motivos del motor real | `test_demo_data_comes_from_the_engine_and_labels_the_mock` (los momentos emitidos del perfil casual coinciden con `MatchAnalytics.candidates`) | Cumplido |
-| Lo simulado está marcado | La misma prueba comprueba `synthetic_mock`; la página lo indica en el campo, la tabla, los avisos y cada frase | Cumplido |
+| Lo simulado está marcado | La misma prueba comprueba `simulated_fixture`; la página lo indica en el campo, la tabla, los avisos y cada frase | Cumplido |
 | Regeneración comprobada | `test_saved_dashboard_contains_current_engine_output` | Cumplido |
 
 ## Reproducción

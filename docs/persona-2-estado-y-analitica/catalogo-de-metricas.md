@@ -58,7 +58,7 @@ Las métricas espaciales muestran en `components` cuántos eventos pudieron eval
 
 ## Velocidad y distancia (RF-12)
 
-Con solo `MatchEvent 1.0`, `ball_speed_kmh`, `shot_speed_kmh` y `distance_covered_m` salen como no disponibles: un pase con inicio y fin no dice cuánto tardó el balón, y el formato pide expresamente no estimarlo así. Con cuadros de seguimiento (`TrackingFrame v1`) se calculan, junto con `top_speed_kmh`, `sprints`, `high_intensity_distance_m`, `team_width_m`, `team_depth_m`, `team_compactness_m`, `pressure_proximity_share` y `nearest_defender_m`. Esas cifras llevan `tracking_evidence` con la fuente (`synthetic_mock` o `video_model`). Las fórmulas y reglas de limpieza están en [analítica de seguimiento](analitica-de-seguimiento.md).
+Con solo `MatchEvent 1.0`, `ball_speed_kmh`, `shot_speed_kmh` y `distance_covered_m` salen como no disponibles: un pase con inicio y fin no dice cuánto tardó el balón, y el formato pide expresamente no estimarlo así. Con las observaciones de seguimiento de Persona 1 (`VisualTrackObservation`) se calculan, junto con `top_speed_kmh`, `sprints`, `high_intensity_distance_m`, `team_width_m`, `team_depth_m`, `team_compactness_m`, `pressure_proximity_share` y `nearest_defender_m`. Esas cifras llevan `tracking_evidence` con el origen (`simulated_fixture` o `actual_model`). Las fórmulas y reglas de limpieza están en [analítica de seguimiento](analitica-de-seguimiento.md).
 
 ## Jugadas (`sequence@1`)
 

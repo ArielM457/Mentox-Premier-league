@@ -1,43 +1,41 @@
 # Analítica de seguimiento
 
-`MatchEvent 1.0` dice qué pasó y dónde empezó y terminó cada acción, pero no cómo se movieron los jugadores y el balón entre eventos. Con posiciones sucesivas y su tiempo (seguimiento) se pueden medir velocidad, distancia, sprints, velocidad del balón, presión por cercanía y forma del equipo. El reto lo pide así: indicadores de velocidad y distancia que se activan al alcanzar umbrales predefinidos.
+`MatchEvent 1.0` dice qué pasó y dónde empezó y terminó cada acción, pero no cómo se movieron los jugadores y el balón entre eventos. Con posiciones sucesivas y su tiempo se pueden medir velocidad, distancia, sprints, velocidad del balón, presión por cercanía y forma del equipo. El reto lo pide así: indicadores de velocidad y distancia que se activan al alcanzar umbrales predefinidos.
 
-- **Estado:** módulo implementado y verificado con trayectorias de resultado conocido y con seguimiento simulado.
-- **Pendiente:** ejecutarlo con posiciones reales de Roboflow Sports sobre un vídeo permitido (DV-US-17 y DV-US-19 de Persona 1).
+Persona 2 solo calcula. Las posiciones las entrega Persona 1 con su propio formato de visión, y esta analítica se adapta a él.
 
-## Contrato `TrackingFrame v1`
+- **Estado:** cálculos verificados con trayectorias de resultado conocido; entrada desde el formato de Persona 1 verificada con observaciones simuladas.
+- **Pendiente:** recibir observaciones reales de vídeo de Persona 1 (DV-US-17 y DV-US-19).
 
-Un cuadro contiene todas las posiciones conocidas en un instante:
+## Entrada: observaciones de visión de Persona 1
 
-```json
-{
-  "schema_version": "1",
-  "match_id": "synthetic-analytics-001",
-  "period": 1,
-  "clock_ms": 471000,
-  "video_time_ms": 474000,
-  "source": "synthetic_mock",
-  "objects": [
-    {"track_id": "trk-aurora-9", "kind": "player", "team_id": "team-aurora",
-     "player_id": "aurora-9", "x_m": 92.4, "y_m": 36.1, "confidence": null},
-    {"track_id": "trk-ball", "kind": "ball", "team_id": null, "player_id": null,
-     "x_m": 93.1, "y_m": 35.8, "confidence": null}
-  ]
-}
-```
+La analítica usa los mismos objetos que Persona 1 ya definió en `application/visual_identity.py` y `application/vision_evaluation.py`:
 
-- `x_m` va de 0 a `pitch_length_m` en el mismo sentido que `x` de `MatchEvent`; `y_m` va de 0 a `pitch_width_m`.
-- `kind` es `player`, `goalkeeper`, `referee` o `ball`.
-- `source` es `synthetic_mock` o `video_model`, y cada cifra calculada lo repite en `tracking_evidence.source`.
-- `player_id` solo se rellena con una identidad confirmada. Una pista de vídeo sin identidad se informa por `track_id` (DV-US-12).
+| Objeto de Persona 1 | Qué aporta | Cómo lo usa la analítica |
+|---|---|---|
+| `VisualTrackObservation` | Una pista en un instante: `track_id`, `video_time_ms`, `team_id`, `detector_confidence` y `position` de 0 a 100 en el campo fijo | Cada observación es una muestra de su pista; la posición se pasa a metros con las dimensiones del partido |
+| `ResolvedVisualIdentity` | Identidad de la pista. Solo es `confirmed` con evidencia ajena al detector (DV-US-12) | Una pista lleva `player_id` solo con identidad confirmada; si dos confirmaciones se contradicen, se descarta la identidad |
+| `PredictionOrigin` | `actual_model` o `simulated_fixture` | Cada cifra lo repite en `tracking_evidence.source` y en los avisos |
 
-Las cifras de seguimiento llevan `tracking_evidence` con fuente, pistas, intervalo y número de cuadros, en lugar de eventos de origen. Es un campo opcional nuevo de `MetricValue` y no rompe a quien no lo lea.
+`application/analytics/tracking_input.py` hace la conversión:
+
+1. Ubica cada observación en `(period, clock_ms)` con el reloj de los eventos. Para cada período usa la diferencia entre `video_time_ms` y `clock_ms` de su primer evento.
+2. Descarta y cuenta las observaciones de otro partido, sin posición, anteriores al inicio o repetidas para la misma pista e instante.
+3. Arma un `TrackSet` con las pistas en orden deportivo. Los cálculos del dominio (`domain/analytics/tracking.py`) solo trabajan sobre ese `TrackSet`.
+
+**A acordar con Persona 1.** `VisualTrackObservation` todavía no indica la clase del objeto. Mientras tanto:
+
+- El balón se reconoce por su `track_id` (por defecto, `ball`).
+- Los porteros, por `goalkeeper_player_ids`.
+- Una pista sin equipo que no es el balón (por ejemplo, el árbitro) queda como `unassigned` y no entra en las cifras de jugadores.
+
+Si Persona 1 añade la clase a su observación, el adaptador la usará y estas convenciones desaparecen.
 
 ## Reglas de limpieza
 
-- Un tramo entre dos cuadros solo cuenta si son del mismo período y están separados por 0,3 s o menos. Un hueco mayor significa que la pista se perdió.
+- Un tramo entre dos muestras solo cuenta si son del mismo período y están separadas por 0,3 s o menos. Un hueco mayor significa que la pista se perdió.
 - Un tramo a más de 12 m/s (43 km/h) para una persona, o a más de 40 m/s (144 km/h) para el balón, se descarta como error de seguimiento. El número de tramos descartados aparece en `components`.
-- Las velocidades son medias del recorrido en ventanas de 1 s (0,2 s para el balón), no de un solo par de cuadros.
+- Las velocidades son medias del recorrido en ventanas de 1 s (0,2 s para el balón), no de un solo par de muestras.
 
 ## Métricas (`tracking@1`)
 
@@ -49,13 +47,13 @@ Las cifras de seguimiento llevan `tracking_evidence` con fuente, pistas, interva
 | `sprints` | jugador | count | Episodios de al menos 1 s a 25,2 km/h o más |
 | `ball_speed_kmh` | partido | km/h | Máxima velocidad media del balón en ventanas de 0,2 s |
 | `shot_speed_kmh` | tiro | km/h | Máxima velocidad del balón en el segundo posterior a cada `shot`; cita el evento |
-| `team_width_m` | equipo | meters | Media por cuadro del ancho ocupado por los jugadores de campo |
-| `team_depth_m` | equipo | meters | Media por cuadro de la distancia entre el más adelantado y el más retrasado |
-| `team_compactness_m` | equipo | meters | Media por cuadro de la distancia de cada jugador de campo a su centro |
-| `pressure_proximity_share` | equipo | percent | Cuadros con el rival en control (a ≤ 2 m del balón) y un defensor a ≤ 5 m, sobre los cuadros con el rival en control |
+| `team_width_m` | equipo | meters | Media por instante del ancho ocupado por los jugadores de campo |
+| `team_depth_m` | equipo | meters | Media por instante de la distancia entre el más adelantado y el más retrasado |
+| `team_compactness_m` | equipo | meters | Media por instante de la distancia de cada jugador de campo a su centro |
+| `pressure_proximity_share` | equipo | percent | Instantes con el rival en control (a ≤ 2 m del balón) y un defensor a ≤ 5 m, sobre los instantes con el rival en control |
 | `nearest_defender_m` | equipo | meters | Distancia media del defensor más cercano al poseedor rival |
 
-Con seguimiento, `build_snapshot(..., tracking=frames)` y `MatchAnalytics(tracking_provider=...)` reemplazan las cifras de velocidad y distancia que antes salían no disponibles. Solo usan los cuadros hasta el instante del snapshot.
+Las cifras de una pista sin identidad confirmada se publican con `player_id` vacío y su `track_id` en `tracking_evidence`. `build_snapshot(..., tracking=track_set)` y `MatchAnalytics(tracking_provider=...)` reemplazan las cifras de velocidad y distancia que antes salían no disponibles, usando solo las muestras hasta el instante del snapshot.
 
 ## Avisos por umbral (`tracking_alert@1`)
 
@@ -64,34 +62,31 @@ Con seguimiento, `build_snapshot(..., tracking=frames)` y `MatchAnalytics(tracki
 | `speed_record` | Al terminar un episodio por encima de 30 km/h, si su pico supera en al menos 1 km/h el último récord avisado del partido. Un sprint produce un solo aviso. |
 | `distance_milestone` | Cuando un jugador alcanza cada 1 000 m recorridos. |
 
-Cada aviso (`TrackingAlert v1`) lleva su cifra con evidencia y los límites de lo que se puede afirmar. Por ejemplo, que el seguimiento es simulado o que la pista no tiene identidad confirmada. Los avisos no pasan por `InsightCandidate v1`, porque ese contrato exige eventos de origen y Persona 4 calcula con ellos el tiempo de vídeo. Integrarlos en el flujo de momentos requiere acordar un cambio de contrato con Persona 3 y Persona 4.
+Cada aviso (`TrackingAlert v1`) lleva su cifra con evidencia, el origen y los límites de lo que se puede afirmar. Por ejemplo, que el seguimiento es simulado o que la pista no tiene identidad confirmada. Los avisos no pasan por `InsightCandidate v1`, porque ese contrato exige eventos de origen y Persona 4 calcula con ellos el tiempo de vídeo. Llevarlos al flujo de momentos requiere acordar el cambio con Persona 3 y Persona 4.
 
-## Seguimiento simulado
+## Observaciones simuladas
 
-`adapters/sources/tracking_mock.py` genera cuadros a 5 Hz a partir de los eventos del escenario. Sirve para desarrollar y demostrar el módulo mientras no haya un vídeo procesado:
+`adapters/sources/tracking_mock.py` produce, a 5 muestras por segundo, exactamente lo que entregará Persona 1:
 
-- El balón pasa por el inicio de cada evento y viaja al final de pases (16 m/s) y tiros (27 m/s). Si un salto entre eventos fuera imposible (más de 32 m/s), el balón no aparece en esos cuadros, como cuando un seguimiento real lo pierde.
+- `VisualTrackObservation` por pista e instante, con `detector_confidence = 1.0`.
+- Identidades resueltas con su propio `PlayerIdentityResolver`, con la referencia de evidencia «mock de Persona 2».
+- Origen `PredictionOrigin.SIMULATED_FIXTURE`.
+
+Así, la analítica recorre con datos de prueba el mismo camino que recorrerá con datos reales.
+
+Las posiciones salen de una cinemática simple a partir de los eventos del escenario:
+
+- El balón pasa por el inicio de cada evento y viaja al final de pases (16 m/s) y tiros (27 m/s). Si un salto entre eventos fuera imposible (más de 32 m/s), el balón no aparece en esas muestras.
 - Cada jugador tiene una zona que se desplaza con el balón y con la posesión. Quien interviene en un evento va hacia el lugar desde 4 s antes.
 - Límites: 8,5 m/s para quien va a la acción, 5,5 m/s para el resto, 5 m/s para porteros y árbitro, y una aceleración de 3,5 m/s².
 
-Con el escenario de 178 eventos (unos 9,9 minutos), cada jugador de campo recorre entre 810 y 1 240 m, con velocidades máximas de 20 a 31 km/h. Los porteros recorren unos 340 m. El balón llega a 114 km/h, los tiros a puerta rondan los 97 km/h y los bloqueados, unos 50 km/h. La mayoría de los jugadores hace entre 0 y 6 sprints. El máximo, 9, es de un defensor al que el guion hace intervenir lejos de su zona durante la fase de caos. Son valores de ejemplo, del orden de los de un partido real, pero no son mediciones y siempre se presentan como simulados.
+Con el escenario de 178 eventos (unos 9,9 minutos):
 
-## Conexión con Roboflow Sports
+- Cada jugador de campo recorre entre 810 y 1 240 m, con velocidades máximas de 20 a 31 km/h. Los porteros recorren unos 340 m.
+- El balón llega a 114 km/h; los tiros a puerta rondan los 97 km/h y los bloqueados, unos 50 km/h.
+- La mayoría de los jugadores hace entre 0 y 6 sprints. El máximo, 9, es de un defensor al que el guion hace intervenir lejos de su zona durante la fase de caos.
 
-`adapters/sources/roboflow_tracking.py` convierte detecciones ya proyectadas al campo, una por fila, en `TrackingFrame v1` con `source = video_model`:
-
-```json
-{"frame_index": 120, "fps": 25.0, "tracker_id": 7, "class_name": "player",
- "team": 0, "pitch_x": 4210.5, "pitch_y": 3120.0, "confidence": 0.91}
-```
-
-- `pitch_x` y `pitch_y` están en las unidades de la configuración del campo de Roboflow; por defecto, 12 000 × 7 000. Hay que confirmar ese valor con la revisión fijada del repositorio.
-- `team` es el grupo del clasificador por color (0 o 1). Es arbitrario, así que hay que indicar qué `team_id` corresponde a cada grupo.
-- No se asigna `player_id`.
-- Si el detector ve varios balones en un cuadro, se conserva el de mayor confianza.
-- Las clases desconocidas y las filas incompletas se ignoran y se cuentan.
-
-Este formato de fila es una **propuesta para el script de exportación de Persona 1** (DV-US-19). Con él, el mismo módulo calcula las métricas reales sin cambios.
+Son valores de ejemplo, del orden de los de un partido real, pero no son mediciones y siempre se presentan como simulados.
 
 ## Pruebas
 
@@ -105,6 +100,8 @@ Este formato de fila es una **propuesta para el script de exportación de Person
 | Presión por cercanía, positiva y negativa | `test_pressure_by_proximity_positive_and_negative` |
 | Forma del equipo con geometría conocida | `test_team_shape_with_known_geometry` |
 | Un aviso de récord por episodio e hitos de distancia | `test_speed_record_alert_once_per_episode_and_distance_milestones` |
-| Seguimiento simulado determinista y plausible | `test_mock_tracking_is_deterministic_and_plausible` |
-| El snapshot no usa cuadros futuros | `test_snapshot_uses_tracking_up_to_its_own_time_only` |
-| Conversión de Roboflow sin inventar identidad | `test_roboflow_rows_become_video_frames_without_inventing_identity` |
+| Reloj de vídeo por período | `test_video_clock_places_observations_in_their_period` |
+| Observaciones de Persona 1 con identidad solo confirmada | `test_persona_1_observations_become_tracks_with_confirmed_identity_only` |
+| Identidades contradictorias descartadas | `test_contradicting_identities_are_dropped` |
+| Observaciones simuladas con el formato de Persona 1 y valores plausibles | `test_mock_produces_persona_1_observations_and_plausible_values` |
+| El snapshot no usa muestras futuras | `test_snapshot_uses_tracking_up_to_its_own_time_only` |

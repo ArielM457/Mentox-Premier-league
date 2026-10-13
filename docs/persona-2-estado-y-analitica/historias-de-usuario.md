@@ -183,7 +183,7 @@ Las personas usuarias de este módulo son sobre todo Persona 3 (narración) y Pe
 - Los saltos imposibles y las pistas perdidas no cuentan.
 - Los avisos por umbral se emiten una vez por episodio o hito.
 - Cada cifra indica si viene de seguimiento simulado o de un modelo de vídeo.
-- Las detecciones de Roboflow Sports se convierten sin inventar identidad.
+- Se usan las observaciones de visión de Persona 1 tal como las entrega, sin inventar identidad.
 
 **Requisitos relacionados:** RF-11, RF-12 y la sugerencia del reto de indicadores de velocidad y distancia por umbral.
 

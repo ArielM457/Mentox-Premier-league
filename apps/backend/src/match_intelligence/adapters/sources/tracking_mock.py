@@ -1,9 +1,11 @@
 """Seguimiento simulado (mock) a partir de eventos sintéticos.
 
-Sirve para desarrollar y probar la analítica de seguimiento mientras no haya un
-vídeo permitido procesado con Roboflow Sports. No es una medición: las
-posiciones salen de una cinemática simple y todos los cuadros se marcan con
-``source = synthetic_mock``.
+Sirve para probar la analítica de seguimiento mientras Persona 1 no entregue
+observaciones reales de vídeo (DV-US-19). Produce lo mismo que entregará
+Persona 1: ``VisualTrackObservation`` por pista e instante, e identidades
+resueltas con su ``PlayerIdentityResolver``. No es una medición: el origen es
+``PredictionOrigin.SIMULATED_FIXTURE`` y las posiciones salen de una
+cinemática simple.
 
 Modelo:
 
@@ -25,15 +27,25 @@ from dataclasses import dataclass
 from math import hypot
 from random import Random
 
+from match_intelligence.application.analytics.tracking_input import (
+    DEFAULT_BALL_TRACK_IDS,
+    TrackingInput,
+)
+from match_intelligence.application.vision_evaluation import PredictionOrigin
+from match_intelligence.application.visual_identity import (
+    ConfirmedPlayerIdentity,
+    IdentityEvidenceKind,
+    PlayerIdentityResolver,
+    ResolvedVisualIdentity,
+    VisualTrackObservation,
+)
 from match_intelligence.domain.analytics.pitch import PitchFrame
 from match_intelligence.domain.analytics.state import MatchState, chronological
-from match_intelligence.domain.analytics.tracking import (
-    TrackedKind,
-    TrackedObject,
-    TrackingFrame,
-    TrackingSource,
-)
-from match_intelligence.domain.contracts import EventType, MatchEvent, MatchMetadata
+from match_intelligence.domain.analytics.tracking import TrackedKind
+from match_intelligence.domain.contracts import EventType, MatchEvent, MatchMetadata, Position
+
+BALL_TRACK_ID = next(iter(DEFAULT_BALL_TRACK_IDS))
+MOCK_EVIDENCE = "mock de Persona 2: identidad asignada al generar el seguimiento simulado"
 
 PASS_SPEED_MS = 16.0
 SHOT_SPEED_MS = 27.0
@@ -85,7 +97,7 @@ def _bodies(metadata: MatchMetadata) -> list[_Body]:
                 kind=TrackedKind.GOALKEEPER if keeper else TrackedKind.PLAYER,
                 team_id=team.team_id, player_id=player.player_id, anchor=anchor,
             ))
-    bodies.append(_Body("trk-ref-1", TrackedKind.REFEREE, None, None, (50.0, 40.0)))
+    bodies.append(_Body("trk-ref-1", TrackedKind.UNASSIGNED, None, None, (50.0, 40.0)))
     return bodies
 
 
@@ -128,15 +140,32 @@ def generate_mock_tracking(
     hz: int = 5,
     seed: int = 11,
     tail_ms: int = 5_000,
-) -> list[TrackingFrame]:
-    """Cuadros deterministas a ``hz`` cuadros por segundo para cada período con eventos."""
+) -> TrackingInput:
+    """Observaciones deterministas a ``hz`` muestras por segundo, con el formato de Persona 1."""
     rng = Random(seed)
     pitch = PitchFrame.from_metadata(metadata)
     length, width = pitch.length_m, pitch.width_m
     step_ms = 1000 // hz
     dt = step_ms / 1000
     ordered = chronological(events)
-    frames: list[TrackingFrame] = []
+    observations: list[VisualTrackObservation] = []
+    first_seen: dict[str, VisualTrackObservation] = {}
+
+    def observe(track_id: str, team_id: str | None, video_time_ms: int, x: float, y: float) -> None:
+        observation = VisualTrackObservation(
+            observation_id=f"mock-{track_id}-{video_time_ms}",
+            match_id=metadata.match_id,
+            video_time_ms=video_time_ms,
+            track_id=track_id,
+            detector_confidence=1.0,
+            team_id=team_id,
+            position=Position(
+                x=round(min(100.0, max(0.0, x / length * 100)), 2),
+                y=round(min(100.0, max(0.0, y / width * 100)), 2),
+            ),
+        )
+        observations.append(observation)
+        first_seen.setdefault(track_id, observation)
 
     for period in sorted({e.period for e in ordered}):
         period_events = [e for e in ordered if e.period == period]
@@ -144,6 +173,8 @@ def generate_mock_tracking(
         offset = next(
             (e.video_time_ms - e.clock_ms for e in period_events if e.video_time_ms is not None), None
         )
+        if offset is None:
+            raise ValueError(f"Los eventos del período {period} necesitan video_time_ms")
         state = MatchState(match_id=metadata.match_id, team_ids=pitch.team_ids)
         cursor = 0
         bodies = _bodies(metadata)
@@ -160,27 +191,36 @@ def generate_mock_tracking(
                 state.apply(period_events[cursor])
                 cursor += 1
             ball = _ball_at(keys, t)
-            objects: list[TrackedObject] = []
             for body in bodies:
                 target, limit = _target(body, pitch, period, ball, state.possession_team_id, actions, t)
                 if first:
                     body.x, body.y = target
                 _move(body, target, limit, dt, rng, length, width)
-                objects.append(TrackedObject(
-                    track_id=body.track_id, kind=body.kind, team_id=body.team_id,
-                    player_id=body.player_id, x_m=round(body.x, 2), y_m=round(body.y, 2),
-                ))
+                observe(body.track_id, body.team_id, t + offset, body.x, body.y)
             if ball is not None:
-                objects.append(TrackedObject(
-                    track_id="trk-ball", kind=TrackedKind.BALL, x_m=round(ball[0], 2), y_m=round(ball[1], 2),
-                ))
+                observe(BALL_TRACK_ID, None, t + offset, ball[0], ball[1])
             first = False
-            frames.append(TrackingFrame(
-                match_id=metadata.match_id, period=period, clock_ms=t,
-                video_time_ms=t + offset if offset is not None else None,
-                source=TrackingSource.SYNTHETIC_MOCK, objects=objects,
-            ))
-    return frames
+
+    # La identidad se resuelve con el mismo componente que usará el vídeo real (DV-US-12).
+    resolver = PlayerIdentityResolver({p.player_id for p in metadata.players})
+    identities: list[ResolvedVisualIdentity] = []
+    for body in _bodies(metadata):
+        if body.player_id is None or body.track_id not in first_seen:
+            continue
+        identities.append(resolver.resolve(
+            first_seen[body.track_id],
+            ConfirmedPlayerIdentity(
+                match_id=metadata.match_id, track_id=body.track_id, player_id=body.player_id,
+                evidence_kind=IdentityEvidenceKind.VERIFIED_ROSTER_MAPPING,
+                evidence_reference=MOCK_EVIDENCE, verified_by="persona-2-mock",
+            ),
+        ))
+    return TrackingInput(
+        observations=tuple(observations),
+        identities=tuple(identities),
+        origin=PredictionOrigin.SIMULATED_FIXTURE,
+        goalkeeper_player_ids=frozenset(p.player_id for p in metadata.players if p.shirt_number == 1),
+    )
 
 
 def _target(
@@ -188,7 +228,7 @@ def _target(
     possession: str | None, actions: dict[str, tuple[list[int], list[tuple[float, float]]]], t: int,
 ) -> tuple[tuple[float, float], float]:
     length, width = pitch.length_m, pitch.width_m
-    if body.kind is TrackedKind.REFEREE:
+    if body.kind is TrackedKind.UNASSIGNED:
         if ball is None:
             return (length / 2, width / 2), KEEPER_MAX_MS
         return (min(length, max(0.0, ball[0] - 8)), min(width, max(0.0, ball[1] + 10))), KEEPER_MAX_MS

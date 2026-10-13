@@ -6,8 +6,8 @@ Actualizado el 11 de octubre de 2026. Rama `persona-2/estado-analitica`.
 
 - **Hecho:** el motor de estado y analítica está terminado y probado en local. Recibe eventos `MatchEvent 1.0` y entrega estado del partido (`MatchSnapshot v1`), momentos candidatos con prioridad y motivos (`InsightCandidate v1`) y cifras de velocidad y distancia desde posiciones. Hay 223 pruebas pasando: 134 de antes y 89 nuevas.
 - **Demo:** [`demo/tablero.html`](demo/tablero.html) reproduce un partido sintético con todo lo que calcula el motor.
-- **Siguiente:** desplegar en Azure, recibir posiciones reales de Roboflow y cerrar la integración con Persona 3 y Persona 4.
-- **Bloqueos:** falta una suscripción de Azure con permisos para desplegar y un vídeo permitido para Roboflow.
+- **Siguiente:** desplegar en Azure, recibir las observaciones reales de vídeo de Persona 1 y cerrar la integración con Persona 3 y Persona 4.
+- **Bloqueos:** falta una suscripción de Azure con permisos para desplegar y un vídeo permitido (Persona 1).
 
 ## Qué hace el motor con cada evento
 
@@ -47,7 +47,7 @@ Los 2 ajustes de Persona 4 son pequeños. Uno es cambiar `moment-evt-006` por `m
 
 | Parte | Qué se simula | Por qué | Qué lo reemplaza |
 |---|---|---|---|
-| Posiciones de jugadores y balón | Se generan desde los eventos con una cinemática simple, 5 cuadros por segundo | No hay vídeo permitido procesado | Roboflow Sports, a través de un conversor que ya está hecho |
+| Posiciones de jugadores y balón | Observaciones generadas desde los eventos con una cinemática simple, 5 por segundo, con el formato de visión de Persona 1 (`VisualTrackObservation`) | No hay vídeo permitido procesado | Las observaciones reales de vídeo de Persona 1, sin cambiar la analítica |
 | Distancias, velocidades y avisos por umbral | El cálculo es real, pero sobre posiciones simuladas | Depende de lo anterior | Lo mismo: con posiciones reales, el cálculo no cambia |
 | Frases de los momentos en el tablero | Plantillas de ejemplo | La narración es de Persona 3 | Los agentes de Persona 3 |
 | Azure en las pruebas | Clientes simulados de Event Hubs y Blob Storage | No hay suscripción desplegada | El despliegue y la prueba de humo ya están escritos |
@@ -112,7 +112,7 @@ Ejemplos listos en [`ejemplos/`](ejemplos/), con un caso válido, uno mínimo y 
 | Persona | Qué recibe | Qué necesito de ella |
 |---|---|---|
 | **Persona 4 (API y pantalla)** | `MatchAnalytics`, que ya cumple su `AnalyticsPort`, y los mismos dos contratos. Opcional: cifras de seguimiento en el snapshot con `tracking_provider`. | Aplicar los 2 ajustes y acordar dónde se aloja el procesador en Azure |
-| **Persona 1 (datos y vídeo)** | La política de reconstrucción de eventos tardíos y un formato propuesto para exportar desde Roboflow | Confirmar la política de tardíos, definir un mensaje de «corrección» de eventos, un vídeo permitido y un partido sintético más largo |
+| **Persona 1 (datos y vídeo)** | La política de reconstrucción de eventos tardíos. La analítica de seguimiento ya consume su `VisualTrackObservation` y su identidad resuelta | Confirmar la política de tardíos, definir un mensaje de «corrección» de eventos, indicar en sus observaciones qué pista es el balón y cuál un portero, un vídeo permitido y un partido sintético más largo |
 | **Persona 5 (UX/UI)** | La lista de tipos de momento, los tres indicadores propios y el tablero como referencia de qué datos existen | Diseñar cómo se muestran los indicadores propios y los avisos de velocidad y distancia |
 
 ## Cómo se integra con Azure

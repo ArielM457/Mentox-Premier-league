@@ -52,7 +52,7 @@ from match_intelligence.domain.analytics.signals import (
     Signal,
 )
 from match_intelligence.domain.analytics.state import MatchState, chronological
-from match_intelligence.domain.analytics.tracking import TrackingFrame, frames_until, tracking_metrics
+from match_intelligence.domain.analytics.tracking import TrackSet, tracking_metrics
 from match_intelligence.domain.analytics.statistics import (
     EventWindow,
     player_statistics,
@@ -66,7 +66,7 @@ from .value_models import ValueModelName, ValueModelRegistry
 
 RECENT_EVENTS = 5
 TRACKING_REPLACES = frozenset({"ball_speed_kmh", "shot_speed_kmh", "distance_covered_m"})
-TrackingProvider = Callable[[MatchMetadata], Sequence[TrackingFrame] | None]
+TrackingProvider = Callable[[MatchMetadata], TrackSet | None]
 
 
 def default_detectors() -> list[Detector]:
@@ -230,11 +230,11 @@ def build_snapshot(
     state_revision: int = 0,
     late_event_ids: Sequence[str] = (),
     corrected_event_ids: Sequence[str] = (),
-    tracking: Sequence[TrackingFrame] | None = None,
+    tracking: TrackSet | None = None,
 ) -> MatchSnapshot:
     """``MatchSnapshot v1`` desde eventos en orden deportivo.
 
-    Con ``tracking`` se calculan además las métricas de seguimiento con los cuadros
+    Con ``tracking`` se calculan además las métricas de seguimiento con las muestras
     hasta el instante del snapshot; sin él, velocidad y distancia quedan no disponibles.
     """
     frame = PitchFrame.from_metadata(metadata)
@@ -281,11 +281,10 @@ def build_snapshot(
         clock_ms = last.clock_ms + max(0, video_time_ms - last.video_time_ms)
 
     if tracking is not None:
-        ordered_frames = sorted(tracking, key=lambda f: (f.period, f.clock_ms))
-        seen_frames = frames_until(ordered_frames, state.period, clock_ms)
-        if seen_frames:
+        seen = tracking.until(state.period, clock_ms)
+        if seen.tracks:
             metrics = [m for m in metrics if m.available or m.key not in TRACKING_REPLACES]
-            metrics.extend(tracking_metrics(seen_frames, frame.team_ids, accepted))
+            metrics.extend(tracking_metrics(seen, frame.team_ids, accepted))
 
     return MatchSnapshot(
         match_id=metadata.match_id,

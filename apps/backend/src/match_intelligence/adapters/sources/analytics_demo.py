@@ -2,8 +2,9 @@
 
 Todo sale del motor real: estado, estadísticas, indicadores, momentos y
 decisiones de atención se calculan con ``MatchAnalytics`` sobre el escenario
-sintético. Lo único simulado es el seguimiento de posiciones
-(``tracking_mock``), marcado como tal en los datos.
+sintético. Lo único simulado son las observaciones de seguimiento
+(``tracking_mock``), con el mismo formato que entregará Persona 1 y marcadas
+como ``simulated_fixture``.
 """
 
 from collections.abc import Sequence
@@ -12,6 +13,7 @@ from typing import Any
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
 from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
 from match_intelligence.application.analytics.pipeline import MatchAnalytics, MatchAnalyzer, build_snapshot
+from match_intelligence.application.analytics.tracking_input import tracks_from_observations
 from match_intelligence.domain.analytics.attention import BASE_PRIORITY
 from match_intelligence.domain.analytics.catalog import METRIC_CATALOG
 from match_intelligence.domain.analytics.models import ATTENTION_VERSION, ENGINE_VERSION, MetricValue
@@ -20,8 +22,7 @@ from match_intelligence.domain.analytics.tracking import (
     PLAYER_MAX_SPEED_MS,
     SPEED_WINDOW_MS,
     TrackedKind,
-    TrackingFrame,
-    build_tracks,
+    TrackSet,
     cumulative_distance,
     tracking_alerts,
     tracking_metrics,
@@ -59,8 +60,8 @@ def _fact(item: MetricValue) -> list[Any]:
     ]
 
 
-def _tracking(frames: Sequence[TrackingFrame], team_ids: Sequence[str], events) -> dict[str, Any]:
-    tracks = build_tracks(frames)
+def _tracking(track_set: TrackSet, team_ids: Sequence[str], events) -> dict[str, Any]:
+    tracks = track_set.tracks
     order = sorted(tracks)
     index = {track_id: i for i, track_id in enumerate(order)}
     meta = [
@@ -69,10 +70,10 @@ def _tracking(frames: Sequence[TrackingFrame], team_ids: Sequence[str], events) 
          tracks[track_id].player_id]
         for track_id in order
     ]
-    seconds = [f for f in frames if f.clock_ms % 1000 == 0]
+    seconds = [i for i in track_set.instants() if i.clock_ms % 1000 == 0]
     compact_frames = [
-        [f.period, f.clock_ms, [[index[o.track_id], round(o.x_m, 1), round(o.y_m, 1)] for o in f.objects]]
-        for f in seconds
+        [i.period, i.clock_ms, [[index[track.track_id], round(x, 1), round(y, 1)] for track, x, y in i.positions]]
+        for i in seconds
     ]
 
     series: dict[str, list[list[float]]] = {}
@@ -96,9 +97,9 @@ def _tracking(frames: Sequence[TrackingFrame], team_ids: Sequence[str], events) 
         speed_at = {(end.period, end.clock_ms): speed for _, end, speed in speeds}
         ball_series = [round(speed_at.get((f.period, f.clock_ms), 0.0) * 3.6) for f in seconds]
 
-    final = tracking_metrics(frames, team_ids, events)
+    final = tracking_metrics(track_set, team_ids, events)
     return {
-        "source": frames[0].source.value if frames else None,
+        "source": track_set.origin,
         "hz_original": 5,
         "tracks": meta,
         "frames": compact_frames,
@@ -107,7 +108,7 @@ def _tracking(frames: Sequence[TrackingFrame], team_ids: Sequence[str], events) 
         "final": [_fact(m) for m in final],
         "alerts": [
             [a.alert_id, a.kind, a.period, a.clock_ms, a.player_id, a.team_id, a.facts[0].value, a.facts[0].unit]
-            for a in tracking_alerts(frames)
+            for a in tracking_alerts(track_set)
         ],
     }
 
@@ -116,7 +117,7 @@ def build_demo_data() -> dict[str, Any]:
     match = generate_analytics_scenario()
     metadata, events = match.metadata, list(match.events)
     team_ids = (metadata.home_team.team_id, metadata.away_team.team_id)
-    frames = generate_mock_tracking(metadata, events)
+    track_set = tracks_from_observations(metadata, events, generate_mock_tracking(metadata, events)).tracks
     analytics = MatchAnalytics()
 
     timeline = []
@@ -157,8 +158,9 @@ def build_demo_data() -> dict[str, Any]:
         })
 
     period_ends = {}
-    for f in frames:
-        period_ends[f.period] = max(period_ends.get(f.period, 0), f.clock_ms)
+    for track in track_set.tracks.values():
+        for sample in track.samples:
+            period_ends[sample.period] = max(period_ends.get(sample.period, 0), sample.clock_ms)
     used_keys = {fact[0] for moment in moments.values() for fact in moment["facts"]} | set(STAT_KEYS) | {
         "control_index", "momentum_index", "chaos_index", "distance_covered_m", "top_speed_kmh",
         "sprints", "high_intensity_distance_m", "ball_speed_kmh", "shot_speed_kmh", "team_width_m",
@@ -190,7 +192,7 @@ def build_demo_data() -> dict[str, Any]:
         "moments": moments,
         "base_priority": BASE_PRIORITY,
         "profiles": profiles,
-        "tracking": _tracking(frames, team_ids, events),
+        "tracking": _tracking(track_set, team_ids, events),
         "catalog": {
             key: [METRIC_CATALOG[key].unit, METRIC_CATALOG[key].origin.value, METRIC_CATALOG[key].formula]
             for key in sorted(used_keys) if key in METRIC_CATALOG
