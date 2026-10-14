@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { api } from '../api.js'
-import { formatClock } from '../overlays.js'
+import { api } from '../api/client.js'
+import { formatClock } from '../lib/overlays.js'
 
 export function PreferencesPanel({ t, prefs, onChange, metadata }) {
   const set = (key) => (e) => onChange({ ...prefs, [key]: e.target.value })

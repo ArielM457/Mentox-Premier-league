@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { api } from './api.js'
+import { api } from './api/client.js'
 import {
   DemoTools,
   EditorialPanel,
@@ -16,7 +16,7 @@ import { Player } from './components/Player.jsx'
 import { useLiveChannel } from './hooks/useLiveChannel.js'
 import { useMatchClock } from './hooks/useMatchClock.js'
 import { strings } from './i18n.js'
-import { pastOverlays, visibleOverlay } from './overlays.js'
+import { pastOverlays, visibleOverlay } from './lib/overlays.js'
 
 const DEFAULT_MATCH = 'synthetic-acceptance-001'
 const PREFS_KEY = 'match-intelligence:prefs'

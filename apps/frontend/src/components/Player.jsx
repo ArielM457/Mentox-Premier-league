@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { formatClock } from '../overlays.js'
+import { formatClock } from '../lib/overlays.js'
 import { Pitch } from './Pitch.jsx'
 
 const SPEEDS = [0.5, 1, 2, 4]

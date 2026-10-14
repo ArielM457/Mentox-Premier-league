@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { api } from '../api.js'
-import { mergeOverlay, overlayMap } from '../overlays.js'
+import { api } from '../api/client.js'
+import { mergeOverlay, overlayMap } from '../lib/overlays.js'
 
 // Une el historial (al cargar o adelantar) con el canal en directo (SSE).
 // Al pausar se cierra el canal; al reanudar o adelantar se abre desde la nueva posición.
