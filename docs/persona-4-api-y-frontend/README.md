@@ -3,8 +3,8 @@
 Este documento registra lo implementado por Persona 4, cómo se verificó y qué falta. El plan original está en [el plan de Persona 4](../plan-de-desarrollo/persona-4-api-y-frontend.md).
 
 - **Estado:** verificado localmente con datos sintéticos y adaptadores provisionales.
-- **Última verificación:** 9 de octubre de 2026.
-- **Rama:** `persona-4/api-frontend`.
+- **Última verificación:** 14 de octubre de 2026.
+- **Ramas:** `feat/persona-4-api-frontend` (API) y `feat/persona-4-figma-ui` (interfaz con el diseño de Persona 5).
 
 ## **Qué existe ahora**
 
@@ -12,7 +12,7 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 
 | Ruta | Para qué sirve |
 |---|---|
-| `GET /matches` · `POST /matches` | Listar y cargar un partido sintético (generador de Persona 1). `inject_error_in` provoca un error controlado para la demo. |
+| `GET /matches` · `POST /matches` | Listar y cargar un partido sintético. `scenario`: `acceptance` (partido corto de Persona 1) o `analytics` (partido de dos tiempos de Persona 2). `inject_error_in` provoca un error controlado para la demo. |
 | `GET /matches/{id}` | Metadatos, duración y fuente de vídeo. |
 | `GET /matches/{id}/events?until_video_ms=` | Eventos ya ocurridos; nunca futuros. |
 | `GET /matches/{id}/state?video_time_ms=` | `MatchSnapshot v1`. |
@@ -28,14 +28,43 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 
 Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`casual`, `analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`.
 
-**Frontend.** `apps/frontend` reemplaza el formulario inicial por la experiencia completa:
+**Frontend.** `apps/frontend` implementa el diseño de Figma de Persona 5 («Inside the Game») en React y JavaScript, como fija la [decisión técnica 3](../07-decisiones-tomadas.md), conectado a la API real.
 
-- Reproductor con «vídeo sintético» (el campo dibuja los eventos ya ocurridos) o un vídeo real si se pega su URL. Controles de reproducir, pausar, ±5 s, reiniciar, barra de tiempo y velocidad. Teclado: espacio o `k` para pausar y flechas para moverse.
-- Marcador, reloj y una sola zona de mensajes sobre el vídeo, con barra de duración.
-- «Ver por qué importa»: explicación, eventos de origen, preferencias aplicadas y formulario de reporte.
-- Preferencias de idioma, modo, nivel, club y jugador. La interfaz también cambia de idioma.
-- Historial de momentos, estado del partido, preguntas, resumen final, revisión editorial, reportes y retraso medido.
-- Herramientas de demo: recargar el partido con un error controlado en el gol.
+| Pantalla | Ruta | Qué muestra |
+|---|---|---|
+| Inicio | `#/` | Presentación del producto, modos y ejemplo con cifras reales del partido de aceptación. |
+| Configuración | `#/onboarding` | Idioma, club, jugador y modo, con los equipos y jugadores que entrega la API. |
+| Descubrir | `#/discover` | Partidos del club favorito, partidos y acciones del jugador favorito. |
+| Partidos | `#/matches` | Búsqueda, filtros en vivo, próximos y resúmenes, y filtro por jugador. |
+| Centro del partido | `#/match/{id}` | Reproducción sincronizada, campo con posiciones reales, mensaje en pantalla, línea de tiempo, estadísticas, vista táctica, retraso del canal y asistente de preguntas. |
+| Momento | `#/match/{id}/moment/{momento}` | Explicación, cifras y jugadores de la jugada, sus eventos de origen y reporte de errores. |
+| Resumen | `#/recap/{id}` | Marcador final, resumen pendiente o aprobado y los tres momentos principales. |
+| Mi experiencia | `#/profile` | Idioma, club, jugador, modo y nivel de explicación. |
+| Revisión | `#/editorial` | Aprobar o rechazar resúmenes, ver reportes y recargar un partido con un error controlado. |
+
+Estructura del código:
+
+```
+apps/frontend/src/
+  api/client.js          Llamadas HTTP a /api/v1
+  app/                   Preferencias (contexto) y enrutador por hash
+  i18n/strings.js        Textos en español e inglés
+  data/branding.js       Escudos, colores y fotos del diseño asignados a los equipos de la API
+  hooks/                 Catálogo, reloj de reproducción y canal en directo (SSE)
+  lib/overlays.js        Qué mensaje se ve en cada instante (sin estado)
+  components/ui|layout|match
+  screens/               Una pantalla por archivo
+  styles/                Un CSS por sección del diseño más experience.css
+```
+
+Decisiones de la implementación:
+
+- **Sin TypeScript ni Tailwind.** El diseño exportado de Figma Make venía en TypeScript con Tailwind importado pero sin usar sus utilidades. Se pasó a JavaScript y CSS normal para seguir la decisión del equipo y no sumar dependencias.
+- **Datos siempre de la API.** El diseño traía partidos y clubes ficticios fijos en el código (algunos con nombres de clubes reales). Ahora los partidos, equipos, jugadores, marcadores, estadísticas y textos vienen del backend. Del diseño solo quedan escudos, fotos e ilustraciones, asignados a los equipos sintéticos en `data/branding.js`.
+- **Sin cifras inventadas.** Donde el diseño mostraba valores de ejemplo (probabilidad de gol, toques, posesión) se usan cifras calculadas o se omiten.
+- **Imágenes optimizadas.** Se convirtieron a WebP con el tamaño en que se muestran: de 21 MB a 1,6 MB. Se descartaron las que no se usan.
+- **Navegación con la URL.** Cada pantalla tiene su dirección y el botón Atrás del navegador funciona.
+- **Pantalla nueva de revisión editorial.** El diseño no la tenía y el reto la pide (RF-38, RF-39).
 
 ## **Decisiones de Persona 4**
 
@@ -88,17 +117,20 @@ npm run lint:frontend
 npm run build:frontend
 ```
 
-Resultado del 9 de octubre de 2026: 166 pruebas superadas (134 previas y 32 nuevas), compilación del frontend correcta y una advertencia del linter sobre la carga inicial de datos en `App.jsx`, que es el patrón esperado.
+Resultado del 14 de octubre de 2026 sobre `main` actualizado: 316 pruebas superadas (incluye Personas 1, 2 y 3 y la colección de Postman), compilación del frontend correcta y tres advertencias del linter por cargar datos dentro de efectos, que es el patrón esperado.
 
-**Prueba en navegador** (Chrome, escritorio y 375 px de ancho): reproducción a 2×, mensajes de robo, recuperación y gol en su momento; marcador 0-0 antes del gol y 1-0 después; saltos a 5, 20, 24, 33,5 y 35 s sin mensajes de otro momento; cambio a inglés y analista; pregunta «How many shots did M. Luz take?» con fuente `evt-010`; resumen bloqueado con 409 y publicado tras aprobar; error controlado «A. Vega» reportado, retirado y corregido a «M. Luz». El retraso medido en local fue de unos 9 ms de transporte, menos de 1 ms de cálculo y unos 850 ms de margen antes de mostrar.
+**Prueba en navegador de la interfaz con el diseño** (14 de octubre, escritorio y 375 px): configuración inicial con club y jugador de la API; centro del partido de dos tiempos a 8× con mensajes, marcador por período y canal en directo; pregunta «¿Cuántos tiros tiene M. Luz?» respondida con `sc-009` y `sc-036`; estadísticas y momentos; detalle de un momento; resumen pendiente y aprobado desde Revisión; error controlado reportado, retirado y corregido; interfaz en inglés; las nueve pantallas sin desbordamiento horizontal a 375 px.
+
+**Prueba en navegador de la primera interfaz** (9 de octubre, Chrome, escritorio y 375 px): reproducción a 2×, mensajes de robo, recuperación y gol en su momento; marcador 0-0 antes del gol y 1-0 después; saltos a 5, 20, 24, 33,5 y 35 s sin mensajes de otro momento; cambio a inglés y analista; pregunta «How many shots did M. Luz take?» con fuente `evt-010`; resumen bloqueado con 409 y publicado tras aprobar; error controlado «A. Vega» reportado, retirado y corregido a «M. Luz». El retraso medido en local fue de unos 9 ms de transporte, menos de 1 ms de cálculo y unos 850 ms de margen antes de mostrar.
 
 ## **Limitaciones y pendientes**
 
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
 - **Analítica y narración provisionales.** Ver la decisión 6.
-- **Partido corto.** El partido de aceptación dura 42 s; sirve para probar, pero la demo se verá mejor con un partido más largo de Persona 1.
+- **Partidos de la demo.** Hay dos: el corto de aceptación (42 s) y el de dos tiempos de Persona 2 (11:30). Los dos enfrentan a Aurora FC y Río Unido.
 - **Estado en memoria.** Revisiones y reportes se pierden al reiniciar el backend. Para la demo alcanza; para producción haría falta guardarlos.
-- **Diseño.** La interfaz usa un estilo propio a la espera de los diseños de Persona 5.
+- **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.
+- **Sin vídeo real.** La interfaz nueva usa el campo sintético; el reproductor de la primera versión aceptaba una URL de vídeo y puede recuperarse cuando el equipo elija el vídeo.
 - **Voz.** No implementada; depende de que el equipo la incluya en el alcance.
 - **Mensajes de verificación** salen en español aunque la interfaz esté en inglés.
 - **Meta de latencia.** Se mide, pero el equipo aún no acordó un valor objetivo (decisión pendiente 6).
