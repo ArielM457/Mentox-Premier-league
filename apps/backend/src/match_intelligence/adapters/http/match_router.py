@@ -138,11 +138,14 @@ def list_matches(registry: Registry) -> list[MatchListItem]:
     response_model=MatchDetailResponse,
     status_code=201,
     summary="Cargar un partido sintético",
-    description="Genera el partido con el generador de Persona 1. Si el identificador ya existe, lo reemplaza y reinicia revisiones y reportes.",
+    description="Genera el partido con el escenario elegido (Persona 1 o Persona 2). Si el identificador ya existe, lo reemplaza y reinicia revisiones y reportes.",
 )
 def load_match(body: LoadMatchRequest, registry: Registry) -> MatchDetailResponse:
     session = registry.load_synthetic(
-        seed=body.seed, match_id=body.match_id, inject_error_in=body.inject_error_in
+        scenario=body.scenario,
+        seed=body.seed,
+        match_id=body.match_id,
+        inject_error_in=body.inject_error_in,
     )
     return _detail(session)
 

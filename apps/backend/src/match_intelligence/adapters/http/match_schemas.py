@@ -22,7 +22,11 @@ class ErrorResponse(BaseModel):
 class LoadMatchRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    seed: int = Field(default=2026, description="Semilla del generador sintético de Persona 1")
+    scenario: Literal["acceptance", "analytics"] = Field(
+        default="acceptance",
+        description="acceptance: partido corto de Persona 1. analytics: partido de dos tiempos de Persona 2",
+    )
+    seed: int | None = Field(default=None, description="Semilla del generador; por defecto la del escenario")
     match_id: str = Field(default="synthetic-acceptance-001", min_length=1)
     inject_error_in: ErrorKind | None = Field(
         default=None,

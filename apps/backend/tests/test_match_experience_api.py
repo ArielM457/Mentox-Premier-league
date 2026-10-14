@@ -313,3 +313,23 @@ def test_overlay_contract_examples(name: str, valid: bool) -> None:
     else:
         with pytest.raises(ValidationError):
             OverlayMessage.model_validate(data)
+
+
+def test_two_half_scenario_from_persona_2_is_playable(client: TestClient) -> None:
+    """El escenario largo de Persona 2 se carga y se reproduce con la misma API."""
+    base = "/api/v1/matches/synthetic-analytics-001"
+    detail = client.get(base).json()
+    assert detail["event_count"] == 178 and detail["duration_ms"] > 600_000
+    assert client.get(f"{base}/state", params={"video_time_ms": detail["duration_ms"]}).json()["score"] == {
+        "team-aurora": 1,
+        "team-rio": 1,
+    }
+    messages = client.get(f"{base}/overlays").json()["overlays"]
+    assert sum(m["kind"] == "goal" for m in messages) == 2
+    for t in range(0, detail["duration_ms"], 1_000):
+        assert len(visible_at(messages, t)) <= 1
+
+
+def test_unknown_scenario_is_rejected(client: TestClient) -> None:
+    response = client.post("/api/v1/matches", json={"scenario": "real-premier-league"})
+    assert response.status_code == 422

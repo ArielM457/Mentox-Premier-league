@@ -1,10 +1,20 @@
 from collections.abc import Callable
 
-from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
+from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.synthetic import SyntheticMatch, generate_acceptance_match
 from match_intelligence.application.match_session import MatchSession, NotFoundError
 from match_intelligence.application.ports import AnalyticsPort, NarrativePort
 
 DEMO_MATCH_ID = "synthetic-acceptance-001"
+ANALYTICS_MATCH_ID = "synthetic-analytics-001"
+
+# Escenarios sintéticos disponibles: el partido corto de aceptación de Persona 1
+# y el partido de dos tiempos que usa Persona 2 para validar su analítica.
+SCENARIOS: dict[str, Callable[..., SyntheticMatch]] = {
+    "acceptance": generate_acceptance_match,
+    "analytics": generate_analytics_scenario,
+}
+DEFAULT_SEEDS = {"acceptance": 2026, "analytics": 7}
 
 
 class MatchRegistry:
@@ -26,11 +36,15 @@ class MatchRegistry:
     def load_synthetic(
         self,
         *,
-        seed: int = 2026,
+        scenario: str = "acceptance",
+        seed: int | None = None,
         match_id: str = DEMO_MATCH_ID,
         inject_error_in: str | None = None,
     ) -> MatchSession:
-        match = generate_acceptance_match(seed=seed, match_id=match_id)
+        generate = SCENARIOS.get(scenario)
+        if generate is None:
+            raise NotFoundError(f"No existe el escenario {scenario}")
+        match = generate(seed=DEFAULT_SEEDS[scenario] if seed is None else seed, match_id=match_id)
         session = MatchSession(
             metadata=match.metadata,
             events=match.events,
@@ -60,6 +74,7 @@ def _default_registry() -> MatchRegistry:
         narrative=lambda inject: ProvisionalNarrative(inject_error_in=inject),
     )
     registry.load_synthetic()
+    registry.load_synthetic(scenario="analytics", match_id=ANALYTICS_MATCH_ID)
     return registry
 
 
