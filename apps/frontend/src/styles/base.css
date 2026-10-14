@@ -1,0 +1,48 @@
+/* Tokens del diseño, tipografía, botones y marca. Basado en el diseño de Figma de Persona 5. */
+:root {
+  --navy: #151329;
+  --navy-2: #0e0c20;
+  --navy-3: #201d3d;
+  --violet: #8257f5;
+  --violet-dark: #6337df;
+  --lime: #d8ff65;
+  --lavender: #e7dcff;
+  --off-white: #f8f7fc;
+  --white: #ffffff;
+  --muted: #706d82;
+  --line: #dfdce8;
+  --red: #f15a67;
+  --shadow: 0 20px 70px rgba(35, 25, 76, 0.13);
+  color: var(--navy);
+  font-family: "DM Sans", sans-serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--off-white); }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { border: 0; cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3, .brand, .card-score, .score-center b { font-family: "Space Grotesk", sans-serif; }
+.icon { display: block; flex: 0 0 auto; }
+
+.btn {
+  min-height: 48px; padding: 0 22px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center;
+  gap: 9px; font-weight: 700; transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.98); }
+.btn-primary { color: var(--white); background: var(--violet); box-shadow: 0 10px 25px rgba(130, 87, 245, .25); }
+.btn-primary:hover { background: var(--violet-dark); box-shadow: 0 14px 32px rgba(130, 87, 245, .35); }
+.btn-lime { background: var(--lime); color: var(--navy); }
+.btn-lime:hover { box-shadow: 0 12px 30px rgba(184, 236, 56, .35); }
+.btn-secondary { background: rgba(130, 87, 245, .16); color: #bca9ff; border: 1px solid rgba(130, 87, 245, .35); }
+.btn-ghost { background: transparent; color: inherit; box-shadow: none; }
+
+.brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; line-height: .88; letter-spacing: -.04em; }
+.brand-mark { width: 38px; height: 38px; display: grid; place-items: center; color: var(--lime); background: var(--navy); border-radius: 13px; transform: rotate(-7deg); }
+.brand-light { color: var(--white); }
+.brand-light .brand-mark, .dark-shell .brand-mark { color: var(--navy); background: var(--lime); }
