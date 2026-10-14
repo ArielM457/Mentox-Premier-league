@@ -39,3 +39,11 @@ export function formatClock(ms) {
   const total = Math.max(0, Math.floor(ms / 1000))
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
+
+// Identificador estable de un momento en la URL: el candidato si existe; si no, el mensaje.
+export const momentIdOf = (overlay) => overlay.candidate_id ?? overlay.message_id
+
+// Reloj del partido con su período ("2T · 1:05"); el tiempo de vídeo queda para la reproducción.
+export function formatMatchClock(item, periodLabel) {
+  return `${periodLabel(item.period)} · ${formatClock(item.clock_ms)}`
+}
