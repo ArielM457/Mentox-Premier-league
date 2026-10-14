@@ -442,9 +442,10 @@ class ProvisionalNarrative:
             applied.append(f"favorite_player:{preferences.favorite_player_id}")
             if involved:
                 kinds = ", ".join(sorted({c.kind for c in involved}))
+                n = len(involved)
                 focus = (
-                    f" Enfoque en {name}: participó en {len(involved)} momentos destacados ({kinds})."
-                    if es else f" Focus on {name}: involved in {len(involved)} key moments ({kinds})."
+                    f" Enfoque en {name}: participó en {n} {'momento destacado' if n == 1 else 'momentos destacados'} ({kinds})."
+                    if es else f" Focus on {name}: involved in {n} key {'moment' if n == 1 else 'moments'} ({kinds})."
                 )
             else:
                 focus = (
@@ -456,8 +457,8 @@ class ProvisionalNarrative:
             mine = [c for c in candidates if c.team_id == preferences.favorite_team_id]
             applied.append(f"favorite_team:{preferences.favorite_team_id}")
             focus = (
-                f" Enfoque en {team_name}: {len(mine)} momentos destacados propios."
-                if es else f" Focus on {team_name}: {len(mine)} key moments of their own."
+                f" Enfoque en {team_name}: {len(mine)} {'momento destacado propio' if len(mine) == 1 else 'momentos destacados propios'}."
+                if es else f" Focus on {team_name}: {len(mine)} key {'moment' if len(mine) == 1 else 'moments'} of their own."
             )
 
         title = ("Resumen: " if es else "Summary: ") + score
