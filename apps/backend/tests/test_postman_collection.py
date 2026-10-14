@@ -42,14 +42,26 @@ def test_collection_covers_every_api_operation():
         for path, operations in app.openapi()["paths"].items()
         for method in operations
     }
-    covered = {
+    requested = {
         (
             item["request"]["method"],
             item["request"]["url"].replace("{{baseUrl}}", "").split("?", 1)[0],
         )
         for item in ITEMS
     }
+
+    def template(path: str) -> re.Pattern[str]:
+        # Las rutas con parámetros, como /matches/{match_id}, se prueban con valores concretos.
+        parts = re.split(r"\{[^}]+\}", path)
+        return re.compile("^" + "[^/]+".join(re.escape(part) for part in parts) + "$")
+
+    covered = {
+        (method, path)
+        for method, path in documented
+        if any(m == method and template(path).match(url) for m, url in requested)
+    }
     assert covered == documented
+    assert all(any(m == method and template(p).match(url) for method, p in documented) for m, url in requested)
 
 
 def test_azure_route_explains_missing_configuration(monkeypatch):

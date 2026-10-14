@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Match Intelligence API",
-    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure.",
+    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure. La experiencia del partido recorre estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -615,6 +615,478 @@
                   "const body = pm.response.json();",
                   "pm.test('Confirma el error', () => pm.expect(body.status).to.equal('confirmed_error'));",
                   "pm.test('Corrige con trazabilidad', () => { pm.expect(body.correction.original_draft_id).to.equal('draft-moment-goal-es-casual-normal-live'); pm.expect(body.correction.claims[0].value).to.equal(1); pm.expect(body.correction.source_event_ids).to.include('evt-105'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Experiencia del partido",
+      "item": [
+        {
+          "name": "POST Cargar partido sintético",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches",
+            "description": "Carga o reinicia el partido de aceptación de Persona 1.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seed\": 2026,\n  \"match_id\": \"synthetic-acceptance-001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Duración y eventos', () => { pm.expect(body.event_count).to.equal(10); pm.expect(body.duration_ms).to.equal(42000); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Partidos cargados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches",
+            "description": "Lista los partidos disponibles para la interfaz."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Incluye el partido', () => pm.expect(body.map(m => m.match_id)).to.include('synthetic-acceptance-001'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Detalle del partido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001",
+            "description": "Metadatos, duración y fuente de vídeo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Equipos', () => pm.expect(body.metadata.home_team.name).to.equal('Aurora FC'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Eventos hasta 20 s",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/events?until_video_ms=20000",
+            "description": "Nunca devuelve eventos posteriores al tiempo del vídeo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Sin eventos futuros', () => pm.expect(body.events.every(e => e.video_time_ms <= 20000)).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Estado tras el gol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/state?video_time_ms=34000",
+            "description": "MatchSnapshot v1 en el segundo 34 del vídeo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Marcador 1-0', () => pm.expect(body.score['team-aurora']).to.equal(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Mensajes en pantalla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/overlays?language=es&mode=casual&level=normal",
+            "description": "OverlayMessage v1 planificados con una sola zona de pantalla."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Un solo gol', () => pm.expect(body.overlays.filter(o => o.kind === 'goal').length).to.equal(1));",
+                  "pm.test('Tiempo de vídeo', () => pm.expect(body.overlays.every(o => o.video_time_ms >= 0)).to.equal(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Canal en directo sin jugador",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/stream?mode=player",
+            "description": "El canal SSE valida las preferencias antes de abrirse. Con preferencias válidas responde text/event-stream."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+                  "const body = pm.response.json();",
+                  "pm.test('Explica el error', () => pm.expect(body.detail).to.include('jugador favorito'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Fuentes del gol",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/drafts/draft-moment-evt-010-es-casual-normal/sources",
+            "description": "Explicación y eventos que sustentan el mensaje."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Eventos de origen', () => pm.expect(body.events.map(e => e.event_id)).to.include('evt-010'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Pregunta sobre pases",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/questions",
+            "description": "Respuesta calculada con los eventos ocurridos.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"¿Cuántos pases lleva Aurora?\",\n  \"video_time_ms\": 40000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Cuenta con evidencia', () => { pm.expect(body.answer.headline).to.include('Aurora FC: 4'); pm.expect(body.answer.source_event_ids.length).to.equal(4); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Resumen final",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/summary?language=es&mode=casual",
+            "description": "El resumen se retiene hasta la revisión editorial."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Pendiente de revisión', () => pm.expect(body.status).to.equal('pending'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Publicación sin aprobar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual/published",
+            "description": "No se publica sin aprobación editorial (RF-38)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', () => pm.response.to.have.status(409));",
+                  "const body = pm.response.json();",
+                  "pm.test('Bloqueado', () => pm.expect(body.detail).to.include('pending'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Aprobar resumen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual/review",
+            "description": "Registra la decisión editorial.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approve\",\n  \"reviewer\": \"Editor de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Aprobado', () => pm.expect(body.status).to.equal('approved'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Publicación aprobada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual/published",
+            "description": "Después de aprobar, el análisis final se publica."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Estado editorial', () => pm.expect(body.editorial_status).to.equal('approved'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Cola editorial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial",
+            "description": "Análisis finales y su estado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Incluye el resumen', () => pm.expect(body.map(r => r.draft.draft_id)).to.include('summary-synthetic-acceptance-001-es-casual'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reporte que no corresponde",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/reports",
+            "description": "El mensaje coincide con sus eventos y no se corrige.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"draft_id\": \"draft-moment-evt-010-es-casual-normal\",\n  \"reason\": \"No fue gol\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Se confirma la salida', () => pm.expect(body.outcome).to.equal('confirmed'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Reportes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/reports",
+            "description": "Historial de reportes y resultado de su verificación."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Registra el reporte', () => pm.expect(body.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reproducir hasta 20 s",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/playback",
+            "description": "Control del reproductor con el sincronizador de Persona 1.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"play\",\n  \"video_time_ms\": 20000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Eventos aplicados', () => pm.expect(body.events_applied).to.equal(5));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Estado del reproductor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/playback",
+            "description": "Posición y estado actuales."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"
                 ]
               }
             }

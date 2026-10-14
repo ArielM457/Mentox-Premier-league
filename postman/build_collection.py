@@ -35,6 +35,145 @@ def request(name: str, path: str, body: dict, checks: list[str], description: st
     }
 
 
+def get(name: str, path: str, checks: list[str], description: str) -> dict:
+    return {
+        "name": name,
+        "request": {"method": "GET", "header": [], "url": "{{baseUrl}}" + path, "description": description},
+        "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": checks}}],
+    }
+
+
+def status(code: int) -> str:
+    return f"pm.test('HTTP {code}', () => pm.response.to.have.status({code}));"
+
+
+def match_experience_items() -> list[dict]:
+    """Recorrido de Persona 4 sobre el partido sintético de aceptación.
+
+    El orden importa: los mensajes registran las narraciones que después se
+    consultan, revisan y reportan.
+    """
+    base = "/api/v1/matches/synthetic-acceptance-001"
+    goal_draft = "draft-moment-evt-010-es-casual-normal"
+    summary = "summary-synthetic-acceptance-001-es-casual"
+    body = "const body = pm.response.json();"
+    return [
+        request(
+            "POST Cargar partido sintético",
+            "/api/v1/matches",
+            {"seed": 2026, "match_id": "synthetic-acceptance-001"},
+            [status(201), body, "pm.test('Duración y eventos', () => { pm.expect(body.event_count).to.equal(10); pm.expect(body.duration_ms).to.equal(42000); });"],
+            "Carga o reinicia el partido de aceptación de Persona 1.",
+        ),
+        get(
+            "GET Partidos cargados",
+            "/api/v1/matches",
+            [status(200), body, "pm.test('Incluye el partido', () => pm.expect(body.map(m => m.match_id)).to.include('synthetic-acceptance-001'));"],
+            "Lista los partidos disponibles para la interfaz.",
+        ),
+        get(
+            "GET Detalle del partido",
+            base,
+            [status(200), body, "pm.test('Equipos', () => pm.expect(body.metadata.home_team.name).to.equal('Aurora FC'));"],
+            "Metadatos, duración y fuente de vídeo.",
+        ),
+        get(
+            "GET Eventos hasta 20 s",
+            base + "/events?until_video_ms=20000",
+            [status(200), body, "pm.test('Sin eventos futuros', () => pm.expect(body.events.every(e => e.video_time_ms <= 20000)).to.equal(true));"],
+            "Nunca devuelve eventos posteriores al tiempo del vídeo.",
+        ),
+        get(
+            "GET Estado tras el gol",
+            base + "/state?video_time_ms=34000",
+            [status(200), body, "pm.test('Marcador 1-0', () => pm.expect(body.score['team-aurora']).to.equal(1));"],
+            "MatchSnapshot v1 en el segundo 34 del vídeo.",
+        ),
+        get(
+            "GET Mensajes en pantalla",
+            base + "/overlays?language=es&mode=casual&level=normal",
+            [status(200), body, "pm.test('Un solo gol', () => pm.expect(body.overlays.filter(o => o.kind === 'goal').length).to.equal(1));", "pm.test('Tiempo de vídeo', () => pm.expect(body.overlays.every(o => o.video_time_ms >= 0)).to.equal(true));"],
+            "OverlayMessage v1 planificados con una sola zona de pantalla.",
+        ),
+        get(
+            "GET Canal en directo sin jugador",
+            base + "/stream?mode=player",
+            [status(400), body, "pm.test('Explica el error', () => pm.expect(body.detail).to.include('jugador favorito'));"],
+            "El canal SSE valida las preferencias antes de abrirse. Con preferencias válidas responde text/event-stream.",
+        ),
+        get(
+            "GET Fuentes del gol",
+            base + f"/drafts/{goal_draft}/sources",
+            [status(200), body, "pm.test('Eventos de origen', () => pm.expect(body.events.map(e => e.event_id)).to.include('evt-010'));"],
+            "Explicación y eventos que sustentan el mensaje.",
+        ),
+        request(
+            "POST Pregunta sobre pases",
+            base + "/questions",
+            {"question": "¿Cuántos pases lleva Aurora?", "video_time_ms": 40000},
+            [status(200), body, "pm.test('Cuenta con evidencia', () => { pm.expect(body.answer.headline).to.include('Aurora FC: 4'); pm.expect(body.answer.source_event_ids.length).to.equal(4); });"],
+            "Respuesta calculada con los eventos ocurridos.",
+        ),
+        get(
+            "GET Resumen final",
+            base + "/summary?language=es&mode=casual",
+            [status(200), body, "pm.test('Pendiente de revisión', () => pm.expect(body.status).to.equal('pending'));"],
+            "El resumen se retiene hasta la revisión editorial.",
+        ),
+        get(
+            "GET Publicación sin aprobar",
+            base + f"/editorial/{summary}/published",
+            [status(409), body, "pm.test('Bloqueado', () => pm.expect(body.detail).to.include('pending'));"],
+            "No se publica sin aprobación editorial (RF-38).",
+        ),
+        request(
+            "POST Aprobar resumen",
+            base + f"/editorial/{summary}/review",
+            {"decision": "approve", "reviewer": "Editor de prueba"},
+            [status(200), body, "pm.test('Aprobado', () => pm.expect(body.status).to.equal('approved'));"],
+            "Registra la decisión editorial.",
+        ),
+        get(
+            "GET Publicación aprobada",
+            base + f"/editorial/{summary}/published",
+            [status(200), body, "pm.test('Estado editorial', () => pm.expect(body.editorial_status).to.equal('approved'));"],
+            "Después de aprobar, el análisis final se publica.",
+        ),
+        get(
+            "GET Cola editorial",
+            base + "/editorial",
+            [status(200), body, "pm.test('Incluye el resumen', () => pm.expect(body.map(r => r.draft.draft_id)).to.include('" + summary + "'));"],
+            "Análisis finales y su estado.",
+        ),
+        request(
+            "POST Reporte que no corresponde",
+            base + "/reports",
+            {"draft_id": goal_draft, "reason": "No fue gol"},
+            [status(201), body, "pm.test('Se confirma la salida', () => pm.expect(body.outcome).to.equal('confirmed'));"],
+            "El mensaje coincide con sus eventos y no se corrige.",
+        ),
+        get(
+            "GET Reportes",
+            base + "/reports",
+            [status(200), body, "pm.test('Registra el reporte', () => pm.expect(body.length).to.be.above(0));"],
+            "Historial de reportes y resultado de su verificación.",
+        ),
+        request(
+            "POST Reproducir hasta 20 s",
+            base + "/playback",
+            {"action": "play", "video_time_ms": 20000},
+            [status(200), body, "pm.test('Eventos aplicados', () => pm.expect(body.events_applied).to.equal(5));"],
+            "Control del reproductor con el sincronizador de Persona 1.",
+        ),
+        get(
+            "GET Estado del reproductor",
+            base + "/playback",
+            [status(200), body, "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"],
+            "Posición y estado actuales.",
+        ),
+    ]
+
+
 def main() -> None:
     collection = json.loads(COLLECTION.read_text(encoding="utf-8"))
     events_group = next(group for group in collection["item"] if group["name"] == "Eventos")
@@ -252,16 +391,18 @@ def main() -> None:
     collection["item"] = [
         group
         for group in collection["item"]
-        if group["name"] not in {"Narrativa", "Enrutamiento de agentes"}
+        if group["name"] not in {"Narrativa", "Enrutamiento de agentes", "Experiencia del partido"}
     ]
     collection["item"].append(
         {"name": "Enrutamiento de agentes", "item": routing_items}
     )
     collection["item"].append({"name": "Narrativa", "item": items})
+    collection["item"].append({"name": "Experiencia del partido", "item": match_experience_items()})
     collection["info"]["description"] = (
         "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. "
         "El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa "
-        "usan provider=fixture y no llaman a Azure."
+        "usan provider=fixture y no llaman a Azure. La experiencia del partido recorre "
+        "estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético."
     )
     COLLECTION.write_text(
         json.dumps(collection, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
