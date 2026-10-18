@@ -1,0 +1,14 @@
+{
+  "contract_version": "1",
+  "draft_id": "answer-demo-001-900000-es",
+  "match_id": "demo-001",
+  "period": 1,
+  "clock_ms": 900000,
+  "language": "es",
+  "mode": "casual",
+  "level": "normal",
+  "content_kind": "answer",
+  "headline": "Datos insuficientes",
+  "explanation": "No se puede determinar con los datos disponibles.",
+  "verification_status": "approved"
+}

@@ -1,0 +1,155 @@
+{
+  "contract_version": "1",
+  "match_id": "demo-routing-001",
+  "description": "Solicitudes sintéticas para diseñar y probar el filtro y el orquestador",
+  "scenarios": [
+    {
+      "scenario_id": "metrics-only-pass",
+      "description": "Un pase normal actualiza estadísticas y no llama agentes",
+      "input_events": [
+        {
+          "schema_version": "1.0",
+          "event_id": "evt-001",
+          "match_id": "demo-routing-001",
+          "period": 1,
+          "clock_ms": 60000,
+          "video_time_ms": 62000,
+          "type": "pass",
+          "team_id": "team-a",
+          "player_id": "player-4",
+          "start": {"x": 18, "y": 42},
+          "end": {"x": 29, "y": 45},
+          "outcome": "success",
+          "source": "synthetic",
+          "confidence": null,
+          "related_event_ids": []
+        }
+      ],
+      "expected_route": "metrics_only",
+      "expected_agent": null
+    },
+    {
+      "scenario_id": "narrative-candidate-progression",
+      "description": "Una secuencia progresiva espera contexto antes de seleccionar el momento",
+      "input_events": [
+        {
+          "schema_version": "1.0",
+          "event_id": "evt-010",
+          "match_id": "demo-routing-001",
+          "period": 1,
+          "clock_ms": 360000,
+          "video_time_ms": 363000,
+          "type": "recovery",
+          "team_id": "team-a",
+          "player_id": "player-6",
+          "start": {"x": 38, "y": 51},
+          "end": null,
+          "outcome": "success",
+          "source": "synthetic",
+          "confidence": null,
+          "related_event_ids": []
+        },
+        {
+          "schema_version": "1.0",
+          "event_id": "evt-011",
+          "match_id": "demo-routing-001",
+          "period": 1,
+          "clock_ms": 364000,
+          "video_time_ms": 367000,
+          "type": "pass",
+          "team_id": "team-a",
+          "player_id": "player-6",
+          "start": {"x": 38, "y": 51},
+          "end": {"x": 58, "y": 46},
+          "outcome": "success",
+          "source": "synthetic",
+          "confidence": null,
+          "related_event_ids": ["evt-010"]
+        },
+        {
+          "schema_version": "1.0",
+          "event_id": "evt-012",
+          "match_id": "demo-routing-001",
+          "period": 1,
+          "clock_ms": 368000,
+          "video_time_ms": 371000,
+          "type": "pass",
+          "team_id": "team-a",
+          "player_id": "player-8",
+          "start": {"x": 58, "y": 46},
+          "end": {"x": 78, "y": 50},
+          "outcome": "success",
+          "source": "synthetic",
+          "confidence": null,
+          "related_event_ids": ["evt-010", "evt-011"]
+        }
+      ],
+      "expected_route": "moment_candidate",
+      "expected_agent": "moment_selector",
+      "expected_window_ms": 120000
+    },
+    {
+      "scenario_id": "immediate-danger-shot",
+      "description": "Un tiro desde una zona peligrosa activa análisis inmediato",
+      "input_events": [
+        {
+          "schema_version": "1.0",
+          "event_id": "evt-020",
+          "match_id": "demo-routing-001",
+          "period": 1,
+          "clock_ms": 802000,
+          "video_time_ms": 805500,
+          "type": "shot",
+          "team_id": "team-a",
+          "player_id": "player-9",
+          "start": {"x": 86, "y": 50},
+          "end": {"x": 100, "y": 50},
+          "outcome": "blocked",
+          "source": "synthetic",
+          "confidence": null,
+          "related_event_ids": ["evt-010", "evt-011", "evt-012"]
+        }
+      ],
+      "expected_route": "danger_immediate",
+      "expected_agent": "danger_simulation"
+    },
+    {
+      "scenario_id": "dead-ball-context",
+      "description": "Una señal de pausa habilita un dato previo aprobado si no hay una alerta superior",
+      "control_signal": {
+        "type": "play_stopped",
+        "period": 1,
+        "clock_ms": 1200000,
+        "video_time_ms": 1205000,
+        "reason": "contract_extension_pending"
+      },
+      "expected_route": "dead_ball_context",
+      "expected_agent": "narrator",
+      "requires_approved_pregame_fact": true
+    },
+    {
+      "scenario_id": "halftime-recap",
+      "description": "El cierre del primer tiempo solicita un resumen de tres a cuatro minutos",
+      "control_signal": {
+        "type": "period_ended",
+        "period": 1,
+        "clock_ms": 2700000
+      },
+      "expected_route": "recap",
+      "expected_agent": "recap",
+      "target_duration_seconds": {"min": 180, "max": 240}
+    },
+    {
+      "scenario_id": "final-recap",
+      "description": "El final solicita un resumen amplio pendiente de revisión editorial",
+      "control_signal": {
+        "type": "match_ended",
+        "period": 2,
+        "clock_ms": 2700000
+      },
+      "expected_route": "recap",
+      "expected_agent": "recap",
+      "expected_editorial_status": "pending"
+    }
+  ]
+}

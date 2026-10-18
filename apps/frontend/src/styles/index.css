@@ -1,0 +1,11 @@
+/* Un archivo por sección del diseño; experience.css añade lo que pide la API (mensajes, fuentes, revisión). */
+@import './base.css';
+@import './landing.css';
+@import './onboarding.css';
+@import './layout.css';
+@import './match.css';
+@import './detail.css';
+@import './recap-profile.css';
+@import './experience.css';
+@import './animations.css';
+@import './responsive.css';

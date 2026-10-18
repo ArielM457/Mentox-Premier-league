@@ -1,0 +1,21 @@
+{
+  "contract_version": "1",
+  "draft_id": "draft-moment-goal-es-casual-normal-live",
+  "candidate_id": "moment-goal",
+  "match_id": "demo-001",
+  "period": 1,
+  "clock_ms": 900000,
+  "language": "es",
+  "mode": "casual",
+  "level": "normal",
+  "content_kind": "live",
+  "headline": "Gol de player-7 - 15'",
+  "explanation": "player-7: 1 gol.",
+  "claims": [
+    {"key": "goals", "value": 1, "unit": "count", "team_id": "team-a", "player_id": "player-7", "source_event_ids": ["evt-105"]}
+  ],
+  "source_event_ids": ["evt-105"],
+  "applied_preferences": {},
+  "verification_status": "approved",
+  "editorial_status": null
+}

@@ -76,6 +76,24 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-39 · P1.** Cuando un reporte señale un posible error de análisis, el sistema debe contrastarlo con sus eventos y métricas, registrar el resultado y corregir o retirar la conclusión si corresponde. Se verifica con un reporte válido y otro que no lo sea.
 
+**RF-40 · P0.** El sistema debe clasificar cada evento aceptado antes de llamar a un agente. Debe separar al menos eventos de solo métricas, candidatos narrativos, peligro inmediato, tiempo muerto y acumulación para resumen. Se verifica reproduciendo los escenarios sintéticos y comprobando su ruta.
+
+**RF-41 · P0.** Los eventos sin valor narrativo inmediato deben actualizar el estado y el acumulado sin llegar al orquestador de agentes. Se verifica contando las llamadas al orquestador durante una secuencia de pases normales.
+
+**RF-42 · P0.** El sistema debe preparar para cada agente un contexto reducido con hechos, métricas, patrones, preferencias y referencias necesarias para su tarea. Se verifica comparando el contexto preparado con el registro completo del partido y comprobando que conserva la evidencia usada.
+
+**RF-43 · P1.** El sistema debe reconocer jugadas mediante un catálogo versionado de señales y datos mínimos. Debe indicar cuándo una coincidencia es incompleta. Se verifica con un caso positivo y uno incompleto de cada patrón elegido.
+
+**RF-44 · P1.** Ante una situación de peligro, el sistema puede producir escenarios contrafactuales sobre cambios concretos de la jugada. Cada escenario debe mostrar el supuesto, el método y una marca visible de simulación. Se verifica comprobando que no modifica el estado real ni se presenta como hecho o predicción.
+
+**RF-45 · P1.** El sistema debe seleccionar momentos durante el partido mediante ventanas configurables y permitir una salida anticipada en goles, peligro alto o pausas adecuadas. Se verifica con un candidato que espera contexto y una alerta que se publica sin esperar la ventana.
+
+**RF-46 · P1.** El sistema debe mantener una base previa al partido con datos externos, fuente, fecha, vigencia y estado de aprobación. El narrador solo puede usar contenido aprobado. Se verifica intentando narrar un dato aprobado y otro pendiente.
+
+**RF-47 · P1.** El sistema debe generar un resumen de medio tiempo con una duración editorial objetivo de tres a cuatro minutos y un resumen final más amplio. Ambos deben usar el acumulado y los momentos verificados. Se verifica midiendo una lectura o voz de prueba y contrastando sus cifras con el estado.
+
+**RF-48 · P1.** El sistema debe separar la investigación previa, la validación de fuentes y la confirmación humana. Se verifica siguiendo un dato desde su propuesta hasta su aprobación o rechazo.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.
@@ -103,6 +121,16 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 **RNF-05 · P1.** La interfaz debe mantener los mensajes legibles y evitar que varios compitan por el mismo espacio. Se verifica durante escenas con muchos eventos.
 
 **RNF-06 · P1.** El sistema debe manejar la falta de respuesta de la parte de IA sin detener la ingesta ni corromper el estado. Se verifica simulando un fallo en la generación de narraciones.
+
+**RNF-07 · P0.** Los consumidores de eventos deben procesar entregas repetidas sin duplicar métricas, decisiones ni narraciones. Se verifica reenviando el mismo identificador de mensaje.
+
+**RNF-08 · P1.** El procesamiento debe conservar el orden dentro de cada partido y permitir partidos distintos en paralelo. Se verifica intercalando eventos de dos partidos y comparando sus estados finales.
+
+**RNF-09 · P1.** Las solicitudes narrativas deben tener vencimiento y no publicarse cuando el momento ya perdió vigencia. Se verifica retrasando una respuesta más allá de su límite.
+
+**RNF-10 · P1.** El filtro, refinador, orquestador y trabajadores deben poder ejecutarse en varias instancias sin guardar estado local obligatorio. Se verifica deteniendo una instancia durante una prueba de carga y comprobando la continuidad.
+
+**RNF-11 · P1.** El sistema debe aplicar control de carga, reintentos limitados y una cola de errores sin detener las métricas. Se verifica superando temporalmente la capacidad de los agentes y recuperando el flujo.
 
 ## **Criterio de alcance**
 

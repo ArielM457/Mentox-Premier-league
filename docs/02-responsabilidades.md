@@ -14,6 +14,10 @@ Debe recibir los eventos en orden de llegada, comprobar su forma, detectar dupli
 
 Debe mantener el marcador, el reloj, la posesión y las estadísticas que puedan calcularse con los datos disponibles. Debe distinguir hechos observados, métricas calculadas e interpretaciones. Un patrón como presión alta o cambio de ritmo necesita una regla o evidencia explícita.
 
+## **Filtro y preparación para agentes**
+
+Debe actualizar las métricas de todos los eventos aceptados y separar los que necesitan análisis narrativo. Los eventos de solo métricas no deben llamar a los agentes. Los candidatos deben compararse con reglas y jugadas conocidas, reducirse al contexto necesario y conservar sus fuentes antes de llegar al orquestador.
+
 ## **Selección de momentos y explicación**
 
 Debe decidir cuándo vale la pena mostrar una idea. Debe explicar por qué importa según el contexto del partido, por ejemplo una secuencia que cambia la presión o un tiro tras varias recuperaciones. Debe vincular cada explicación con los eventos y métricas que la sostienen y evitar afirmaciones sin respaldo.
@@ -26,9 +30,9 @@ Debe convertir la idea en mensajes claros para distintos modos, idiomas y prefer
 
 Debe entregar mensajes estructurados y sincronizables para que una interfaz los pueda mostrar junto al partido. Debe permitir controlar cuándo aparecen, cuánto tiempo se sugieren en pantalla y cuándo se reemplazan. La interfaz debe representar el contenido de forma legible.
 
-## **Resumen del partido**
+## **Resúmenes del partido**
 
-Debe seleccionar los momentos principales después del encuentro, reunir estadísticas consistentes con el estado final y crear un resumen en el idioma y modo elegidos.
+Debe producir un resumen de medio tiempo con las métricas y momentos disponibles hasta ese punto. Después del encuentro debe reunir el estado final y crear un resumen más amplio. Ambos usan datos acumulados, incluidos los eventos que no necesitaron una narración en directo.
 
 ## **Observación y control editorial**
 
