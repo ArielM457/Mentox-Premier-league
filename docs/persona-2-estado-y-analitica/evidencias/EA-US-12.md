@@ -38,7 +38,7 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 - **Adaptador en lugar de cambiar contratos.** `PresentationAnalytics` entrega a la API de Persona 4 el subconjunto que conoce. Las razones, señales y componentes siguen en `match-insights`.
 - **El escenario vuelve a `src`.** Desde la unión con `main`, la API de Persona 4 lo carga al arrancar, y el código de producción no puede importar desde `tests`.
 - **Dos fases en Bicep.** Las Container Apps necesitan que las imágenes ya existan en el registro.
-- **Secreto fuera de la línea de comandos.** La cadena de Supabase pasa a Azure en un archivo temporal y queda como secreto de Container Apps.
+- **Secreto fuera de la línea de comandos.** La cadena de Supabase pasa a Azure en un archivo temporal de una carpeta privada y queda como secreto de Container Apps. Una revisión de seguridad automática señaló que en Linux `/tmp` deja el archivo legible por otros usuarios; se corrigió con permisos 700 y 600 antes de escribirlo.
 
 ## Reproducción
 

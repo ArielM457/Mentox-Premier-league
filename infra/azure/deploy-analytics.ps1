@@ -139,10 +139,24 @@ function Write-ParameterFile([hashtable] $Values) {
         contentVersion = '1.0.0.0'
         parameters     = $parameters
     }
-    $path = Join-Path ([IO.Path]::GetTempPath()) ("mentox-analytics-{0}.json" -f [guid]::NewGuid())
+    # Puede contener la cadena de Supabase: va en una carpeta privada. En Windows, la
+    # carpeta temporal del usuario ya es privada; en Linux y macOS se limita a 700/600
+    # antes de escribir el secreto.
+    $directory = Join-Path ([IO.Path]::GetTempPath()) ("mentox-analytics-{0}" -f [guid]::NewGuid())
+    New-Item -ItemType Directory -Path $directory | Out-Null
+    $path = Join-Path $directory 'parameters.json'
+    New-Item -ItemType File -Path $path | Out-Null
+    if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+        Invoke-Native 'chmod' @('700', $directory)
+        Invoke-Native 'chmod' @('600', $path)
+    }
     $json = $document | ConvertTo-Json -Depth 6
     [IO.File]::WriteAllText($path, $json, (New-Object System.Text.UTF8Encoding $false))
     return $path
+}
+
+function Remove-ParameterFile([string] $Path) {
+    Remove-Item (Split-Path -Parent $Path) -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 function Get-PlainText([Security.SecureString] $Secure) {
@@ -259,7 +273,7 @@ if ($WhatIf) {
             '--template-file', $Template, '--parameters', "@$file")
     }
     finally {
-        Remove-Item $file -Force -ErrorAction SilentlyContinue
+        Remove-ParameterFile $file
     }
     exit 0
 }
@@ -272,7 +286,7 @@ try {
             --query properties.outputs --output json)
 }
 finally {
-    Remove-Item $file -Force -ErrorAction SilentlyContinue
+    Remove-ParameterFile $file
 }
 $registryName = Get-OutputValue $infra 'registryName'
 $loginServer = Get-OutputValue $infra 'registryLoginServer'
@@ -350,7 +364,7 @@ try {
             --query properties.outputs --output json)
 }
 finally {
-    Remove-Item $file -Force -ErrorAction SilentlyContinue
+    Remove-ParameterFile $file
 }
 $apiUrl = Get-OutputValue $apps 'apiUrl'
 $webUrl = Get-OutputValue $apps 'webUrl'

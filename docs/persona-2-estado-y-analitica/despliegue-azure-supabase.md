@@ -130,7 +130,7 @@ El script:
 3. **Fase 1:** despliega Event Hubs, Storage, Log Analytics, el registro, la identidad con sus roles y el entorno de Container Apps.
 4. Construye y publica las imágenes `match-intelligence-api` y `match-intelligence-web` con Docker. Con `-UseAcrBuild`, las construye en Azure, aunque algunas suscripciones de estudiante no permiten ACR Tasks.
 5. Con `-SeedDatabase`, carga el esquema y los datos ficticios.
-6. **Fase 2:** despliega la API, la interfaz, el procesador y el trabajo `replay`. La cadena de Supabase viaja en un archivo temporal que se borra al terminar y queda como secreto de Container Apps.
+6. **Fase 2:** despliega la API, la interfaz, el procesador y el trabajo `replay`. La cadena de Supabase viaja en un archivo temporal de una carpeta privada (700 y 600 en Linux y macOS; en Windows, la carpeta temporal del usuario). El archivo se borra al terminar y la cadena queda como secreto de Container Apps.
 7. Espera a que la API responda y muestra las direcciones y los comandos útiles.
 
 | Opción | Efecto |
@@ -236,6 +236,7 @@ La API lee los partidos al arrancar. Si vuelve a cargar los datos, reinicie la A
 ## Limitaciones
 
 - No se desplegó en una suscripción real. Bicep no se compiló en este equipo porque no tiene Azure CLI. El script ejecuta la validación de Azure en la fase 1 y se detiene ante cualquier error.
+- La cadena de Supabase queda como secreto de Container Apps. Guardarla en Azure Key Vault evitaría que toque el disco local, pero añade otro recurso; queda como mejora.
 - La API usa una sola réplica: guarda en memoria la revisión editorial y los reportes de Persona 4.
 - La API carga los partidos al arrancar. Con los dos partidos, el arranque tarda unos segundos y un estado con seguimiento, entre 0,1 y 0,15 s en este equipo.
 - La entrada de Container Apps corta las peticiones HTTP largas (240 s según su documentación). El canal en directo de la interfaz puede cerrarse en partidos largos; hay que comprobar en el primer despliegue cómo se reconecta.
