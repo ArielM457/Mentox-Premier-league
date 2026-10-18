@@ -200,3 +200,19 @@ Las personas usuarias de este módulo son sobre todo Persona 3 (narración) y Pe
 - Todas las cifras, momentos y motivos salen del motor real.
 - Lo simulado (posiciones y frases) está marcado en la página.
 - El archivo se regenera desde el código y una prueba detecta si quedó viejo.
+
+### EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase
+
+**Como** equipo,
+**quiero** que la API use la analítica real con partidos guardados en una base y que un script despliegue todo en Azure,
+**para** dejar de depender de adaptadores provisionales y mostrar el flujo completo en la nube.
+
+**Prioridad:** P1. **Estado:** verificada en local; despliegue en Azure pendiente. **Evidencia:** [EA-US-12](evidencias/EA-US-12.md).
+
+**Criterios de aceptación:**
+
+- La API responde con el motor de Persona 2 y los contratos de Persona 4; sin variables se comporta como antes.
+- Los partidos, eventos y observaciones se guardan y se leen iguales a sus contratos.
+- La carga de datos se puede repetir sin duplicar y todo lo simulado lleva su origen.
+- Un script despliega Event Hubs, Storage, el registro, la identidad y las Container Apps, sin escribir la cadena de la base en la línea de comandos.
+- Otro script apaga o borra el despliegue para cuidar los créditos.

@@ -185,3 +185,22 @@ az deployment group what-if \
 ```
 
 Los roles, las variables, el procesador continuo y la prueba de humo están en [integración de la analítica con Azure](../../docs/persona-2-estado-y-analitica/integracion-azure.md).
+
+## Despliegue completo de la analítica
+
+`analytics-platform.bicep` despliega todo lo que necesita la analítica en un solo grupo. Usa `main.bicep` y `analytics.bicep` como módulos, sin cambiarlos, y añade:
+
+- Log Analytics.
+- Azure Container Registry.
+- Una identidad administrada con sus roles (`modules/analytics-roles.bicep`).
+- Un entorno de Container Apps con la API, la interfaz, el procesador continuo y un trabajo que repite partidos de Supabase.
+
+`deploy-analytics.ps1` lo despliega en dos fases, con la construcción de las imágenes en medio. `remove-analytics.ps1` lo apaga o lo borra:
+
+```powershell
+./infra/azure/deploy-analytics.ps1 -ResourceGroup "<grupo>" -Location "<region>" -WhatIf
+./infra/azure/deploy-analytics.ps1 -ResourceGroup "<grupo>" -Location "<region>" -SeedDatabase
+./infra/azure/remove-analytics.ps1 -ResourceGroup "<grupo>"
+```
+
+La guía, los costos con Azure for Students y la carga de datos ficticios en Supabase están en [despliegue en Azure y Supabase](../../docs/persona-2-estado-y-analitica/despliegue-azure-supabase.md).

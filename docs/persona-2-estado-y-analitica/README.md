@@ -14,6 +14,7 @@ Esta carpeta documenta el trabajo de Persona 2. El objetivo es convertir eventos
 - [Reglas de jugadas, patrones y atención](reglas-de-patrones-y-atencion.md): detectores con ejemplos positivos y negativos, y cómo se calcula la prioridad.
 - [Informe de viabilidad de xT, VAEP y xG](informe-modelos-de-valor.md): qué se puede validar hoy y qué queda desactivado.
 - [Integración con Azure](integracion-azure.md): flujo en Event Hubs y Blob Storage, despliegue y prueba de humo.
+- [Despliegue en Azure y Supabase](despliegue-azure-supabase.md): script que despliega todos los servicios de la analítica, datos ficticios en Supabase y costos con Azure for Students.
 - [Analítica de seguimiento](analitica-de-seguimiento.md): velocidad, distancia, presión por cercanía y forma del equipo a partir de las observaciones de visión de Persona 1, hoy simuladas.
 - [Tablero de demostración](demo/README.md): reproducción del partido con todo lo que calcula el motor y un guion para presentar avances.
 - [Evidencias](evidencias/README.md): criterios cubiertos, archivos, comandos, versiones y limitaciones.
@@ -61,7 +62,10 @@ MatchEvent 1.0
 | Puente con la ingesta de Persona 1 | `adapters/messaging/analytics_bridge.py` |
 | Analítica de seguimiento | `domain/analytics/tracking.py` |
 | Entrada desde las observaciones de visión de Persona 1 | `application/analytics/tracking_input.py` |
-| Infraestructura | `infra/azure/analytics.bicep` |
+| `AnalyticsPort` de Persona 4 con el motor real | `application/analytics/presentation.py` |
+| Partidos y análisis en Supabase (PostgreSQL) | `adapters/storage/supabase_store.py` |
+| Escenario sintético de 178 eventos (la API lo carga como segundo partido) | `adapters/sources/analytics_scenarios.py` |
+| Infraestructura | `infra/azure/analytics.bicep`, `infra/azure/analytics-platform.bicep` y `infra/supabase/migrations/` |
 
 Las rutas de código son relativas a `apps/backend/src/match_intelligence/`, salvo la de la infraestructura. El dominio no importa FastAPI, Azure, CrewAI ni bibliotecas de modelos.
 
@@ -69,11 +73,11 @@ Los datos de prueba no forman parte del código de producción y están en `apps
 
 | Pieza | Archivo |
 |---|---|
-| Escenario sintético de 178 eventos para probar la analítica | `tests/analytics_scenarios.py` |
 | Observaciones de seguimiento simuladas con el formato de Persona 1 | `tests/tracking_mock.py` |
 | Generador de los ejemplos de contrato | `tests/analytics_examples.py` y `scripts/export_analytics_examples.py` |
 | Datos del tablero | `tests/analytics_demo.py` y `scripts/export_analytics_demo.py` |
 | Constructores de eventos para pruebas | `tests/analytics_builders.py` |
+| Datos ficticios para Supabase | `tests/supabase_seed_data.py` y `scripts/supabase_seed.py` |
 
 ## Cómo probarlo
 
