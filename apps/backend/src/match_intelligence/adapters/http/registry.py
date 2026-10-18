@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable
 
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
@@ -45,6 +46,10 @@ class MatchRegistry:
         if generate is None:
             raise NotFoundError(f"No existe el escenario {scenario}")
         match = generate(seed=DEFAULT_SEEDS[scenario] if seed is None else seed, match_id=match_id)
+        return self.load_match(match, inject_error_in=inject_error_in)
+
+    def load_match(self, match: SyntheticMatch, *, inject_error_in: str | None = None) -> MatchSession:
+        """Carga un partido ya generado, por ejemplo leído de Supabase."""
         session = MatchSession(
             metadata=match.metadata,
             events=match.events,
@@ -52,7 +57,7 @@ class MatchRegistry:
             narrative=self._narrative(inject_error_in),
             correction_narrative=self._narrative(None),
         )
-        self._sessions[match_id] = session
+        self._sessions[match.metadata.match_id] = session
         return session
 
     def get(self, match_id: str) -> MatchSession:
@@ -65,16 +70,71 @@ class MatchRegistry:
         return list(self._sessions.values())
 
 
+# ANALYTICS_ENGINE elige la analítica: la provisional de Persona 4 o la real de
+# Persona 2. MATCH_SOURCE elige de dónde salen los partidos al iniciar: los
+# generadores sintéticos o la base de Supabase (SUPABASE_DB_URL).
+ANALYTICS_ENGINES = ("provisional", "persona2")
+MATCH_SOURCES = ("synthetic", "supabase")
+
+
+def _setting(name: str, default: str, allowed: tuple[str, ...]) -> str:
+    value = os.getenv(name, default).strip().lower() or default
+    if value not in allowed:
+        raise RuntimeError(f"{name} debe ser uno de {', '.join(allowed)}; se recibió {value}")
+    return value
+
+
+def _analytics_factory(engine: str, tracks: dict) -> Callable[[], AnalyticsPort]:
+    if engine == "provisional":
+        from match_intelligence.adapters.provisional.analytics import ProvisionalAnalytics
+
+        return ProvisionalAnalytics
+
+    from match_intelligence.application.analytics.pipeline import MatchAnalytics
+    from match_intelligence.application.analytics.presentation import PresentationAnalytics
+
+    return lambda: PresentationAnalytics(
+        MatchAnalytics(tracking_provider=lambda metadata: tracks.get(metadata.match_id))
+    )
+
+
+def _stored_matches(load_tracking: bool) -> tuple[list[SyntheticMatch], dict]:
+    from match_intelligence.adapters.storage.supabase_store import (
+        DATABASE_URL_VARIABLE,
+        SupabaseMatchStore,
+    )
+    from match_intelligence.application.analytics.tracking_input import tracks_from_observations
+
+    store = SupabaseMatchStore.from_env()
+    if store is None:
+        raise RuntimeError(f"MATCH_SOURCE=supabase requiere la variable {DATABASE_URL_VARIABLE}")
+    matches = store.load_matches()
+    tracks = {}
+    if load_tracking:
+        for match in matches:
+            tracking = store.load_tracking(match.metadata.match_id)
+            if tracking is not None:
+                conversion = tracks_from_observations(match.metadata, match.events, tracking)
+                tracks[match.metadata.match_id] = conversion.tracks
+    return matches, tracks
+
+
 def _default_registry() -> MatchRegistry:
-    from match_intelligence.adapters.provisional.analytics import ProvisionalAnalytics
     from match_intelligence.adapters.provisional.narrative import ProvisionalNarrative
 
+    engine = _setting("ANALYTICS_ENGINE", "provisional", ANALYTICS_ENGINES)
+    source = _setting("MATCH_SOURCE", "synthetic", MATCH_SOURCES)
+    matches, tracks = _stored_matches(engine == "persona2") if source == "supabase" else ([], {})
+
     registry = MatchRegistry(
-        analytics=ProvisionalAnalytics,
+        analytics=_analytics_factory(engine, tracks),
         narrative=lambda inject: ProvisionalNarrative(inject_error_in=inject),
     )
-    registry.load_synthetic()
-    registry.load_synthetic(scenario="analytics", match_id=ANALYTICS_MATCH_ID)
+    for match in matches:
+        registry.load_match(match)
+    if not matches:
+        registry.load_synthetic()
+        registry.load_synthetic(scenario="analytics", match_id=ANALYTICS_MATCH_ID)
     return registry
 
 

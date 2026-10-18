@@ -19,6 +19,7 @@ dependencies = [
 
 [project.optional-dependencies]
 agents = ["crewai[azure-ai-inference]>=1.14,<2"]
+db = ["psycopg[binary]>=3.2,<4"]
 dev = ["httpx>=0.27,<1", "pytest>=8,<10"]
 
 [tool.setuptools.packages.find]

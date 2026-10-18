@@ -39,6 +39,54 @@ def _fact(candidate: InsightCandidate, key: str) -> float | None:
     return None
 
 
+def _first_fact(candidate: InsightCandidate, *keys: str) -> float | None:
+    for key in keys:
+        value = _fact(candidate, key)
+        if value is not None:
+            return value
+    return None
+
+
+# Textos para los momentos que solo propone la analítica real de Persona 2.
+# Cada función recibe (es, equipo, jugador) y devuelve (titular, explicación).
+_ANALYTICS_KINDS = {
+    "fast_progression": lambda es, team, player: (
+        f"{team} avanza rápido" if es else f"{team} break forward quickly",
+        "La posesión gana mucho terreno en pocos segundos."
+        if es else "The move gains a lot of ground in a few seconds.",
+    ),
+    "recovery_to_shot": lambda es, team, player: (
+        f"{team} recupera y remata" if es else f"{team} win it back and shoot",
+        "El remate llega poco después de recuperar el balón."
+        if es else "The shot comes shortly after winning the ball back.",
+    ),
+    "sustained_pressure": lambda es, team, player: (
+        f"{team} mantiene la presión arriba" if es else f"{team} keep pressing high",
+        "Varias acciones defensivas seguidas en campo rival."
+        if es else "Several defensive actions in a row in the opponent's half.",
+    ),
+    "high_recovery": lambda es, team, player: (
+        f"{player} recupera arriba para {team}" if es else f"{player} wins it back high for {team}",
+        "Recuperar cerca del arco rival deja poco tiempo para defender."
+        if es else "Winning it near the opponent's goal leaves little time to defend.",
+    ),
+    "control_shift": lambda es, team, player: (
+        f"{team} toma el control" if es else f"{team} take control",
+        "El indicador de control cambia de equipo."
+        if es else "The control index switches to this team.",
+    ),
+    "chaos_phase": lambda es, team, player: (
+        "Partido de ida y vuelta" if es else "End-to-end phase",
+        "Pérdidas y recuperaciones se suceden cada pocos segundos."
+        if es else "Possession changes hands every few seconds.",
+    ),
+    "player_milestone": lambda es, team, player: (
+        f"Hito de {player}" if es else f"Milestone for {player}",
+        "Alcanza una cifra destacada en el partido." if es else "Reaches a notable figure in the match.",
+    ),
+}
+
+
 def _num(value: float | None) -> str:
     if value is None:
         return "?"
@@ -101,7 +149,7 @@ class ProvisionalNarrative:
         kind = candidate.kind
 
         if kind == "goal":
-            passes = _num(_fact(candidate, "passes_in_build_up"))
+            passes = _num(_first_fact(candidate, "passes_in_build_up", "sequence_passes"))
             since = _fact(candidate, "seconds_since_recovery")
             headline = (
                 f"¡Gol de {team}! Marca {player}" if es else f"Goal for {team}! {player} scores"
@@ -143,15 +191,24 @@ class ProvisionalNarrative:
                 else f"{team} breaks the opponent's build-up and changes possession."
             )
         elif kind == "progressive_pass":
-            gain = _num(_fact(candidate, "forward_progress"))
             headline = (
                 f"Pase vertical de {player}" if es else f"Forward pass by {player}"
             )
-            why = (
-                f"{team} avanza {gain} unidades de campo con un solo pase."
-                if es
-                else f"{team} moves {gain} pitch units forward with a single pass."
-            )
+            gain_m = _fact(candidate, "pass_forward_gain_m")
+            if _fact(candidate, "forward_progress") is None and gain_m is not None:
+                # Hecho de la analítica de Persona 2: avance hacia el arco rival en metros.
+                why = (
+                    f"{team} avanza {_num(round(gain_m))} m con un solo pase."
+                    if es
+                    else f"{team} moves {_num(round(gain_m))} m forward with a single pass."
+                )
+            else:
+                gain = _num(_fact(candidate, "forward_progress"))
+                why = (
+                    f"{team} avanza {gain} unidades de campo con un solo pase."
+                    if es
+                    else f"{team} moves {gain} pitch units forward with a single pass."
+                )
         elif kind == "pressure":
             headline = f"{team} presiona arriba" if es else f"{team} press high"
             why = (
@@ -159,6 +216,8 @@ class ProvisionalNarrative:
                 if es
                 else f"{player} forces the opponent to rush."
             )
+        elif kind in _ANALYTICS_KINDS:
+            headline, why = _ANALYTICS_KINDS[kind](es, team, player)
         else:
             headline = kind
             why = ""

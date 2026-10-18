@@ -13,6 +13,10 @@ durante ``ANALYTICS_IDLE_SECONDS``, guarda su registro en el contenedor
     ANALYTICS_IDLE_SECONDS=30          # opcional
     ANALYTICS_RUN_SECONDS=0            # opcional; 0 = sin límite
     VALUE_MODELS_SOURCE=none           # none | blob
+    SUPABASE_DB_URL=<secreto>          # opcional: metadatos y registros también en Supabase
+
+Con ``SUPABASE_DB_URL``, los metadatos se buscan primero en Supabase y luego en
+Blob, y el registro de cada análisis se guarda en los dos.
 
 Desde la raíz del repositorio::
 
@@ -30,9 +34,18 @@ from match_intelligence.adapters.messaging.analytics_bridge import EventHubAnaly
 from match_intelligence.adapters.messaging.azure_event_hubs import AzureEventHubConsumer
 from match_intelligence.adapters.messaging.azure_insights import AzureEventHubInsightPublisher
 from match_intelligence.adapters.models.loader import registry_from_blob
+from match_intelligence.adapters.storage.analytics_sinks import (
+    FanOutAnalyticsWriter,
+    FirstAvailableMetadataProvider,
+)
 from match_intelligence.adapters.storage.azure_analytics import (
     AzureBlobAnalyticsWriter,
     AzureBlobMatchMetadataProvider,
+)
+from match_intelligence.adapters.storage.supabase_store import (
+    SupabaseAnalyticsWriter,
+    SupabaseMatchMetadataProvider,
+    SupabaseMatchStore,
 )
 from match_intelligence.application.analytics.stream import AnalyticsStreamProcessor
 from match_intelligence.application.analytics.value_models import ValueModelRegistry
@@ -65,8 +78,16 @@ async def main() -> None:
         fully_qualified_namespace=namespace,
         eventhub_name=os.getenv("INSIGHTS_EVENT_HUB_NAME", "match-insights"),
     )
-    metadata = AzureBlobMatchMetadataProvider.from_default_credential(account_url=account_url)
-    writer = AzureBlobAnalyticsWriter.from_default_credential(account_url=account_url)
+    blob_metadata = AzureBlobMatchMetadataProvider.from_default_credential(account_url=account_url)
+    blob_writer = AzureBlobAnalyticsWriter.from_default_credential(account_url=account_url)
+    metadata, writer = blob_metadata, blob_writer
+    store = SupabaseMatchStore.from_env()
+    if store is not None:
+        metadata = FirstAvailableMetadataProvider(SupabaseMatchMetadataProvider(store), blob_metadata)
+        writer = FanOutAnalyticsWriter(
+            blob_writer, SupabaseAnalyticsWriter(store, produced_by="stream-worker")
+        )
+    print(json.dumps({"worker": "started", "supabase": store is not None}))
     processor = AnalyticsStreamProcessor(metadata, publisher, value_models=value_models)
     bridge = EventHubAnalyticsBridge(consumer, processor)
     receive_task = asyncio.create_task(consumer.receive(starting_position="@latest", max_wait_time=1))
@@ -88,8 +109,12 @@ async def main() -> None:
                 }))
             for match_id, seen in list(last_seen.items()):
                 if monotonic() - seen >= idle_seconds:
-                    locations = await processor.finalize(match_id, writer, run_id=f"run-{uuid4()}")
-                    print(json.dumps({"match_id": match_id, "stored": locations}))
+                    run_id = f"run-{uuid4()}"
+                    locations = await processor.finalize(match_id, writer, run_id=run_id)
+                    print(json.dumps({
+                        "match_id": match_id, "run_id": run_id, "files": len(locations),
+                        "supabase": store is not None,
+                    }))
                     del last_seen[match_id]
             await asyncio.sleep(0.2)
     finally:
@@ -98,8 +123,8 @@ async def main() -> None:
             await receive_task
         await consumer.close()
         await publisher.close()
-        await metadata.close()
-        await writer.close()
+        await blob_metadata.close()
+        await blob_writer.close()
 
 
 if __name__ == "__main__":
