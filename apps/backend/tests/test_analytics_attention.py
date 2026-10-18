@@ -2,7 +2,7 @@
 
 from analytics_builders import A, B, Events, metadata
 
-from analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
 from match_intelligence.application.analytics.pipeline import MatchAnalytics
 from match_intelligence.domain.analytics.models import AttentionOutcome, RelevancePreferences
 from match_intelligence.domain.contracts import EventOutcome

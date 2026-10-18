@@ -99,7 +99,7 @@ Todos los datos simulados están en `apps/backend/tests/`, fuera del código de 
 | Distancias, velocidades y avisos por umbral | El cálculo es real, pero sobre posiciones simuladas | Depende de lo anterior | Lo mismo: con observaciones reales, el cálculo no cambia |
 | Frases de los momentos en el tablero | Plantillas de ejemplo | La narración es de Persona 3 | Los agentes de Persona 3 |
 | Azure en las pruebas | Clientes simulados de Event Hubs y Blob Storage | No hay suscripción desplegada | El despliegue y la prueba de humo ya están escritos |
-| Partido | Escenario sintético de 178 eventos con fases diseñadas (`tests/analytics_scenarios.py`) | El reto exige datos sintéticos | Partidos más largos de Persona 1 |
+| Partido | Escenario sintético de 178 eventos con fases diseñadas (`adapters/sources/analytics_scenarios.py`) | El reto exige datos sintéticos | Partidos más largos de Persona 1 |
 
 **No es simulado:** el estado, las estadísticas, los patrones, los indicadores, los momentos, las prioridades y los motivos. Todo eso sale del motor real.
 

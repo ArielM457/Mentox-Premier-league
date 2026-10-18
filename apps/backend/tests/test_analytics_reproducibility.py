@@ -1,6 +1,6 @@
 """Dos ejecuciones del mismo partido producen lo mismo (RNF-01) y los momentos son causales."""
 
-from analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
 from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
 from match_intelligence.application.analytics.pipeline import MatchAnalytics, build_snapshot
 

@@ -27,7 +27,7 @@ Las jugadas (`sequence@1`) agrupan acciones de un equipo con el balón. Cuatro p
 | `domain/analytics/sequences.py` | Jugadas |
 | `domain/analytics/signals.py` | Señal, nota, contexto e historial con búsqueda por ventana |
 | `domain/analytics/patterns.py` | Detectores de tiro, progresión rápida, recuperación y tiro, presión sostenida, pase progresivo y recuperación alta |
-| `apps/backend/tests/analytics_scenarios.py` | Escenario sintético de prueba (antes en `adapters/sources`; se movió a las pruebas el 13 de octubre de 2026) |
+| `adapters/sources/analytics_scenarios.py` | Escenario sintético de prueba. Se movió a las pruebas el 13 de octubre de 2026 y volvió a `src` el 18, porque la API de Persona 4 lo carga al arrancar |
 
 ## Cobertura de criterios
 
