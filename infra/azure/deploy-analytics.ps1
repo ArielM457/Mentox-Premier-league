@@ -62,7 +62,8 @@ param(
     # Solo la fase 1: infraestructura, sin imágenes ni aplicaciones.
     [switch] $InfraOnly,
 
-    # Muestra qué cambiaría la fase 1 sin crear nada.
+    # Muestra qué cambiaría la fase 1. Solo registra proveedores y crea el grupo vacío,
+    # que no tienen costo.
     [switch] $WhatIf,
 
     # No pide confirmación.
@@ -240,21 +241,18 @@ else {
 }
 
 # ----- 4. Proveedores y grupo -------------------------------------------------
-if (-not $WhatIf) {
-    Write-Step 'Registrando proveedores de recursos'
-    foreach ($provider in $Providers) {
-        $state = Invoke-Az provider show --namespace $provider --query registrationState --output tsv
-        if ($state -ne 'Registered') {
-            Write-Host "Registrando $provider..."
-            Invoke-Az provider register --namespace $provider --wait | Out-Null
-        }
+Write-Step 'Registrando proveedores de recursos'
+foreach ($provider in $Providers) {
+    $state = Invoke-Az provider show --namespace $provider --query registrationState --output tsv
+    if ($state -ne 'Registered') {
+        Write-Host "Registrando $provider (puede tardar unos minutos)..."
+        Invoke-Az provider register --namespace $provider --wait | Out-Null
     }
 }
 
 Write-Step "Grupo de recursos $ResourceGroup"
 $groupExists = Invoke-Az group exists --name $ResourceGroup
 if ($groupExists -ne 'true') {
-    if ($WhatIf) { throw "El grupo $ResourceGroup no existe; what-if necesita un grupo existente." }
     Invoke-Az group create --name $ResourceGroup --location $Location --tags project=mentox-premier-league workload=analytics --output none | Out-Null
 }
 
