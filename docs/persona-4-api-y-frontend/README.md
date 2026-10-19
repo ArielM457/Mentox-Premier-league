@@ -3,7 +3,7 @@
 Este documento registra lo implementado por Persona 4, cómo se verificó y qué falta. El plan original está en [el plan de Persona 4](../plan-de-desarrollo/persona-4-api-y-frontend.md).
 
 - **Estado:** verificado localmente con datos sintéticos y adaptadores provisionales.
-- **Última verificación:** 14 de octubre de 2026.
+- **Última verificación:** 18 de octubre de 2026.
 - **Ramas:** `feat/persona-4-api-frontend` (API) y `feat/persona-4-figma-ui` (interfaz con el diseño de Persona 5).
 
 ## **Qué existe ahora**
@@ -40,7 +40,8 @@ Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`
 | Momento | `#/match/{id}/moment/{momento}` | Explicación, cifras y jugadores de la jugada, sus eventos de origen y reporte de errores. |
 | Resumen | `#/recap/{id}` | Marcador final, resumen pendiente o aprobado y los tres momentos principales. |
 | Mi experiencia | `#/profile` | Idioma, club, jugador, modo y nivel de explicación. |
-| Revisión | `#/editorial` | Aprobar o rechazar resúmenes, ver reportes y recargar un partido con un error controlado. |
+| Revisión | `#/editorial` | Solo analista. Aprobar o rechazar resúmenes, ver reportes y recargar un partido con un error controlado. |
+| Inicio de sesión | `#/login` | Perfil aficionado o analista profesional. |
 
 Estructura del código:
 
@@ -65,6 +66,30 @@ Decisiones de la implementación:
 - **Imágenes optimizadas.** Se convirtieron a WebP con el tamaño en que se muestran: de 21 MB a 1,6 MB. Se descartaron las que no se usan.
 - **Navegación con la URL.** Cada pantalla tiene su dirección y el botón Atrás del navegador funciona.
 - **Pantalla nueva de revisión editorial.** El diseño no la tenía y el reto la pide (RF-38, RF-39).
+
+## **Inicio de sesión y consola del analista**
+
+La aplicación tiene dos perfiles. Sin sesión solo se ven la portada y el inicio de sesión.
+
+| Perfil | Usuario | Contraseña | Qué ve |
+|---|---|---|---|
+| Aficionado | `aficionado` | `aficionado-demo-2026` | Partidos, explicaciones, preguntas y resumen según sus preferencias. |
+| Analista profesional | `analista` | `analista-demo-2026` | Todo lo anterior, la **Consola del analista** y la **Revisión** editorial. |
+
+Son cuentas de demostración con datos sintéticos. Las contraseñas no se guardan: `apps/backend/demo-users.json` solo tiene la sal y el hash PBKDF2-SHA256. Para otro entorno, crea tu propio archivo y apunta `MATCH_DEMO_USERS_FILE` a él.
+
+| Ruta | Para qué sirve |
+|---|---|
+| `POST /api/v1/auth/login` | Devuelve un token firmado (HMAC-SHA256, 8 horas) y el usuario con su rol. |
+| `GET /api/v1/auth/me` | Usuario de la sesión actual. |
+| `GET /api/v1/matches/{id}/analyst/feed?until_video_ms=` | **Solo analista.** Eventos, estado, cada momento candidato con sus hechos y límites, la narración casual y analista de cada uno, en qué modos se mostró y el comentario en vivo completo (incluidos los mensajes en cola o reemplazados). Nunca devuelve lo que todavía no pasó en el vídeo. |
+| `POST /api/v1/matches/{id}/editorial/{draft_id}/review` | Ahora **solo analista**: 401 sin sesión, 403 para aficionados. |
+
+El token se envía como `Authorization: Bearer <token>`. El secreto se lee de `MATCH_AUTH_SECRET`; sin él se genera uno al arrancar y las sesiones duran mientras el backend siga encendido. En el navegador la sesión se guarda en `sessionStorage`, así que se cierra al cerrar la pestaña.
+
+**Consola del analista** (pestaña del centro del partido): se actualiza cada vez que el vídeo cruza un evento o se adelanta. Tiene tres secciones: comentarios en vivo con prioridad y ventana de pantalla, momentos detectados con hechos, límites de la evidencia y la narración de cada modo lado a lado, y la tabla de eventos del partido.
+
+Pruebas: `tests/test_auth.py` (contraseñas, token alterado o vencido, cuentas documentadas) y `tests/test_analyst_console.py` (permisos, contenido y que no adelanta el futuro). La colección de Postman tiene el grupo «Sesión»: «POST Login analista» guarda `{{token}}` para las peticiones protegidas.
 
 ## **Decisiones de Persona 4**
 

@@ -26,3 +26,5 @@ Las peticiones de narrativa llevan `provider=fixture`. Ese proveedor produce una
 Las rutas de validación solo revisan el formato; no guardan partidos ni eventos. El resumen se entrega pendiente de revisión editorial y estas rutas no publican contenido.
 
 El grupo «Experiencia del partido» se ejecuta en orden: primero carga el partido sintético y pide los mensajes, después consulta fuentes, aprueba el resumen y envía un reporte. Si lo ejecutas dos veces sin reiniciar la API, la primera petición vuelve a cargar el partido y reinicia revisiones y reportes.
+
+El grupo «Sesión» inicia sesión con la cuenta de demostración del analista y guarda el token en la variable `token` de la colección. Las peticiones protegidas (aprobar un resumen y la consola del analista) lo envían como `Authorization: Bearer {{token}}`. Ejecuta ese grupo antes que «Experiencia del partido».
