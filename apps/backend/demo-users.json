@@ -1,0 +1,19 @@
+{
+  "note": "Cuentas de demostración. Las contraseñas están en docs/persona-4-api-y-frontend/README.md. Para otro entorno, usa MATCH_DEMO_USERS_FILE con tus propios hashes.",
+  "users": [
+    {
+      "username": "aficionado",
+      "display_name": "Aficionado de la demo",
+      "role": "fan",
+      "salt": "b1e30656697578187a1f9e1145b4f30c",
+      "password_hash": "12d7d49cc52e35564e1ebd5cd517d27ebca7b168d1986e51335c1d3294400ffe"
+    },
+    {
+      "username": "analista",
+      "display_name": "Analista profesional",
+      "role": "analyst",
+      "salt": "f1ac65f0b23a6c8fe255a40cef8b9413",
+      "password_hash": "0e97f83147fcac708806a57e4f00c2f3e12f03ed92cf3cb8124f4401f839a2e7"
+    }
+  ]
+}

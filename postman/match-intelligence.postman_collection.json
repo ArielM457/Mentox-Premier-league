@@ -8,6 +8,11 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8000"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -615,6 +620,111 @@
                   "const body = pm.response.json();",
                   "pm.test('Confirma el error', () => pm.expect(body.status).to.equal('confirmed_error'));",
                   "pm.test('Corrige con trazabilidad', () => { pm.expect(body.correction.original_draft_id).to.equal('draft-moment-goal-es-casual-normal-live'); pm.expect(body.correction.claims[0].value).to.equal(1); pm.expect(body.correction.source_event_ids).to.include('evt-105'); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sesión",
+      "item": [
+        {
+          "name": "POST Login analista",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Cuenta de demostración del analista profesional. Guarda el token en la variable token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"analista\",\n  \"password\": \"analista-demo-2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Rol analista', () => pm.expect(body.user.role).to.equal('analyst'));",
+                  "pm.collectionVariables.set('token', body.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Login incorrecto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Una contraseña equivocada no inicia sesión.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"analista\",\n  \"password\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+                  "const body = pm.response.json();",
+                  "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Sesión actual",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "description": "Devuelve el usuario del token."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Usuario de la sesión', () => pm.expect(body.username).to.equal('analista'));"
                 ]
               }
             }

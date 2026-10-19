@@ -19,15 +19,31 @@ COLLECTION = json.loads(COLLECTION_PATH.read_text(encoding="utf-8"))
 ITEMS = [item for group in COLLECTION["item"] for item in group["item"]]
 
 
+def _collection_token() -> str:
+    """Hace lo mismo que Postman: ejecuta la petición que guarda {{token}} y devuelve su valor."""
+    login = next(
+        item for item in ITEMS
+        if any("collectionVariables.set('token'" in line for event in item["event"] for line in event["script"]["exec"])
+    )
+    request = login["request"]
+    response = TestClient(app).post(request["url"].replace("{{baseUrl}}", ""), json=json.loads(request["body"]["raw"]))
+    return response.json()["token"]
+
+
 @pytest.mark.parametrize("item", ITEMS, ids=[item["name"] for item in ITEMS])
 def test_postman_request_matches_http_route(item):
     request = item["request"]
     path = request["url"].replace("{{baseUrl}}", "")
     body = request.get("body")
+    headers = {header["key"]: header["value"] for header in request.get("header", [])}
+    if any("{{token}}" in value for value in headers.values()):
+        token = _collection_token()
+        headers = {key: value.replace("{{token}}", token) for key, value in headers.items()}
     response = TestClient(app).request(
         request["method"],
         path,
         json=json.loads(body["raw"]) if body else None,
+        headers=headers,
     )
     scripts = [line for event in item["event"] for line in event["script"]["exec"]]
     expected = re.search(r"have\.status\((\d+)\)", "\n".join(scripts))

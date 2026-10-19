@@ -12,12 +12,15 @@ COLLECTION = Path(__file__).with_name("match-intelligence.postman_collection.jso
 FIXTURES = ROOT / "apps" / "backend" / "tests" / "fixtures"
 
 
-def request(name: str, path: str, body: dict, checks: list[str], description: str) -> dict:
+AUTH_HEADER = {"key": "Authorization", "value": "Bearer {{token}}"}
+
+
+def request(name: str, path: str, body: dict, checks: list[str], description: str, *, auth: bool = False) -> dict:
     return {
         "name": name,
         "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [{"key": "Content-Type", "value": "application/json"}] + ([AUTH_HEADER] if auth else []),
             "url": "{{baseUrl}}" + path,
             "description": description,
             "body": {
@@ -35,10 +38,10 @@ def request(name: str, path: str, body: dict, checks: list[str], description: st
     }
 
 
-def get(name: str, path: str, checks: list[str], description: str) -> dict:
+def get(name: str, path: str, checks: list[str], description: str, *, auth: bool = False) -> dict:
     return {
         "name": name,
-        "request": {"method": "GET", "header": [], "url": "{{baseUrl}}" + path, "description": description},
+        "request": {"method": "GET", "header": [AUTH_HEADER] if auth else [], "url": "{{baseUrl}}" + path, "description": description},
         "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": checks}}],
     }
 
@@ -170,6 +173,39 @@ def match_experience_items() -> list[dict]:
             base + "/playback",
             [status(200), body, "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"],
             "Posición y estado actuales.",
+        ),
+    ]
+
+
+def session_items() -> list[dict]:
+    """Inicio de sesión de la demo. El login del analista guarda {{token}} para las rutas protegidas."""
+    body = "const body = pm.response.json();"
+    return [
+        request(
+            "POST Login analista",
+            "/api/v1/auth/login",
+            {"username": "analista", "password": "analista-demo-2026"},
+            [
+                status(200),
+                body,
+                "pm.test('Rol analista', () => pm.expect(body.user.role).to.equal('analyst'));",
+                "pm.collectionVariables.set('token', body.token);",
+            ],
+            "Cuenta de demostración del analista profesional. Guarda el token en la variable token.",
+        ),
+        request(
+            "POST Login incorrecto",
+            "/api/v1/auth/login",
+            {"username": "analista", "password": "incorrecta"},
+            [status(401), body, "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));"],
+            "Una contraseña equivocada no inicia sesión.",
+        ),
+        get(
+            "GET Sesión actual",
+            "/api/v1/auth/me",
+            [status(200), body, "pm.test('Usuario de la sesión', () => pm.expect(body.username).to.equal('analista'));"],
+            "Devuelve el usuario del token.",
+            auth=True,
         ),
     ]
 
@@ -391,13 +427,17 @@ def main() -> None:
     collection["item"] = [
         group
         for group in collection["item"]
-        if group["name"] not in {"Narrativa", "Enrutamiento de agentes", "Experiencia del partido"}
+        if group["name"] not in {"Narrativa", "Enrutamiento de agentes", "Sesión", "Experiencia del partido"}
     ]
     collection["item"].append(
         {"name": "Enrutamiento de agentes", "item": routing_items}
     )
     collection["item"].append({"name": "Narrativa", "item": items})
+    collection["item"].append({"name": "Sesión", "item": session_items()})
     collection["item"].append({"name": "Experiencia del partido", "item": match_experience_items()})
+    collection["variable"] = [v for v in collection.get("variable", []) if v["key"] != "token"] + [
+        {"key": "token", "value": "", "type": "string"}
+    ]
     collection["info"]["description"] = (
         "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. "
         "El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa "
