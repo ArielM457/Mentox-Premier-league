@@ -27,19 +27,30 @@ export function prefsBody(prefs) {
   }
 }
 
+// Token de la sesión actual; lo fija SessionProvider al iniciar o cerrar sesión.
+let authToken = null
+
+export function setAuthToken(token) {
+  authToken = token
+}
+
+export const UNAUTHORIZED_EVENT = 'itg:unauthorized'
+
 async function request(path, options = {}) {
+  const headers = {}
+  if (options.body) headers['Content-Type'] = 'application/json'
+  if (authToken) headers.Authorization = `Bearer ${authToken}`
   let response
   try {
-    response = await fetch(path, {
-      ...options,
-      headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
-    })
+    response = await fetch(path, { ...options, headers })
   } catch {
     throw new ApiError('No hay conexión con la API', 0)
   }
   const data = await response.json().catch(() => null)
   if (!response.ok) {
     const detail = typeof data?.detail === 'string' ? data.detail : JSON.stringify(data?.detail ?? response.statusText)
+    // Una sesión vencida o inválida se cierra en toda la aplicación.
+    if (response.status === 401 && authToken) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
     throw new ApiError(detail, response.status)
   }
   return data
@@ -48,6 +59,14 @@ async function request(path, options = {}) {
 const base = (matchId) => `/api/v1/matches/${encodeURIComponent(matchId)}`
 
 export const api = {
+  login: (username, password) =>
+    request('/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
+  me: () => request('/api/v1/auth/me'),
+  analystFeed: (id, prefs, until) => {
+    const params = prefsQuery(prefs)
+    params.set('until_video_ms', String(Math.floor(until)))
+    return request(`${base(id)}/analyst/feed?${params}`)
+  },
   health: () => request('/api/v1/health'),
   listMatches: () => request('/api/v1/matches'),
   loadMatch: (body) => request('/api/v1/matches', { method: 'POST', body: JSON.stringify(body) }),

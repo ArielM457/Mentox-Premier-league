@@ -1,0 +1,23 @@
+/* Inicio de sesión con dos perfiles y cuenta en la barra lateral. */
+
+.login-profiles { grid-template-columns: repeat(2, 1fr) !important; }
+.login-fields { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.login-fields label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+.login-fields input { height: 50px; padding: 0 14px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; outline: 0; }
+.login-fields input:focus { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(130,87,245,.12); }
+.login-hint { margin: 12px 0 0; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.login-hint .icon { color: var(--violet); }
+.login-modal .error-notice { margin: 14px 0 0; }
+
+.sidebar-account { width: 100%; margin-top: auto; display: grid; gap: 6px; }
+.sidebar-account .sidebar-profile { margin-top: 0; }
+.sidebar-profile > span.is-analyst { color: var(--navy); background: var(--lime); }
+.app-sidebar .sidebar-logout { min-height: 36px; justify-content: center; color: var(--muted); font-size: 12px; }
+.app-sidebar .sidebar-logout:hover { color: var(--red); background: #ffe9ec; }
+.dark-shell .app-sidebar .sidebar-logout:hover { color: #ffb4bd; background: rgba(241,90,103,.14); }
+.app-sidebar.collapsed .sidebar-logout { font-size: 0; }
+.button-row { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+@media (max-width: 760px) {
+  .login-profiles, .login-fields { grid-template-columns: 1fr !important; }
+}

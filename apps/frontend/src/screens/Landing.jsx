@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
+import { useSession } from '../app/session.js'
 import { MODE_ART } from '../data/branding.js'
 import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -14,7 +15,8 @@ export function Landing() {
   const copy = t.landing
   const [selectedPoint, setSelectedPoint] = useState(0)
   const [examplePlaying, setExamplePlaying] = useState(true)
-  const start = () => navigate(preferences.onboarded ? paths.discover() : paths.onboarding())
+  const { user } = useSession()
+  const start = () => navigate(!user ? paths.login() : preferences.onboarded ? paths.discover() : paths.onboarding())
 
   return (
     <main className="landing">

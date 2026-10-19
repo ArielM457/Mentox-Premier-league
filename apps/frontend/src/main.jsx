@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './styles/index.css'
 import App from './App.jsx'
 import { PreferencesProvider } from './app/PreferencesProvider.jsx'
+import { SessionProvider } from './app/SessionProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PreferencesProvider>
-      <App />
+      <SessionProvider>
+        <App />
+      </SessionProvider>
     </PreferencesProvider>
   </StrictMode>,
 )

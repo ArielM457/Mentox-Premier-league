@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { usePreferences } from '../../app/preferences.js'
 import { navigate, paths } from '../../app/router.js'
+import { useSession } from '../../app/session.js'
 import { Brand } from '../ui/Brand.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
@@ -10,8 +11,12 @@ const ITEMS = [
   ['discover', 'home', paths.discover()],
   ['matches', 'match', paths.matches()],
   ['profile', 'user', paths.profile()],
-  ['editorial', 'shield', paths.editorial()],
+  ['editorial', 'shield', paths.editorial(), 'analyst'],
 ]
+
+function initials(name) {
+  return name.split(' ').map((word) => word[0]).join('').slice(0, 2).toUpperCase()
+}
 
 function readCollapsed() {
   try {
@@ -24,7 +29,14 @@ function readCollapsed() {
 // Marco común de las pantallas internas: barra lateral en escritorio y barra inferior en móvil.
 export function AppShell({ active, dark = false, children }) {
   const { t } = usePreferences()
+  const { user, isAnalyst, logout } = useSession()
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  const items = ITEMS.filter(([, , , role]) => !role || (role === 'analyst' && isAnalyst))
+
+  function signOut() {
+    logout()
+    navigate(paths.landing())
+  }
 
   function toggle() {
     const next = !collapsed
@@ -48,7 +60,7 @@ export function AppShell({ active, dark = false, children }) {
           </button>
         </div>
         <nav aria-label={t.nav.discover}>
-          {ITEMS.map(([key, icon, path]) => (
+          {items.map(([key, icon, path]) => (
             <button
               aria-current={active === key ? 'page' : undefined}
               className={active === key ? 'active' : ''}
@@ -61,17 +73,24 @@ export function AppShell({ active, dark = false, children }) {
             </button>
           ))}
         </nav>
-        <button className="sidebar-profile" onClick={() => navigate(paths.profile())} type="button">
-          <span>IN</span>
-          <div>
-            <strong>{t.nav.guest}</strong>
-            <small>{t.nav.preferences}</small>
-          </div>
-          <Icon name="arrow" size={15} />
-        </button>
+        <div className="sidebar-account">
+          <button className="sidebar-profile" onClick={() => navigate(paths.profile())} type="button">
+            <span className={isAnalyst ? 'is-analyst' : ''}>{initials(user?.display_name ?? t.nav.guest)}</span>
+            <div>
+              <strong>{user?.display_name ?? t.nav.guest}</strong>
+              <small>{user ? t.auth.roles[user.role] : t.nav.preferences}</small>
+            </div>
+            <Icon name="arrow" size={15} />
+          </button>
+          {user && (
+            <button className="sidebar-logout" onClick={signOut} title={t.auth.logout} type="button">
+              <Icon name="back" size={16} /> {t.auth.logout}
+            </button>
+          )}
+        </div>
       </aside>
-      <nav className="mobile-nav" aria-label={t.nav.discover}>
-        {ITEMS.map(([key, icon, path]) => (
+      <nav className="mobile-nav" aria-label={t.nav.discover} style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
+        {items.map(([key, icon, path]) => (
           <button
             aria-current={active === key ? 'page' : undefined}
             className={active === key ? 'active' : ''}

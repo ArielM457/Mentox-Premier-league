@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
+import { useSession } from '../app/session.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { formatMatchClock, momentIdOf } from '../lib/overlays.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
@@ -16,6 +17,7 @@ const TOP = 3
 export function Recap({ matchId }) {
   const { t, preferences, apiPreferences } = usePreferences()
   const { data: catalog, error: catalogError, reload } = useCatalog()
+  const { isAnalyst } = useSession()
   const match = catalog?.matches.find((m) => m.id === matchId)
   const [summary, setSummary] = useState(null)
   const [moments, setMoments] = useState(null)
@@ -77,9 +79,11 @@ export function Recap({ matchId }) {
                 <span className="personal-note">{t.recap.personal(t.modes[preferences.mode].name)}</span>
               </div>
               {summary.status === 'pending' && <p className="recap-note">{t.recap.pendingNote}</p>}
-              <Button variant="lime" onClick={() => navigate(paths.editorial())}>
-                <Icon name="shield" size={17} /> {t.recap.goReview}
-              </Button>
+              {isAnalyst && (
+                <Button variant="lime" onClick={() => navigate(paths.editorial())}>
+                  <Icon name="shield" size={17} /> {t.recap.goReview}
+                </Button>
+              )}
             </div>
           </section>
         )}

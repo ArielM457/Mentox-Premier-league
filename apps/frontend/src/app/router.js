@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 // y cada pantalla se puede abrir o compartir con su dirección.
 const ROUTES = [
   ['landing', /^\/?$/],
+  ['login', /^\/login$/],
   ['onboarding', /^\/onboarding$/],
   ['discover', /^\/discover$/],
   ['matches', /^\/matches$/],
@@ -14,13 +15,19 @@ const ROUTES = [
   ['editorial', /^\/editorial$/],
 ]
 
+// Pantallas que exigen sesión y las que además exigen ser analista.
+export const PROTECTED = new Set(['onboarding', 'discover', 'matches', 'match', 'moment', 'recap', 'profile', 'editorial'])
+export const ANALYST_ONLY = new Set(['editorial'])
+
 export function parseRoute(hash) {
-  const path = decodeURIComponent(hash.replace(/^#/, '')) || '/'
+  const [rawPath, rawQuery = ''] = hash.replace(/^#/, '').split('?')
+  const path = decodeURIComponent(rawPath) || '/'
+  const query = Object.fromEntries(new URLSearchParams(rawQuery))
   for (const [name, pattern] of ROUTES) {
     const match = path.match(pattern)
-    if (match) return { name, params: match.slice(1) }
+    if (match) return { name, params: match.slice(1), path, query }
   }
-  return { name: 'landing', params: [] }
+  return { name: 'landing', params: [], path: '/', query }
 }
 
 export function navigate(path) {
@@ -29,6 +36,7 @@ export function navigate(path) {
 
 export const paths = {
   landing: () => '/',
+  login: (next) => (next ? `/login?next=${encodeURIComponent(next)}` : '/login'),
   onboarding: () => '/onboarding',
   discover: () => '/discover',
   matches: () => '/matches',

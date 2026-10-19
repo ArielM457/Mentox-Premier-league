@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
+import { useSession } from '../app/session.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -15,7 +16,8 @@ export function Editorial() {
   const [matchId, setMatchId] = useState('')
   const [queue, setQueue] = useState([])
   const [reports, setReports] = useState([])
-  const [reviewer, setReviewer] = useState('')
+  const { user } = useSession()
+  const [reviewer, setReviewer] = useState(user?.display_name ?? '')
   const [note, setNote] = useState('')
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
