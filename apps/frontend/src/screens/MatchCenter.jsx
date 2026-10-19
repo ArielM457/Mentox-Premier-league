@@ -2,11 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
+import { useSession } from '../app/session.js'
 import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 import { useLiveChannel } from '../hooks/useLiveChannel.js'
 import { useMatchClock } from '../hooks/useMatchClock.js'
 import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
+import { AnalystConsole } from '../components/match/AnalystConsole.jsx'
 import { Assistant } from '../components/match/Assistant.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
 import { OverlayCard } from '../components/match/OverlayCard.jsx'
@@ -49,6 +51,8 @@ export function MatchCenter({ matchId }) {
 function LiveMatch({ match }) {
   const { t, preferences, apiPreferences } = usePreferences()
   const { data: catalog } = useCatalog()
+  const { isAnalyst } = useSession()
+  const tabs = isAnalyst ? [...TABS, 'console'] : TABS
   const matchId = match.id
   const metadata = match.metadata
   const videoRef = useRef(null)
@@ -134,9 +138,9 @@ function LiveMatch({ match }) {
     <div onKeyDown={onKeyDown}>
       <MatchScore metadata={metadata} minute={minute} score={snapshot?.score} status="LIVE" statusLabel={t.matches.status.LIVE} />
       <nav className="match-tabs" role="tablist">
-        {TABS.map((item) => (
+        {tabs.map((item) => (
           <button aria-selected={tab === item} className={tab === item ? 'active' : ''} key={item} onClick={() => setTab(item)} role="tab" type="button">
-            {t.match.tabs[item]}
+            {item === 'console' ? <><Icon name="chart" size={14} /> {t.console.tab}</> : t.match.tabs[item]}
           </button>
         ))}
       </nav>
@@ -156,7 +160,9 @@ function LiveMatch({ match }) {
 
       <div className="match-layout">
         <div className="pitch-column">
-          {tab === 'stats' ? (
+          {tab === 'console' && isAnalyst ? (
+            <AnalystConsole crossed={crossed} matchId={matchId} metadata={metadata} onOpenMoment={openMoment} seekVersion={seekVersion} timeRef={clock.timeRef} />
+          ) : tab === 'stats' ? (
             <StatsPanel metadata={metadata} snapshot={snapshot} />
           ) : tab === 'events' ? (
             <MomentFeed items={history} onOpen={openMoment} />
