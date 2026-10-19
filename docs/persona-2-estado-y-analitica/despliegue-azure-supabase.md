@@ -2,7 +2,10 @@
 
 Esta guía deja la analítica funcionando en la nube con datos guardados, en lugar de calcularla con adaptadores provisionales en memoria. Un solo script despliega todos los servicios de la analítica en Azure, y otro carga datos ficticios en Supabase.
 
-- **Estado:** implementado y verificado en local. Hay pruebas automáticas, un PostgreSQL 18 local, las dos imágenes en Docker y el script ejecutado con dobles de Azure CLI. El despliegue en una suscripción real todavía no se hizo, porque este equipo no tiene Azure CLI ni la sesión de la cuenta.
+- **Estado:** datos cargados en Supabase y despliegue en curso en Azure for Students (`eastus2`).
+  - La vista previa y la fase 1 salieron bien, y las imágenes están en el registro.
+  - La primera fase 2 falló porque Azure creó el entorno en modo Express, que no admite trabajos.
+  - La plantilla ya pide el modo `WorkloadProfiles`, y las dos fases validan contra la suscripción.
 - **Fecha:** 18 de octubre de 2026.
 - **Decisión de Persona 2 a confirmar con el equipo:** Supabase guarda los partidos ficticios y los resultados de la analítica. No reemplaza a Event Hubs ni a Blob Storage (decisión 10). Supabase no es un servicio de Azure; si el jurado exige todo en Azure, el mismo esquema funciona en Azure Database for PostgreSQL, porque es PostgreSQL estándar.
 
@@ -34,13 +37,15 @@ Esta guía deja la analítica funcionando en la nube con datos guardados, en lug
 | Log Analytics | Registros de las aplicaciones, con tope de 0,1 GB al día | `analytics-platform.bicep` |
 | Azure Container Registry Basic | Guardar las dos imágenes | `analytics-platform.bicep` |
 | Identidad administrada | Leer el registro, publicar y consumir en Event Hubs y escribir en Blob, sin claves | `analytics-platform.bicep` y `modules/analytics-roles.bicep` |
-| Entorno de Container Apps (consumo) | Ejecutar las aplicaciones | `analytics-platform.bicep` |
+| Entorno de Container Apps en modo `WorkloadProfiles`, solo con el perfil `Consumption` (pago por uso) | Ejecutar las aplicaciones y el trabajo | `analytics-platform.bicep` |
 | `api` | API de Persona 4 con la analítica real de Persona 2; pública, con `/docs` | `analytics-platform.bicep` |
 | `web` | Interfaz de Persona 4 servida por nginx, que reenvía `/api` a la API | `analytics-platform.bicep` |
 | `worker` | Procesador continuo: `match-events` → `match-insights`, Blob y Supabase; apagado por defecto | `analytics-platform.bicep` |
 | `replay` | Trabajo manual que repite un partido de Supabase en `match-events` | `analytics-platform.bicep` |
 
 La API y la interfaz se apagan solas sin tráfico (cero réplicas). La primera visita tarda unos segundos en arrancar.
+
+Desde 2026, si no se indica el modo, Azure crea los entornos en modo Express. Ese modo es solo para apps web: no admite trabajos y apaga lo que no recibe HTTP. Por eso la plantilla usa `environmentMode: 'WorkloadProfiles'` con la API `2026-07-01`. El modo no se puede cambiar después. Si el script encuentra un entorno Express de un despliegue anterior, pide confirmación y lo recrea con sus aplicaciones, que no guardan datos propios.
 
 ## Costo estimado con Azure for Students
 
@@ -235,7 +240,7 @@ La API lee los partidos al arrancar. Si vuelve a cargar los datos, reinicie la A
 
 ## Limitaciones
 
-- No se desplegó en una suscripción real. Bicep no se compiló en este equipo porque no tiene Azure CLI. El script ejecuta la validación de Azure en la fase 1 y se detiene ante cualquier error.
+- El despliegue completo en Azure todavía no termina: falta repetirlo con el entorno en modo `WorkloadProfiles`.
 - La cadena de Supabase queda como secreto de Container Apps. Guardarla en Azure Key Vault evitaría que toque el disco local, pero añade otro recurso; queda como mejora.
 - La API usa una sola réplica: guarda en memoria la revisión editorial y los reportes de Persona 4.
 - La API carga los partidos al arrancar. Con los dos partidos, el arranque tarda unos segundos y un estado con seguimiento, entre 0,1 y 0,15 s en este equipo.

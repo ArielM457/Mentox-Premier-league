@@ -256,6 +256,48 @@ if ($groupExists -ne 'true') {
     Invoke-Az group create --name $ResourceGroup --location $Location --tags project=mentox-premier-league workload=analytics --output none | Out-Null
 }
 
+# Un entorno creado sin modo explícito queda en Express, que no admite el trabajo
+# replay y apaga lo que no recibe HTTP. El modo no se puede cambiar: se recrea con
+# sus aplicaciones, que no guardan datos propios.
+$environmentName = "cae-$Prefix-$Environment"
+$subscriptionId = $account.id
+$environmentUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroup" +
+    "/providers/Microsoft.App/managedEnvironments/${environmentName}?api-version=2026-07-01"
+$existing = Get-AzQuiet rest --method get --url $environmentUrl --output json
+if ($existing) {
+    $properties = (ConvertFrom-AzJson $existing).properties
+    $mode = $null
+    if ($properties.PSObject.Properties['environmentMode']) { $mode = $properties.environmentMode }
+    if ($mode -eq 'Express') {
+        Write-Warning "El entorno $environmentName está en modo Express: no admite el trabajo replay y puede apagar el procesador."
+        if ($WhatIf) {
+            Write-Host 'La vista previa no lo cambia. El despliegue real lo recreará en modo WorkloadProfiles.'
+        }
+        else {
+            if (-not $Yes) {
+                $answer = Read-Host "¿Borrar y recrear $environmentName con sus aplicaciones? (s/N)"
+                if ($answer -notmatch '^(s|si|sí|y|yes)$') {
+                    Write-Host 'Cancelado.'
+                    exit 1
+                }
+            }
+            Write-Step "Recreando $environmentName"
+            $query = "[?ends_with(properties.managedEnvironmentId, '/$environmentName')].name"
+            foreach ($app in @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv)) {
+                Write-Host "Borrando la aplicación $app..."
+                Invoke-Az containerapp delete --name $app --resource-group $ResourceGroup --yes --output none | Out-Null
+            }
+            $jobQuery = "[?ends_with(properties.environmentId, '/$environmentName')].name"
+            foreach ($job in @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv)) {
+                Write-Host "Borrando el trabajo $job..."
+                Invoke-Az containerapp job delete --name $job --resource-group $ResourceGroup --yes --output none | Out-Null
+            }
+            Write-Host "Borrando el entorno $environmentName (tarda unos minutos)..."
+            Invoke-Az containerapp env delete --name $environmentName --resource-group $ResourceGroup --yes --output none | Out-Null
+        }
+    }
+}
+
 $baseParameters = @{
     projectPrefix   = $Prefix
     environmentName = $Environment

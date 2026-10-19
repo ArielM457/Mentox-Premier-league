@@ -150,11 +150,20 @@ module dataRoles 'modules/analytics-roles.bicep' = {
   }
 }
 
-resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+// Modo WorkloadProfiles con el perfil Consumption (pago por uso). Sin indicarlo,
+// Azure crea un entorno Express, que no admite trabajos y apaga lo que no recibe HTTP.
+resource environment 'Microsoft.App/managedEnvironments@2026-07-01' = {
   name: names.environment
   location: location
   tags: tags
   properties: {
+    environmentMode: 'WorkloadProfiles'
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
@@ -223,6 +232,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
   ]
   properties: {
     managedEnvironmentId: environment.id
+    workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
       ingress: {
@@ -308,6 +318,7 @@ resource worker 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
   ]
   properties: {
     managedEnvironmentId: environment.id
+    workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
       registries: registries
@@ -362,6 +373,7 @@ resource replay 'Microsoft.App/jobs@2024-03-01' = if (deployApps && hasDatabase)
   ]
   properties: {
     environmentId: environment.id
+    workloadProfileName: 'Consumption'
     configuration: {
       triggerType: 'Manual'
       replicaTimeout: 3600
@@ -417,6 +429,7 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployWeb) {
   ]
   properties: {
     managedEnvironmentId: environment.id
+    workloadProfileName: 'Consumption'
     configuration: {
       activeRevisionsMode: 'Single'
       ingress: {

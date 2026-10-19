@@ -3,7 +3,7 @@
 ## Identificación
 
 - **Historia:** EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase.
-- **Estado:** verificada en local con PostgreSQL 18, imágenes en Docker y el script ejecutado con dobles de Azure CLI. El despliegue en una suscripción real queda pendiente.
+- **Estado:** verificada en local y con datos reales en Supabase. En Azure, la vista previa, la fase 1 y la publicación de imágenes salieron bien. La fase 2 se repite con el entorno en modo `WorkloadProfiles`.
 - **Prioridad:** P1.
 - **Última verificación:** 18 de octubre de 2026.
 - **Responsable:** Persona 2 · Estado y analítica.
@@ -28,7 +28,9 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 | La API carga partidos y seguimiento desde la base | `test_api_loads_matches_and_tracking_from_the_database` | Cumplido |
 | Las imágenes se construyen y la interfaz llega a la API, incluido el canal en directo | `docker build` de las dos imágenes y prueba manual con las dos en una red de Docker | Cumplido en local |
 | El script sigue los pasos en orden y no expone la cadena de Supabase | Ejecución con dobles de `az`, `docker` e `Invoke-RestMethod`; la carga real corrió contra PostgreSQL local | Cumplido con dobles |
-| Despliegue en Azure | Necesita una suscripción con Azure CLI | Pendiente |
+| Carga de datos en Supabase | `supabase_seed.py --schema` contra el proyecto real: 2 partidos, 49 222 observaciones y 2 análisis; la consulta de `attention_decisions` devuelve los momentos | Cumplido |
+| Plantilla aceptada por Azure | `what-if` (20 recursos para crear y 3 asignaciones de roles que no se pueden calcular antes) y `az deployment group validate` de las dos fases | Cumplido |
+| Despliegue en Azure | Fase 1 e imágenes publicadas. La fase 2 falló con `ExpressEnvironmentResourceNotSupported` en el trabajo `replay`: Azure había creado el entorno en modo Express. Ya está corregido y falta repetirla. | En curso |
 
 ## Decisiones técnicas
 
@@ -81,8 +83,8 @@ El salto omitido sin base es la prueba de Postman de Persona 4, que ya se omití
 
 ## Limitaciones y riesgos
 
-- Context7 no estaba disponible. Las propiedades de Bicep, Container Apps y psycopg se tomaron de la documentación conocida y se confirman en el primer despliegue real.
-- Bicep no se compiló en este equipo. El primer despliegue real puede mostrar errores de validación que el script detiene antes de crear las aplicaciones.
+- Context7 no estaba disponible. Las propiedades de Bicep y Container Apps se confirmaron con la validación de Azure y con la referencia de `Microsoft.App/managedEnvironments` 2026-07-01, cuyos valores de `environmentMode` son `ConsumptionOnly`, `WorkloadProfiles`, `Express` y `Archived`.
+- Azure ahora crea los entornos en modo Express si no se indica el modo. Ese modo no admite trabajos ni sufijos de revisión, y apaga lo que no recibe HTTP. El modo no se puede cambiar: el script recrea el entorno después de pedir confirmación.
 - Las comprobaciones del script con dobles no prueban los permisos reales de la suscripción, como el registro de proveedores o la política de regiones.
 - Event Hubs Standard cobra aunque no se use: hay que borrar el grupo después de la demo.
 - La API mantiene una sola réplica porque guarda estado en memoria.
