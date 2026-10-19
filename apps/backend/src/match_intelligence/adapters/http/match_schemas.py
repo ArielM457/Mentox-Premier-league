@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
 from match_intelligence.domain.presentation import (
     EditorialStatus,
+    InsightCandidate,
     MatchSnapshot,
     NarrativeDraft,
     OverlayMessage,
@@ -134,3 +135,23 @@ class PlaybackResponse(BaseModel):
     video_time_ms: int
     events_applied: int
     duration_ms: int
+
+
+class AnalystMomentResponse(BaseModel):
+    candidate: InsightCandidate
+    video_time_ms: int
+    drafts: dict[Literal["casual", "analyst"], NarrativeDraft] = Field(
+        description="Lo que se generó para cada modo con los mismos hechos (RF-23)"
+    )
+    shown_in: list[Literal["casual", "analyst"]] = Field(description="Modos en que el momento llegó a la pantalla")
+
+
+class AnalystFeedResponse(BaseModel):
+    until_video_ms: int
+    pipeline_ms: float
+    snapshot: MatchSnapshot
+    events: list[MatchEvent]
+    moments: list[AnalystMomentResponse]
+    commentary: list[OverlayMessage] = Field(
+        description="Comentario en vivo completo, incluidos los mensajes en cola o reemplazados"
+    )

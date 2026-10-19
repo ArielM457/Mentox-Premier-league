@@ -82,6 +82,24 @@ class ErrorReport:
 
 
 @dataclass
+class AnalystMoment:
+    candidate: InsightCandidate
+    video_time_ms: int
+    drafts: dict[str, NarrativeDraft]
+    shown_in: list[str]
+
+
+@dataclass
+class AnalystFeed:
+    until_video_ms: int
+    pipeline_ms: float
+    snapshot: MatchSnapshot
+    events: list[MatchEvent]
+    moments: list[AnalystMoment]
+    commentary: list[OverlayMessage]
+
+
+@dataclass
 class OverlayBatch:
     overlays: list[OverlayMessage]
     pipeline_ms: float
@@ -270,6 +288,45 @@ class MatchSession:
             source_event_ids=draft.source_event_ids,
             display_until_ms=video_time_ms + show_for,
             corrected=corrected,
+        )
+
+    # ----- consola del analista ---------------------------------------------
+    def analyst_feed(
+        self, preferences: ViewerPreferences, *, until_video_ms: int | None = None
+    ) -> AnalystFeed:
+        """Todo lo que el sistema generó hasta ``until_video_ms``.
+
+        Incluye cada momento candidato con sus hechos y límites, la narración
+        de los modos casual y analista, en qué modos se mostró y el comentario
+        en vivo completo (también lo que quedó en cola o fue reemplazado).
+        """
+        self._validate_preferences(preferences)
+        limit = self.duration_ms if until_video_ms is None else until_video_ms
+        self._check_time(limit)
+        started = time.perf_counter()
+        events = self.events_until(limit)
+        by_id = {e.event_id: e for e in events}
+        neutral = preferences.model_copy(update={"mode": ViewerMode.CASUAL, "favorite_team_id": None, "favorite_player_id": None})
+        moments: list[AnalystMoment] = []
+        for candidate in self.analytics.candidates(self.metadata, events, neutral):
+            drafts: dict[str, NarrativeDraft] = {}
+            shown_in: list[str] = []
+            for mode in (ViewerMode.CASUAL, ViewerMode.ANALYST):
+                mode_prefs = neutral.model_copy(update={"mode": mode})
+                drafts[mode.value], _ = self._live_draft(candidate, mode_prefs)
+                if self._selected(candidate, mode_prefs):
+                    shown_in.append(mode.value)
+            video_time = max(_video_time(by_id[eid]) for eid in candidate.source_event_ids if eid in by_id)
+            moments.append(AnalystMoment(candidate, video_time, drafts, shown_in))
+        commentary = self.overlays(preferences, until_video_ms=limit).overlays
+        elapsed = (time.perf_counter() - started) * 1000
+        return AnalystFeed(
+            until_video_ms=limit,
+            pipeline_ms=elapsed,
+            snapshot=self.snapshot(limit),
+            events=events,
+            moments=moments,
+            commentary=commentary,
         )
 
     # ----- fuentes de un mensaje ------------------------------------------

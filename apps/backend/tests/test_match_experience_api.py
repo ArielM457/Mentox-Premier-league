@@ -6,11 +6,13 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from match_intelligence.adapters.http.auth_router import require_analyst
 from match_intelligence.adapters.http.registry import (
     DEMO_MATCH_ID,
     _default_registry,
     get_registry,
 )
+from match_intelligence.application.auth import Role, User
 from match_intelligence.application.match_session import schedule_overlays
 from match_intelligence.main import app
 
@@ -21,6 +23,8 @@ BASE = f"/api/v1/matches/{DEMO_MATCH_ID}"
 def client() -> TestClient:
     registry = _default_registry()
     app.dependency_overrides[get_registry] = lambda: registry
+    # Estas pruebas cubren el flujo editorial; los permisos están en test_auth_and_analyst.py.
+    app.dependency_overrides[require_analyst] = lambda: User("editor", "Editor", Role.ANALYST)
     yield TestClient(app)
     app.dependency_overrides.clear()
 

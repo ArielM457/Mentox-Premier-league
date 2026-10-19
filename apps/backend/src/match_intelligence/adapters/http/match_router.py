@@ -27,7 +27,12 @@ from match_intelligence.domain.presentation import (
     ViewerPreferences,
 )
 
+from match_intelligence.application.auth import User
+
+from .auth_router import require_analyst
 from .match_schemas import (
+    AnalystFeedResponse,
+    AnalystMomentResponse,
     AnswerResponse,
     EditorialRecordResponse,
     ErrorResponse,
@@ -65,6 +70,12 @@ def _session(match_id: str, registry: Registry) -> MatchSession:
 
 
 Session = Annotated[MatchSession, Depends(_session)]
+Analyst = Annotated[User, Depends(require_analyst)]
+
+ANALYST_ERRORS = {
+    401: {"model": ErrorResponse, "description": "Sin sesión"},
+    403: {"model": ErrorResponse, "description": "La sesión no es de un analista"},
+}
 
 
 def preferences(
@@ -300,9 +311,10 @@ def editorial_queue(session: Session) -> list[EditorialRecordResponse]:
     "/{match_id}/editorial/{draft_id}/review",
     response_model=EditorialRecordResponse,
     summary="Aprobar o rechazar un análisis final",
-    responses={409: {"model": ErrorResponse, "description": "Ya fue revisado"}},
+    description="Solo un analista con sesión iniciada puede aprobar o rechazar (RF-38).",
+    responses={409: {"model": ErrorResponse, "description": "Ya fue revisado"}, **ANALYST_ERRORS},
 )
-def review(session: Session, draft_id: str, body: ReviewRequest) -> EditorialRecordResponse:
+def review(session: Session, draft_id: str, body: ReviewRequest, _: Analyst) -> EditorialRecordResponse:
     record = session.review(draft_id, ReviewDecision(body.decision), body.reviewer, body.note)
     return _editorial(record)
 
@@ -347,4 +359,36 @@ def _playback(session: MatchSession) -> PlaybackResponse:
         video_time_ms=replay.video_time_ms,
         events_applied=replay.position,
         duration_ms=session.duration_ms,
+    )
+
+
+@router.get(
+    "/{match_id}/analyst/feed",
+    response_model=AnalystFeedResponse,
+    summary="Consola del analista: todo lo generado hasta un tiempo",
+    description=(
+        "Eventos, estado, cada momento candidato con sus hechos y límites, la narración casual y "
+        "analista de cada uno y el comentario en vivo completo. Requiere sesión de analista."
+    ),
+    responses=ANALYST_ERRORS,
+)
+def analyst_feed(
+    session: Session,
+    prefs: Preferences,
+    _: Analyst,
+    until_video_ms: Annotated[int | None, Query(ge=0)] = None,
+) -> AnalystFeedResponse:
+    feed = session.analyst_feed(prefs, until_video_ms=until_video_ms)
+    return AnalystFeedResponse(
+        until_video_ms=feed.until_video_ms,
+        pipeline_ms=round(feed.pipeline_ms, 3),
+        snapshot=feed.snapshot,
+        events=feed.events,
+        moments=[
+            AnalystMomentResponse(
+                candidate=m.candidate, video_time_ms=m.video_time_ms, drafts=m.drafts, shown_in=m.shown_in
+            )
+            for m in feed.moments
+        ],
+        commentary=feed.commentary,
     )

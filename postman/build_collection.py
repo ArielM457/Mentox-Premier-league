@@ -130,11 +130,19 @@ def match_experience_items() -> list[dict]:
             "No se publica sin aprobación editorial (RF-38).",
         ),
         request(
+            "POST Aprobar sin sesión",
+            base + f"/editorial/{summary}/review",
+            {"decision": "approve", "reviewer": "Editor de prueba"},
+            [status(401), body, "pm.test('Pide iniciar sesión', () => pm.expect(body.detail).to.include('iniciar sesión'));"],
+            "Aprobar o rechazar exige una sesión de analista.",
+        ),
+        request(
             "POST Aprobar resumen",
             base + f"/editorial/{summary}/review",
             {"decision": "approve", "reviewer": "Editor de prueba"},
             [status(200), body, "pm.test('Aprobado', () => pm.expect(body.status).to.equal('approved'));"],
-            "Registra la decisión editorial.",
+            "Registra la decisión editorial con la sesión del analista (ejecuta antes «POST Login analista»).",
+            auth=True,
         ),
         get(
             "GET Publicación aprobada",
@@ -167,6 +175,24 @@ def match_experience_items() -> list[dict]:
             {"action": "play", "video_time_ms": 20000},
             [status(200), body, "pm.test('Eventos aplicados', () => pm.expect(body.events_applied).to.equal(5));"],
             "Control del reproductor con el sincronizador de Persona 1.",
+        ),
+        get(
+            "GET Consola sin sesión",
+            base + "/analyst/feed?until_video_ms=20000",
+            [status(401), body, "pm.test('Protegida', () => pm.expect(body.detail).to.include('iniciar sesión'));"],
+            "La consola del analista no responde sin sesión.",
+        ),
+        get(
+            "GET Consola del analista",
+            base + "/analyst/feed?until_video_ms=42000",
+            [
+                status(200),
+                body,
+                "pm.test('Momentos con narración por modo', () => { const goal = body.moments.find(m => m.candidate.kind === 'goal'); pm.expect(goal.drafts.casual.source_event_ids).to.deep.equal(goal.drafts.analyst.source_event_ids); });",
+                "pm.test('Comentario completo', () => pm.expect(body.commentary.length).to.be.above(0));",
+            ],
+            "Eventos, momentos candidatos, narración casual y analista y comentario en vivo completo.",
+            auth=True,
         ),
         get(
             "GET Estado del reproductor",

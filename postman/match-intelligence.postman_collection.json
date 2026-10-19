@@ -1007,7 +1007,7 @@
           ]
         },
         {
-          "name": "POST Aprobar resumen",
+          "name": "POST Aprobar sin sesión",
           "request": {
             "method": "POST",
             "header": [
@@ -1017,7 +1017,47 @@
               }
             ],
             "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual/review",
-            "description": "Registra la decisión editorial.",
+            "description": "Aprobar o rechazar exige una sesión de analista.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approve\",\n  \"reviewer\": \"Editor de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+                  "const body = pm.response.json();",
+                  "pm.test('Pide iniciar sesión', () => pm.expect(body.detail).to.include('iniciar sesión'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Aprobar resumen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual/review",
+            "description": "Registra la decisión editorial con la sesión del analista (ejecuta antes «POST Login analista»).",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"decision\": \"approve\",\n  \"reviewer\": \"Editor de prueba\"\n}",
@@ -1175,6 +1215,56 @@
                   "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
                   "pm.test('Eventos aplicados', () => pm.expect(body.events_applied).to.equal(5));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Consola sin sesión",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/analyst/feed?until_video_ms=20000",
+            "description": "La consola del analista no responde sin sesión."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+                  "const body = pm.response.json();",
+                  "pm.test('Protegida', () => pm.expect(body.detail).to.include('iniciar sesión'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Consola del analista",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/analyst/feed?until_video_ms=42000",
+            "description": "Eventos, momentos candidatos, narración casual y analista y comentario en vivo completo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Momentos con narración por modo', () => { const goal = body.moments.find(m => m.candidate.kind === 'goal'); pm.expect(goal.drafts.casual.source_event_ids).to.deep.equal(goal.drafts.analyst.source_event_ids); });",
+                  "pm.test('Comentario completo', () => pm.expect(body.commentary.length).to.be.above(0));"
                 ]
               }
             }
