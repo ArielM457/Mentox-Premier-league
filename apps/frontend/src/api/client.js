@@ -1,9 +1,10 @@
 // Cliente de la API de partido. Cada función lanza ApiError con el detalle del backend.
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, data = null) {
     super(message)
     this.status = status
+    this.data = data
   }
 }
 
@@ -51,7 +52,7 @@ async function request(path, options = {}) {
     const detail = typeof data?.detail === 'string' ? data.detail : JSON.stringify(data?.detail ?? response.statusText)
     // Una sesión vencida o inválida se cierra en toda la aplicación.
     if (response.status === 401 && authToken) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT))
-    throw new ApiError(detail, response.status)
+    throw new ApiError(detail, response.status, data)
   }
   return data
 }
@@ -62,6 +63,7 @@ export const api = {
   login: (username, password) =>
     request('/api/v1/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
   me: () => request('/api/v1/auth/me'),
+  logout: () => request('/api/v1/auth/logout', { method: 'POST' }),
   analystFeed: (id, prefs, until) => {
     const params = prefsQuery(prefs)
     params.set('until_video_ms', String(Math.floor(until)))

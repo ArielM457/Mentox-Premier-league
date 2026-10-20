@@ -7,10 +7,10 @@ import { SessionProvider } from './app/SessionProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <PreferencesProvider>
-      <SessionProvider>
+    <SessionProvider>
+      <PreferencesProvider>
         <App />
-      </SessionProvider>
-    </PreferencesProvider>
+      </PreferencesProvider>
+    </SessionProvider>
   </StrictMode>,
 )

@@ -10,7 +10,7 @@ import { Icon } from '../components/ui/Icon.jsx'
 
 const LANGUAGES = [['es', 'ES', 'Español', 'Experiencia en español'], ['en', 'EN', 'English', 'Experience in English']]
 
-export function Onboarding() {
+export function Onboarding({ next }) {
   const { t, preferences, update } = usePreferences()
   const { data: catalog, error, reload } = useCatalog()
   const copy = t.onboarding
@@ -25,9 +25,11 @@ export function Onboarding() {
   const club = catalog?.clubs.find((team) => team.team_id === draft.favoriteTeamId)
   const players = catalog?.players.filter((player) => player.team_id === draft.favoriteTeamId) ?? []
 
+  const leave = () => navigate(next && next !== paths.onboarding() ? next : paths.discover())
+
   function finish() {
     update({ ...draft, onboarded: true })
-    navigate(paths.discover())
+    leave()
   }
 
   return (
@@ -35,7 +37,7 @@ export function Onboarding() {
       <section className="onboarding-modal compact-modal">
         <div className="compact-modal-top">
           <Brand />
-          <button className="skip-setup" onClick={() => { update({ onboarded: true }); navigate(paths.discover()) }} type="button">
+          <button className="skip-setup" onClick={() => { update({ onboarded: true }); leave() }} type="button">
             {copy.skip}
           </button>
         </div>

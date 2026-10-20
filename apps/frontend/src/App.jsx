@@ -1,5 +1,6 @@
+import { usePreferences } from './app/preferences.js'
 import { ANALYST_ONLY, PROTECTED, useRoute } from './app/router.js'
-import { useSession } from './app/session.js'
+import { ROLES, useSession } from './app/session.js'
 import { AllMatches } from './screens/AllMatches.jsx'
 import { Discover } from './screens/Discover.jsx'
 import { Editorial } from './screens/Editorial.jsx'
@@ -15,11 +16,16 @@ import { Recap } from './screens/Recap.jsx'
 export default function App() {
   const route = useRoute()
   const { user, isAnalyst } = useSession()
+  const { preferences } = usePreferences()
   const { name, params, path, query } = route
 
   // Sin sesión se pide iniciarla y después se vuelve a la misma pantalla.
   if (PROTECTED.has(name) && !user) return <Login next={path} />
   if (ANALYST_ONLY.has(name) && !isAnalyst) return <Forbidden />
+  // Un aficionado configura su experiencia una sola vez por cuenta.
+  if (PROTECTED.has(name) && name !== 'onboarding' && user?.role === ROLES.fan && !preferences.onboarded) {
+    return <Onboarding next={path} />
+  }
 
   switch (name) {
     case 'login':
