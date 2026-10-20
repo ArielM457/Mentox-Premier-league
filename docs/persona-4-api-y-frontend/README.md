@@ -80,12 +80,22 @@ Son cuentas de demostración con datos sintéticos. Las contraseñas no se guard
 
 | Ruta | Para qué sirve |
 |---|---|
-| `POST /api/v1/auth/login` | Devuelve un token firmado (HMAC-SHA256, 8 horas) y el usuario con su rol. |
+| `POST /api/v1/auth/login` | Devuelve un token firmado (HMAC-SHA256, 8 horas), su vencimiento y el usuario con su rol. |
+| `POST /api/v1/auth/logout` | Revoca el token actual en el servidor. |
 | `GET /api/v1/auth/me` | Usuario de la sesión actual. |
 | `GET /api/v1/matches/{id}/analyst/feed?until_video_ms=` | **Solo analista.** Eventos, estado, cada momento candidato con sus hechos y límites, la narración casual y analista de cada uno, en qué modos se mostró y el comentario en vivo completo (incluidos los mensajes en cola o reemplazados). Nunca devuelve lo que todavía no pasó en el vídeo. |
 | `POST /api/v1/matches/{id}/editorial/{draft_id}/review` | Ahora **solo analista**: 401 sin sesión, 403 para aficionados. |
 
-El token se envía como `Authorization: Bearer <token>`. El secreto se lee de `MATCH_AUTH_SECRET`; sin él se genera uno al arrancar y las sesiones duran mientras el backend siga encendido. En el navegador la sesión se guarda en `sessionStorage`, así que se cierra al cerrar la pestaña.
+Medidas de seguridad de la demo:
+
+- **Bloqueo temporal:** 5 intentos fallidos en 15 minutos bloquean esa cuenta 5 minutos. El login responde 401 con `attempts_left` y, al bloquear, 429 con `retry_after_s` y la cabecera `Retry-After`. Un login correcto reinicia el contador.
+- **Cierre de sesión real:** `POST /api/v1/auth/logout` revoca el token en el servidor; deja de servir aunque no haya vencido.
+- **Tokens con identificador** (`jti`), fecha de emisión y vencimiento (`expires_at` en la respuesta del login).
+- Revocaciones e intentos se guardan en memoria: se pierden al reiniciar el backend.
+
+En la interfaz: panel de marca y formulario, selector de perfil, mostrar u ocultar la contraseña, aviso de Bloq Mayús, «Mantener la sesión en este dispositivo» (`localStorage`; si no, `sessionStorage`), botón «Usar cuenta de demostración», intentos restantes y cuenta regresiva del bloqueo. La sesión se cierra sola al vencer y se valida con el servidor al abrir la aplicación; si fue revocada, el login lo explica. **Cada cuenta guarda sus propias preferencias**: el aficionado ve la configuración inicial solo la primera vez.
+
+El token se envía como `Authorization: Bearer <token>`. El secreto se lee de `MATCH_AUTH_SECRET`; sin él se genera uno al arrancar y las sesiones duran mientras el backend siga encendido. 
 
 **Consola del analista** (pestaña del centro del partido): se actualiza cada vez que el vídeo cruza un evento o se adelanta. Tiene tres secciones: comentarios en vivo con prioridad y ventana de pantalla, momentos detectados con hechos, límites de la evidencia y la narración de cada modo lado a lado, y la tabla de eventos del partido.
 
