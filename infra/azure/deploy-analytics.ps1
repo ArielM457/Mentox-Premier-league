@@ -115,6 +115,15 @@ function Test-Docker {
     return ($LASTEXITCODE -eq 0)
 }
 
+function Wait-Until([scriptblock] $Condition, [string] $What, [int] $Minutes = 20) {
+    $deadline = (Get-Date).AddMinutes($Minutes)
+    while (-not (& $Condition)) {
+        if ((Get-Date) -gt $deadline) { throw "Se agotó la espera: $What. Vuelva a ejecutar el script." }
+        Write-Host "  esperando $What..."
+        Start-Sleep -Seconds 15
+    }
+}
+
 function Invoke-Native([string] $Command, [string[]] $Arguments) {
     & $Command @Arguments
     if ($LASTEXITCODE -ne 0) {
@@ -282,18 +291,27 @@ if ($existing) {
                 }
             }
             Write-Step "Recreando $environmentName"
+            # Los borrados se lanzan sin esperar y luego se comprueba que terminaron:
+            # Microsoft.App a veces responde GatewayTimeout aunque el borrado siga.
             $query = "[?ends_with(properties.managedEnvironmentId, '/$environmentName')].name"
+            $jobQuery = "[?ends_with(properties.environmentId, '/$environmentName')].name"
             foreach ($app in @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv)) {
                 Write-Host "Borrando la aplicación $app..."
-                Invoke-Az containerapp delete --name $app --resource-group $ResourceGroup --yes --output none | Out-Null
+                [void](Test-AzCommand containerapp delete --name $app --resource-group $ResourceGroup --yes --no-wait)
             }
-            $jobQuery = "[?ends_with(properties.environmentId, '/$environmentName')].name"
             foreach ($job in @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv)) {
                 Write-Host "Borrando el trabajo $job..."
-                Invoke-Az containerapp job delete --name $job --resource-group $ResourceGroup --yes --output none | Out-Null
+                [void](Test-AzCommand containerapp job delete --name $job --resource-group $ResourceGroup --yes --no-wait)
+            }
+            Wait-Until -What 'el borrado de las aplicaciones' -Condition {
+                @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv).Count -eq 0 -and
+                @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv).Count -eq 0
             }
             Write-Host "Borrando el entorno $environmentName (tarda unos minutos)..."
-            Invoke-Az containerapp env delete --name $environmentName --resource-group $ResourceGroup --yes --output none | Out-Null
+            [void](Test-AzCommand containerapp env delete --name $environmentName --resource-group $ResourceGroup --yes --no-wait)
+            Wait-Until -What "el borrado de $environmentName" -Condition {
+                -not (Get-AzQuiet rest --method get --url $environmentUrl --output json)
+            }
         }
     }
 }
