@@ -64,7 +64,8 @@ var names = {
   logs: 'log-${normalizedPrefix}-${environmentName}-${substring(resourceSuffix, 0, 6)}'
   registry: 'cr${normalizedPrefix}${resourceSuffix}'
   identity: 'id-${normalizedPrefix}-${environmentName}-analytics'
-  environment: 'cae-${normalizedPrefix}-${environmentName}'
+  // -wp: entorno WorkloadProfiles; el nombre anterior quedó en modo Express o suspendido.
+  environment: 'cae-${normalizedPrefix}-${environmentName}-wp'
   api: 'ca-${normalizedPrefix}-api'
   worker: 'ca-${normalizedPrefix}-worker'
   web: 'ca-${normalizedPrefix}-web'

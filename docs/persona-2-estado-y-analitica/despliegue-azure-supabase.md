@@ -45,7 +45,16 @@ Esta guía deja la analítica funcionando en la nube con datos guardados, en lug
 
 La API y la interfaz se apagan solas sin tráfico (cero réplicas). La primera visita tarda unos segundos en arrancar.
 
-Desde 2026, si no se indica el modo, Azure crea los entornos en modo Express. Ese modo es solo para apps web: no admite trabajos y apaga lo que no recibe HTTP. Por eso la plantilla usa `environmentMode: 'WorkloadProfiles'` con la API `2026-07-01`. El modo no se puede cambiar después. Si el script encuentra un entorno Express de un despliegue anterior, pide confirmación y lo recrea con sus aplicaciones, que no guardan datos propios.
+Desde 2026, si no se indica el modo, Azure crea los entornos en modo Express. Ese modo es solo para apps web: no admite trabajos y apaga lo que no recibe HTTP. Por eso la plantilla usa `environmentMode: 'WorkloadProfiles'` con la API `2026-07-01`. El modo no se puede cambiar después.
+
+El entorno se llama `cae-<prefijo>-<entorno>-wp`. Azure for Students permite un solo entorno por región, así que el script reemplaza el anterior, siempre después de pedir confirmación. Las aplicaciones no guardan datos propios y se vuelven a crear. Lo reemplaza en estos casos:
+
+- Tiene el nombre anterior (sin `-wp`).
+- Está en modo Express.
+- Azure suspendió su cómputo (`ManagedClusterSuspended`).
+- Se pidió con `-RecreateEnvironment`.
+
+Al terminar, el script espera 90 s y comprueba que el entorno siga activo.
 
 ## Costo estimado con Azure for Students
 
@@ -240,7 +249,7 @@ La API lee los partidos al arrancar. Si vuelve a cargar los datos, reinicie la A
 
 ## Limitaciones
 
-- El despliegue completo en Azure todavía no termina: falta repetirlo con el entorno en modo `WorkloadProfiles`.
+- El 19 de octubre de 2026, Azure suspendió el cómputo del primer entorno `WorkloadProfiles` un minuto después de arrancar (`ManagedClusterSuspended`, «unknown reasons»). La suscripción estaba habilitada, con cuota de sobra y sin incidentes. Se había creado con el mismo nombre que el entorno Express borrado dos minutos antes; por eso el entorno nuevo usa otro nombre. Si se repite, la alternativa es dejar la API y la interfaz en un entorno Express y correr el procesador y la repetición desde un equipo del equipo durante la demo.
 - La cadena de Supabase queda como secreto de Container Apps. Guardarla en Azure Key Vault evitaría que toque el disco local, pero añade otro recurso; queda como mejora.
 - La API usa una sola réplica: guarda en memoria la revisión editorial y los reportes de Persona 4.
 - La API carga los partidos al arrancar. Con los dos partidos, el arranque tarda unos segundos y un estado con seguimiento, entre 0,1 y 0,15 s en este equipo.

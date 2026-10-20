@@ -30,7 +30,7 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 | El script sigue los pasos en orden y no expone la cadena de Supabase | Ejecución con dobles de `az`, `docker` e `Invoke-RestMethod`; la carga real corrió contra PostgreSQL local | Cumplido con dobles |
 | Carga de datos en Supabase | `supabase_seed.py --schema` contra el proyecto real: 2 partidos, 49 222 observaciones y 2 análisis; la consulta de `attention_decisions` devuelve los momentos | Cumplido |
 | Plantilla aceptada por Azure | `what-if` (20 recursos para crear y 3 asignaciones de roles que no se pueden calcular antes) y `az deployment group validate` de las dos fases | Cumplido |
-| Despliegue en Azure | Fase 1 e imágenes publicadas. La fase 2 falló con `ExpressEnvironmentResourceNotSupported` en el trabajo `replay`: Azure había creado el entorno en modo Express. Ya está corregido y falta repetirla. | En curso |
+| Despliegue en Azure | Fase 1 e imágenes publicadas. La fase 2 falló con `ExpressEnvironmentResourceNotSupported` en el trabajo `replay`: Azure había creado el entorno en modo Express. La segunda vez, con modo `WorkloadProfiles`, todo se desplegó y la API respondió con los partidos de Supabase. Un minuto después Azure suspendió el cómputo del entorno (`ManagedClusterSuspended`, «unknown reasons»). Se repite con un entorno de nombre nuevo. | En curso |
 
 ## Decisiones técnicas
 

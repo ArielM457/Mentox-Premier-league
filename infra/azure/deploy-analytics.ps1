@@ -62,6 +62,9 @@ param(
     # Solo la fase 1: infraestructura, sin imágenes ni aplicaciones.
     [switch] $InfraOnly,
 
+    # Borra y vuelve a crear el entorno de Container Apps con sus aplicaciones.
+    [switch] $RecreateEnvironment,
+
     # Muestra qué cambiaría la fase 1. Solo registra proveedores y crea el grupo vacío,
     # que no tienen costo.
     [switch] $WhatIf,
@@ -265,55 +268,83 @@ if ($groupExists -ne 'true') {
     Invoke-Az group create --name $ResourceGroup --location $Location --tags project=mentox-premier-league workload=analytics --output none | Out-Null
 }
 
-# Un entorno creado sin modo explícito queda en Express, que no admite el trabajo
-# replay y apaga lo que no recibe HTTP. El modo no se puede cambiar: se recrea con
-# sus aplicaciones, que no guardan datos propios.
-$environmentName = "cae-$Prefix-$Environment"
+# El entorno de Container Apps debe estar en modo WorkloadProfiles y activo. Se
+# reemplaza, después de confirmar, si está en modo Express (no admite el trabajo
+# replay), si Azure suspendió su cómputo (ManagedClusterSuspended) o si es el de
+# nombre anterior. Las aplicaciones no guardan datos propios y se vuelven a crear.
+$environmentName = "cae-$Prefix-$Environment-wp"
+$legacyEnvironmentName = "cae-$Prefix-$Environment"
 $subscriptionId = $account.id
-$environmentUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroup" +
-    "/providers/Microsoft.App/managedEnvironments/${environmentName}?api-version=2026-07-01"
-$existing = Get-AzQuiet rest --method get --url $environmentUrl --output json
-if ($existing) {
+
+function Get-EnvironmentUrl([string] $Name) {
+    return "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroup" +
+        "/providers/Microsoft.App/managedEnvironments/${Name}?api-version=2026-07-01"
+}
+
+function Get-EnvironmentProblem([string] $Name) {
+    # Devuelve por qué hay que reemplazar el entorno, o nada si no existe o está bien.
+    $existing = Get-AzQuiet rest --method get --url (Get-EnvironmentUrl $Name) --output json
+    if (-not $existing) { return }
+    if ($Name -eq $legacyEnvironmentName) { return 'es el entorno de un despliegue anterior' }
     $properties = (ConvertFrom-AzJson $existing).properties
-    $mode = $null
-    if ($properties.PSObject.Properties['environmentMode']) { $mode = $properties.environmentMode }
-    if ($mode -eq 'Express') {
-        Write-Warning "El entorno $environmentName está en modo Express: no admite el trabajo replay y puede apagar el procesador."
-        if ($WhatIf) {
-            Write-Host 'La vista previa no lo cambia. El despliegue real lo recreará en modo WorkloadProfiles.'
-        }
-        else {
-            if (-not $Yes) {
-                $answer = Read-Host "¿Borrar y recrear $environmentName con sus aplicaciones? (s/N)"
-                if ($answer -notmatch '^(s|si|sí|y|yes)$') {
-                    Write-Host 'Cancelado.'
-                    exit 1
-                }
-            }
-            Write-Step "Recreando $environmentName"
-            # Los borrados se lanzan sin esperar y luego se comprueba que terminaron:
-            # Microsoft.App a veces responde GatewayTimeout aunque el borrado siga.
-            $query = "[?ends_with(properties.managedEnvironmentId, '/$environmentName')].name"
-            $jobQuery = "[?ends_with(properties.environmentId, '/$environmentName')].name"
-            foreach ($app in @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv)) {
-                Write-Host "Borrando la aplicación $app..."
-                [void](Test-AzCommand containerapp delete --name $app --resource-group $ResourceGroup --yes --no-wait)
-            }
-            foreach ($job in @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv)) {
-                Write-Host "Borrando el trabajo $job..."
-                [void](Test-AzCommand containerapp job delete --name $job --resource-group $ResourceGroup --yes --no-wait)
-            }
-            Wait-Until -What 'el borrado de las aplicaciones' -Condition {
-                @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv).Count -eq 0 -and
-                @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv).Count -eq 0
-            }
-            Write-Host "Borrando el entorno $environmentName (tarda unos minutos)..."
-            [void](Test-AzCommand containerapp env delete --name $environmentName --resource-group $ResourceGroup --yes --no-wait)
-            Wait-Until -What "el borrado de $environmentName" -Condition {
-                -not (Get-AzQuiet rest --method get --url $environmentUrl --output json)
-            }
+    if ($properties.PSObject.Properties['environmentMode'] -and $properties.environmentMode -eq 'Express') {
+        return 'está en modo Express, que no admite el trabajo replay'
+    }
+    if ($RecreateEnvironment) { return 'se pidió recrearlo con -RecreateEnvironment' }
+    if (Test-EnvironmentSuspended $Name) { return 'Azure suspendió su cómputo (ManagedClusterSuspended)' }
+}
+
+function Test-EnvironmentSuspended([string] $Name) {
+    $ErrorActionPreference = 'Continue'
+    $apps = @(Get-AzQuiet containerapp list --resource-group $ResourceGroup `
+            --query "[?ends_with(properties.managedEnvironmentId, '/$Name')].name" --output tsv)
+    if ($apps.Count -eq 0) { return $false }
+    $answer = (& az containerapp revision list --name $apps[0] --resource-group $ResourceGroup --output none 2>&1) | Out-String
+    return ($answer -match 'ManagedClusterSuspended')
+}
+
+function Remove-ContainerAppsEnvironment([string] $Name) {
+    # Los borrados se lanzan sin esperar y luego se comprueba que terminaron:
+    # Microsoft.App a veces responde GatewayTimeout aunque el borrado siga.
+    Write-Step "Retirando $Name"
+    $query = "[?ends_with(properties.managedEnvironmentId, '/$Name')].name"
+    $jobQuery = "[?ends_with(properties.environmentId, '/$Name')].name"
+    foreach ($app in @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv)) {
+        Write-Host "Borrando la aplicación $app..."
+        [void](Test-AzCommand containerapp delete --name $app --resource-group $ResourceGroup --yes --no-wait)
+    }
+    foreach ($job in @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv)) {
+        Write-Host "Borrando el trabajo $job..."
+        [void](Test-AzCommand containerapp job delete --name $job --resource-group $ResourceGroup --yes --no-wait)
+    }
+    Wait-Until -What 'el borrado de las aplicaciones' -Condition {
+        @(Get-AzQuiet containerapp list --resource-group $ResourceGroup --query $query --output tsv).Count -eq 0 -and
+        @(Get-AzQuiet containerapp job list --resource-group $ResourceGroup --query $jobQuery --output tsv).Count -eq 0
+    }
+    Write-Host "Borrando el entorno $Name (tarda unos minutos)..."
+    [void](Test-AzCommand containerapp env delete --name $Name --resource-group $ResourceGroup --yes --no-wait)
+    $url = Get-EnvironmentUrl $Name
+    Wait-Until -What "el borrado de $Name" -Condition {
+        -not (Get-AzQuiet rest --method get --url $url --output json)
+    }
+}
+
+foreach ($candidate in @($legacyEnvironmentName, $environmentName)) {
+    $problem = Get-EnvironmentProblem $candidate
+    if (-not $problem) { continue }
+    Write-Warning "Hay que reemplazar el entorno ${candidate}: $problem. El nuevo es $environmentName, en modo WorkloadProfiles."
+    if ($WhatIf) {
+        Write-Host 'La vista previa no lo cambia. El despliegue real lo reemplazará.'
+        continue
+    }
+    if (-not $Yes) {
+        $answer = Read-Host "¿Borrar $candidate con sus aplicaciones? Se vuelven a crear después (s/N)"
+        if ($answer -notmatch '^(s|si|sí|y|yes)$') {
+            Write-Host 'Cancelado.'
+            exit 1
         }
     }
+    Remove-ContainerAppsEnvironment $candidate
 }
 
 $baseParameters = @{
@@ -446,6 +477,19 @@ if ($null -eq $loaded) {
 }
 else {
     Write-Host ('Partidos cargados: {0}' -f (($loaded | ForEach-Object { $_.match_id }) -join ', '))
+}
+
+if ($null -ne $loaded) {
+    # Azure puede suspender el cómputo de un entorno nuevo poco después de arrancar.
+    Write-Step 'Comprobando que el entorno sigue activo (90 s)'
+    Start-Sleep -Seconds 90
+    if (Test-EnvironmentSuspended $environmentName) {
+        Write-Warning ("Azure suspendió el cómputo de $environmentName (ManagedClusterSuspended). " +
+            "Vuelva a ejecutar el script con -RecreateEnvironment; si se repite, consulte la guía.")
+    }
+    else {
+        Write-Host 'El entorno sigue activo.'
+    }
 }
 
 # ----- 10. Resumen ----------------------------------------------------------------
