@@ -200,6 +200,14 @@ def match_experience_items() -> list[dict]:
             [status(200), body, "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"],
             "Posición y estado actuales.",
         ),
+        request(
+            "POST Cerrar sesión",
+            "/api/v1/auth/logout",
+            {},
+            [status(200), body, "pm.test('Sesión cerrada', () => pm.expect(body.detail).to.equal('Sesión cerrada'));"],
+            "Revoca el token en el servidor. Va al final para no invalidar {{token}} antes de las rutas protegidas.",
+            auth=True,
+        ),
     ]
 
 
@@ -223,7 +231,12 @@ def session_items() -> list[dict]:
             "POST Login incorrecto",
             "/api/v1/auth/login",
             {"username": "analista", "password": "incorrecta"},
-            [status(401), body, "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));"],
+            [
+                status(401),
+                body,
+                "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));",
+                "pm.test('Avisa los intentos restantes', () => pm.expect(body.attempts_left).to.be.a('number'));",
+            ],
             "Una contraseña equivocada no inicia sesión.",
         ),
         get(

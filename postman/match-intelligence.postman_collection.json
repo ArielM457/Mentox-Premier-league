@@ -697,7 +697,8 @@
                 "exec": [
                   "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
                   "const body = pm.response.json();",
-                  "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));"
+                  "pm.test('No revela qué falló', () => pm.expect(body.detail).to.equal('Usuario o contraseña incorrectos'));",
+                  "pm.test('Avisa los intentos restantes', () => pm.expect(body.attempts_left).to.be.a('number'));"
                 ]
               }
             }
@@ -1287,6 +1288,46 @@
                   "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
                   "const body = pm.response.json();",
                   "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": "Revoca el token en el servidor. Va al final para no invalidar {{token}} antes de las rutas protegidas.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Sesión cerrada', () => pm.expect(body.detail).to.equal('Sesión cerrada'));"
                 ]
               }
             }
