@@ -77,6 +77,8 @@ FusionPolicy ──────────────────────�
 Todos los resultados conservan las observaciones originales.
 ```
 
+El 18 de octubre de 2026 se añadió además un contrato crudo para acciones de SoccerNet y otro para detecciones de Roboflow. Ambos admiten posiciones normalizadas y tiempos de vídeo, por lo que pueden alimentar la fusión existente sin mezclar la salida de los modelos. La conexión de un exportador real con `ObservationFusionService` sigue pendiente.
+
 `MatchEvent` no contiene identificadores de observación visual. Por eso `FusedVideoEvent` lo envuelve y añade `source_observation_ids`, `track_id`, objetos originales, identidad, diferencia temporal y distancia espacial.
 
 ## Política de fusión

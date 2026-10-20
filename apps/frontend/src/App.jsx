@@ -1,4 +1,6 @@
 import { useRoute } from './app/router.js'
+import { usePreferences } from './app/preferences.js'
+import { Icon } from './components/ui/Icon.jsx'
 import { AllMatches } from './screens/AllMatches.jsx'
 import { Discover } from './screens/Discover.jsx'
 import { Editorial } from './screens/Editorial.jsx'
@@ -11,24 +13,52 @@ import { Recap } from './screens/Recap.jsx'
 
 export default function App() {
   const { name, params } = useRoute()
+  const { preferences, update, t } = usePreferences()
+  let screen
   switch (name) {
     case 'onboarding':
-      return <Onboarding />
+      screen = <Onboarding />
+      break
     case 'discover':
-      return <Discover />
+      screen = <Discover />
+      break
     case 'matches':
-      return <AllMatches />
+      screen = <AllMatches />
+      break
     case 'match':
-      return <MatchCenter key={params[0]} matchId={params[0]} />
+      screen = <MatchCenter key={params[0]} matchId={params[0]} />
+      break
     case 'moment':
-      return <MomentDetail key={params.join('/')} matchId={params[0]} momentId={params[1]} />
+      screen = <MomentDetail key={params.join('/')} matchId={params[0]} momentId={params[1]} />
+      break
     case 'recap':
-      return <Recap key={params[0]} matchId={params[0]} />
+      screen = <Recap key={params[0]} matchId={params[0]} />
+      break
     case 'profile':
-      return <Profile />
+      screen = <Profile />
+      break
     case 'editorial':
-      return <Editorial />
+      screen = <Editorial />
+      break
     default:
-      return <Landing />
+      screen = <Landing />
   }
+
+  const dark = preferences.theme !== 'light'
+  return (
+    <>
+      {screen}
+      <button
+        aria-label={dark ? t.common.lightTheme : t.common.darkTheme}
+        aria-pressed={dark}
+        className="theme-toggle"
+        onClick={() => update({ theme: dark ? 'light' : 'dark' })}
+        title={dark ? t.common.lightTheme : t.common.darkTheme}
+        type="button"
+      >
+        <Icon name={dark ? 'sun' : 'moon'} size={20} />
+        <span>{dark ? t.common.lightTheme : t.common.darkTheme}</span>
+      </button>
+    </>
+  )
 }

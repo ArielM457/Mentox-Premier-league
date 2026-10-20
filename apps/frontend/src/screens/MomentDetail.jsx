@@ -79,8 +79,13 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
 
   const playerName = (id) => metadata.players.find((p) => p.player_id === id)?.name ?? id ?? '—'
   const involved = [...new Map(events.filter((e) => e.player_id).map((e) => [e.player_id, e])).values()]
+  const authorEvent = events.slice().reverse().find((event) => event.player_id)
+  const author = playerName(authorEvent?.player_id)
+  const team = authorEvent?.team_id === metadata.home_team.team_id ? metadata.home_team.name : authorEvent?.team_id === metadata.away_team.team_id ? metadata.away_team.name : '—'
   const span = events.length > 1 ? (events[events.length - 1].clock_ms - events[0].clock_ms) / 1000 : 0
   const passes = events.filter((e) => e.type === 'pass').length
+  const explanation = sources.draft.explanation || overlay.explanation || overlay.headline
+  const conciseExplanation = explanation.length > 260 ? `${explanation.slice(0, 257)}…` : explanation
 
   return (
     <div className="detail-grid">
@@ -89,7 +94,13 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
           <Icon name="spark" size={16} /> {t.moment.pill(formatMatchClock(overlay, t.match.period))} · {t.kinds[overlay.kind] ?? overlay.kind}
         </span>
         <h1>{overlay.headline}</h1>
-        <p>{overlay.explanation}</p>
+        <p>{conciseExplanation}</p>
+        <div className="moment-context">
+          <span><small>{t.moment.author}</small><strong>{author}</strong></span>
+          <span><small>{t.moment.situation}</small><strong>{t.kinds[overlay.kind] ?? overlay.kind}</strong></span>
+          <span><small>{t.moment.team}</small><strong>{team}</strong></span>
+          <span><small>{t.moment.minute}</small><strong>{formatMatchClock(overlay, t.match.period)}</strong></span>
+        </div>
         <div className="detail-pitch">
           <Pitch
             events={events.slice(0, Math.max(1, step))}
@@ -130,7 +141,7 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
               <Icon name="spark" size={26} />
             </span>
             <h2>{t.moment.why}</h2>
-            <p>{sources.draft.explanation || overlay.headline}</p>
+            <p>{conciseExplanation}</p>
             <div className="takeaway">
               <strong>{t.moment.takeaway}</strong>
               <span>{t.moment.takeawayCopy(events.length)}</span>

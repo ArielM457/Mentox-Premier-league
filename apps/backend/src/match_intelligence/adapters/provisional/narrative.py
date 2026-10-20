@@ -86,6 +86,7 @@ class ProvisionalNarrative:
     def live(
         self,
         metadata: MatchMetadata,
+        snapshot: MatchSnapshot,
         candidate: InsightCandidate,
         preferences: ViewerPreferences,
     ) -> NarrativeDraft:
@@ -317,6 +318,35 @@ class ProvisionalNarrative:
                 snapshot.recent_event_ids[-1:],
             )
 
+        if metric is None and seen and any(
+            k in q for k in ("pasando", "partido", "momento", "jugada", "explica", "happening", "match", "play", "explain")
+        ):
+            latest = seen[-1]
+            actor = self._player(metadata, latest.player_id) if latest.player_id else self._team(metadata, latest.team_id)
+            event_label = {
+                EventType.PASS: ("un pase", "a pass"),
+                EventType.SHOT: ("un remate", "a shot"),
+                EventType.RECOVERY: ("una recuperación", "a recovery"),
+                EventType.PRESSURE: ("una presión", "a press"),
+                EventType.TACKLE: ("una entrada", "a tackle"),
+                EventType.POSSESSION_CHANGE: ("un cambio de posesión", "a possession change"),
+            }[latest.type][0 if es else 1]
+            home_score = snapshot.score.get(metadata.home_team.team_id, 0)
+            away_score = snapshot.score.get(metadata.away_team.team_id, 0)
+            sources = [
+                event_id for event_id in [*latest.related_event_ids, latest.event_id]
+                if any(event.event_id == event_id for event in seen)
+            ]
+            return draft(
+                (f"{actor} protagoniza {event_label}" if es else f"{actor} is involved in {event_label}"),
+                (
+                    f"Es la acción más reciente registrada. El marcador está {metadata.home_team.name} {home_score}-{away_score} {metadata.away_team.name}."
+                    if es
+                    else f"This is the latest recorded action. The score is {metadata.home_team.name} {home_score}-{away_score} {metadata.away_team.name}."
+                ),
+                sources,
+            )
+
         if metric is None:
             return draft(
                 "No puedo responder con los datos disponibles" if es else "I cannot answer with the available data",
@@ -430,7 +460,7 @@ class ProvisionalNarrative:
         key_moments.sort(key=lambda c: c.clock_ms)
         moments = []
         for c in key_moments:
-            live = self.live(metadata, c, preferences.model_copy(update={"level": DetailLevel.SIMPLE, "mode": ViewerMode.CASUAL}))
+            live = self.live(metadata, snapshot, c, preferences.model_copy(update={"level": DetailLevel.SIMPLE, "mode": ViewerMode.CASUAL}))
             moments.append(f"{_clock(c.clock_ms)} {live.headline}")
             sources.update(c.source_event_ids)
 

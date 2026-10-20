@@ -85,6 +85,13 @@ export const api = {
       body: JSON.stringify({ draft_id: draftId, message_id: messageId || null, reason }),
     }),
   reports: (id) => request(`${base(id)}/reports`),
+  simulate: (id, prefs) => request(`${base(id)}/simulation?${prefsQuery(prefs)}`, { method: 'POST' }),
+  highlights: (id) => request(`${base(id)}/highlights`),
+  reviewHighlight: (id, clipId, decision, reviewer) =>
+    request(`${base(id)}/highlights/${encodeURIComponent(clipId)}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ decision, reviewer }),
+    }),
   playback: (id, action, t) =>
     request(`${base(id)}/playback`, {
       method: 'POST',

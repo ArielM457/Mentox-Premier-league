@@ -27,14 +27,22 @@ LABELS = {
         "recoveries": ("recuperación", "recuperaciones"),
         "shots": ("tiro", "tiros"),
         "goals": ("gol", "goles"),
+        "goal": ("gol", "goles"),
         "passes": ("pase", "pases"),
+        "passes_in_build_up": ("pase en la jugada", "pases en la jugada"),
+        "seconds_since_recovery": ("segundo desde la recuperación", "segundos desde la recuperación"),
+        "forward_progress": ("metro de progresión", "metros de progresión"),
         "pressure": ("acción de presión", "acciones de presión"),
     },
     "en": {
         "recoveries": ("recovery", "recoveries"),
         "shots": ("shot", "shots"),
         "goals": ("goal", "goals"),
+        "goal": ("goal", "goals"),
         "passes": ("pass", "passes"),
+        "passes_in_build_up": ("pass in the move", "passes in the move"),
+        "seconds_since_recovery": ("second since the recovery", "seconds since the recovery"),
+        "forward_progress": ("metre of progression", "metres of progression"),
         "pressure": ("pressure", "pressures"),
     },
 }
@@ -78,9 +86,10 @@ def _fact_text(fact: EvidenceFact, language: str) -> str:
     label = labels[0 if fact.value == 1 else 1] if labels else fact.key.replace("_", " ")
     subject = fact.player_id or fact.team_id or ("El partido" if language == "es" else "The match")
     unit = "" if fact.unit in (None, "count") else f" {fact.unit}"
+    value = int(fact.value) if isinstance(fact.value, float) and fact.value.is_integer() else fact.value
     if language == "es":
-        return f"{subject}: {fact.value}{unit} {label}".strip()
-    return f"{subject}: {fact.value}{unit} {label}".strip()
+        return f"{subject}: {value}{unit} {label}".strip()
+    return f"{subject}: {value}{unit} {label}".strip()
 
 
 def _render(
@@ -110,7 +119,7 @@ def _render(
     focus = facts[0].player_id or facts[0].team_id
     if candidate.kind == "question":
         headline = "Respuesta" if language == "es" else "Answer"
-    elif candidate.kind == "goal" and any(fact.key == "goals" and fact.value for fact in facts):
+    elif candidate.kind == "goal" and any(fact.key in {"goal", "goals"} and fact.value for fact in facts):
         headline = f"Gol de {focus} - {clock}" if language == "es" else f"Goal for {focus} - {clock}"
     elif candidate.kind == "shot" and any(fact.key == "shots" for fact in facts):
         headline = f"Tiro de {focus} - {clock}" if language == "es" else f"Shot by {focus} - {clock}"

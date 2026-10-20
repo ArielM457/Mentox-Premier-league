@@ -17,6 +17,7 @@ La documentación distingue el alcance del reto, las decisiones del equipo y lo 
 - [Equipo de agentes](10-arquitectura-agentes.md): responsabilidades, autonomía, verificación y revisión antes de publicar.
 - [Plan de implementación de agentes por eventos](11-plan-implementacion-agentes-eventos.md): filtro, orquestación, simulación, resúmenes, escalado y pruebas de disponibilidad.
 - [Política de modelos de IA](12-politica-modelos-ia.md): asignación de modelos por demanda, búsqueda web, embeddings y criterios para cambiar de modelo.
+- [Persistencia en Supabase](13-supabase.md): variables locales, migraciones y tablas de la experiencia.
 - [Plan de desarrollo](plan-de-desarrollo/README.md): reparto entre cuatro personas de programación y una de UX/UI, con contratos para trabajar en paralelo.
 - [Detalle de datos y visión](persona-1-datos-y-vision/README.md): plan, requisitos e historias de usuario de Persona 1, incluida la integración reproducible con Azure.
 - [Detalle de estado y analítica](persona-2-estado-y-analitica/README.md): estado del partido, catálogo de métricas, patrones, motor de atención, modelos de valor e integración con Azure de Persona 2.

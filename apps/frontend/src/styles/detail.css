@@ -7,6 +7,11 @@
 .moment-pill { display: inline-flex; gap: 7px; align-items: center; padding: 8px 12px; color: var(--lime); background: rgba(216,255,101,.1); border-radius: 999px; font-size: 11px; font-weight: 800; }
 .detail-main h1 { max-width: 760px; margin: 15px 0 8px; font-size: clamp(34px, 5vw, 60px); line-height: 1; letter-spacing: -.055em; }
 .detail-main > p { max-width: 700px; color: #aaa5bd; line-height: 1.5; }
+.moment-context { max-width: 760px; margin-top: 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.moment-context span { padding: 10px 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.07); border-radius: 10px; }
+.moment-context small, .moment-context strong { display: block; }
+.moment-context small { margin-bottom: 4px; color: #918ba5; font-size: 8px; font-weight: 800; text-transform: uppercase; }
+.moment-context strong { font-size: 11px; }
 .detail-pitch { margin-top: 24px; padding: 12px; background: #1d1934; border-radius: 20px; }
 .video-controls { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 15px; }
 .video-controls > div { height: 4px; overflow: hidden; background: #3b3653; border-radius: 4px; }

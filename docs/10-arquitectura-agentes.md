@@ -58,6 +58,25 @@ flowchart TD
     U --> L
 ```
 
+## **Tres rutas de transporte**
+
+La ejecución local representa tres rutas lógicas sin exigir servicios de nube:
+
+```mermaid
+flowchart LR
+    API[API Gateway] --> I[Ingreso de todos los eventos]
+    I --> F[Filtro determinista]
+    F -->|Solo métricas| M[Telemetría y métricas tolerantes a pérdida]
+    F -->|Candidato o prioridad| D[Eventos importantes durables]
+    D --> A[Refinador y agentes]
+    M --> S[(Acumulado de métricas)]
+    A --> V[Validación y salida]
+```
+
+En Azure, la propuesta es usar API Management como entrada, Event Hubs para el ingreso y la telemetría de alto volumen, y Service Bus para el trabajo importante. Service Bus debe habilitar detección de duplicados, reintentos limitados y cola de mensajes no procesables. Las métricas pueden usar retención corta y reconstruirse desde los eventos originales cuando la política de conservación lo permita.
+
+Esta topología todavía no está desplegada. La implementación actual simula las rutas dentro del proceso y deja contratos reproducibles para validar la conducta antes de pagar o depender de la nube.
+
 ## **Servicio filtro de datos**
 
 Este servicio se ejecuta antes del orquestador y no usa un modelo de lenguaje. Debe responder rápido y de forma reproducible.
@@ -134,6 +153,6 @@ El despliegue debe permitir varias instancias sin estado del filtro, refinador, 
 
 ## **Estado de implementación**
 
-El backend implementa un flujo CrewAI secuencial con observador, analista, selector y verificador para solicitudes individuales. También implementa la primera versión reproducible del filtro, el catálogo, el refinador y el despacho. Reconoce tiros desde zona peligrosa y progresiones rápidas después de una recuperación. Todavía no implementa el canal durable, GPT-4.1 mini en el orquestador, el researcher, la ejecución de simulaciones contrafactuales, los resúmenes de medio tiempo ni el despliegue con varias instancias.
+El backend implementa un flujo CrewAI secuencial con observador, analista, selector y verificador para solicitudes individuales. La experiencia del partido ya puede usar ese flujo mediante un adaptador y elegir despliegues distintos para tareas rápidas y narrativas. También implementa el filtro, el catálogo, el refinador, el despacho y una simulación reproducible de las seis rutas. La interfaz muestra el resultado al perfil analista y permite revisar propuestas de recorte. Todavía no implementa el transporte real con Event Hubs y Service Bus, el corte físico y la carga a Blob, GPT-4.1 mini dentro del orquestador, el researcher, las simulaciones contrafactuales, los resúmenes de medio tiempo ni el despliegue con varias instancias.
 
 El plan de implementación y las pruebas de carga están en [plan de implementación de agentes por eventos](11-plan-implementacion-agentes-eventos.md). La asignación y evaluación de modelos está en [política de modelos de IA](12-politica-modelos-ia.md).

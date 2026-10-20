@@ -15,6 +15,8 @@ Una observación visual conserva su `track_id`, tiempo, posición, equipo estima
 
 La regla se comprobó con confianza de detector desde 0 hasta 1. Incluso `detector_confidence=1` mantiene la identidad como `unconfirmed` cuando no existe evidencia independiente.
 
+Desde el 18 de octubre de 2026, `RoboflowDetectionRecord` también representa la observación cruda que llega antes del resolvedor. Conserva `track_id` aunque `player_id` sea nulo y separa `confidence` de la identidad nominal. Este contrato no autoriza asociación automática.
+
 ## Alcance implementado
 
 - Contrato `VisualTrackObservation` separado del evento deportivo.

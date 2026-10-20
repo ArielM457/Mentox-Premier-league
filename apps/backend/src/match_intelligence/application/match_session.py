@@ -16,6 +16,7 @@ from match_intelligence.application.ports import (
     NarrativePort,
     VerificationOutcome,
 )
+from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
 from match_intelligence.application.video_sync import (
     SynchronizedEvent,
     VideoSynchronizedReplay,
@@ -98,11 +99,13 @@ class MatchSession:
     analytics: AnalyticsPort
     narrative: NarrativePort
     correction_narrative: NarrativePort
+    persistence: MatchPersistence = field(default_factory=NullMatchPersistence)
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     _drafts: dict[str, NarrativeDraft] = field(default_factory=dict)
     _withdrawn_candidates: set[str] = field(default_factory=set)
     _editorial: dict[str, EditorialRecord] = field(default_factory=dict)
     _reports: list[ErrorReport] = field(default_factory=list)
+    _draft_cache: dict[str, NarrativeDraft] = field(default_factory=dict)
     _clock: Callable[[], datetime] = field(default=lambda: datetime.now(UTC))
     _replay: VideoSynchronizedReplay | None = None
 
@@ -167,6 +170,7 @@ class MatchSession:
             messages.extend(self._quiet_messages(events, candidates, preferences, limit))
 
         scheduled = schedule_overlays(messages)
+        self.persistence.save_moments(scheduled)
         elapsed = (time.perf_counter() - started) * 1000
         return OverlayBatch(scheduled, elapsed)
 
@@ -182,13 +186,22 @@ class MatchSession:
     def _live_draft(
         self, candidate: InsightCandidate, preferences: ViewerPreferences
     ) -> tuple[NarrativeDraft, bool]:
+        preference_key = preferences.model_dump_json()
+        cache_key = f"{candidate.candidate_id}:{preference_key}"
+        if candidate.candidate_id not in self._withdrawn_candidates and cache_key in self._draft_cache:
+            return self._draft_cache[cache_key], False
+        sources = {event.event_id for event in self.events if event.event_id in candidate.source_event_ids}
+        source_events = [event for event in self.events if event.event_id in sources]
+        video_time_ms = max((_video_time(event) for event in source_events), default=0)
+        snapshot = self.snapshot(video_time_ms)
         if candidate.candidate_id in self._withdrawn_candidates:
-            draft = self.correction_narrative.live(self.metadata, candidate, preferences)
+            draft = self.correction_narrative.live(self.metadata, snapshot, candidate, preferences)
             draft = draft.model_copy(update={"draft_id": draft.draft_id + "-v2"})
             corrected = True
         else:
-            draft = self.narrative.live(self.metadata, candidate, preferences)
+            draft = self.narrative.live(self.metadata, snapshot, candidate, preferences)
             corrected = False
+            self._draft_cache[cache_key] = draft
         self._drafts[draft.draft_id] = draft
         return draft, corrected
 
@@ -294,6 +307,12 @@ class MatchSession:
             self.metadata, self.events_until(video_time_ms), snapshot, question, preferences
         )
         self._drafts[draft.draft_id] = draft
+        self.persistence.save_question(
+            match_id=self.match_id,
+            video_time_ms=video_time_ms,
+            question=question,
+            answer=draft,
+        )
         return draft
 
     # ----- resumen y revisión editorial -------------------------------------
@@ -428,7 +447,11 @@ class MatchSession:
         if preferences.favorite_team_id and preferences.favorite_team_id not in team_ids:
             raise SessionError(f"El club {preferences.favorite_team_id} no juega este partido")
         player_ids = {p.player_id for p in self.metadata.players}
-        if preferences.favorite_player_id and preferences.favorite_player_id not in player_ids:
+        if (
+            preferences.mode is ViewerMode.PLAYER
+            and preferences.favorite_player_id
+            and preferences.favorite_player_id not in player_ids
+        ):
             raise SessionError(f"El jugador {preferences.favorite_player_id} no juega este partido")
         if preferences.mode is ViewerMode.PLAYER and not preferences.favorite_player_id:
             raise SessionError("El modo jugador necesita un jugador favorito")

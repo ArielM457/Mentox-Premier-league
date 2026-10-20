@@ -94,6 +94,38 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-48 · P1.** El sistema debe separar la investigación previa, la validación de fuentes y la confirmación humana. Se verifica siguiendo un dato desde su propuesta hasta su aprobación o rechazo.
 
+**RF-49 · P0.** La captura de visión debe poder registrar una observación por segundo con tiempo de partido, tiempo de vídeo, fotograma, clase o evento, confianza y procedencia. Las observaciones de acción y seguimiento deben conservar contratos separados hasta su fusión. Se verifica validando registros completos y rechazando valores fuera de rango.
+
+**RF-50 · P1.** Las observaciones espaciales deben conservar caja limitadora, `track_id`, equipo estimado, color de camiseta, posición de campo, identidad opcional y retraso de procesamiento. La confianza del detector no debe confirmar por sí sola la identidad nominal. Se verifica con un seguimiento identificado y otro sin evidencia de identidad.
+
+**RF-51 · P0.** El flujo debe separar tres rutas lógicas: ingreso de todos los eventos, métricas tolerantes a pérdida y eventos importantes durables. Una pérdida de telemetría no debe descartar una jugada importante. Se verifica simulando fallos independientes de cada consumidor.
+
+**RF-52 · P0.** La interfaz debe permitir iniciar una simulación sintética y mostrar las seis decisiones del filtro: solo métricas, candidato narrativo, peligro inmediato, tiempo muerto, resumen e inválido o duplicado. Se verifica desde el centro del partido sin cargar datos reales.
+
+**RF-53 · P1.** El sistema debe proponer límites temporales para recortes destacados, conservar sus eventos de origen y exigir confirmación o rechazo humano antes de publicarlos. Se verifica revisando un recorte pendiente.
+
+**RF-54 · P1.** El perfil profesional analista debe poder habilitar comentarios en vivo y consultar decisiones de ruta, agentes llamados, mensajes generados y recortes pendientes. Se verifica comparando el perfil analista con el perfil casual.
+
+**RF-55 · P1.** “Mi experiencia” debe conservar en el navegador el historial de partidos y resúmenes abiertos, además de mostrar contenido disponible del jugador seguido. Se verifica cerrando y abriendo la interfaz sin perder el historial local.
+
+**RF-56 · P0.** El centro del partido debe mantener una única sesión de reproducción al cambiar entre Resumen, Momentos, Estadísticas, Vista táctica, Explicaciones y Comentarios. Debe permitir iniciar, pausar, continuar y reiniciar sin perder el tiempo actual al cambiar de pestaña. Se verifica iniciando la demo, recorriendo todas las vistas y comprobando que el reloj no se reinicia.
+
+**RF-57 · P1.** El campo debe mostrar todos los jugadores registrados y permitir enfocar uno sin ocultar a los demás. La posición observada más reciente tiene prioridad; cuando no exista, la interfaz debe distinguir una posición sintética de demostración. Se verifica seleccionando jugadores con y sin eventos posicionales.
+
+**RF-58 · P1.** La vista Resumen debe mostrar un selector de un solo momento y abrir el momento elegido en la vista Momentos. Se verifica avanzando y retrocediendo por los momentos ya ocurridos.
+
+**RF-59 · P1.** La vista Momentos debe permitir comparar cambios concretos de una jugada conforme a RF-44. Mientras no exista un agente contrafactual integrado, cualquier estimación local debe identificarse de forma visible y no presentarse como un hecho ni como salida de IA. Se verifica cambiando cada supuesto y comprobando que no modifica el estado real.
+
+**RF-60 · P1.** Las estadísticas deben actualizarse cuando el reloj cruce nuevos eventos y representar visualmente qué equipo tiene mayor valor, sin convertir datos ausentes en cero. Se verifica pausando antes y después de eventos que cambien el estado.
+
+**RF-61 · P1.** La vista táctica debe mostrar ambos equipos inicialmente, permitir enfocar uno y nombrar patrones solo cuando los eventos ocurridos aporten evidencia suficiente. Se verifica con la selección de ambos equipos y de cada equipo individual.
+
+**RF-62 · P1.** Explicaciones debe listar situaciones de gol o alta prioridad con una vista previa y acceso al análisis breve. Comentarios en vivo debe mostrar el campo, mensajes sincronizados y un panel de locutor; durante intervalos sin narración solo puede usar contenido contextual respaldado por los metadatos o el estado del partido. Se verifica recorriendo un tramo con momento narrativo y otro sin mensaje visible.
+
+**RF-63 · P0.** La representación del campo debe actualizar el movimiento con intervalos de un segundo o menos y mostrar una secuencia sintética coherente entre pasador, receptor, balón y remate. Se verifica reproduciendo el pase final y el gol, comprobando que cada desplazamiento dura como máximo un segundo y conserva sus coordenadas de origen.
+
+**RF-64 · P1.** El backend debe poder guardar partidos, eventos, momentos y conversaciones del asistente en Supabase mediante una clave exclusiva del servidor. La falta temporal de la base no debe detener la reproducción en memoria. Se verifica con escrituras repetidas, eventos de origen conservados y una prueba de Supabase deshabilitado.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.

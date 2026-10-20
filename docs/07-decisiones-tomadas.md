@@ -52,6 +52,14 @@ Los análisis finales tendrán una revisión antes de publicarse. La persona o m
 
 La infraestructura de esta parte se definirá con Bicep y se desplegará mediante Azure CLI. Los nombres, la región, el grupo de recursos y la suscripción serán configurables para que cada integrante pueda desplegar los servicios en su propia cuenta sin editar la plantilla ni compartir credenciales. El [plan detallado de datos y visión](persona-1-datos-y-vision/plan-general.md) describe el alcance inicial.
 
+**11.** El 18 de octubre de 2026 se refinó el transporte en tres rutas lógicas. Event Hubs recibirá todos los eventos y alimentará el filtro. La telemetría y las métricas no críticas usarán un flujo de retención corta y aceptarán pérdida controlada. Las decisiones importantes usarán Azure Service Bus con reintentos, deduplicación y cola de mensajes no procesables. Esta decisión reemplaza la idea de usar un único canal para todo.
+
+**12.** Los vídeos permitidos, las observaciones crudas y los recortes destacados se almacenarán en Blob Storage. Un recorte propuesto permanece pendiente hasta una decisión humana. La simulación local solo calcula sus límites y registra la decisión; no afirma que el archivo de vídeo ya haya sido cortado ni cargado.
+
+**13.** La primera integración visible será local y sintética. El botón de simulación debe recorrer las seis rutas del filtro y permitir revisar recortes. El despliegue de las colas, contenedores y trabajadores en Azure se hará después de revisar costos y aprobar expresamente la ejecución del script.
+
+**14.** Usaremos Supabase como base de datos de la experiencia para conservar partidos, eventos normalizados, momentos y conversaciones del asistente. React no recibe la clave secreta. El backend realiza las escrituras mediante un adaptador y conserva el modo en memoria cuando la base está deshabilitada o no responde. El esquema se administra con migraciones versionadas bajo `supabase/migrations`.
+
 ## **Estado actual**
 
-El monorepo y los proyectos iniciales de frontend y backend están preparados. La ingesta sintética y la analítica de Persona 2 tienen módulos y pruebas propios. Existe un módulo de narrativa con un flujo CrewAI secuencial de cuatro tareas y un proveedor local de prueba. El filtro, el catálogo inicial de jugadas y el despacho reproducible están implementados de forma local. La conexión entre módulos, el canal durable, la investigación previa, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía están pendientes.
+El monorepo y los proyectos iniciales de frontend y backend están preparados. La ingesta sintética y la analítica de Persona 2 tienen módulos y pruebas propios. El flujo de la experiencia usa el adaptador de narrativa de Persona 3 y puede seleccionar el proveedor provisional, fixture o Azure. El filtro, el catálogo inicial, el despacho reproducible, la simulación local de rutas y la revisión de recortes están implementados. El canal durable real, el corte físico del vídeo, la investigación previa, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía están pendientes.

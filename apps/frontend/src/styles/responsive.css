@@ -16,6 +16,10 @@
 }
 
 @media (max-width: 760px) {
+  .experience-grid { grid-template-columns: 1fr; }
+  .simulation-toolbar, .live-comments > header, .highlight-review > article { align-items: stretch; flex-direction: column; }
+  .queue-counters { grid-template-columns: repeat(2, 1fr); }
+  .routing-list article { grid-template-columns: 1fr; }
   body { padding-bottom: 66px; }
   .landing { margin-bottom: -66px; }
   .landing-header { height: 76px; }
@@ -130,6 +134,19 @@
   .score-center { min-width: 90px; }
   .score-center b { font-size: 26px; }
   .pitch-wrap { padding: 8px; }
+  .simulation-toolbar { align-items: stretch; flex-direction: column; }
+  .live-toolbar-actions { justify-content: stretch; }
+  .live-mode-switch { flex: 1; }
+  .live-mode-switch button { flex: 1; }
+  .moment-selector-current { grid-template-columns: auto minmax(0,1fr); }
+  .moment-selector-current small { display: none; }
+  .moment-workspace, .tactical-panel, .insight-list, .commentary-stage { padding: 14px; }
+  .moment-workspace > header, .tactical-panel > header { align-items: stretch; flex-direction: column; }
+  .moment-workspace-grid, .commentary-stage { grid-template-columns: 1fr; }
+  .insight-list > button { grid-template-columns: 100px minmax(0,1fr); }
+  .insight-list > button > .icon { display: none; }
+  .commentary-preview .pitch { aspect-ratio: 1.45; }
+  .stats-heading { align-items: flex-start; flex-direction: column; }
   .pitch-meta { align-items: flex-start; flex-direction: column; }
   .pitch { min-height: 0; aspect-ratio: 1.45; }
   .player-dot { width: 18px; height: 18px; }
@@ -142,6 +159,7 @@
   .detail-header .brand, .share-label { display: none; }
   .detail-grid { padding: 28px 14px; grid-template-columns: 1fr; }
   .detail-main h1 { font-size: 38px; }
+  .moment-context { grid-template-columns: repeat(2, 1fr); }
   .detail-pitch .pitch { min-height: 0; }
   .detail-insight { margin-top: 0; }
   .video-controls { grid-template-columns: auto 1fr auto; }

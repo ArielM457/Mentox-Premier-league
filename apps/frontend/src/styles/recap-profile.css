@@ -52,3 +52,15 @@
 .profile-modes strong, .profile-modes small { display: block; }
 .profile-modes small { color: var(--muted); font-size: 10px; }
 .save-row { margin-top: 32px; display: flex; gap: 12px; }
+.experience-grid { margin-bottom: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.experience-panel { min-height: 150px; padding: 18px; background: var(--surface, white); border: 1px solid var(--line); border-radius: 18px; }
+.experience-panel h2 { margin: 0 0 12px; font-size: 16px; }
+.experience-panel p { color: var(--muted); font-size: 12px; }
+.experience-panel button { width: 100%; padding: 10px 0; display: grid; grid-template-columns: 1fr auto; color: var(--navy); background: transparent; border-top: 1px solid var(--line); text-align: left; }
+.experience-panel button strong, .experience-panel button small { display: block; grid-column: 1; }
+.experience-panel button small { color: var(--muted); font-size: 10px; }
+.experience-panel button .icon { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+.analyst-comments-toggle { width: 100%; margin-top: 12px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.analyst-comments-toggle.selected { border: 2px solid var(--violet); background: #f1ebff; }
+.analyst-comments-toggle strong, .analyst-comments-toggle small { display: block; }
+.analyst-comments-toggle small { margin-top: 3px; color: var(--muted); }

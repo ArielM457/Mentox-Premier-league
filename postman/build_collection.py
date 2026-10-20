@@ -171,6 +171,26 @@ def match_experience_items() -> list[dict]:
             [status(200), body, "pm.test('Reproduciendo', () => pm.expect(body.state).to.equal('playing'));"],
             "Posición y estado actuales.",
         ),
+        request(
+            "POST Simular colas y agentes",
+            base + "/simulation?language=es&mode=casual&level=normal",
+            {},
+            [status(200), body, "pm.test('Seis rutas', () => { pm.expect(body.steps.length).to.equal(6); pm.expect(body.metrics_queue).to.equal(1); pm.expect(body.important_queue).to.equal(4); });"],
+            "Envía casos sintéticos por ingreso, métricas, eventos importantes y agentes.",
+        ),
+        get(
+            "GET Recortes destacados",
+            base + "/highlights",
+            [status(200), body, "pm.test('Recorte pendiente', () => pm.expect(body[0].status).to.equal('pending'));"],
+            "Lista los recortes propuestos por la simulación.",
+        ),
+        request(
+            "POST Confirmar recorte destacado",
+            base + "/highlights/clip-overlay-moment-evt-010-es-casual-normal/review",
+            {"decision": "approved", "reviewer": "Analista de prueba"},
+            [status(200), body, "pm.test('Confirmado', () => pm.expect(body.status).to.equal('approved'));"],
+            "Registra la confirmación humana antes de publicar el recorte.",
+        ),
     ]
 
 
