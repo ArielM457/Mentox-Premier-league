@@ -18,6 +18,10 @@ Transformar eventos normalizados en estado, estadísticas y momentos candidatos 
 
 **6. Indicadores propios.** Probar control, impulso y caos como fórmulas versionadas. Mostrar sus componentes y evitar que una escala creada por el equipo parezca una métrica oficial.
 
+**7. Servicio filtro.** Clasificar cada evento aceptado en solo métricas, candidato narrativo, peligro inmediato, tiempo muerto, resumen o rechazo. El filtro usa reglas reproducibles y se ejecuta antes del orquestador. Entrega `RoutingDecision v1` y no llama a un modelo de lenguaje.
+
+**8. Catálogo de jugadas.** Mantener patrones versionados con señales necesarias, señales opcionales, casos negativos y límites. Entregar `PlayContext v1` sin afirmar una causa táctica cuando falten datos.
+
 ## **Entregables**
 
 **1.** Motor de estado con reconstrucción reproducible desde un partido sintético.
@@ -30,6 +34,10 @@ Transformar eventos normalizados en estado, estadísticas y momentos candidatos 
 
 **5.** Informe de viabilidad y, cuando corresponda, adaptadores probados para xT, VAEP y xG.
 
+**6.** Filtro con pruebas de rutas, duplicados y ventanas de eventos.
+
+**7.** Catálogo inicial de jugadas con triangulación, recuperación alta, contraataque, progresión, pase al área y balón detenido.
+
 ## **Trabajo independiente**
 
 Puede desarrollar todo con eventos fijos basados en `MatchEvent v1`. Para probar el motor de atención puede crear preferencias de ejemplo sin esperar a Persona 3. Entrega snapshots y candidatos como archivos de prueba para que Persona 3 y Persona 4 trabajen en paralelo.
@@ -40,4 +48,4 @@ Sus archivos principales estarán en `domain` y `application` dentro del backend
 
 Dos ejecuciones del mismo partido deben generar las mismas estadísticas y momentos. Una cifra debe poder recalcularse desde sus eventos. Las secuencias que no cumplen un patrón no deben activarlo. Cada métrica avanzada requiere comparación con una referencia o una prueba de plausibilidad documentada.
 
-Requisitos principales: RF-07 a RF-12, RF-14, RF-17 y RF-29 a RF-33. Apoya RF-15, RF-16 y RNF-01 a RNF-03.
+Requisitos principales: RF-07 a RF-12, RF-14, RF-17, RF-29 a RF-33 y RF-40 a RF-45. Apoya RF-15, RF-16, RNF-01 a RNF-03 y RNF-07 a RNF-09.

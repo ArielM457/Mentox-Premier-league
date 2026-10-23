@@ -1,0 +1,13 @@
+{
+  "contract_version": "1",
+  "candidate_id": "moment-minimal",
+  "match_id": "demo-001",
+  "period": 1,
+  "clock_ms": 120000,
+  "kind": "shot",
+  "priority": 70,
+  "facts": [
+    {"key": "shots", "value": 1, "source_event_ids": ["evt-minimal"]}
+  ],
+  "source_event_ids": ["evt-minimal"]
+}

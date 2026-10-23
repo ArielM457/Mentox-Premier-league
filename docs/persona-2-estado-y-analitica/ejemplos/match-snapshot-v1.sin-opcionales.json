@@ -1,0 +1,10 @@
+{
+  "contract_version": "1",
+  "match_id": "synthetic-acceptance-001",
+  "period": 1,
+  "clock_ms": 0,
+  "score": {
+    "team-aurora": 0,
+    "team-rio": 0
+  }
+}

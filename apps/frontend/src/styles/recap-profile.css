@@ -1,0 +1,66 @@
+/* Resumen final y perfil. Basado en el diseño de Figma de Persona 5. */
+/* Recap and profile */
+.recap-content > .match-score { max-width: 650px; margin: auto 0 28px; color: var(--navy); background: white; border-color: var(--line); }
+.recap-hero { min-height: 350px; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; color: white; background: var(--navy); border-radius: 26px; overflow: hidden; }
+.recap-art { height: 100%; position: relative; display: grid; place-items: center; background: var(--violet); overflow: hidden; }
+.recap-art .player-illustration { width: 105%; margin: 0 0 -45% -20%; }
+.celebration-number { position: absolute; left: 10%; top: 5%; z-index: 0; color: var(--lime); font: 700 180px/1 "Space Grotesk"; opacity: .75; }
+.recap-hero > div:last-child { padding: 45px; }
+.recap-hero .section-kicker { color: var(--lime); }
+.recap-hero h2 { margin: 12px 0; font-size: clamp(30px, 4vw, 48px); letter-spacing: -.05em; }
+.recap-hero p { color: #c7c3d3; line-height: 1.65; }
+.personal-note { padding: 7px 10px; display: inline-block; color: var(--lime); background: rgba(216,255,101,.1); border-radius: 7px; font-size: 10px; }
+.recap-moments { margin-top: 35px; }
+.recap-list { display: grid; gap: 10px; }
+.recap-list button { min-height: 84px; padding: 14px 20px; display: grid; grid-template-columns: 40px 50px 1fr auto; gap: 14px; align-items: center; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 16px; text-align: left; transition: transform 180ms, border 180ms; }
+.recap-list button:hover { transform: translateX(5px); border-color: var(--violet); }
+.moment-number { width: 36px; height: 36px; display: grid; place-items: center; color: white; background: var(--violet); border-radius: 50%; font-weight: 800; }
+.moment-time { color: var(--violet); font-weight: 800; }
+.recap-list strong, .recap-list small { display: block; }
+.recap-list small { margin-top: 4px; color: var(--muted); }
+.profile-content { max-width: 980px; }
+.profile-card { padding: 32px; background: white; border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); }
+.profile-intro { display: flex; align-items: center; gap: 14px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.profile-intro > span { width: 58px; height: 58px; }
+.profile-intro h2, .profile-intro p { margin: 0; }
+.profile-intro p { color: var(--muted); font-size: 13px; }
+.preference-summary { margin-top: 22px; padding: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--navy); border-radius: 16px; }
+.preference-summary span { padding: 0 12px; border-right: 1px solid rgba(255,255,255,.13); }
+.preference-summary span:last-child { border: 0; }
+.preference-summary small, .preference-summary strong { display: block; }
+.preference-summary small { margin-bottom: 4px; color: #aaa5bd; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+.preference-summary strong { color: white; font-size: 13px; }
+.preference-block { margin-top: 28px; }
+.preference-block h3 { font-size: 18px; }
+.language-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.language-options button { min-height: 58px; padding: 8px 14px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.language-options button.selected, .player-options button.selected { border: 2px solid var(--violet); background: #f1ebff; }
+.language-options button > span { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--violet); border-radius: 10px; font-size: 11px; font-weight: 800; }
+.language-options button > .icon, .player-options button > .icon { color: var(--violet); }
+.compact-grid .team-select { min-height: 110px; }
+.profile-club-logo { width: 52px; height: 52px; object-fit: contain; }
+.player-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.player-options button { padding: 12px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 11px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.player-options button > span { width: 40px; height: 40px; display: grid; place-items: center; color: var(--navy); background: var(--lime); border-radius: 50%; font-weight: 800; font-size: 11px; }
+.player-options button > img { width: 42px; height: 42px; object-fit: cover; object-position: center top; border-radius: 11px; }
+.player-options strong, .player-options small { display: block; }
+.player-options small { color: var(--muted); font-size: 10px; }
+.profile-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.profile-modes button { padding: 16px; display: flex; gap: 12px; align-items: center; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.profile-modes button.selected { border: 2px solid var(--violet); background: #f1ebff; }
+.profile-modes .icon { color: var(--violet); }
+.profile-modes strong, .profile-modes small { display: block; }
+.profile-modes small { color: var(--muted); font-size: 10px; }
+.save-row { margin-top: 32px; display: flex; gap: 12px; }
+.experience-grid { margin-bottom: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.experience-panel { min-height: 150px; padding: 18px; background: var(--surface, white); border: 1px solid var(--line); border-radius: 18px; }
+.experience-panel h2 { margin: 0 0 12px; font-size: 16px; }
+.experience-panel p { color: var(--muted); font-size: 12px; }
+.experience-panel button { width: 100%; padding: 10px 0; display: grid; grid-template-columns: 1fr auto; color: var(--navy); background: transparent; border-top: 1px solid var(--line); text-align: left; }
+.experience-panel button strong, .experience-panel button small { display: block; grid-column: 1; }
+.experience-panel button small { color: var(--muted); font-size: 10px; }
+.experience-panel button .icon { grid-column: 2; grid-row: 1 / 3; align-self: center; }
+.analyst-comments-toggle { width: 100%; margin-top: 12px; padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.analyst-comments-toggle.selected { border: 2px solid var(--violet); background: #f1ebff; }
+.analyst-comments-toggle strong, .analyst-comments-toggle small { display: block; }
+.analyst-comments-toggle small { margin-top: 3px; color: var(--muted); }

@@ -233,3 +233,9 @@ Suite completa:
 6. Exportar predicciones al contrato documentado.
 7. Ejecutar el evaluador y revisar cada falso positivo y omisión.
 8. Acordar umbrales y decidir si alguno queda como candidato para la demo.
+
+## Ampliación del contrato de observaciones · 18 de octubre de 2026
+
+Se añadió `domain/vision.py` con dos contratos estrictos y separados. `SoccerNetActionRecord` conserva fotograma, tiempo de partido, tiempo de vídeo, tipo de evento, equipo con posesión, color de camiseta, jugador opcional, posición del balón y confianza. `RoboflowDetectionRecord` conserva clase, confianza, caja limitadora, `track_id`, equipo, color, identidad opcional, posición de campo y retraso de procesamiento.
+
+`tests/test_vision_records.py` verifica ambos registros y el rechazo de una caja limitadora inválida. Esto completa el modelo local de entrada, pero no cambia el estado general de DV-US-11: no se ejecutó SoccerNet ni Roboflow Sports y no existe evidencia sobre vídeo real.

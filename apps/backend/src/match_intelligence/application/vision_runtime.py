@@ -52,28 +52,32 @@ class VisionObservationRuntime:
         self.publisher: VisionObservationPublisher | None = None
         self.consumer: VisionObservationConsumer | None = None
         self._consumer_task: asyncio.Task[None] | None = None
+        self._start_lock = asyncio.Lock()
 
     async def start(self) -> None:
         if self.settings.transport == "memory":
             return
-        assert self.settings.namespace is not None
-        self.publisher = VisionObservationPublisher.from_default_credential(
-            fully_qualified_namespace=self.settings.namespace,
-            eventhub_name=self.settings.eventhub_name,
-        )
-        self.consumer = VisionObservationConsumer.from_default_credential(
-            fully_qualified_namespace=self.settings.namespace,
-            eventhub_name=self.settings.eventhub_name,
-            consumer_group=self.settings.consumer_group,
-            handler=self.hub.publish,
-        )
-        self._consumer_task = asyncio.create_task(self.consumer.receive())
+        async with self._start_lock:
+            if self.publisher is not None:
+                return
+            assert self.settings.namespace is not None
+            self.publisher = VisionObservationPublisher.from_default_credential(
+                fully_qualified_namespace=self.settings.namespace,
+                eventhub_name=self.settings.eventhub_name,
+            )
+            self.consumer = VisionObservationConsumer.from_default_credential(
+                fully_qualified_namespace=self.settings.namespace,
+                eventhub_name=self.settings.eventhub_name,
+                consumer_group=self.settings.consumer_group,
+                handler=self.hub.publish,
+            )
+            self._consumer_task = asyncio.create_task(self.consumer.receive())
 
     async def publish(self, observation: LiveObservation) -> bool:
         if self.settings.transport == "memory":
             return await self.hub.publish(observation)
-        if self.publisher is None:
-            raise RuntimeError("El transporte Azure no fue iniciado")
+        await self.start()
+        assert self.publisher is not None
         await self.publisher.publish(observation)
         return True
 
@@ -87,8 +91,8 @@ class VisionObservationRuntime:
             for observation in observations:
                 accepted += int(await self.hub.publish(observation))
             return accepted
-        if self.publisher is None:
-            raise RuntimeError("El transporte Azure no fue iniciado")
+        await self.start()
+        assert self.publisher is not None
         await self.publisher.publish_many(observations)
         return len(observations)
 

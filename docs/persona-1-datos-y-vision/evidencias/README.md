@@ -28,6 +28,7 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 | DV-US-20 · Ejecutar SoccerNet | Verificada experimentalmente en CPU y GPU; calidad pendiente de anotación manual | [DV-US-20](DV-US-20.md) |
 | DV-US-21 · Calibrar identidad y fusión | Verificada experimentalmente; un candidato sin identidad y ningún evento publicado | [DV-US-21](DV-US-21.md) |
 | DV-US-22 · Ejecutar el ensayo de aceptación integrado | Verificada en integración; recorrido local, Azure, vídeo, modelos, fusión y fallo controlado comprobados | [DV-US-22](DV-US-22.md) |
+| DV-US-28 · Integrar visión con la aplicación oficial | Implementada en rama de integración; frontend y pruebas aisladas verificados | [DV-US-28](DV-US-28.md) |
 | DV-US-23 · Integrar el pipeline en el backend oficial | Backend y API HTTP verificados en un recorrido consolidado; Compose y frontend fuera de esta prueba | [DV-US-23](DV-US-23.md) |
 | DV-US-24 · Transportar observaciones durante la transmisión | Verificada localmente; canal Azure desplegado y prueba de datos pendiente con identidad autorizada | [DV-US-24](DV-US-24.md) |
 | DV-US-25 · Controlar observaciones con la reproducción | Verificada localmente; recorrido visual con Compose pendiente | [DV-US-25](DV-US-25.md) |

@@ -1,0 +1,714 @@
+<title>Sala de análisis Mentox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Diseño: mesa de análisis de transmisión. Campo a la izquierda como pieza central,
+   flujo de momentos a la derecha; el resto, instrumentos discretos. */
+:root {
+  --bg: #f3f5f2;
+  --surface: #fcfcfb;
+  --surface-2: #edf0ec;
+  --fg: #141a17;
+  --fg-2: #4a534e;
+  --muted: #7c8681;
+  --line: #dde2db;
+  --axis: #c1c9c1;
+  --home: #eb6834;
+  --away: #2a78d6;
+  --chaos: #1baf7a;
+  --pitch: #e2ebdf;
+  --pitch-line: #ffffff;
+  --ring: #fcfcfb;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --idle: #9aa39e;
+  --neg: #b4473f;
+  --focus: #141a17;
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1110; --surface: #171a19; --surface-2: #1f2321; --fg: #eef2ee; --fg-2: #b6c0ba;
+    --muted: #87918b; --line: #2a302c; --axis: #3b423e; --home: #d95926; --away: #3987e5;
+    --chaos: #199e70; --pitch: #15211a; --pitch-line: #3a5244; --ring: #171a19; --neg: #e07068;
+    --focus: #eef2ee; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1110; --surface: #171a19; --surface-2: #1f2321; --fg: #eef2ee; --fg-2: #b6c0ba;
+  --muted: #87918b; --line: #2a302c; --axis: #3b423e; --home: #d95926; --away: #3987e5;
+  --chaos: #199e70; --pitch: #15211a; --pitch-line: #3a5244; --ring: #171a19; --neg: #e07068;
+  --focus: #eef2ee; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.45; }
+.app { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 40px; display: grid; gap: 14px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+.label { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .08em; font-size: 13px; font-weight: 600; color: var(--fg-2); }
+.muted { color: var(--muted); }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Cabecera */
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.brand { display: grid; gap: 2px; min-width: 0; }
+.brand h1 { font-family: var(--font-display); font-weight: 700; font-size: 28px; letter-spacing: .01em; }
+.brand p { margin: 0; color: var(--fg-2); }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 6px 10px; cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.select { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 6px 8px; }
+
+/* Marcador y reproducción */
+.board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: grid; gap: 10px; }
+.score { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+.teams { display: flex; align-items: center; gap: 14px; font-family: var(--font-display); }
+.team { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 600; }
+.chip { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.chip.home { background: var(--home); } .chip.away { background: var(--away); }
+.goals { font-size: 40px; font-weight: 700; line-height: 1; min-width: 1.6ch; text-align: center; }
+.clock { font-family: var(--font-display); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.poss { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--fg-2); }
+.transport { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.play { border: 1px solid var(--fg); background: var(--fg); color: var(--bg); border-radius: 8px; padding: 6px 14px; cursor: pointer; font-weight: 600; }
+.ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+#scrub { flex: 1 1 260px; min-width: 0; accent-color: var(--fg); }
+
+/* Rejilla principal */
+.grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.col { display: grid; gap: 14px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; margin-bottom: 10px; }
+.card-head h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+.tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--fg-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.tag.sim::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+.tag.real::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+@media (max-width: 980px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Campo */
+.pitch-wrap { width: 100%; max-width: 100%; }
+#pitch { width: 100%; height: auto; display: block; border-radius: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; color: var(--fg-2); font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Indicadores */
+.ind { display: grid; gap: 12px; }
+.ind-row { display: grid; grid-template-columns: 136px minmax(0, 1fr) 92px; gap: 10px; align-items: center; }
+.ind-name { display: grid; gap: 0; }
+.ind-name b { font-weight: 600; }
+.ind-name small { color: var(--muted); font-size: 11px; }
+.split { display: flex; gap: 2px; height: 12px; }
+.split div { height: 100%; }
+.split .h { background: var(--home); border-radius: 4px 0 0 4px; }
+.split .a { background: var(--away); border-radius: 0 4px 4px 0; }
+.split.na div { background: var(--surface-2); }
+.meter { position: relative; height: 12px; background: var(--surface-2); border-radius: 4px; }
+.meter .fill { position: absolute; inset: 0 auto 0 0; background: var(--chaos); border-radius: 4px; }
+.meter .tick { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--fg-2); }
+.ind-val { text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; }
+.charts { display: grid; gap: 2px; margin-top: 14px; }
+.chart-title { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; font-size: 12px; color: var(--fg-2); }
+.chart-title span { display: inline-flex; align-items: center; gap: 6px; }
+.key { width: 14px; height: 2px; display: inline-block; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.tip { position: fixed; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 5; max-width: 260px; }
+
+/* Tablas */
+.tables { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; }
+@media (max-width: 640px) { .tables { grid-template-columns: minmax(0, 1fr); } .ind-row { grid-template-columns: 96px minmax(0, 1fr) 76px; } }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+th { font-weight: 500; color: var(--fg-2); font-size: 12px; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+
+/* Momentos */
+.feed-tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; color: var(--fg-2); font-size: 12px; }
+.feed-tools label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 560px; overflow-y: auto; }
+.item { display: grid; gap: 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--surface); text-align: left; width: 100%; }
+.item[aria-current="true"] { border-color: var(--fg); }
+.item.discarded { opacity: .62; }
+.item-top { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.kind { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+.time { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.out { font-size: 11px; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--line); color: var(--fg-2); }
+.out.e { border-color: var(--good); }
+.headline { color: var(--fg-2); font-size: 13px; }
+.prio { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; align-items: center; }
+.prio-bar { position: relative; height: 6px; background: var(--surface-2); border-radius: 3px; }
+.prio-bar .fill { position: absolute; inset: 0 auto 0 0; background: var(--fg-2); border-radius: 3px; }
+.prio-bar .thr { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--fg); }
+.prio small { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-2); }
+.empty { color: var(--muted); padding: 10px 0; }
+
+/* Detalle */
+.detail h3 { font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+.detail section { display: grid; gap: 6px; margin-top: 12px; }
+.reasons { display: grid; gap: 4px; }
+.reason { display: grid; grid-template-columns: minmax(0, 1fr) 120px 36px; gap: 8px; align-items: center; font-size: 13px; }
+.reason .bar { height: 8px; position: relative; }
+.reason .bar i { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.reason .pos { background: var(--fg-2); left: 50%; }
+.reason .neg { background: var(--neg); right: 50%; }
+.reason .axis { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.reason b { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.reason small { display: block; color: var(--muted); font-size: 11px; }
+.origin { font-size: 11px; border-radius: 4px; padding: 0 6px; border: 1px solid var(--line); white-space: nowrap; color: var(--fg-2); }
+.origin.team_indicator { border-color: var(--chaos); }
+.limits { margin: 0; padding-left: 18px; color: var(--fg-2); font-size: 13px; display: grid; gap: 4px; }
+.sources { display: flex; flex-wrap: wrap; gap: 6px; }
+.src { font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; background: var(--surface); cursor: default; }
+.mocknote { font-size: 12px; color: var(--muted); }
+
+/* Perfiles y estado */
+.profiles { display: grid; gap: 8px; }
+.prow { display: grid; grid-template-columns: 190px minmax(0, 1fr) 96px; gap: 10px; align-items: center; font-size: 13px; }
+.prow.sel { font-weight: 600; }
+.pbar { display: flex; gap: 2px; height: 14px; }
+.pbar .e { background: var(--fg); border-radius: 4px 0 0 4px; }
+.pbar .d { background: var(--axis); border-radius: 0 4px 4px 0; }
+@media (max-width: 640px) { .prow { grid-template-columns: 1fr; gap: 4px; } }
+.stages { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.stage { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px; align-content: start; }
+.stage b { font-weight: 600; }
+.stage p { margin: 0; color: var(--fg-2); font-size: 13px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; }
+.status i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.status.done i { background: var(--good); }
+.status.sim i { background: var(--warn); }
+.status.todo i { background: transparent; border: 2px solid var(--idle); }
+footer { color: var(--muted); font-size: 12px; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Sala de análisis Mentox</h1>
+      <p>Aurora FC contra Río Unido · escenario sintético de 178 eventos procesado por el motor de estado y analítica (Persona 2)</p>
+    </div>
+    <div class="controls">
+      <span class="label" id="profile-label">Perfil del espectador</span>
+      <select class="select" id="profile" aria-labelledby="profile-label"></select>
+    </div>
+  </header>
+
+  <section class="board" aria-label="Marcador y reproducción">
+    <div class="score">
+      <div class="teams">
+        <span class="team"><i class="chip home"></i><span id="home-name"></span></span>
+        <span class="goals" id="home-goals">0</span>
+        <span class="goals muted">–</span>
+        <span class="goals" id="away-goals">0</span>
+        <span class="team"><span id="away-name"></span><i class="chip away"></i></span>
+      </div>
+      <span class="clock" id="clock">P1 00:00</span>
+      <span class="poss" id="poss">Sin posesión</span>
+    </div>
+    <div class="transport">
+      <button class="play" id="play" type="button">Reproducir</button>
+      <button class="ghost" id="back" type="button" aria-label="Retroceder 10 segundos">−10 s</button>
+      <button class="ghost" id="fwd" type="button" aria-label="Avanzar 10 segundos">+10 s</button>
+      <div class="seg" role="group" aria-label="Velocidad" id="speeds"></div>
+      <input type="range" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Tiempo del partido">
+    </div>
+  </section>
+
+  <main class="grid">
+    <div class="col">
+      <section class="card">
+        <div class="card-head">
+          <h2>Campo</h2>
+          <span class="tag sim">Posiciones de seguimiento simuladas a 5 Hz</span>
+        </div>
+        <div class="pitch-wrap"><svg id="pitch" viewBox="-3 -3 111 74" role="img" aria-label="Campo con jugadores, balón y últimos eventos"></svg></div>
+        <div class="legend">
+          <span><i class="chip home"></i>Aurora FC</span>
+          <span><i class="chip away"></i>Río Unido</span>
+          <span><svg width="16" height="10" aria-hidden="true"><line x1="1" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="2"/></svg>Últimos pases y tiros</span>
+          <span><svg width="12" height="12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" fill="none" stroke="currentColor" stroke-width="2" transform="rotate(45 6 6)"/></svg>Acción defensiva</span>
+          <span>Al elegir un momento se marcan sus eventos de origen</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Ritmo del partido</h2>
+          <span class="tag real">Calculado desde los eventos</span>
+        </div>
+        <div class="ind" id="indicators"></div>
+        <div class="charts" id="charts"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <h2>Cifras en este instante</h2>
+          <span class="muted" style="font-size:12px">Cada cifra se recalcula desde sus eventos o su seguimiento</span>
+        </div>
+        <div class="tables">
+          <div class="scroll"><table id="stats" aria-label="Estadísticas por equipo"></table></div>
+          <div class="scroll"><table id="tracking" aria-label="Seguimiento por jugador"></table></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <div class="card-head">
+          <h2>Momentos</h2>
+          <span class="tag real" id="feed-count">Motor de atención</span>
+        </div>
+        <div class="feed-tools">
+          <label><input type="checkbox" id="show-discarded"> Mostrar descartados</label>
+          <label><input type="checkbox" id="show-alerts" checked> Avisos de seguimiento</label>
+        </div>
+        <ul class="feed" id="feed" aria-live="polite" style="margin-top:8px"></ul>
+      </section>
+      <section class="card detail" id="detail" aria-live="polite"></section>
+    </div>
+  </main>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>El mismo partido para cada espectador</h2>
+      <span class="muted" style="font-size:12px">Momentos emitidos y descartados en todo el partido; los hechos son iguales en todos los perfiles</span>
+    </div>
+    <div class="profiles" id="profiles"></div>
+    <div class="legend"><span><i class="chip" style="background:var(--fg)"></i>Emitidos</span><span><i class="chip" style="background:var(--axis)"></i>Descartados</span></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Qué está listo</h2>
+      <span class="muted" style="font-size:12px">Estado del flujo de cinco etapas del reto</span>
+    </div>
+    <div class="stages" id="stages"></div>
+  </section>
+
+  <footer>
+    <span id="provenance"></span>
+    <span>Todos los equipos, jugadores y eventos son sintéticos. No se usan datos de partidos de la Premier League.</span>
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script id="datos" type="application/json">__DATOS__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("datos").textContent);
+  const M = D.match;
+  const LEN = M.length, WID = M.width;
+  const TEAM = M.teams;
+  const NS = "http://www.w3.org/2000/svg";
+  const $ = id => document.getElementById(id);
+
+  // Tiempo global continuo entre períodos.
+  const OFF = {}; let acc = 0;
+  for (const [p, end] of M.periods) { OFF[p] = acc; acc += end + 1000; }
+  const TOTAL = acc - 1000;
+  const G = (p, c) => OFF[p] + c;
+  const local = tg => { let r = [M.periods[0][0], 0]; for (const [p, end] of M.periods) if (tg >= OFF[p]) r = [p, Math.min(end, tg - OFF[p])]; return r; };
+  const mmss = ms => { const s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+  const at = (p, c) => `P${p} ${mmss(c)}`;
+  const num = (v, d = 0) => v === null || v === undefined ? "—" : Number(v).toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const E = D.events.map(e => ({ id: e[0], p: e[1], c: e[2], type: e[3], team: e[4], player: e[5], out: e[6], sx: e[7], sy: e[8], ex: e[9], ey: e[10], g: G(e[1], e[2]) }));
+  const EV = new Map(E.map(e => [e.id, e]));
+  const lastIndex = (arr, tg) => { let lo = 0, hi = arr.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m].g <= tg) { r = m; lo = m + 1; } else hi = m - 1; } return r; };
+  const name = pid => pid && M.players[pid] ? M.players[pid][0] : (pid || "sin identificar");
+  const teamName = i => i === null || i === undefined ? "el partido" : TEAM[i].name;
+  const teamVar = i => i === 0 ? "var(--home)" : i === 1 ? "var(--away)" : "var(--muted)";
+
+  // Seguimiento.
+  const TR = D.tracking;
+  const TF = TR.frames.map(f => ({ p: f[0], c: f[1], g: G(f[0], f[1]), pos: new Map(f[2].map(o => [o[0], [o[1], o[2]]])) }));
+  const tracks = TR.tracks.map(t => ({ id: t[0], kind: t[1], team: t[2], player: t[3] }));
+
+  const KIND = { goal: "Gol", shot: "Tiro", recovery_to_shot: "Recuperación y tiro", fast_progression: "Progresión rápida", sustained_pressure: "Presión sostenida", control_shift: "Cambio de control", chaos_phase: "Fase de caos", player_milestone: "Hito de jugador", high_recovery: "Recuperación alta", progressive_pass: "Pase progresivo", speed_record: "Récord de velocidad", distance_milestone: "Distancia recorrida" };
+  const REASON = { base_kind: "Tipo de momento", measured_fact: "Hecho medido", combined_signals: "Varias reglas a la vez", novelty: "Novedad", repetition: "Repetición reciente", favorite_team: "Club favorito", favorite_player: "Jugador favorito", analyst_mode: "Modo analista", casual_mode: "Modo casual", player_mode_involved: "Modo jugador: participa", player_mode_not_involved: "Modo jugador: no participa", decisive_fact: "Hecho decisivo", below_threshold: "Debajo del umbral" };
+  const FACT = { goals: "Goles", shots: "Tiros del jugador", shots_on_target: "Tiros a puerta", shot_distance_m: "Distancia del tiro", shot_angle_deg: "Ángulo de tiro", sequence_passes: "Pases de la jugada", sequence_duration_s: "Duración de la jugada", forward_progress: "Avance en x′", forward_progress_m: "Avance", seconds_since_recovery: "Desde la recuperación", defensive_actions_opponent_half: "Acciones defensivas en campo rival", ball_wins_opponent_half: "Balones ganados en campo rival", pass_accuracy: "Precisión de pase del rival", control_index: "Índice de control", chaos_index: "Índice de caos", momentum_index: "Índice de impulso", passes_completed: "Pases completados", progressive_passes: "Pases progresivos", recoveries: "Recuperaciones", tackles_won: "Entradas ganadas", match_longest_pass_m: "Pase más largo del partido", high_recoveries: "Recuperaciones altas", pass_forward_gain_m: "Avance del pase", pass_distance_m: "Distancia del pase" };
+  const UNIT = { count: "", percent: " %", meters: " m", seconds: " s", degrees: "°", pitch_percent: " % del largo", index_0_100: " /100", "km/h": " km/h" };
+  const ORIGIN = { event_count: "Conteo", derived: "Cálculo", team_indicator: "Indicador propio", value_model: "Modelo" };
+
+  const state = { tg: 0, playing: false, speed: 4, profile: D.profiles[0].key, selected: null, showDiscarded: false, showAlerts: true, last: null };
+
+  // ---------- Perfiles ----------
+  const PROF = new Map(D.profiles.map(p => [p.key, p]));
+  for (const p of D.profiles) { const o = document.createElement("option"); o.value = p.key; o.textContent = p.label; $("profile").appendChild(o); }
+
+  // ---------- Narración simulada (Persona 3 produce la real) ----------
+  const factOf = (m, key, team) => m.facts.find(f => f[0] === key && (team === undefined || f[1] === team));
+  function headline(id, m) {
+    const team = m.team !== null ? TEAM[m.team] : null;
+    const who = name(m.players[0]);
+    const f = k => factOf(m, k);
+    const anchor = EV.get(m.anchor);
+    switch (m.kind) {
+      case "goal": {
+        const h = factOf(m, "goals", TEAM[0].id), a = factOf(m, "goals", TEAM[1].id);
+        let s = `Gol de ${team.name}: marca ${name(anchor.player)}, ${h ? h[3] : "?"}-${a ? a[3] : "?"}.`;
+        const r = f("seconds_since_recovery"); if (r) s += ` Llegó ${num(r[3], 0)} s después de recuperar el balón.`;
+        return s;
+      }
+      case "shot": { const d = f("shot_distance_m"); const out = { saved: "atajado", blocked: "bloqueado", off_target: "desviado" }[anchor.out] || ""; return `Tiro ${out} de ${name(anchor.player)}${d ? ` desde ${num(d[3], 0)} m` : ""}.`; }
+      case "fast_progression": { const pm = f("forward_progress_m"), s = f("sequence_duration_s"); return `${team.name} avanza ${num(pm[3], 0)} m en ${num(s[3], 0)} s hasta el último tercio.`; }
+      case "sustained_pressure": { const acts = m.facts.filter(x => x[0] === "defensive_actions_opponent_half"); const prev = acts[1]; return `${team.name} presiona arriba: ${acts[0][3]} acciones en campo rival en 90 s${prev ? ` (antes, ${prev[3]})` : ""}.`; }
+      case "control_shift": { const [now, before] = m.facts.filter(x => x[0] === "control_index"); return `El control pasa a ${team.name}: ${num(now[3], 0)} sobre 100, frente a ${num(before[3], 0)} en los 3 minutos anteriores.`; }
+      case "chaos_phase": return `Partido de idas y vueltas: índice de caos ${num(m.facts[0][3], 0)} en los últimos 3 minutos.`;
+      case "player_milestone": { const x = m.facts[0]; if (x[0] === "match_longest_pass_m") return `${name(x[2])} firma el pase más largo del partido: ${num(x[3], 0)} m.`; return `${name(x[2])} llega a ${x[3]} ${(FACT[x[0]] || x[0]).toLowerCase()}.`; }
+      case "high_recovery": return `${who} recupera el balón en campo rival.`;
+      case "progressive_pass": { const g = f("pass_forward_gain_m"); return `${who} adelanta el balón ${num(g[3], 0)} m con un pase.`; }
+      default: return KIND[m.kind] || m.kind;
+    }
+  }
+
+  // ---------- Campo ----------
+  const pitch = $("pitch");
+  const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  (function drawPitch() {
+    const lines = { fill: "none", stroke: "var(--pitch-line)", "stroke-width": 0.35 };
+    el("rect", { x: -3, y: -3, width: 111, height: 74, rx: 2, fill: "var(--pitch)" }, pitch);
+    el("rect", { x: 0, y: 0, width: LEN, height: WID, ...lines }, pitch);
+    el("line", { x1: LEN / 2, y1: 0, x2: LEN / 2, y2: WID, ...lines }, pitch);
+    el("circle", { cx: LEN / 2, cy: WID / 2, r: 9.15, ...lines }, pitch);
+    el("circle", { cx: LEN / 2, cy: WID / 2, r: 0.4, fill: "var(--pitch-line)" }, pitch);
+    for (const side of [0, 1]) {
+      const x = side ? LEN : 0, dir = side ? -1 : 1;
+      el("rect", { x: side ? LEN - 16.5 : 0, y: WID / 2 - 20.16, width: 16.5, height: 40.32, ...lines }, pitch);
+      el("rect", { x: side ? LEN - 5.5 : 0, y: WID / 2 - 9.16, width: 5.5, height: 18.32, ...lines }, pitch);
+      el("circle", { cx: x + dir * 11, cy: WID / 2, r: 0.4, fill: "var(--pitch-line)" }, pitch);
+      el("rect", { x: side ? LEN : -1.6, y: WID / 2 - 3.66, width: 1.6, height: 7.32, ...lines }, pitch);
+    }
+  })();
+  const layerEvents = el("g", {}, pitch), layerSources = el("g", {}, pitch), layerTrack = el("g", {}, pitch);
+  const marker = el("defs", {}, pitch);
+  for (const [id, color] of [["ah-0", "var(--home)"], ["ah-1", "var(--away)"], ["ah-s", "var(--fg)"]]) {
+    const mk = el("marker", { id, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 4, markerHeight: 4, orient: "auto-start-reverse" }, marker);
+    el("path", { d: "M0,0 L10,5 L0,10 z", fill: color }, mk);
+  }
+  const PX = x => x * LEN / 100, PY = y => y * WID / 100;
+  function drawEvent(e, layer, strong) {
+    const color = strong ? "var(--fg)" : teamVar(e.team);
+    if (e.sx === null) return;
+    const x = PX(e.sx), y = PY(e.sy);
+    if ((e.type === "pass" || e.type === "shot") && e.ex !== null) {
+      el("line", { x1: x, y1: y, x2: PX(e.ex), y2: PY(e.ey), stroke: color, "stroke-width": strong ? 0.7 : 0.5, "stroke-linecap": "round", "marker-end": `url(#${strong ? "ah-s" : "ah-" + e.team})`, opacity: e.out === "failure" ? 0.55 : 1 }, layer);
+    } else {
+      el("rect", { x: x - 0.9, y: y - 0.9, width: 1.8, height: 1.8, fill: "none", stroke: color, "stroke-width": strong ? 0.5 : 0.35, transform: `rotate(45 ${x} ${y})` }, layer);
+    }
+  }
+  function frameIndex(tg) { let lo = 0, hi = TF.length - 1, r = 0; while (lo <= hi) { const m = (lo + hi) >> 1; if (TF[m].g <= tg) { r = m; lo = m + 1; } else hi = m - 1; } return r; }
+  function positions(tg) {
+    const i = frameIndex(tg), a = TF[i], b = TF[i + 1];
+    if (!b || b.p !== a.p || tg <= a.g) return a.pos;
+    const t = Math.min(1, (tg - a.g) / (b.g - a.g)), out = new Map();
+    for (const [k, [x, y]] of a.pos) { const q = b.pos.get(k); out.set(k, q ? [x + (q[0] - x) * t, y + (q[1] - y) * t] : [x, y]); }
+    return out;
+  }
+  function renderPitch() {
+    const [p] = local(state.tg);
+    layerEvents.replaceChildren(); layerSources.replaceChildren(); layerTrack.replaceChildren();
+    const idx = lastIndex(E, state.tg);
+    const recent = E.slice(Math.max(0, idx - 5), idx + 1).filter(e => e.p === p);
+    recent.forEach((e, n) => { const g = el("g", { opacity: 0.35 + 0.65 * (n + 1) / recent.length }, layerEvents); drawEvent(e, g, false); });
+    if (state.selected && D.moments[state.selected]) for (const sid of D.moments[state.selected].sources) { const e = EV.get(sid); if (e && e.p === p) drawEvent(e, layerSources, true); }
+    const pos = positions(state.tg);
+    tracks.forEach((t, i) => {
+      const xy = pos.get(i); if (!xy) return;
+      const [x, y] = xy;
+      if (t.kind === "ball") { el("circle", { cx: x, cy: y, r: 0.85, fill: "var(--fg)", stroke: "var(--ring)", "stroke-width": 0.35 }, layerTrack); return; }
+      if (t.kind === "referee") { el("circle", { cx: x, cy: y, r: 0.9, fill: "var(--idle)", stroke: "var(--ring)", "stroke-width": 0.35 }, layerTrack); return; }
+      const g = el("g", {}, layerTrack);
+      el("circle", { cx: x, cy: y, r: 1.55, fill: teamVar(t.team), stroke: "var(--ring)", "stroke-width": 0.4 }, g);
+      const number = t.player && M.players[t.player] ? M.players[t.player][1] : "";
+      const label = el("text", { x, y: y + 0.55, "text-anchor": "middle", "font-size": 1.55, "font-family": "var(--font-display)", "font-weight": 700, fill: "#ffffff" }, g);
+      label.textContent = number;
+      const title = el("title", {}, g); title.textContent = `${name(t.player)} · ${TEAM[t.team].name}`;
+    });
+  }
+
+  // ---------- Indicadores y gráficos ----------
+  const TL = D.timeline;
+  function row() { const i = lastIndex(E, state.tg); return i < 0 ? null : TL[i]; }
+  function renderIndicators() {
+    const r = row();
+    const box = $("indicators"); box.replaceChildren();
+    const add = (title, sub, bar, value) => {
+      const d = document.createElement("div"); d.className = "ind-row";
+      d.innerHTML = `<div class="ind-name"><b>${title}</b><small>${sub}</small></div>`;
+      d.appendChild(bar);
+      const v = document.createElement("div"); v.className = "ind-val"; v.textContent = value; d.appendChild(v);
+      box.appendChild(d);
+    };
+    const split = v => { const s = document.createElement("div"); if (v === null || v === undefined) { s.className = "split na"; s.innerHTML = `<div style="width:100%;border-radius:4px"></div>`; return s; } s.className = "split"; s.innerHTML = `<div class="h" style="width:${v}%"></div><div class="a" style="width:${100 - v}%"></div>`; s.setAttribute("role", "img"); s.setAttribute("aria-label", `Aurora ${num(v, 1)}, Río ${num(100 - v, 1)}`); return s; };
+    const ctrl = r ? r[3] : null, mom = r ? r[4] : null, chaos = r ? r[5] : null;
+    add("Control", "indicador propio · 3 min", split(ctrl), ctrl === null ? "sin datos aún" : `${num(ctrl, 0)} · ${num(100 - ctrl, 0)}`);
+    add("Impulso", "indicador propio · semivida 2 min", split(mom), mom === null ? "sin datos aún" : `${num(mom, 0)} · ${num(100 - mom, 0)}`);
+    const m = document.createElement("div"); m.className = "meter"; m.setAttribute("role", "img");
+    m.setAttribute("aria-label", chaos === null ? "Caos sin datos" : `Caos ${num(chaos, 0)} de 100`);
+    m.innerHTML = `<div class="fill" style="width:${chaos ?? 0}%"></div><div class="tick" style="left:60%" title="Umbral de fase de caos: 60"></div>`;
+    add("Caos", "indicador propio · umbral 60", m, chaos === null ? "sin datos aún" : `${num(chaos, 0)} /100`);
+  }
+
+  const CH = { w: 640, h: 100, l: 30, r: 8, t: 8, b: 22 };
+  const xOf = tg => CH.l + (CH.w - CH.l - CH.r) * tg / TOTAL;
+  const yOf = v => CH.t + (CH.h - CH.t - CH.b) * (1 - v / 100);
+  const charts = [];
+  function buildChart(title, keyColor, keyText, getter, refs) {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `<div class="chart-title"><span><i class="key" style="background:${keyColor}"></i>${keyText}</span><span class="muted">${title}</span></div>`;
+    const svg = el("svg", { class: "chart", viewBox: `0 0 ${CH.w} ${CH.h}`, role: "img", "aria-label": keyText }, null);
+    wrap.appendChild(svg); $("charts").appendChild(wrap);
+    for (const v of [0, 50, 100]) {
+      el("line", { x1: CH.l, x2: CH.w - CH.r, y1: yOf(v), y2: yOf(v), stroke: v === 0 ? "var(--axis)" : "var(--line)", "stroke-width": 1 }, svg);
+      const t = el("text", { x: CH.l - 6, y: yOf(v) + 3.5, "text-anchor": "end", "font-size": 10, fill: "var(--muted)" }, svg); t.textContent = v;
+    }
+    for (const [v, label] of refs) {
+      el("line", { x1: CH.l, x2: CH.w - CH.r, y1: yOf(v), y2: yOf(v), stroke: "var(--fg-2)", "stroke-width": 1, opacity: .45 }, svg);
+      const t = el("text", { x: CH.w - CH.r, y: yOf(v) - 3, "text-anchor": "end", "font-size": 10, fill: "var(--fg-2)" }, svg); t.textContent = label;
+    }
+    for (const [p, end] of M.periods) {
+      for (let minute = 0; minute * 60000 <= end; minute += 2) {
+        const x = xOf(G(p, minute * 60000));
+        el("line", { x1: x, x2: x, y1: CH.h - CH.b, y2: CH.h - CH.b + 3, stroke: "var(--axis)", "stroke-width": 1 }, svg);
+        if (minute % 4 === 0) { const t = el("text", { x, y: CH.h - 2, "text-anchor": "middle", "font-size": 9, fill: "var(--muted)" }, svg); t.textContent = `${minute}′`; }
+      }
+    }
+    if (M.periods.length > 1) { const x = xOf(OFF[M.periods[1][0]] - 500); el("line", { x1: x, x2: x, y1: CH.t, y2: CH.h - CH.b, stroke: "var(--axis)", "stroke-width": 1 }, svg); const t = el("text", { x: x + 4, y: CH.t + 9, "font-size": 10, fill: "var(--muted)" }, svg); t.textContent = "2.º período"; }
+    let d = "", prev = null;
+    E.forEach((e, i) => {
+      const v = getter(TL[i]);
+      if (v === null || v === undefined) { prev = null; return; }
+      const x = xOf(e.g), y = yOf(v);
+      d += prev === null ? `M${x.toFixed(1)},${y.toFixed(1)}` : `H${x.toFixed(1)}V${y.toFixed(1)}`;
+      prev = v;
+    });
+    el("path", { d, fill: "none", stroke: keyColor, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+    const marks = el("g", {}, svg);
+    const head = el("line", { y1: CH.t, y2: CH.h - CH.b, stroke: "var(--fg)", "stroke-width": 1 }, svg);
+    const dot = el("circle", { r: 4, fill: keyColor, stroke: "var(--surface)", "stroke-width": 2 }, svg);
+    const hit = el("rect", { x: CH.l, y: 0, width: CH.w - CH.l - CH.r, height: CH.h, fill: "transparent" }, svg);
+    hit.addEventListener("mousemove", ev => {
+      const box = svg.getBoundingClientRect();
+      const tg = Math.max(0, Math.min(TOTAL, (ev.clientX - box.left) / box.width * CH.w - CH.l) / (CH.w - CH.l - CH.r) * TOTAL);
+      const i = lastIndex(E, tg); const v = i < 0 ? null : getter(TL[i]); const [p, c] = local(tg);
+      showTip(ev, `<b>${at(p, c)}</b><br>${keyText}: ${v === null || v === undefined ? "sin datos" : num(v, 1)}`);
+    });
+    hit.addEventListener("mouseleave", hideTip);
+    hit.addEventListener("click", ev => { const box = svg.getBoundingClientRect(); seek(((ev.clientX - box.left) / box.width * CH.w - CH.l) / (CH.w - CH.l - CH.r) * TOTAL); });
+    charts.push({ head, dot, marks, getter, svg });
+  }
+  buildChart("Río = 100 − Aurora; 50 es equilibrio", "var(--home)", "Control de Aurora", r => r[3], [[50, "equilibrio"]]);
+  buildChart("Marcas arriba: momentos emitidos del perfil", "var(--chaos)", "Índice de caos", r => r[5], [[60, "umbral 60"]]);
+  function renderChartMarks() {
+    const prof = PROF.get(state.profile);
+    for (const c of charts) {
+      c.marks.replaceChildren();
+      for (const [cid, outc] of prof.decisions) {
+        if (outc !== "e") continue; const m = D.moments[cid]; if (!m) continue;
+        const x = xOf(G(m.period, m.clock));
+        el("line", { x1: x, x2: x, y1: CH.t, y2: CH.t + 5, stroke: teamVar(m.team), "stroke-width": 2 }, c.marks);
+      }
+    }
+  }
+  function renderPlayhead() {
+    const r = row();
+    for (const c of charts) {
+      const x = xOf(state.tg); c.head.setAttribute("x1", x); c.head.setAttribute("x2", x);
+      const v = r ? c.getter(r) : null;
+      if (v === null || v === undefined) c.dot.setAttribute("visibility", "hidden");
+      else { c.dot.setAttribute("visibility", "visible"); c.dot.setAttribute("cx", x); c.dot.setAttribute("cy", yOf(v)); }
+    }
+  }
+  const tip = $("tip");
+  function showTip(ev, html) { tip.innerHTML = html; tip.hidden = false; const x = Math.min(window.innerWidth - 270, ev.clientX + 12); tip.style.left = x + "px"; tip.style.top = (ev.clientY + 12) + "px"; }
+  function hideTip() { tip.hidden = true; }
+
+  // ---------- Tablas ----------
+  const SK = D.stat_keys, si = k => SK.indexOf(k);
+  function renderStats() {
+    const r = row();
+    const v = (team, key) => r ? r[6][team][si(key)] : (["pass_accuracy", "possession_share"].includes(key) ? null : 0);
+    const rows = [
+      ["Goles", t => num(v(t, "goals"))],
+      ["Tiros (a puerta)", t => `${num(v(t, "shots"))} (${num(v(t, "shots_on_target"))})`],
+      ["Pases completados", t => `${num(v(t, "passes_completed"))} de ${num(v(t, "passes_attempted"))}`],
+      ["Precisión de pase", t => v(t, "pass_accuracy") === null ? "no disponible" : `${num(v(t, "pass_accuracy"), 1)} %`],
+      ["Posesión por tiempo", t => v(t, "possession_share") === null ? "no disponible" : `${num(v(t, "possession_share"), 1)} %`],
+      ["Recuperaciones", t => num(v(t, "recoveries"))],
+      ["Presiones", t => num(v(t, "pressures"))],
+      ["Pases progresivos", t => num(v(t, "progressive_passes"))],
+      ["Entradas ganadas", t => num(v(t, "tackles_won"))],
+    ];
+    $("stats").innerHTML = `<thead><tr><th>Equipo</th><th class="n"><i class="chip home"></i> ${TEAM[0].short}</th><th class="n"><i class="chip away"></i> ${TEAM[1].short}</th></tr></thead><tbody>` +
+      rows.map(([label, f]) => `<tr><td>${label}</td><td class="n">${f(0)}</td><td class="n">${f(1)}</td></tr>`).join("") + "</tbody>";
+  }
+  function renderTracking() {
+    const i = frameIndex(state.tg);
+    const players = Object.keys(TR.series).map(pid => {
+      const s = TR.series[pid]; const cur = s[i]; let top = 0;
+      for (let k = 0; k <= i; k++) top = Math.max(top, s[k][1]);
+      return { pid, team: M.players[pid] ? M.players[pid][2] : null, dist: cur[0], speed: cur[1], top };
+    }).sort((a, b) => b.dist - a.dist);
+    const ball = TR.ball_speed[i] || 0;
+    $("tracking").innerHTML = `<thead><tr><th>Jugador</th><th class="n">Distancia</th><th class="n">Ahora</th><th class="n">Máx.</th></tr></thead><tbody>` +
+      players.map(p => `<tr><td><i class="chip ${p.team === 0 ? "home" : "away"}"></i> ${name(p.pid)}</td><td class="n">${num(p.dist)} m</td><td class="n">${num(p.speed, 1)}</td><td class="n">${num(p.top, 1)}</td></tr>`).join("") +
+      `<tr><td class="muted">Balón</td><td class="n muted">—</td><td class="n">${num(ball)}</td><td class="n muted">km/h</td></tr></tbody>` +
+      `<caption style="caption-side:bottom;text-align:left;padding-top:6px;font-size:11px;color:var(--muted)">Velocidades en km/h, media de ventanas de 1 s. Seguimiento simulado: valores de ejemplo.</caption>`;
+  }
+
+  // ---------- Momentos ----------
+  function visibleItems() {
+    const prof = PROF.get(state.profile);
+    const items = [];
+    for (const [cid, outc, prio, thr, reasons] of prof.decisions) {
+      const m = D.moments[cid]; if (!m) continue;
+      const g = G(m.period, m.clock); if (g > state.tg) continue;
+      if (outc === "d" && !state.showDiscarded) continue;
+      items.push({ type: "moment", cid, outc, prio, thr, reasons, m, g });
+    }
+    if (state.showAlerts) {
+      for (const a of TR.alerts) {
+        const [aid, kind, p, c, pid, team, value, unit] = a;
+        const g = G(p, c); if (g > state.tg) continue;
+        const prof2 = PROF.get(state.profile).profile;
+        const fav = (prof2.match(/player=([^;]+)/) || [])[1];
+        if (kind === "distance_milestone" && fav && pid !== fav) continue;
+        items.push({ type: "alert", aid, kind, p, c, pid, team, value, unit, g });
+      }
+    }
+    return items.sort((x, y) => y.g - x.g);
+  }
+  function renderFeed(force) {
+    const items = visibleItems();
+    const key = state.profile + "|" + items.length + "|" + state.showDiscarded + "|" + state.showAlerts + "|" + state.selected;
+    if (!force && key === state.last) return;
+    state.last = key;
+    const prof = PROF.get(state.profile);
+    const emitted = prof.decisions.filter(d => d[1] === "e" && G(D.moments[d[0]].period, D.moments[d[0]].clock) <= state.tg).length;
+    $("feed-count").textContent = `${emitted} momentos emitidos hasta ahora`;
+    const ul = $("feed"); ul.replaceChildren();
+    if (!items.length) { const li = document.createElement("li"); li.className = "empty"; li.textContent = "Todavía no hay momentos. Reproduzca o adelante el partido."; ul.appendChild(li); return; }
+    for (const it of items) {
+      const li = document.createElement("li");
+      const b = document.createElement("button"); b.type = "button"; b.className = "item";
+      if (it.type === "moment") {
+        if (it.outc === "d") b.classList.add("discarded");
+        if (state.selected === it.cid) b.setAttribute("aria-current", "true");
+        const tm = it.m.team;
+        b.innerHTML = `<div class="item-top"><span class="kind">${KIND[it.m.kind] || it.m.kind}</span>${tm !== null ? `<i class="chip ${tm === 0 ? "home" : "away"}" title="${TEAM[tm].name}"></i>` : ""}<span class="time">${at(it.m.period, it.m.clock)}</span><span class="out ${it.outc}">${it.outc === "e" ? "✓ Emitido" : "✕ Descartado"}</span></div>
+          <div class="headline">${headline(it.cid, it.m)}</div>
+          <div class="prio"><div class="prio-bar" role="img" aria-label="Prioridad ${it.prio} de 100, umbral ${it.thr}"><div class="fill" style="width:${it.prio}%"></div><div class="thr" style="left:calc(${it.thr}% - 1px)"></div></div><small>${it.prio}/100</small></div>`;
+        b.addEventListener("click", () => { state.selected = it.cid; renderDetail(); renderFeed(true); renderPitch(); });
+      } else {
+        const unitText = it.unit === "meters" ? " m" : " km/h";
+        b.innerHTML = `<div class="item-top"><span class="kind">${KIND[it.kind]}</span>${it.team ? `<i class="chip ${it.team === TEAM[0].id ? "home" : "away"}"></i>` : ""}<span class="time">${at(it.p, it.c)}</span><span class="out">Aviso por umbral · simulado</span></div>
+          <div class="headline">${it.kind === "speed_record" ? `${name(it.pid)} marca la velocidad más alta del partido: ${num(it.value, 1)}${unitText}.` : `${name(it.pid)} supera los ${num(it.value)}${unitText} recorridos.`}</div>`;
+        b.addEventListener("click", () => { state.selected = null; renderDetailAlert(it); renderFeed(true); renderPitch(); });
+      }
+      li.appendChild(b); ul.appendChild(li);
+    }
+  }
+  function decisionOf(cid) { return PROF.get(state.profile).decisions.find(d => d[0] === cid); }
+  function renderDetail() {
+    const box = $("detail");
+    if (!state.selected) { box.innerHTML = `<h3>Elija un momento</h3><p class="muted">Verá por qué se emitió o descartó, sus cifras con la fórmula y los eventos que lo sostienen.</p>`; return; }
+    const m = D.moments[state.selected], d = decisionOf(state.selected);
+    if (!m || !d) { state.selected = null; return renderDetail(); }
+    const [, outc, prio, thr, reasons] = d;
+    const maxAbs = Math.max(...reasons.map(r => Math.abs(r[1])), 1);
+    const reasonRows = reasons.map(([code, pts, detail]) => {
+      const w = Math.abs(pts) / maxAbs * 50;
+      return `<div class="reason"><span>${REASON[code] || code}<small>${detail}</small></span><span class="bar"><span class="axis"></span>${pts > 0 ? `<i class="pos" style="width:${w}%"></i>` : pts < 0 ? `<i class="neg" style="width:${w}%"></i>` : ""}</span><b>${pts > 0 ? "+" : ""}${pts}</b></div>`;
+    }).join("");
+    const factRows = m.facts.map(f => {
+      const [key, team, player, value, unit, origin, formula, win, sources] = f;
+      const owner = player ? name(player) : team ? TEAM.find(t => t.id === team).short : "Partido";
+      const winText = win ? `${at(win[0], Math.max(0, win[1]))}–${mmss(win[2])}` : "";
+      return `<tr><td>${FACT[key] || key}<br><small class="muted">${owner}${winText ? " · " + winText : ""}</small></td><td class="n">${num(value, Number.isInteger(value) ? 0 : 1)}${UNIT[unit] ?? ""}</td><td><span class="origin ${origin}">${ORIGIN[origin] || origin}</span><br><small class="mono muted">${formula}</small></td><td class="n">${sources.length}</td></tr>`;
+    }).join("");
+    const sources = m.sources.map(s => { const e = EV.get(s); return `<span class="src" title="${e ? `${e.type} · ${name(e.player)}` : ""}">${s}${e ? ` · ${at(e.p, e.c)}` : ""}</span>`; }).join("");
+    box.innerHTML = `<div class="card-head" style="margin-bottom:0"><h3>${KIND[m.kind] || m.kind} · ${at(m.period, m.clock)}</h3><span class="out ${outc}">${outc === "e" ? "✓ Emitido" : "✕ Descartado"}</span></div>
+      <p class="headline" style="margin:6px 0 0">${headline(state.selected, m)}</p>
+      <p class="mocknote">Texto de ejemplo (simulado). La narración real la produce el equipo de agentes de Persona 3 con estos hechos.</p>
+      <section><span class="label">Por qué tiene prioridad ${prio} (umbral del perfil: ${thr})</span><div class="reasons">${reasonRows}</div></section>
+      <section><span class="label">Hechos medidos</span><div class="scroll"><table><thead><tr><th>Cifra</th><th class="n">Valor</th><th>Origen y fórmula</th><th class="n">Eventos</th></tr></thead><tbody>${factRows}</tbody></table></div></section>
+      <section><span class="label">Lo que los datos no permiten afirmar</span>${m.limits.length ? `<ul class="limits">${m.limits.map(l => `<li>${l}</li>`).join("")}</ul>` : `<p class="muted" style="margin:0">Sin límites registrados.</p>`}</section>
+      <section><span class="label">Eventos de origen (marcados en el campo)</span><div class="sources">${sources}</div>${m.signals.length > 1 ? `<p class="muted" style="margin:0;font-size:12px">Reglas cumplidas en el mismo evento: ${m.signals.map(s => KIND[s] || s).join(", ")}.</p>` : ""}</section>`;
+  }
+  function renderDetailAlert(it) {
+    $("detail").innerHTML = `<h3>${KIND[it.kind]} · ${at(it.p, it.c)}</h3>
+      <p class="headline">${name(it.pid)} · ${it.kind === "speed_record" ? `${num(it.value, 1)} km/h` : `${num(it.value)} m`}</p>
+      <section><span class="label">Regla</span><p style="margin:0">${it.kind === "speed_record" ? "Aviso al terminar cada episodio por encima de 30 km/h si su pico supera en al menos 1 km/h el último récord del partido (tracking_alert@1)." : "Aviso cuando un jugador alcanza cada 1.000 m recorridos (tracking_alert@1)."}</p></section>
+      <section><span class="label">Lo que los datos no permiten afirmar</span><ul class="limits"><li>Seguimiento simulado a partir de los eventos sintéticos: las velocidades y distancias son de ejemplo y no se midieron en un vídeo.</li><li>Con un vídeo permitido, Roboflow Sports entregaría estas mismas posiciones y la regla no cambia.</li></ul></section>`;
+  }
+
+  // ---------- Perfiles y estado ----------
+  function renderProfiles() {
+    const max = Math.max(...D.profiles.map(p => p.decisions.length));
+    $("profiles").innerHTML = D.profiles.map(p => {
+      const e = p.decisions.filter(d => d[1] === "e").length, d = p.decisions.length - e;
+      return `<div class="prow ${p.key === state.profile ? "sel" : ""}"><span>${p.label}</span><div class="pbar" role="img" aria-label="${e} emitidos y ${d} descartados"><div class="e" style="width:${e / max * 100}%"></div><div class="d" style="width:${d / max * 100}%"></div></div><span class="n" style="text-align:right">${e} · ${d}</span></div>`;
+    }).join("");
+  }
+  const STAGES = [
+    ["done", "Estado del partido", "Marcador, reloj y posesión por tramos; reconstrucción ante eventos tardíos, corregidos o retirados."],
+    ["done", "Estadísticas trazables", "Cada cifra con fórmula, unidad, versión y eventos de origen. Sin datos queda no disponible, nunca en cero."],
+    ["done", "Jugadas y patrones", "Progresión rápida, recuperación y tiro, presión sostenida, hitos, cambio de control y fase de caos, con ejemplos positivos y negativos."],
+    ["done", "Motor de atención", "Prioridad como suma visible de motivos; preferencias de modo, club y jugador sin cambiar los hechos."],
+    ["sim", "Seguimiento de posiciones", "Velocidad, distancia, sprints, presión por cercanía y forma del equipo, probados con trayectorias conocidas. Hoy con posiciones simuladas; listo para recibir Roboflow Sports."],
+    ["todo", "xT, xG y VAEP", "Adaptadores probados contra referencias. Desactivados hasta entrenarlos con datos con licencia."],
+    ["sim", "Azure", "Event Hub match-insights y registros en Blob Storage, probados con clientes simulados. Despliegue en la suscripción pendiente."],
+    ["sim", "Narración", "En este tablero, texto de ejemplo. La narración multilingüe con agentes es de Persona 3."],
+    ["todo", "Superposición en vídeo", "La API y la pantalla de Persona 4 ya consumen este motor en una prueba de integración."],
+  ];
+  const STATUS = { done: "Hecho y probado", sim: "Funciona con simulación", todo: "Pendiente" };
+  $("stages").innerHTML = STAGES.map(([s, t, p]) => `<div class="stage"><span class="status ${s}"><i></i>${STATUS[s]}</span><b>${t}</b><p>${p}</p></div>`).join("");
+  $("provenance").textContent = `Motor ${D.versions.engine} · atención ${D.versions.attention} · partido ${M.id} · seguimiento ${TR.source} a ${TR.hz_original} Hz (submuestreado a 1 Hz en esta página).`;
+
+  // ---------- Reproducción ----------
+  $("home-name").textContent = TEAM[0].name; $("away-name").textContent = TEAM[1].name;
+  const SPEEDS = [1, 4, 10, 30];
+  for (const s of SPEEDS) { const b = document.createElement("button"); b.type = "button"; b.textContent = `${s}×`; b.setAttribute("aria-pressed", String(s === state.speed)); b.addEventListener("click", () => { state.speed = s; for (const x of $("speeds").children) x.setAttribute("aria-pressed", String(x.textContent === `${s}×`)); }); $("speeds").appendChild(b); }
+  function renderScore() {
+    const r = row(), [p, c] = local(state.tg);
+    $("home-goals").textContent = r ? r[0] : 0; $("away-goals").textContent = r ? r[1] : 0;
+    $("clock").textContent = at(p, c);
+    $("poss").innerHTML = r && r[2] !== null ? `<i class="chip ${r[2] === 0 ? "home" : "away"}"></i> Posesión: ${TEAM[r[2]].name}` : "Sin posesión";
+    $("scrub").value = Math.round(state.tg / TOTAL * 1000);
+  }
+  function render(force) { renderScore(); renderPitch(); renderIndicators(); renderPlayhead(); renderStats(); renderTracking(); renderFeed(force); }
+  function seek(tg) { state.tg = Math.max(0, Math.min(TOTAL, tg)); render(); }
+  let lastTs = null;
+  function loop(ts) {
+    if (!state.playing) { lastTs = null; return; }
+    if (lastTs !== null) { state.tg += (ts - lastTs) * state.speed; if (state.tg >= TOTAL) { state.tg = TOTAL; state.playing = false; $("play").textContent = "Reproducir"; } render(); }
+    lastTs = ts; requestAnimationFrame(loop);
+  }
+  $("play").addEventListener("click", () => { state.playing = !state.playing; $("play").textContent = state.playing ? "Pausar" : "Reproducir"; if (state.playing) { if (state.tg >= TOTAL) state.tg = 0; requestAnimationFrame(loop); } });
+  $("back").addEventListener("click", () => seek(state.tg - 10000));
+  $("fwd").addEventListener("click", () => seek(state.tg + 10000));
+  $("scrub").addEventListener("input", e => seek(e.target.value / 1000 * TOTAL));
+  $("profile").addEventListener("change", e => { state.profile = e.target.value; renderChartMarks(); renderProfiles(); if (state.selected && !decisionOf(state.selected)) state.selected = null; renderDetail(); render(true); });
+  $("show-discarded").addEventListener("change", e => { state.showDiscarded = e.target.checked; renderFeed(true); });
+  $("show-alerts").addEventListener("change", e => { state.showAlerts = e.target.checked; renderFeed(true); });
+  document.addEventListener("keydown", e => {
+    if (e.target.closest("input, select, textarea")) return;
+    if (e.key === " ") { e.preventDefault(); $("play").click(); }
+    if (e.key === "ArrowRight") seek(state.tg + 5000);
+    if (e.key === "ArrowLeft") seek(state.tg - 5000);
+  });
+
+  // Estado inicial: justo después del gol de Aurora, con ese momento abierto.
+  const goal = Object.entries(D.moments).find(([, m]) => m.kind === "goal");
+  if (goal) { state.selected = goal[0]; state.tg = G(goal[1].period, goal[1].clock) + 1500; }
+  renderChartMarks(); renderProfiles(); renderDetail(); render(true);
+})();
+</script>

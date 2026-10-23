@@ -1,0 +1,126 @@
+/* Configuración inicial de preferencias. Basado en el diseño de Figma de Persona 5. */
+/* Onboarding */
+.onboarding { min-height: 100vh; padding: 36px; display: grid; place-items: center; background: radial-gradient(circle at 15% 85%, rgba(216,255,101,.45), transparent 26%), var(--lavender); }
+.onboarding-modal { width: min(100%, 1240px); display: grid; grid-template-columns: .78fr 1.22fr; overflow: hidden; background: white; border: 1px solid rgba(130,87,245,.18); border-radius: 34px; box-shadow: 0 35px 100px rgba(48,31,96,.2); }
+.onboarding-art { min-height: 650px; padding: 30px; position: relative; display: flex; flex-direction: column; overflow: hidden; background: radial-gradient(circle at 40% 30%, #6e4be0, transparent 35%), linear-gradient(160deg, #251c4b, var(--navy)); }
+.onboarding-art::after { content: ""; width: 360px; height: 360px; position: absolute; left: -80px; bottom: -120px; border: 1px solid rgba(216,255,101,.28); border-radius: 50%; box-shadow: 0 0 0 44px rgba(216,255,101,.04), 0 0 0 88px rgba(216,255,101,.025); }
+.onboarding-art > div { flex: 1; position: relative; display: grid; place-items: center; }
+.onboarding-art img { width: 135%; max-width: none; position: relative; z-index: 1; filter: drop-shadow(0 28px 32px rgba(0,0,0,.35)); animation: hero-in 650ms cubic-bezier(.2,.9,.3,1) both; }
+.onboarding-art > div > span { position: absolute; z-index: 2; inset: auto 0 10px; padding: 12px 14px; display: flex; justify-content: center; align-items: center; gap: 7px; color: var(--lime); background: rgba(21,19,41,.65); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; backdrop-filter: blur(12px); font-size: 12px; font-weight: 700; }
+.onboarding-form { padding: 42px; }
+.onboarding-heading { max-width: 650px; margin: 0 auto 28px; text-align: center; }
+.onboarding-heading h1 { margin: 10px 0; font-size: clamp(36px, 4vw, 54px); line-height: 1; letter-spacing: -.055em; }
+.onboarding-heading p { margin: 0; color: var(--muted); }
+.experience-stepper { margin: 0 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); }
+.experience-stepper button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--muted); background: transparent; font-size: 10px; font-weight: 700; }
+.experience-stepper button::before { content: ""; height: 2px; position: absolute; z-index: 0; left: 0; right: 50%; top: 15px; background: var(--line); }
+.experience-stepper button::after { content: ""; height: 2px; position: absolute; z-index: 0; left: 50%; right: 0; top: 15px; background: var(--line); }
+.experience-stepper button:first-child::before, .experience-stepper button:last-child::after { display: none; }
+.experience-stepper button.complete::after, .experience-stepper button.complete::before, .experience-stepper button.active::before { background: var(--violet); }
+.experience-stepper button > span { width: 32px; height: 32px; position: relative; z-index: 1; display: grid; place-items: center; color: var(--muted); background: white; border: 2px solid var(--line); border-radius: 50%; }
+.experience-stepper button.active > span, .experience-stepper button.complete > span { color: white; background: var(--violet); border-color: var(--violet); box-shadow: 0 0 0 5px rgba(130,87,245,.1); }
+.experience-stepper button.active small { color: var(--violet); }
+.onboarding-preference { min-height: 225px; padding: 22px; background: linear-gradient(145deg, white, #faf8ff); border: 1px solid var(--line); border-radius: 18px; animation: step-in 260ms ease both; }
+.preference-label { margin-bottom: 13px; display: flex; align-items: center; gap: 11px; }
+.preference-label > span { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; color: var(--violet); background: var(--lavender); border-radius: 9px; font: 700 10px "Space Grotesk"; }
+.preference-label strong, .preference-label small { display: block; }
+.preference-label small { color: var(--muted); font-size: 10px; }
+.onboarding-language, .onboarding-clubs, .onboarding-players { display: flex; flex-wrap: wrap; gap: 8px; }
+.onboarding-language button { min-width: 150px; padding: 8px 12px 8px 8px; display: flex; align-items: center; gap: 9px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 13px; font-weight: 700; }
+.onboarding-language button b { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--violet); border-radius: 9px; font-size: 10px; }
+.onboarding-language button > .icon { margin-left: auto; color: var(--violet); }
+.onboarding-language button.selected, .onboarding-clubs button.selected, .onboarding-players button.selected, .reading-modes button.selected { border-color: var(--violet); background: #f1ebff; box-shadow: 0 8px 24px rgba(130,87,245,.1); }
+.onboarding-clubs button { min-height: 48px; padding: 7px 12px; display: flex; align-items: center; gap: 7px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 13px; font-weight: 700; }
+.onboarding-players button { min-height: 38px; padding: 0 11px; display: flex; align-items: center; gap: 6px; color: var(--muted); background: var(--off-white); border: 1px solid var(--line); border-radius: 999px; font-size: 11px; }
+.onboarding-players button.selected { color: var(--violet-dark); }
+.reading-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.reading-modes button { min-height: 76px; padding: 12px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
+.reading-modes button > span { width: 42px; height: 42px; display: grid; place-items: center; color: var(--violet); background: var(--lavender); border-radius: 12px; }
+.reading-modes strong, .reading-modes small { display: block; }
+.reading-modes small { margin-top: 3px; color: var(--muted); font-size: 10px; }
+.reading-modes button > .icon { color: var(--violet); }
+.onboarding-actions { padding-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.onboarding-actions > div { width: 100%; display: flex; justify-content: center; gap: 8px; }
+.onboarding-actions > div .btn-primary { min-width: 210px; }
+.compact-onboarding { padding: 24px; }
+.compact-modal { width: min(100%, 920px); display: block; overflow: visible; }
+.compact-modal-top { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.skip-setup { padding: 9px 14px; color: var(--muted); background: var(--off-white); border-radius: 999px; font-size: 12px; font-weight: 700; }
+.skip-setup:hover { color: var(--violet); background: var(--lavender); }
+.compact-modal .onboarding-form { padding: 26px 42px 30px; }
+.compact-heading { margin-bottom: 20px; }
+.compact-heading h1 { font-size: clamp(32px, 4vw, 46px); }
+.compact-modal .experience-stepper { margin-bottom: 18px; }
+.compact-step { min-height: 255px; padding: 20px 22px; }
+.step-intro { margin-bottom: 17px; display: flex; align-items: center; gap: 12px; }
+.step-intro > span { width: 34px; height: 34px; flex: 0 0 auto; display: grid; place-items: center; color: var(--violet); background: var(--lavender); border-radius: 10px; font: 700 10px "Space Grotesk"; }
+.step-intro h2, .step-intro p { margin: 0; }
+.step-intro h2 { font-size: 20px; }.step-intro p { margin-top: 2px; color: var(--muted); font-size: 11px; }
+.language-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.language-cards button { min-width: 0; min-height: 76px; }
+.language-cards button > span { flex: 1; }
+.language-cards button strong, .language-cards button small { display: block; }
+.language-cards button small { margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 500; }
+.club-logo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.club-logo-grid button { min-width: 0; min-height: 145px; padding: 10px 6px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 14px; }
+.club-logo-grid button:hover { transform: translateY(-3px); border-color: var(--violet); }
+.club-logo-grid button.selected { border: 2px solid var(--violet); background: #f5f1ff; box-shadow: 0 9px 24px rgba(130,87,245,.12); }
+.club-logo-grid img { width: 68px; height: 68px; object-fit: contain; }
+.club-logo-grid strong { font-size: 10px; line-height: 1.15; text-align: center; }
+.club-logo-grid button > span { width: 22px; height: 22px; position: absolute; right: 6px; top: 6px; display: grid; place-items: center; color: white; background: var(--violet); border-radius: 50%; }
+.player-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.player-card-grid button { min-width: 0; min-height: 180px; padding: 0; position: relative; overflow: hidden; color: white; background: #214f86; border: 2px solid transparent; border-radius: 15px; text-align: left; }
+.player-card-grid button.selected { border-color: var(--lime); box-shadow: 0 10px 28px rgba(53,34,105,.18); }
+.player-card-grid button > img { width: 100%; height: 132px; display: block; object-fit: cover; object-position: center top; transition: transform 250ms ease; }
+.player-card-grid button:hover > img { transform: scale(1.04); }
+.player-card-grid button > span { padding: 9px 11px; display: block; }
+.player-card-grid strong, .player-card-grid small { display: block; }
+.player-card-grid strong { font-size: 12px; }.player-card-grid small { color: #bdb8cc; font-size: 9px; }
+.player-card-grid button > i, .visualization-modes button > i { width: 24px; height: 24px; position: absolute; right: 8px; top: 8px; display: grid; place-items: center; color: var(--navy); background: var(--lime); border-radius: 50%; }
+.choose-club-prompt { min-height: 120px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--violet); background: var(--off-white); border: 1px dashed #bba7f7; border-radius: 14px; font-weight: 700; }
+.visualization-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.visualization-modes button { min-height: 165px; padding: 0; position: relative; overflow: hidden; color: white; background: #285f9e; border: 2px solid transparent; border-radius: 16px; text-align: left; }
+.visualization-modes button:nth-child(2) { background: #1f79a8; }
+.visualization-modes button.selected { border-color: var(--lime); }
+.visualization-modes button > div { height: 105px; overflow: hidden; background: linear-gradient(145deg, #78b9eb, #326eae); }
+.visualization-modes button:nth-child(2) > div { background: linear-gradient(145deg, #75c9d7, #287999); }
+.visualization-modes button img { width: 100%; height: 100%; object-fit: contain; transition: transform 250ms ease; }
+.visualization-modes button:hover img { transform: scale(1.05); }
+.visualization-modes button > span { padding: 10px 13px; display: block; }
+.visualization-modes strong, .visualization-modes small { display: block; }
+.visualization-modes small { margin-top: 2px; color: #c5c0d0; font-size: 10px; }
+.compact-actions { padding-top: 14px; }
+.onboard-progress { position: fixed; top: 30px; display: flex; gap: 7px; z-index: 3; }
+.onboard-progress span { width: 28px; height: 4px; border-radius: 4px; background: rgba(21,19,41,.14); transition: background 200ms; }
+.onboard-progress span.active { background: var(--violet); }
+.welcome-card { width: min(100%, 1020px); min-height: 610px; display: grid; grid-template-columns: 1fr 1fr; background: var(--white); border-radius: 36px; box-shadow: var(--shadow); overflow: hidden; }
+.welcome-art { position: relative; display: grid; place-items: center; overflow: hidden; background: var(--navy); }
+.welcome-art::before { content: ""; position: absolute; inset: 10%; border-radius: 50%; background: var(--violet); filter: blur(5px); }
+.welcome-illustration { position: relative; z-index: 1; width: 125%; max-width: none; object-fit: contain; filter: drop-shadow(0 22px 20px rgba(8, 6, 24, .35)); animation: hero-in 600ms cubic-bezier(.2,.9,.3,1) both; }
+.player-illustration.compact { width: 120%; margin-bottom: -20%; }
+.welcome-copy { padding: 64px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.welcome-copy .brand { margin-bottom: 70px; }
+.welcome-copy h2, .selection-shell h2 { margin: 14px 0; font-size: clamp(40px, 5vw, 66px); line-height: .96; letter-spacing: -.06em; }
+.welcome-copy > p, .selection-shell > p { color: var(--muted); line-height: 1.6; max-width: 480px; }
+.welcome-copy .btn-primary { margin-top: 22px; width: 100%; }
+.welcome-copy .btn-ghost { align-self: center; margin-top: 8px; }
+.selection-shell { width: min(100%, 900px); padding: 42px 54px 48px; text-align: center; background: var(--white); border-radius: 32px; box-shadow: var(--shadow); }
+.selection-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+.team-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 34px 0; }
+.team-select { min-height: 156px; position: relative; padding: 20px 10px; border: 1px solid var(--line); border-radius: 18px; background: var(--off-white); color: var(--navy); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px; transition: transform 180ms, border 180ms, background 180ms; }
+.team-select:hover { transform: translateY(-4px); border-color: var(--violet); }
+.team-select.selected { border: 2px solid var(--violet); background: #f1ebff; box-shadow: 0 10px 28px rgba(130,87,245,.13); }
+.team-select strong { font-size: 13px; }
+.selection-check { width: 24px; height: 24px; position: absolute; right: 9px; top: 9px; display: grid; place-items: center; border-radius: 50%; background: var(--violet); color: white; }
+.team-badge { flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; color: var(--navy); background: var(--team); font: 700 10px/1 "Space Grotesk"; border: 3px solid rgba(255,255,255,.8); box-shadow: 0 3px 10px rgba(21,19,41,.15); }
+.team-badge img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.badge-sm { width: 30px; height: 30px; }.badge-md { width: 44px; height: 44px; }.badge-lg { width: 60px; height: 60px; font-size: 12px; }
+.mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 34px 0; }
+.mode-card { min-height: 190px; position: relative; padding: 24px 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 20px; }
+.mode-card:hover, .mode-card.selected { border-color: var(--violet); transform: translateY(-3px); }
+.mode-card.selected { color: var(--white); background: var(--violet); }
+.mode-card small { max-width: 150px; color: var(--muted); }
+.mode-card.selected small { color: #eee8ff; }
+.mode-icon { width: 52px; height: 52px; display: grid; place-items: center; color: var(--violet); background: var(--lavender); border-radius: 16px; }
+.mode-card.selected .mode-icon { color: var(--lime); background: rgba(21,19,41,.2); }
+.wide-button { width: 100%; }

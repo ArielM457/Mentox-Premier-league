@@ -68,11 +68,19 @@ class PlaybackPositionRequest(BaseModel):
 
 @asynccontextmanager
 async def integration_lifespan(_: object):
-    await vision_runtime.start()
+    await start_integration_runtime()
     try:
         yield
     finally:
-        await vision_runtime.close()
+        await close_integration_runtime()
+
+
+async def start_integration_runtime() -> None:
+    await vision_runtime.start()
+
+
+async def close_integration_runtime() -> None:
+    await vision_runtime.close()
 
 
 @router.get("/status")

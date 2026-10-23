@@ -662,3 +662,22 @@ endpoints reales y prepara evidencia. La guía se encuentra en la
 25. DV-US-25: control de observaciones mediante el reproductor de diagnóstico.
 26. DV-US-26: suite espacial de Roboflow Sports en CPU o GPU.
 27. DV-US-27: SoccerNet Game State Reconstruction aislado en GPU.
+
+### DV-US-28 · Integrar visión con la aplicación oficial
+
+**Como** integrante del equipo,
+**quiero** usar las salidas de visión desde el backend y frontend oficiales,
+**para** validar una sola experiencia sin mantener una interfaz paralela.
+
+**Prioridad:** P0.
+
+**Estado:** implementada en rama de integración y verificada para compilación del frontend y pruebas aisladas de Persona 1. La suite HTTP combinada y el transporte durable de eventos importantes siguen pendientes.
+
+**Evidencia:** [informe técnico de DV-US-28](evidencias/DV-US-28.md).
+
+**Criterios de aceptación:**
+
+- El frontend oficial consulta las observaciones sincronizadas.
+- Los controles de reproducción gobiernan también la reproducción de visión.
+- La interfaz diferencia observaciones, candidatos y hechos confirmados.
+- La falta de artefactos no interrumpe la experiencia sintética.
