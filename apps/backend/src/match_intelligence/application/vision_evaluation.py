@@ -17,6 +17,7 @@ class PredictionOrigin(StrEnum):
 class PermissionBasis(StrEnum):
     PROJECT_GENERATED = "project_generated"
     WRITTEN_AUTHORIZATION = "written_authorization"
+    SOURCE_TERMS = "source_terms"
 
 
 class IntegrationDecision(StrEnum):

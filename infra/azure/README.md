@@ -5,8 +5,9 @@ Esta carpeta despliega los recursos de DV-US-06 mediante Azure CLI y Bicep. Cada
 ## Recursos
 
 - Namespace Standard de Azure Event Hubs.
-- Event hub `match-events` con dos particiones y un día de retención.
-- Grupos de consumidores `backend` y `diagnostics`.
+- Event hub `match-events` para hechos deportivos confirmados.
+- Event hub `vision-observations` para detecciones, acciones y candidatos experimentales.
+- Grupos de consumidores `backend` y `diagnostics` en ambos hubs.
 - Cuenta `StorageV2` con redundancia local.
 - Contenedores privados `matches`, `authorized-videos` y `observations`.
 
@@ -114,6 +115,9 @@ Después del despliegue y de asignar el rol `Azure Event Hubs Data Owner`, confi
 export EVENT_HUB_FULLY_QUALIFIED_NAMESPACE="<namespace>.servicebus.windows.net"
 export EVENT_HUB_NAME="match-events"
 export EVENT_HUB_CONSUMER_GROUP="diagnostics"
+export VISION_OBSERVATION_TRANSPORT="azure_event_hubs"
+export VISION_EVENT_HUB_NAME="vision-observations"
+export VISION_EVENT_HUB_CONSUMER_GROUP="backend"
 ```
 
 Ejecute la prueba de ida y vuelta de DV-US-07:
@@ -124,6 +128,28 @@ uv run --project apps/backend --python 3.12 \
 ```
 
 La prueba inicia un consumidor, publica dos veces el mismo evento sintético y espera un aceptado y un duplicado. La salida incluye duraciones de publicación y latencia de transporte. No imprime tokens ni utiliza cadenas de conexión.
+
+Para añadir únicamente el canal visual a un namespace ya desplegado, sin reconciliar otros recursos:
+
+```bash
+az deployment group what-if \
+  --resource-group "<grupo>" \
+  --template-file infra/azure/vision-observations.bicep \
+  --parameters eventHubNamespaceName="<namespace>"
+
+az deployment group create \
+  --name "mentox-vision-observations" \
+  --resource-group "<grupo>" \
+  --template-file infra/azure/vision-observations.bicep \
+  --parameters eventHubNamespaceName="<namespace>"
+```
+
+Después se comprueba productor, consumidor y deduplicación sin crear `MatchEvent`:
+
+```bash
+uv run --project apps/backend --python 3.12 \
+  python apps/backend/scripts/vision_event_hubs_smoke.py
+```
 
 ## Probar Blob Storage con identidad de Azure
 

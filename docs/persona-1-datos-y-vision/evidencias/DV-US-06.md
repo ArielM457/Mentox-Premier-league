@@ -3,13 +3,15 @@
 ## Identificación
 
 - **Historia:** DV-US-06 · Desplegar recursos en una cuenta propia.
-- **Estado:** implementada y verificada localmente; despliegue Azure pendiente.
+- **Estado:** verificada en Azure mediante DV-US-14.
 - **Prioridad:** P0.
-- **Última verificación:** 9 de octubre de 2026.
+- **Última verificación:** 13 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
 - **Requisitos relacionados:** DV-RF-15, DV-RF-16, DV-RNF-04 y DV-RNF-05.
 
 ## Objetivo comprobado
+
+> **Actualización de integración:** el 13 de octubre de 2026 la plantilla superó `validate` y `what-if` y se desplegó en `centralus` con estado `Succeeded`. Los recursos y RBAC están documentados de forma anonimizada en [DV-US-14](DV-US-14.md). Las referencias posteriores de este informe a un despliegue pendiente describen el corte local original del 9 de octubre.
 
 Cada integrante dispone de una plantilla Bicep común y comandos documentados para desplegar Event Hubs y Blob Storage en su propia suscripción sin editar `main.bicep` ni guardar credenciales. La plantilla compila localmente y su contrato se comprueba mediante pruebas automatizadas.
 

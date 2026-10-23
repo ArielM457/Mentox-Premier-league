@@ -20,6 +20,7 @@ var normalizedPrefix = toLower(replace(projectPrefix, '-', ''))
 var resourceSuffix = uniqueString(subscription().id, resourceGroup().id, projectPrefix)
 var eventHubNamespaceName = 'eh-${toLower(projectPrefix)}-${environmentName}-${resourceSuffix}'
 var eventHubName = 'match-events'
+var visionEventHubName = 'vision-observations'
 var storageAccountName = 'st${normalizedPrefix}${resourceSuffix}'
 var commonTags = {
   project: 'mentox-premier-league'
@@ -69,6 +70,32 @@ resource diagnosticsConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consu
   parent: matchEventsHub
   properties: {
     userMetadata: 'Consumidor aislado para pruebas y diagnóstico.'
+  }
+}
+
+resource visionObservationsHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = {
+  name: visionEventHubName
+  parent: eventHubNamespace
+  properties: {
+    messageRetentionInDays: 1
+    partitionCount: 2
+    status: 'Active'
+  }
+}
+
+resource visionBackendConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumerGroups@2024-01-01' = {
+  name: 'backend'
+  parent: visionObservationsHub
+  properties: {
+    userMetadata: 'Consume observaciones visuales para validación, fusión y entrega en vivo.'
+  }
+}
+
+resource visionDiagnosticsConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumerGroups@2024-01-01' = {
+  name: 'diagnostics'
+  parent: visionObservationsHub
+  properties: {
+    userMetadata: 'Pruebas aisladas del canal de observaciones visuales.'
   }
 }
 
@@ -133,9 +160,12 @@ resource observationsContainer 'Microsoft.Storage/storageAccounts/blobServices/c
 output eventHubNamespaceName string = eventHubNamespace.name
 output eventHubFullyQualifiedNamespace string = '${eventHubNamespace.name}.servicebus.windows.net'
 output eventHubName string = matchEventsHub.name
+output visionEventHubName string = visionObservationsHub.name
 output eventHubEndpoint string = eventHubNamespace.properties.serviceBusEndpoint
 output backendConsumerGroupName string = backendConsumerGroup.name
 output diagnosticsConsumerGroupName string = diagnosticsConsumerGroup.name
+output visionBackendConsumerGroupName string = visionBackendConsumerGroup.name
+output visionDiagnosticsConsumerGroupName string = visionDiagnosticsConsumerGroup.name
 output storageAccountName string = storageAccount.name
 output blobServiceEndpoint string = storageAccount.properties.primaryEndpoints.blob
 output containerNames array = [

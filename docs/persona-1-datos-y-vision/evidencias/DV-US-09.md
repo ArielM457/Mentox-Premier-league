@@ -3,13 +3,15 @@
 ## Identificación
 
 - **Historia:** DV-US-09 · Conservar artefactos autorizados.
-- **Estado:** contrato y adaptador verificados localmente; Azure real pendiente.
+- **Estado:** `matches` y `observations` verificados en Azure mediante DV-US-16; vídeo pendiente de DV-US-17.
 - **Prioridad:** P1.
-- **Última verificación:** 9 de octubre de 2026.
+- **Última verificación:** 13 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
 - **Requisitos relacionados:** DV-RF-14 y DV-RNF-03.
 
 ## Objetivo comprobado
+
+> **Actualización de integración:** el 13 de octubre de 2026 un partido sintético se cargó y recuperó desde `matches`, una observación experimental hizo lo mismo desde `observations` y Azure rechazó la sobrescritura sin alterar el original. [DV-US-16](DV-US-16.md) conserva tamaños, hashes y resultados. `authorized-videos` depende de DV-US-17. Las referencias posteriores a Azure pendiente describen el corte local original.
 
 El backend clasifica partidos sintéticos, vídeos declarados como autorizados y observaciones experimentales, los dirige a contenedores privados distintos y conserva en el nombre y los metadatos la relación con el partido y el origen. La recuperación comprueba metadatos, tipo de contenido y hash SHA-256 antes de entregar los mismos bytes.
 

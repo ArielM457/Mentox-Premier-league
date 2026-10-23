@@ -117,7 +117,7 @@ Las personas usuarias de este módulo son principalmente integrantes técnicos q
 
 **Prioridad:** P0.
 
-**Estado:** implementada y verificada localmente mediante compilación de Bicep. El despliegue, `what-if` y la prueba con dos suscripciones o prefijos están pendientes de una cuenta Azure autenticada.
+**Estado:** verificada en una cuenta Azure mediante DV-US-14. `validate`, `what-if` y el despliegue incremental aprobaron con parámetros externos a la plantilla. La prueba adicional con dos suscripciones o prefijos sigue siendo opcional y no se ejecutó.
 
 **Evidencia:** [informe técnico de DV-US-06](evidencias/DV-US-06.md), plantilla y guía en `infra/azure/`, y pruebas de contrato en `apps/backend/tests/test_azure_infrastructure.py`.
 
@@ -140,7 +140,7 @@ Las personas usuarias de este módulo son principalmente integrantes técnicos q
 
 **Prioridad:** P0.
 
-**Estado:** productor, consumidor, sobre, diagnósticos y prueba de ida y vuelta implementados y verificados localmente con dobles del SDK. La ejecución contra Azure está pendiente de recursos desplegados y roles RBAC.
+**Estado:** verificada en integración mediante DV-US-15. La ida y vuelta real aceptó un evento, detectó su duplicado y terminó sin rechazos ni fallos.
 
 **Evidencia:** [informe técnico de DV-US-07](evidencias/DV-US-07.md), contrato en `apps/backend/src/match_intelligence/application/transport.py`, adaptadores en `apps/backend/src/match_intelligence/adapters/messaging/azure_event_hubs.py`, prueba manual en `apps/backend/scripts/event_hubs_smoke.py` y pruebas automatizadas en `apps/backend/tests/test_azure_event_hubs.py`.
 
@@ -162,7 +162,7 @@ Las personas usuarias de este módulo son principalmente integrantes técnicos q
 
 **Prioridad:** P0.
 
-**Estado:** implementada y verificada localmente mediante configuración y dobles de Event Hubs. El cambio contra un servicio Azure real queda pendiente del despliegue y RBAC de DV-US-06 y DV-US-07.
+**Estado:** verificada en integración mediante DV-US-15. Event Hubs real aprobó y el transporte en memoria mantuvo sus pruebas después de la ejecución.
 
 **Evidencia:** [informe técnico de DV-US-08](evidencias/DV-US-08.md), configuración y fábricas en `apps/backend/src/match_intelligence/adapters/messaging/configuration.py`, ejemplo en `apps/backend/.env.example` y pruebas en `apps/backend/tests/test_transport_configuration.py`.
 
@@ -182,7 +182,7 @@ Las personas usuarias de este módulo son principalmente integrantes técnicos q
 
 **Prioridad:** P1.
 
-**Estado:** implementada y verificada localmente con dobles del SDK. La carga y recuperación en una cuenta Azure real quedan pendientes del despliegue y de RBAC.
+**Estado:** verificada en integración mediante DV-US-16 para artefactos sintéticos y observaciones experimentales. `authorized-videos` continúa condicionado a un vídeo permitido en DV-US-17.
 
 **Evidencia:** [informe técnico de DV-US-09](evidencias/DV-US-09.md), contrato en `apps/backend/src/match_intelligence/application/artifacts.py`, adaptador en `apps/backend/src/match_intelligence/adapters/storage/azure_blob.py`, prueba manual en `apps/backend/scripts/blob_storage_smoke.py` y pruebas automatizadas en `apps/backend/tests/test_azure_blob_storage.py`.
 
@@ -293,7 +293,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente.
+**Estado:** verificada en integración el 13 de octubre de 2026. El despliegue incremental terminó en `Succeeded`, los recursos se comprobaron y un principal temporal recibió únicamente los dos roles de datos en los alcances de recurso.
+
+**Evidencia:** [informe técnico de DV-US-14](evidencias/DV-US-14.md).
 
 **Criterios de aceptación:**
 
@@ -316,7 +318,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente.
+**Estado:** verificada en integración el 13 de octubre de 2026. La prueba real publicó dos mensajes, aceptó uno, registró un duplicado y terminó sin rechazos ni fallos; el transporte en memoria continuó aprobando sus pruebas.
+
+**Evidencia:** [informe técnico de DV-US-15](evidencias/DV-US-15.md).
 
 **Criterios de aceptación:**
 
@@ -339,7 +343,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente.
+**Estado:** verificada en integración el 13 de octubre de 2026. `matches` y `observations` conservaron bytes y SHA-256; una segunda carga fue rechazada con `ResourceExistsError` y no alteró el original. No se probó `authorized-videos` sin permiso.
+
+**Evidencia:** [informe técnico de DV-US-16](evidencias/DV-US-16.md).
 
 **Criterios de aceptación:**
 
@@ -362,7 +368,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente.
+**Estado:** verificada localmente el 13 de octubre de 2026. Se generó e inspeccionó un MP4 sintético de 30 segundos, se verificaron sus metadatos e integridad y se creó una anotación manual mínima del balón.
+
+**Evidencia:** [informe técnico de DV-US-17](evidencias/DV-US-17.md).
 
 **Criterios de aceptación:**
 
@@ -384,7 +392,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente; historia compartida con Persona 4.
+**Estado:** implementada y verificada automáticamente en una herramienta aislada, sin modificar el frontend oficial. Falta ejecutar el recorrido visual en navegador, exportar el registro y conservar las capturas antes de marcarla verificada en integración.
+
+**Evidencia:** [informe técnico de DV-US-18](evidencias/DV-US-18.md).
 
 **Criterios de aceptación:**
 
@@ -407,7 +417,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P2.
 
-**Estado:** pendiente.
+**Estado:** verificada localmente como experimento; el modelo fue `rejected` para integración con esta muestra y configuración. Procesó los 300 cuadros, exportó seis predicciones reales y el evaluador registró F1 0,00 y factor de tiempo real 13,81 en CPU.
+
+**Evidencia:** [informe técnico de DV-US-19](evidencias/DV-US-19.md).
 
 **Criterios de aceptación:**
 
@@ -430,7 +442,9 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P2.
 
-**Estado:** pendiente.
+**Estado:** verificada experimentalmente en CPU y GPU sobre vídeo permitido. La RTX 3060 Laptop de 6 GB produjo 127 observaciones en 5,66 segundos; la calidad sigue pendiente de anotaciones manuales completas.
+
+**Evidencia:** [informe técnico de DV-US-20](evidencias/DV-US-20.md).
 
 **Criterios de aceptación:**
 
@@ -453,7 +467,7 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P2.
 
-**Estado:** pendiente.
+**Estado:** verificada experimentalmente con vídeo permitido; un candidato revisable, ningún `MatchEvent` publicado.
 
 **Criterios de aceptación:**
 
@@ -476,7 +490,7 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 
 **Prioridad:** P0.
 
-**Estado:** pendiente.
+**Estado:** verificada en integración; aceptación local, Azure, vídeo, modelos, fusión y fallo controlado comprobados.
 
 **Criterios de aceptación:**
 
@@ -490,6 +504,134 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 **Dependencias:** DV-US-14 a DV-US-21 según el alcance confirmado para la demo.
 
 **Eleva:** el módulo completo de Persona 1.
+
+### DV-US-23 · Integrar el pipeline en el backend oficial
+
+**Como** integrante del equipo,
+**quiero** consultar vídeo, observaciones y candidatos desde una sola API,
+**para** validar datos y visión sin ejecutar scripts inconexos ni modificar el frontend de producto.
+
+**Prioridad:** P0.
+
+**Estado:** backend oficial verificado localmente mediante un recorrido HTTP
+consolidado; el contenedor Compose y el frontend permanecen fuera de esta
+prueba.
+
+**Criterios de aceptación:**
+
+- El backend oficial expone el estado de Roboflow, SoccerNet y fusión.
+- Una ventana temporal devuelve detecciones, acciones y candidatos del mismo medio.
+- Los candidatos conservan fuentes, `track_id` y ausencia de `player_id`.
+- Ningún candidato se presenta ni publica como `MatchEvent`.
+- La interfaz técnica consume la API oficial y se sincroniza con el vídeo permitido.
+- El equipo puede iniciar la integración directamente o mediante Compose sin incorporar vídeo, resultados o secretos a la imagen.
+
+**Ejecución consolidada:** `experiments/run-backend-integration.sh` procesa el
+vídeo, recalcula la fusión, ejecuta las pruebas, inicia FastAPI, consulta los
+endpoints reales y prepara evidencia. La guía se encuentra en la
+[guía de integración del backend](guia-integracion-backend.md).
+
+**Dependencias:** DV-US-18 a DV-US-22.
+
+**Eleva:** el backend oficial de Persona 1 y el contrato para cualquier frontend.
+
+### DV-US-24 · Transportar observaciones durante la transmisión
+
+**Como** equipo de la transmisión,
+**quiero** que los workers publiquen observaciones conforme procesan el vídeo,
+**para** consumirlas, fusionarlas y mostrarlas aunque el procesamiento tenga retraso.
+
+**Prioridad:** P0.
+
+**Estado:** implementada y verificada localmente; infraestructura Azure desplegada y prueba de datos pendiente con la identidad autorizada.
+
+**Criterios de aceptación:**
+
+- `match-events` conserva únicamente hechos deportivos y `vision-observations` recibe resultados de percepción.
+- El transporte cambia entre memoria y Azure mediante configuración.
+- El consumidor valida, deduplica y conserva origen, tiempo, `track_id` y ausencia de identidad nominal.
+- Una cola acotada evita que un navegador lento detenga al productor.
+- El backend entrega al frontend por WebSocket después del transporte.
+- Roboflow puede publicar cada detección al terminar el cuadro y registra su retraso respecto al vídeo.
+- Una prueba real publica, consume y deduplica sin producir `MatchEvent`.
+
+**Dependencias:** DV-US-15, DV-US-19, DV-US-20 y DV-US-23.
+
+**Eleva:** el pipeline continuo de visión; no garantiza latencia de tiempo real en CPU.
+
+### DV-US-25 · Controlar observaciones con la reproducción
+
+**Como** revisor de la integración,
+**quiero** iniciar, pausar y reposicionar la reproducción de observaciones desde el vídeo,
+**para** comprobar el canal sin recibir resultados antes de comenzar el partido.
+
+**Prioridad:** P0.
+
+**Estado:** implementada y verificada localmente; recorrido visual con Compose pendiente.
+
+**Criterios de aceptación:**
+
+- Antes de pulsar Play no se publica ninguna observación precomputada.
+- Pause impide publicar observaciones futuras y conserva la posición.
+- Un salto mueve el cursor sin presentar el historial como observaciones nuevas.
+- Reiniciar vuelve a cero, pausa la sesión y limpia la vista en vivo.
+- La publicación conserva el transporte configurado: memoria o Event Hubs.
+- El WebSocket continúa siendo únicamente la salida del backend hacia el navegador.
+
+**Dependencias:** DV-US-18, DV-US-23 y DV-US-24.
+
+**Eleva:** la validación reproducible del pipeline integrado.
+
+### DV-US-26 · Ampliar la percepción espacial de fútbol
+
+**Como** responsable de visión,
+**quiero** ejecutar los tres pesos oficiales de fútbol de Roboflow Sports en CPU o GPU,
+**para** detectar participantes, seguir trayectorias, localizar el balón y obtener puntos clave del campo.
+
+**Prioridad:** P1.
+
+**Estado:** verificada operativamente en una RTX 3060 Laptop de 6 GB. Los tres pesos procesaron 750 cuadros; la calidad y estabilidad de tracking siguen pendientes de anotaciones manuales.
+
+**Evidencia:** [informe técnico de DV-US-26](evidencias/DV-US-26.md).
+
+**Criterios de aceptación:**
+
+- La imagen contiene los pesos oficiales de participantes, balón y campo fijados por identificador.
+- Cada observación conserva modelo, cuadro, tiempo, confianza y procedencia.
+- Las cajas de participantes usan ByteTrack sin inventar `player_id`.
+- Los puntos del campo se exportan separados de las cajas y pueden viajar por el canal de observaciones.
+- La ejecución automática conserva CPU y admite una GPU NVIDIA seleccionable con media precisión configurable.
+- La evidencia distingue pesos ejecutables, datasets de entrenamiento y etapas compuestas todavía no integradas.
+
+**Dependencias:** DV-US-19, DV-US-24 y una GPU NVIDIA con Container Toolkit para la verificación acelerada.
+
+**Eleva:** DV-US-19 y la entrada espacial del pipeline integrado.
+
+### DV-US-27 · Evaluar SoccerNet Game State Reconstruction en GPU
+
+**Como** responsable de visión,
+**quiero** ejecutar el baseline oficial de Game State Reconstruction en un contenedor GPU aislado,
+**para** medir tracking, reidentificación, equipo, dorsal, calibración y posición sobre el campo antes de integrarlos.
+
+**Prioridad:** P2.
+
+**Estado:** implementada y ajustada para 6 GB, pendiente de ejecución. La primera prueba se omitió por una interpretación restrictiva del dataset; la documentación oficial confirma descarga automática de datos y pesos.
+
+**Evidencia:** [informe técnico de DV-US-27](evidencias/DV-US-27.md).
+
+**Criterios de aceptación:**
+
+- El repositorio, TrackLab, Python, PyTorch y CUDA quedan fijados.
+- El baseline corre en un contenedor separado del backend Python 3.12.
+- La ejecución valida CUDA antes de descargar o procesar datos.
+- Dataset, pesos, estado de tracking y vídeo quedan fuera de Git.
+- La primera prueba usa una sola secuencia pública y un límite de cuadros.
+- Dorsal y equipo permanecen como observaciones; no crean `player_id` automáticamente.
+- La evidencia diferencia el smoke oficial del futuro adaptador para el MP4 autorizado.
+
+**Dependencias:** GPU NVIDIA, NVIDIA Container Toolkit, espacio de disco y acceso a los artefactos públicos de SoccerNet GSR.
+
+**Eleva:** DV-US-12, DV-US-17 y la futura fusión espacial de DV-US-21.
 
 ## Orden sugerido del backlog
 
@@ -515,3 +657,8 @@ Estas historias no reemplazan las pruebas locales. Elevan una capacidad desde �
 20. DV-US-20: experimento real de SoccerNet.
 21. DV-US-21: calibración de identidad y fusión.
 22. DV-US-22: ensayo integrado y cierre de evidencias.
+23. DV-US-23: pipeline integrado en backend e interfaz técnica.
+24. DV-US-24: transporte continuo de observaciones mediante Event Hubs.
+25. DV-US-25: control de observaciones mediante el reproductor de diagnóstico.
+26. DV-US-26: suite espacial de Roboflow Sports en CPU o GPU.
+27. DV-US-27: SoccerNet Game State Reconstruction aislado en GPU.

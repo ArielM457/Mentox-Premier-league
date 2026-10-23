@@ -40,3 +40,48 @@ npm run dev:frontend
 La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. El formulario inicial valida un evento contra el formato `1.0`; todavía no guarda eventos ni analiza partidos.
 
 CrewAI figura como dependencia opcional del backend. Cuando se implemente el equipo de agentes y se elija un proveedor de modelos, se podrá instalar con `uv sync --project apps/backend --extra agents`.
+
+## **Demostración integrada de datos y visión**
+
+La demostración reutiliza el backend oficial y una interfaz técnica de validación. No modifica el frontend de producto. Requiere el vídeo permitido y las exportaciones locales de Roboflow Sports, SoccerNet y DV-US-21.
+
+```bash
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 \
+  uvicorn video_sync_diagnostic.app:app \
+  --app-dir experiments --host 127.0.0.1 --port 8018
+```
+
+Abra <http://127.0.0.1:8018>. La API integrada está en `GET /api/v1/integration/status`, `GET /api/v1/integration/timeline` y `/docs`.
+
+Con Docker:
+
+```bash
+docker-compose -f compose.integration.yml up --build
+```
+
+El vídeo y los resultados se montan como volúmenes de solo lectura y no se incorporan a la imagen. Para Azure, exporte las variables de `apps/backend/.env.example`; el modo predeterminado sigue siendo `memory`.
+
+La interfaz controla la reproducción de las observaciones ya calculadas. No se
+publica nada hasta pulsar **Play**; pausa, salto y reinicio actualizan el cursor
+del backend sin volver a presentar el historial como nuevo.
+
+Para iniciar la prueba integrada:
+
+```bash
+sudo docker-compose -f compose.integration.yml up --build
+```
+
+En Azure, añada antes:
+
+```bash
+export VISION_OBSERVATION_TRANSPORT=azure_event_hubs
+export EVENT_HUB_FULLY_QUALIFIED_NAMESPACE="<namespace>.servicebus.windows.net"
+export VISION_EVENT_HUB_NAME="vision-observations"
+export VISION_EVENT_HUB_CONSUMER_GROUP="backend"
+```
+
+El reproductor ordena al backend publicar el tramo cruzado. En Azure, el backend
+produce en Event Hubs, su consumidor recibe y deduplica, y finalmente WebSocket
+actualiza la interfaz. Esta prueba reutiliza inferencias ya calculadas; no vuelve
+a ejecutar los modelos.

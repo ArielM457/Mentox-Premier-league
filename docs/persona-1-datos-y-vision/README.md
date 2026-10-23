@@ -4,9 +4,15 @@ Esta carpeta contiene el plan detallado de Persona 1. Su objetivo es entregar un
 
 ## Documentos
 
+- [Overview para pruebas de modelos](overview-para-pruebas-de-modelos.md): contexto breve, alcance y ruta de trabajo para la persona o IA que ejecutará Roboflow y SoccerNet en una computadora GPU.
+- [Guía de integración del backend](guia-integracion-backend.md): un solo comando para modelos, fusión, API, pruebas, Azure opcional y evidencias sin frontend.
+- [Guía de instalación y ejecución desde cero](guia-ejecucion-desde-cero.md): preparación de Ubuntu, GPU, Docker, modelos e interfaz para una persona principiante.
 - [Plan general](plan-general.md): alcance, arquitectura, fases, entregables y estrategia de Azure.
 - [Requisitos funcionales](requisitos-funcionales.md): capacidades verificables del módulo.
 - [Historias de usuario](historias-de-usuario.md): necesidades de los consumidores del módulo y criterios de aceptación.
+- [Estado actual](estado-actual.md): resumen consolidado de lo implementado, verificado y pendiente.
+- [Resumen del trabajo realizado](resumen-trabajo-realizado.md): lista directa, punto por punto, de lo construido hasta ahora.
+- [Diagrama del flujo de datos](diagrama-flujo.md): representación Mermaid del funcionamiento local, la integración Azure y los modelos de visión.
 - [Plan de pruebas con servicios reales](plan-pruebas-servicios-reales.md): orden de despliegue, integración Azure, vídeo, modelos e interfaz mínima de comprobación.
 - [Evidencias técnicas](evidencias/README.md): implementación, criterios cubiertos, pruebas y limitaciones de cada historia.
 
@@ -24,4 +30,4 @@ Si existe una contradicción, se debe resolver en el documento general correspon
 
 ## Estado
 
-DV-US-01 a DV-US-13 tienen implementación y evidencia local en distintos niveles. Los recursos Azure, el vídeo permitido y las ejecuciones reales de Roboflow Sports y SoccerNet todavía no están verificados. DV-US-14 a DV-US-22 separan ese trabajo de integración de las capacidades comprobadas con dobles y datos sintéticos.
+DV-US-01 a DV-US-13 tienen implementación y evidencia local en distintos niveles. DV-US-14, DV-US-15 y DV-US-16 ya están verificadas contra Azure. El vídeo permitido y las ejecuciones reales de Roboflow Sports y SoccerNet todavía no están verificados. DV-US-14 a DV-US-22 separan ese trabajo de integración de las capacidades comprobadas con dobles y datos sintéticos.

@@ -17,6 +17,7 @@ La documentación distingue el alcance del reto, las decisiones del equipo y lo 
 - [Equipo de agentes](10-arquitectura-agentes.md): responsabilidades, autonomía, verificación y revisión antes de publicar.
 - [Plan de desarrollo](plan-de-desarrollo/README.md): reparto entre cuatro personas de programación y una de UX/UI, con contratos para trabajar en paralelo.
 - [Detalle de datos y visión](persona-1-datos-y-vision/README.md): plan, requisitos e historias de usuario de Persona 1, incluida la integración reproducible con Azure.
+- [Overview para pruebas GPU](persona-1-datos-y-vision/overview-para-pruebas-de-modelos.md): contexto operativo para otra persona o IA que deba ejecutar y documentar los modelos de visión.
 - [Decisiones pendientes](05-decisiones-pendientes.md): elecciones que aún necesitan datos o acuerdos del equipo.
 
 ## **Cómo leer el estado de cada punto**
