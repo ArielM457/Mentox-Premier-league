@@ -12,11 +12,13 @@ La separación propuesta es viable, pero no son tres colas equivalentes:
 
 API Management no clasifica el partido: protege y limita la API HTTP. El backend publica cada resultado en el canal correspondiente.
 
-## Estado de `origin/main`
+## Estado después de la integración
 
-Ya existen el filtro, `RoutingDecision v1`, las rutas lógicas locales `metrics`, `important` y `discarded`, analítica, agentes, API, frontend oficial y Event Hubs para `match-events` y `match-insights`. La topología está documentada y simulada, pero no desplegada.
+Ya existen el filtro, `RoutingDecision v1`, analítica, agentes, API y frontend oficial. `RoutedEventPipeline` conecta el ingreso con dos salidas: métricas reconstruibles e importantes. Funciona en memoria y tiene adaptadores Azure con identidad.
 
-Faltan Service Bus, API Management, el trabajador distribuido y la promoción controlada de observaciones visuales a `MatchEvent`.
+La plantilla añade `match-metrics` al namespace existente y puede crear una cola `important-events` en Service Bus Basic. Esta última permanece desactivada por defecto para evitar costo accidental. La vista de visión está incorporada en Resumen dentro del centro del partido; no existe una segunda interfaz de producto.
+
+Faltan desplegar y probar los recursos nuevos en Azure, ejecutar un trabajador distribuido permanente y definir la promoción controlada de observaciones visuales a `MatchEvent`. API Management continúa opcional y no es necesario para probar el backend.
 
 ## Captura cada segundo
 

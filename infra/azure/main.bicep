@@ -16,11 +16,16 @@ param environmentName string = 'dev'
 @description('Región de los recursos. De forma predeterminada usa la región del grupo.')
 param location string = resourceGroup().location
 
+@description('Crea Service Bus para eventos importantes. Actívelo tras revisar costo y cuota de la suscripción.')
+param deployDurableImportantQueue bool = false
+
 var normalizedPrefix = toLower(replace(projectPrefix, '-', ''))
 var resourceSuffix = uniqueString(subscription().id, resourceGroup().id, projectPrefix)
 var eventHubNamespaceName = 'eh-${toLower(projectPrefix)}-${environmentName}-${resourceSuffix}'
 var eventHubName = 'match-events'
 var visionEventHubName = 'vision-observations'
+var metricsEventHubName = 'match-metrics'
+var serviceBusNamespaceName = 'sb-${toLower(projectPrefix)}-${environmentName}-${resourceSuffix}'
 var storageAccountName = 'st${normalizedPrefix}${resourceSuffix}'
 var commonTags = {
   project: 'mentox-premier-league'
@@ -80,6 +85,55 @@ resource visionObservationsHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-
     messageRetentionInDays: 1
     partitionCount: 2
     status: 'Active'
+  }
+}
+
+resource metricsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = {
+  name: metricsEventHubName
+  parent: eventHubNamespace
+  properties: {
+    messageRetentionInDays: 1
+    partitionCount: 2
+    status: 'Active'
+  }
+}
+
+resource metricsDiagnosticsConsumerGroup 'Microsoft.EventHub/namespaces/eventhubs/consumerGroups@2024-01-01' = {
+  name: 'diagnostics'
+  parent: metricsEventHub
+  properties: {
+    userMetadata: 'Diagnóstico de métricas reconstruibles; no procesa jugadas importantes.'
+  }
+}
+
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = if (deployDurableImportantQueue) {
+  name: serviceBusNamespaceName
+  location: location
+  tags: commonTags
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+  }
+  properties: {
+    disableLocalAuth: true
+    minimumTlsVersion: '1.2'
+    publicNetworkAccess: 'Enabled'
+    zoneRedundant: false
+  }
+}
+
+resource importantEventsQueue 'Microsoft.ServiceBus/namespaces/queues@2024-01-01' = if (deployDurableImportantQueue) {
+  name: 'important-events'
+  parent: serviceBusNamespace
+  properties: {
+    deadLetteringOnMessageExpiration: true
+    defaultMessageTimeToLive: 'P1D'
+    enableBatchedOperations: true
+    lockDuration: 'PT1M'
+    maxDeliveryCount: 10
+    maxSizeInMegabytes: 1024
+    requiresDuplicateDetection: false
+    requiresSession: false
   }
 }
 
@@ -161,11 +215,14 @@ output eventHubNamespaceName string = eventHubNamespace.name
 output eventHubFullyQualifiedNamespace string = '${eventHubNamespace.name}.servicebus.windows.net'
 output eventHubName string = matchEventsHub.name
 output visionEventHubName string = visionObservationsHub.name
+output metricsEventHubName string = metricsEventHub.name
 output eventHubEndpoint string = eventHubNamespace.properties.serviceBusEndpoint
 output backendConsumerGroupName string = backendConsumerGroup.name
 output diagnosticsConsumerGroupName string = diagnosticsConsumerGroup.name
 output visionBackendConsumerGroupName string = visionBackendConsumerGroup.name
 output visionDiagnosticsConsumerGroupName string = visionDiagnosticsConsumerGroup.name
+output serviceBusFullyQualifiedNamespace string = deployDurableImportantQueue ? '${serviceBusNamespace.name}.servicebus.windows.net' : ''
+output importantEventsQueueName string = deployDurableImportantQueue ? importantEventsQueue.name : ''
 output storageAccountName string = storageAccount.name
 output blobServiceEndpoint string = storageAccount.properties.primaryEndpoints.blob
 output containerNames array = [

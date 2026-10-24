@@ -681,3 +681,27 @@ endpoints reales y prepara evidencia. La guía se encuentra en la
 - Los controles de reproducción gobiernan también la reproducción de visión.
 - La interfaz diferencia observaciones, candidatos y hechos confirmados.
 - La falta de artefactos no interrumpe la experiencia sintética.
+
+### DV-US-29 · Separar telemetría y eventos importantes
+
+**Como** responsable del flujo en vivo,
+**quiero** clasificar cada ventana después de conservar su ingreso y entregarla en un canal acorde con su criticidad,
+**para** que una pérdida de telemetría no elimine una jugada importante ni llame agentes por cada evento.
+
+**Prioridad:** P0.
+
+**Estado:** verificada localmente. La topología en memoria, la API y la plantilla Bicep están comprobadas; el despliegue real de `match-metrics` y Service Bus queda pendiente de `what-if`, cuota, costo y RBAC.
+
+**Evidencia:** [informe técnico de DV-US-29](evidencias/DV-US-29.md).
+
+**Criterios de aceptación:**
+
+- Toda ventana válida se publica primero en ingreso con `match_id` como clave de partición.
+- Una decisión `metrics_only` se envía a telemetría reconstruible y nunca llama a los agentes.
+- Las decisiones narrativas, de peligro, tiempo muerto o resumen usan una cola durable de importantes.
+- Un fallo de métricas queda observable y no invalida el ingreso aceptado.
+- Un fallo de importantes se propaga para permitir reintento; no se confirma silenciosamente.
+- Los duplicados o inválidos se auditan mediante la decisión y no ocupan una cuarta cola.
+- El botón de simulación del centro del partido recorre esta misma canalización.
+
+**Dependencias:** RF-40, RF-41, RF-51, DV-US-28 y autorización de Azure para la verificación remota.

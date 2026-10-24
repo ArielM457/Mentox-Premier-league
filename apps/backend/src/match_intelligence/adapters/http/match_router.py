@@ -352,9 +352,11 @@ async def control_playback(session: Session, body: PlaybackRequest) -> PlaybackR
     response_model=SimulationReport,
     summary="Simular las colas y el procesamiento de agentes",
 )
-def start_simulation(session: Session, prefs: Preferences) -> SimulationReport:
+async def start_simulation(session: Session, prefs: Preferences) -> SimulationReport:
     """Ejecuta datos sintéticos por ingreso, métricas, importantes y agentes."""
-    return run_local_simulation(session, prefs)
+    from match_intelligence.adapters.http.routing_router import routing_pipeline
+
+    return await run_local_simulation(session, prefs, routing_pipeline)
 
 
 @router.get(

@@ -19,7 +19,7 @@ import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
-const TABS = ['overview', 'events', 'stats', 'tactical', 'insights', 'vision']
+const TABS = ['overview', 'events', 'stats', 'tactical', 'insights']
 const SPEEDS = [1, 2, 4, 8]
 const notify = (promise) => promise.catch(() => {})
 
@@ -235,8 +235,6 @@ function LiveMatch({ match }) {
             <InsightsPanel events={pastEvents} metadata={metadata} moments={history} onOpen={openMoment} />
           ) : activeTab === 'tactical' ? (
             <TacticalPanel events={pastEvents} metadata={metadata} playing={clock.playing} timeMs={clock.time} />
-          ) : activeTab === 'vision' ? (
-            <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />
           ) : (
             <div className="pitch-wrap">
               <div className="pitch-meta">
@@ -263,6 +261,8 @@ function LiveMatch({ match }) {
               <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
             </div>
           )}
+
+          {activeTab === 'overview' && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}
 
           <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>

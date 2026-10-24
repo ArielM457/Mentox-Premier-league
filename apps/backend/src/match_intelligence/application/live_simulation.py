@@ -8,7 +8,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from match_intelligence.application.match_session import MatchSession
-from match_intelligence.application.routing import AgentRoutingService
+from match_intelligence.application.routing import RoutedEventPipeline
 from match_intelligence.application.routing.contracts import (
     ControlSignal,
     Position,
@@ -122,12 +122,15 @@ def _scenarios(match_id: str, team_id: str, preferences: RoutingPreferences):
     ]
 
 
-def run_local_simulation(session: MatchSession, preferences: ViewerPreferences) -> SimulationReport:
+async def run_local_simulation(
+    session: MatchSession,
+    preferences: ViewerPreferences,
+    routing_pipeline: RoutedEventPipeline,
+) -> SimulationReport:
     routing_preferences = RoutingPreferences.model_validate(preferences.model_dump(mode="json"))
-    service = AgentRoutingService()
     steps: list[SimulationStep] = []
     for scenario_id, label, request in _scenarios(session.match_id, session.metadata.home_team.team_id, routing_preferences):
-        outcome = service.evaluate(request)
+        outcome = await routing_pipeline.evaluate(request)
         route = outcome.decision.route
         queue = "metrics" if route == "metrics_only" else "discarded" if route == "rejected" else "important"
         steps.append(SimulationStep(

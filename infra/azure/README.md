@@ -7,11 +7,15 @@ Esta carpeta despliega los recursos de DV-US-06 mediante Azure CLI y Bicep. Cada
 - Namespace Standard de Azure Event Hubs.
 - Event hub `match-events` para hechos deportivos confirmados.
 - Event hub `vision-observations` para detecciones, acciones y candidatos experimentales.
+- Event hub `match-metrics` para actualizaciones reconstruibles y tolerantes a pérdida.
+- Cola opcional `important-events` en Service Bus Basic para jugadas que deben reintentarse y conservarse.
 - Grupos de consumidores `backend` y `diagnostics` en ambos hubs.
 - Cuenta `StorageV2` con redundancia local.
 - Contenedores privados `matches`, `authorized-videos` y `observations`.
 
 La autenticación local mediante claves compartidas está deshabilitada. Las aplicaciones deberán usar una identidad de Azure con roles RBAC. La asignación de roles se hará por cuenta o entorno y no forma parte de esta plantilla compartida.
+
+La cola durable está desactivada por defecto para no generar un recurso con costo sin revisión. Para desplegarla, establezca `deployDurableImportantQueue = true`, ejecute `what-if` y confirme la cuota de `Microsoft.ServiceBus` en la región elegida.
 
 ## Requisitos
 
@@ -119,6 +123,17 @@ export VISION_OBSERVATION_TRANSPORT="azure_event_hubs"
 export VISION_EVENT_HUB_NAME="vision-observations"
 export VISION_EVENT_HUB_CONSUMER_GROUP="backend"
 ```
+
+Para ejecutar el enrutamiento de tres canales desde el backend:
+
+```bash
+export ROUTING_TRANSPORT="azure"
+export METRICS_EVENT_HUB_NAME="match-metrics"
+export SERVICE_BUS_FULLY_QUALIFIED_NAMESPACE="<namespace-service-bus>.servicebus.windows.net"
+export IMPORTANT_EVENTS_QUEUE_NAME="important-events"
+```
+
+La identidad necesita `Azure Event Hubs Data Sender` en el namespace de Event Hubs y `Azure Service Bus Data Sender` en la cola o namespace de Service Bus. En desarrollo local, omita esas variables: `ROUTING_TRANSPORT=memory` es el valor predeterminado y conserva los mismos tres canales de forma reproducible.
 
 Ejecute la prueba de ida y vuelta de DV-US-07:
 

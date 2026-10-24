@@ -8,7 +8,7 @@ Implementada en `integration/persona1-main-20261023`. Se incorporaron 33 commits
 
 - El backend registra contratos, narrativa, agentes, partido y visión.
 - Play, pausa, salto y reinicio notifican al reproductor de observaciones.
-- `Visión IA` muestra Roboflow, SoccerNet y candidatos sincronizados.
+- La vista Resumen del partido en vivo muestra Roboflow, SoccerNet y candidatos sincronizados sin crear una pantalla paralela.
 - La interfaz distingue observaciones experimentales de hechos publicados.
 - La falta de artefactos no rompe el partido sintético.
 - No se promueve un candidato a `MatchEvent` sin evidencia suficiente.
@@ -31,4 +31,4 @@ La suite HTTP combinada no se marca como aprobada: en el entorno resuelto, mezcl
 
 ## Azure y límites
 
-La arquitectura de tres rutas ya estaba propuesta en `main`, pero no desplegada. Esta entrega no creó Service Bus, API Management ni costos adicionales. La vista usa inferencias calculadas previamente y publica cero `MatchEvent` de visión.
+La vista usa inferencias calculadas previamente y publica cero `MatchEvent` de visión. La separación de transporte posterior se documenta en DV-US-29.
