@@ -14,7 +14,7 @@ import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
 import { Pitch } from '../components/match/Pitch.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
-import { AnnouncerPanel, InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel } from '../components/match/LiveExperiencePanels.jsx'
+import { AnnouncerPanel, InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
@@ -96,20 +96,24 @@ function LiveMatch({ match }) {
     clock.seek(next)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'seek', next))
+    notify(api.visionPlayback('seek', next))
   }, [clock, liveDurationMs, matchId])
 
   const play = () => {
     clock.play()
     notify(api.playback(matchId, 'play', clock.timeRef.current))
+    notify(api.visionPlayback('play', clock.timeRef.current))
   }
   const pause = () => {
     clock.pause()
     notify(api.playback(matchId, 'pause', clock.timeRef.current))
+    notify(api.visionPlayback('pause', clock.timeRef.current))
   }
   const replay = () => {
     clock.seek(0)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'restart'))
+    notify(api.visionPlayback('restart', 0))
     clock.play()
   }
 
@@ -257,6 +261,8 @@ function LiveMatch({ match }) {
               <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
             </div>
           )}
+
+          {activeTab === 'overview' && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}
 
           <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>

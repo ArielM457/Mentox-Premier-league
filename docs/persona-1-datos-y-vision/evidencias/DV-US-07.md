@@ -3,13 +3,15 @@
 ## Identificación
 
 - **Historia:** DV-US-07 · Publicar eventos en Event Hubs.
-- **Estado:** adaptadores y recorrido verificados localmente; integración Azure pendiente.
+- **Estado:** verificada en integración mediante DV-US-15.
 - **Prioridad:** P0.
-- **Última verificación:** 9 de octubre de 2026.
+- **Última verificación:** 13 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
 - **Requisitos relacionados:** DV-RF-12, DV-RF-13, DV-RNF-06 y DV-RNF-07.
 
 ## Objetivo comprobado
+
+> **Actualización de integración:** el 13 de octubre de 2026 la prueba real publicó dos mensajes, aceptó uno, registró un duplicado y terminó sin rechazos ni fallos. Los tiempos y la salida anonimizada están en [DV-US-15](DV-US-15.md). Las referencias posteriores a Azure pendiente pertenecen al corte local original del 9 de octubre.
 
 El backend dispone de un productor y un consumidor asíncronos para Azure Event Hubs. El productor envuelve cada `MatchEvent 1.0` en el sobre documentado, conserva la identidad deportiva y registra el intento de publicación. El consumidor reconstruye y valida el sobre, entrega una sola vez cada evento deportivo y separa mensajes inválidos, duplicados y fallos del SDK.
 

@@ -1,0 +1,3700 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-23T14:17:31.378576+00:00",
+  "media_sha256": "7788719b32b944e42d8f1024fb4802f681bc2053d6301218a5bff6705b549f96",
+  "inputs": {
+    "roboflow": "docs/mentox-modelos-20261023T045413Z/resultados/roboflow-sports-predictions.json",
+    "soccernet": "docs/mentox-modelos-20261023T045413Z/resultados/soccernet-predictions.json",
+    "spatial_predictions": 16324,
+    "temporal_predictions": 127
+  },
+  "input_artifacts": {
+    "roboflow_sha256": "825262770b591ad447f32d3cff0c192377962e39511dd9ad937703ab470d90af",
+    "soccernet_sha256": "e15e9265cf913e648968a02a9799e9d87f3eb83e921db208ddb0efc79bd248a3"
+  },
+  "calibration_basis": {
+    "video_fps": 25.0,
+    "video_frame_interval_ms": 40.0,
+    "soccernet_model_fps": 12.5,
+    "soccernet_frame_interval_ms": 80.0,
+    "spatial_unit": "normalized_image_diagonal",
+    "field_homography_available": false,
+    "identity_evidence_available": false
+  },
+  "selected_result": {
+    "policy": {
+      "temporal_tolerance_ms": 120,
+      "image_distance_tolerance": 0.12,
+      "ambiguity_margin": 0.01,
+      "minimum_action_confidence": 0.1
+    },
+    "actions_evaluated": 127,
+    "raw_candidates": 19,
+    "candidates": 12,
+    "suppressed_competing_candidates": 7,
+    "ambiguous": 3,
+    "insufficient_evidence": 105,
+    "reason_counts": {
+      "La confianza de la acción no alcanza el umbral": 104,
+      "Dos jugadores son espacialmente indistinguibles con la política actual": 3,
+      "No existe una detección de balón dentro de la ventana temporal": 1
+    },
+    "candidate_details": [
+      {
+        "action": {
+          "prediction_id": "soccernet-0003",
+          "timestamp_ms": 240,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.381103515625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000006-det-000",
+          "timestamp_ms": 240,
+          "label": "ball",
+          "confidence": 0.68505859375,
+          "bounding_box": {
+            "x_min": 0.1173828125,
+            "y_min": 0.3902777777777778,
+            "x_max": 0.1232421875,
+            "y_max": 0.4013888888888889
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000007-det-015",
+          "timestamp_ms": 280,
+          "label": "player",
+          "confidence": 0.8427734375,
+          "bounding_box": {
+            "x_min": 0.10942975680033366,
+            "y_min": 0.36081972475405094,
+            "x_max": 0.12487273216247559,
+            "y_max": 0.40155252527307583
+          },
+          "track_id": 19
+        },
+        "source_prediction_ids": [
+          "soccernet-0003",
+          "ball-frame-000006-det-000",
+          "player-frame-000007-det-015"
+        ],
+        "track_id": 19,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 40,
+        "image_center_distance": 0.014984466891304072,
+        "confidence": 0.381103515625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0017",
+          "timestamp_ms": 4160,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.5174153447151184
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000107-det-000",
+          "timestamp_ms": 4280,
+          "label": "ball",
+          "confidence": 0.299072265625,
+          "bounding_box": {
+            "x_min": 0.279296875,
+            "y_min": 0.3923611111111111,
+            "x_max": 0.287109375,
+            "y_max": 0.40555555555555556
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000107-det-008",
+          "timestamp_ms": 4280,
+          "label": "player",
+          "confidence": 0.60009765625,
+          "bounding_box": {
+            "x_min": 0.24220863978068033,
+            "y_min": 0.3815718756781684,
+            "x_max": 0.25457261403401693,
+            "y_max": 0.4223083778663918
+          },
+          "track_id": 4
+        },
+        "source_prediction_ids": [
+          "soccernet-0017",
+          "ball-frame-000107-det-000",
+          "player-frame-000107-det-008"
+        ],
+        "track_id": 4,
+        "player_id": null,
+        "action_ball_delta_ms": 120,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.03493996444708266,
+        "confidence": 0.299072265625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0033",
+          "timestamp_ms": 8320,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.1164703369140625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000207-det-000",
+          "timestamp_ms": 8280,
+          "label": "ball",
+          "confidence": 0.4853515625,
+          "bounding_box": {
+            "x_min": 0.724609375,
+            "y_min": 0.5916666666666667,
+            "x_max": 0.731640625,
+            "y_max": 0.6041666666666666
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000210-det-002",
+          "timestamp_ms": 8400,
+          "label": "player",
+          "confidence": 0.892578125,
+          "bounding_box": {
+            "x_min": 0.7117279052734375,
+            "y_min": 0.5878659283673322,
+            "x_max": 0.7330684026082357,
+            "y_max": 0.6468102349175348
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0033",
+          "ball-frame-000207-det-000",
+          "player-frame-000210-det-002"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 80,
+        "image_center_distance": 0.020248163507989886,
+        "confidence": 0.1164703369140625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0038",
+          "timestamp_ms": 9520,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.24365234375
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000237-det-000",
+          "timestamp_ms": 9480,
+          "label": "ball",
+          "confidence": 0.161376953125,
+          "bounding_box": {
+            "x_min": 0.7,
+            "y_min": 0.5888888888888889,
+            "x_max": 0.7078125,
+            "y_max": 0.6027777777777777
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000236-det-001",
+          "timestamp_ms": 9440,
+          "label": "player",
+          "confidence": 0.9140625,
+          "bounding_box": {
+            "x_min": 0.7010868708292644,
+            "y_min": 0.5876274391456887,
+            "x_max": 0.7197776158650716,
+            "y_max": 0.6562095924660012
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0038",
+          "ball-frame-000237-det-000",
+          "player-frame-000236-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 80,
+        "image_center_distance": 0.026889130402292773,
+        "confidence": 0.161376953125
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0046",
+          "timestamp_ms": 11040,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.262481689453125
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000276-det-000",
+          "timestamp_ms": 11040,
+          "label": "ball",
+          "confidence": 0.79248046875,
+          "bounding_box": {
+            "x_min": 0.43046875,
+            "y_min": 0.5923611111111111,
+            "x_max": 0.43984375,
+            "y_max": 0.6076388888888888
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000273-det-008",
+          "timestamp_ms": 10920,
+          "label": "player",
+          "confidence": 0.9013671875,
+          "bounding_box": {
+            "x_min": 0.3750218391418457,
+            "y_min": 0.6384941948784723,
+            "x_max": 0.3947106043497721,
+            "y_max": 0.6983378657588253
+          },
+          "track_id": 68
+        },
+        "source_prediction_ids": [
+          "soccernet-0046",
+          "ball-frame-000276-det-000",
+          "player-frame-000273-det-008"
+        ],
+        "track_id": 68,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.0849107775630963,
+        "confidence": 0.262481689453125
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0052",
+          "timestamp_ms": 12080,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.39630126953125
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000301-det-000",
+          "timestamp_ms": 12040,
+          "label": "ball",
+          "confidence": 0.69921875,
+          "bounding_box": {
+            "x_min": 0.5875,
+            "y_min": 0.6208333333333333,
+            "x_max": 0.596875,
+            "y_max": 0.6375
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000305-det-009",
+          "timestamp_ms": 12200,
+          "label": "player",
+          "confidence": 0.87890625,
+          "bounding_box": {
+            "x_min": 0.5750645955403646,
+            "y_min": 0.5760065714518229,
+            "x_max": 0.589772097269694,
+            "y_max": 0.6304479528356481
+          },
+          "track_id": 24
+        },
+        "source_prediction_ids": [
+          "soccernet-0052",
+          "ball-frame-000301-det-000",
+          "player-frame-000305-det-009"
+        ],
+        "track_id": 24,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.027718027869355857,
+        "confidence": 0.39630126953125
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0056",
+          "timestamp_ms": 13120,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.100799560546875
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000328-det-000",
+          "timestamp_ms": 13120,
+          "label": "ball",
+          "confidence": 0.78857421875,
+          "bounding_box": {
+            "x_min": 0.80078125,
+            "y_min": 0.7763888888888889,
+            "x_max": 0.81015625,
+            "y_max": 0.7916666666666666
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000331-det-001",
+          "timestamp_ms": 13240,
+          "label": "player",
+          "confidence": 0.9091796875,
+          "bounding_box": {
+            "x_min": 0.7572767257690429,
+            "y_min": 0.7474727489330151,
+            "x_max": 0.7915440241495768,
+            "y_max": 0.8176214712637442
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0056",
+          "ball-frame-000328-det-000",
+          "player-frame-000331-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.031093649463274257,
+        "confidence": 0.100799560546875
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0058",
+          "timestamp_ms": 13920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.185791015625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000348-det-000",
+          "timestamp_ms": 13920,
+          "label": "ball",
+          "confidence": 0.1451416015625,
+          "bounding_box": {
+            "x_min": 0.86015625,
+            "y_min": 0.8069444444444445,
+            "x_max": 0.86953125,
+            "y_max": 0.8236111111111111
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000351-det-001",
+          "timestamp_ms": 14040,
+          "label": "player",
+          "confidence": 0.875,
+          "bounding_box": {
+            "x_min": 0.8368786493937175,
+            "y_min": 0.7678027682834201,
+            "x_max": 0.867548116048177,
+            "y_max": 0.840818504050926
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0058",
+          "ball-frame-000348-det-000",
+          "player-frame-000351-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.016727354025990536,
+        "confidence": 0.1451416015625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0061",
+          "timestamp_ms": 14240,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.416015625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000356-det-000",
+          "timestamp_ms": 14240,
+          "label": "ball",
+          "confidence": 0.7080078125,
+          "bounding_box": {
+            "x_min": 0.8859375,
+            "y_min": 0.8083333333333333,
+            "x_max": 0.8953125,
+            "y_max": 0.8236111111111111
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000359-det-001",
+          "timestamp_ms": 14360,
+          "label": "player",
+          "confidence": 0.8232421875,
+          "bounding_box": {
+            "x_min": 0.8641833623250326,
+            "y_min": 0.7716827957718461,
+            "x_max": 0.895303471883138,
+            "y_max": 0.8475807472511574
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0061",
+          "ball-frame-000356-det-000",
+          "player-frame-000359-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.012594052625574517,
+        "confidence": 0.416015625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0071",
+          "timestamp_ms": 16480,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.108734130859375
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000413-det-000",
+          "timestamp_ms": 16520,
+          "label": "ball",
+          "confidence": 0.1973876953125,
+          "bounding_box": {
+            "x_min": 0.83671875,
+            "y_min": 0.7034722222222223,
+            "x_max": 0.84453125,
+            "y_max": 0.7173611111111111
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000409-det-014",
+          "timestamp_ms": 16360,
+          "label": "player",
+          "confidence": 0.900390625,
+          "bounding_box": {
+            "x_min": 0.8187922795613607,
+            "y_min": 0.6970071863245081,
+            "x_max": 0.8389577865600586,
+            "y_max": 0.7604671902126736
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0071",
+          "ball-frame-000413-det-000",
+          "player-frame-000409-det-014"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.021764724552380328,
+        "confidence": 0.108734130859375
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0080",
+          "timestamp_ms": 18480,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.1684722900390625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000461-det-000",
+          "timestamp_ms": 18440,
+          "label": "ball",
+          "confidence": 0.1895751953125,
+          "bounding_box": {
+            "x_min": 0.9015625,
+            "y_min": 0.5868055555555556,
+            "x_max": 0.9078125,
+            "y_max": 0.6006944444444444
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000461-det-003",
+          "timestamp_ms": 18440,
+          "label": "player",
+          "confidence": 0.8798828125,
+          "bounding_box": {
+            "x_min": 0.9075576146443685,
+            "y_min": 0.5451907122576678,
+            "x_max": 0.9277830759684245,
+            "y_max": 0.6020666051793981
+          },
+          "track_id": 139
+        },
+        "source_prediction_ids": [
+          "soccernet-0080",
+          "ball-frame-000461-det-000",
+          "player-frame-000461-det-003"
+        ],
+        "track_id": 139,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 40,
+        "image_center_distance": 0.02394624495020227,
+        "confidence": 0.1684722900390625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0083",
+          "timestamp_ms": 19680,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.52508544921875
+        },
+        "ball": {
+          "prediction_id": "player-frame-000491-det-022",
+          "timestamp_ms": 19640,
+          "label": "ball",
+          "confidence": 0.106689453125,
+          "bounding_box": {
+            "x_min": 0.8624612808227539,
+            "y_min": 0.5658218383789062,
+            "x_max": 0.8697682698567708,
+            "y_max": 0.5781914605034723
+          },
+          "track_id": 304
+        },
+        "player": {
+          "prediction_id": "player-frame-000493-det-003",
+          "timestamp_ms": 19720,
+          "label": "player",
+          "confidence": 0.69091796875,
+          "bounding_box": {
+            "x_min": 0.8600912094116211,
+            "y_min": 0.5303632948133681,
+            "x_max": 0.8787551244099935,
+            "y_max": 0.576743005823206
+          },
+          "track_id": 139
+        },
+        "source_prediction_ids": [
+          "soccernet-0083",
+          "player-frame-000491-det-022",
+          "player-frame-000493-det-003"
+        ],
+        "track_id": 139,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 40,
+        "image_center_distance": 0.018747722119401924,
+        "confidence": 0.106689453125
+      }
+    ],
+    "suppressed_candidate_details": [
+      {
+        "action": {
+          "prediction_id": "soccernet-0002",
+          "timestamp_ms": 160,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.3798828125
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000005-det-000",
+          "timestamp_ms": 200,
+          "label": "ball",
+          "confidence": 0.1461181640625,
+          "bounding_box": {
+            "x_min": 0.1162109375,
+            "y_min": 0.38819444444444445,
+            "x_max": 0.1224609375,
+            "y_max": 0.40069444444444446
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000007-det-015",
+          "timestamp_ms": 280,
+          "label": "player",
+          "confidence": 0.8427734375,
+          "bounding_box": {
+            "x_min": 0.10942975680033366,
+            "y_min": 0.36081972475405094,
+            "x_max": 0.12487273216247559,
+            "y_max": 0.40155252527307583
+          },
+          "track_id": 19
+        },
+        "source_prediction_ids": [
+          "soccernet-0002",
+          "ball-frame-000005-det-000",
+          "player-frame-000007-det-015"
+        ],
+        "track_id": 19,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.013437109723328821,
+        "confidence": 0.1461181640625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0000",
+          "timestamp_ms": 160,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.294677734375
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000005-det-000",
+          "timestamp_ms": 200,
+          "label": "ball",
+          "confidence": 0.1461181640625,
+          "bounding_box": {
+            "x_min": 0.1162109375,
+            "y_min": 0.38819444444444445,
+            "x_max": 0.1224609375,
+            "y_max": 0.40069444444444446
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000007-det-015",
+          "timestamp_ms": 280,
+          "label": "player",
+          "confidence": 0.8427734375,
+          "bounding_box": {
+            "x_min": 0.10942975680033366,
+            "y_min": 0.36081972475405094,
+            "x_max": 0.12487273216247559,
+            "y_max": 0.40155252527307583
+          },
+          "track_id": 19
+        },
+        "source_prediction_ids": [
+          "soccernet-0000",
+          "ball-frame-000005-det-000",
+          "player-frame-000007-det-015"
+        ],
+        "track_id": 19,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.013437109723328821,
+        "confidence": 0.1461181640625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0034",
+          "timestamp_ms": 8320,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.113525390625
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000207-det-000",
+          "timestamp_ms": 8280,
+          "label": "ball",
+          "confidence": 0.4853515625,
+          "bounding_box": {
+            "x_min": 0.724609375,
+            "y_min": 0.5916666666666667,
+            "x_max": 0.731640625,
+            "y_max": 0.6041666666666666
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000210-det-002",
+          "timestamp_ms": 8400,
+          "label": "player",
+          "confidence": 0.892578125,
+          "bounding_box": {
+            "x_min": 0.7117279052734375,
+            "y_min": 0.5878659283673322,
+            "x_max": 0.7330684026082357,
+            "y_max": 0.6468102349175348
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0034",
+          "ball-frame-000207-det-000",
+          "player-frame-000210-det-002"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 80,
+        "image_center_distance": 0.020248163507989886,
+        "confidence": 0.113525390625
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0050",
+          "timestamp_ms": 11280,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.10533905029296875
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000282-det-000",
+          "timestamp_ms": 11280,
+          "label": "ball",
+          "confidence": 0.537109375,
+          "bounding_box": {
+            "x_min": 0.392578125,
+            "y_min": 0.6527777777777778,
+            "x_max": 0.401171875,
+            "y_max": 0.6680555555555555
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000279-det-008",
+          "timestamp_ms": 11160,
+          "label": "player",
+          "confidence": 0.880859375,
+          "bounding_box": {
+            "x_min": 0.3819228172302246,
+            "y_min": 0.6564702351888021,
+            "x_max": 0.4023991902669271,
+            "y_max": 0.7229255393699363
+          },
+          "track_id": 68
+        },
+        "source_prediction_ids": [
+          "soccernet-0050",
+          "ball-frame-000282-det-000",
+          "player-frame-000279-det-008"
+        ],
+        "track_id": 68,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.02965824744026857,
+        "confidence": 0.10533905029296875
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0059",
+          "timestamp_ms": 13920,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.107421875
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000348-det-000",
+          "timestamp_ms": 13920,
+          "label": "ball",
+          "confidence": 0.1451416015625,
+          "bounding_box": {
+            "x_min": 0.86015625,
+            "y_min": 0.8069444444444445,
+            "x_max": 0.86953125,
+            "y_max": 0.8236111111111111
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000351-det-001",
+          "timestamp_ms": 14040,
+          "label": "player",
+          "confidence": 0.875,
+          "bounding_box": {
+            "x_min": 0.8368786493937175,
+            "y_min": 0.7678027682834201,
+            "x_max": 0.867548116048177,
+            "y_max": 0.840818504050926
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0059",
+          "ball-frame-000348-det-000",
+          "player-frame-000351-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.016727354025990536,
+        "confidence": 0.107421875
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0062",
+          "timestamp_ms": 14320,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.1100616455078125
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000359-det-000",
+          "timestamp_ms": 14360,
+          "label": "ball",
+          "confidence": 0.1171875,
+          "bounding_box": {
+            "x_min": 0.89375,
+            "y_min": 0.8,
+            "x_max": 0.903125,
+            "y_max": 0.8166666666666667
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000361-det-001",
+          "timestamp_ms": 14440,
+          "label": "player",
+          "confidence": 0.90478515625,
+          "bounding_box": {
+            "x_min": 0.8722359975179036,
+            "y_min": 0.7716346458152489,
+            "x_max": 0.9024447123209636,
+            "y_max": 0.846830975567853
+          },
+          "track_id": 7
+        },
+        "source_prediction_ids": [
+          "soccernet-0062",
+          "ball-frame-000359-det-000",
+          "player-frame-000361-det-001"
+        ],
+        "track_id": 7,
+        "player_id": null,
+        "action_ball_delta_ms": 40,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.011133538900865454,
+        "confidence": 0.1100616455078125
+      },
+      {
+        "action": {
+          "prediction_id": "soccernet-0082",
+          "timestamp_ms": 19520,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.336212158203125
+        },
+        "ball": {
+          "prediction_id": "ball-frame-000488-det-000",
+          "timestamp_ms": 19520,
+          "label": "ball",
+          "confidence": 0.5341796875,
+          "bounding_box": {
+            "x_min": 0.8640625,
+            "y_min": 0.5680555555555555,
+            "x_max": 0.8703125,
+            "y_max": 0.5791666666666667
+          },
+          "track_id": null
+        },
+        "player": {
+          "prediction_id": "player-frame-000491-det-003",
+          "timestamp_ms": 19640,
+          "label": "player",
+          "confidence": 0.6875,
+          "bounding_box": {
+            "x_min": 0.8643157323201497,
+            "y_min": 0.527494529441551,
+            "x_max": 0.8828477223714193,
+            "y_max": 0.5759901258680555
+          },
+          "track_id": 139
+        },
+        "source_prediction_ids": [
+          "soccernet-0082",
+          "ball-frame-000488-det-000",
+          "player-frame-000491-det-003"
+        ],
+        "track_id": 139,
+        "player_id": null,
+        "action_ball_delta_ms": 0,
+        "action_player_delta_ms": 120,
+        "image_center_distance": 0.02278442084426243,
+        "confidence": 0.336212158203125
+      }
+    ],
+    "decision_details": [
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0000",
+          "timestamp_ms": 160,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.294677734375
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0000",
+            "timestamp_ms": 160,
+            "label": "drive",
+            "visual_team": "left",
+            "confidence": 0.294677734375
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000005-det-000",
+            "timestamp_ms": 200,
+            "label": "ball",
+            "confidence": 0.1461181640625,
+            "bounding_box": {
+              "x_min": 0.1162109375,
+              "y_min": 0.38819444444444445,
+              "x_max": 0.1224609375,
+              "y_max": 0.40069444444444446
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000007-det-015",
+            "timestamp_ms": 280,
+            "label": "player",
+            "confidence": 0.8427734375,
+            "bounding_box": {
+              "x_min": 0.10942975680033366,
+              "y_min": 0.36081972475405094,
+              "x_max": 0.12487273216247559,
+              "y_max": 0.40155252527307583
+            },
+            "track_id": 19
+          },
+          "source_prediction_ids": [
+            "soccernet-0000",
+            "ball-frame-000005-det-000",
+            "player-frame-000007-det-015"
+          ],
+          "track_id": 19,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.013437109723328821,
+          "confidence": 0.1461181640625
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0001",
+          "timestamp_ms": 160,
+          "label": "out",
+          "visual_team": "left",
+          "confidence": 0.01314544677734375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0002",
+          "timestamp_ms": 160,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.3798828125
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0002",
+            "timestamp_ms": 160,
+            "label": "pass",
+            "visual_team": "left",
+            "confidence": 0.3798828125
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000005-det-000",
+            "timestamp_ms": 200,
+            "label": "ball",
+            "confidence": 0.1461181640625,
+            "bounding_box": {
+              "x_min": 0.1162109375,
+              "y_min": 0.38819444444444445,
+              "x_max": 0.1224609375,
+              "y_max": 0.40069444444444446
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000007-det-015",
+            "timestamp_ms": 280,
+            "label": "player",
+            "confidence": 0.8427734375,
+            "bounding_box": {
+              "x_min": 0.10942975680033366,
+              "y_min": 0.36081972475405094,
+              "x_max": 0.12487273216247559,
+              "y_max": 0.40155252527307583
+            },
+            "track_id": 19
+          },
+          "source_prediction_ids": [
+            "soccernet-0002",
+            "ball-frame-000005-det-000",
+            "player-frame-000007-det-015"
+          ],
+          "track_id": 19,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.013437109723328821,
+          "confidence": 0.1461181640625
+        },
+        "reasons": []
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0003",
+          "timestamp_ms": 240,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.381103515625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0003",
+            "timestamp_ms": 240,
+            "label": "high pass",
+            "visual_team": "left",
+            "confidence": 0.381103515625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000006-det-000",
+            "timestamp_ms": 240,
+            "label": "ball",
+            "confidence": 0.68505859375,
+            "bounding_box": {
+              "x_min": 0.1173828125,
+              "y_min": 0.3902777777777778,
+              "x_max": 0.1232421875,
+              "y_max": 0.4013888888888889
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000007-det-015",
+            "timestamp_ms": 280,
+            "label": "player",
+            "confidence": 0.8427734375,
+            "bounding_box": {
+              "x_min": 0.10942975680033366,
+              "y_min": 0.36081972475405094,
+              "x_max": 0.12487273216247559,
+              "y_max": 0.40155252527307583
+            },
+            "track_id": 19
+          },
+          "source_prediction_ids": [
+            "soccernet-0003",
+            "ball-frame-000006-det-000",
+            "player-frame-000007-det-015"
+          ],
+          "track_id": 19,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 40,
+          "image_center_distance": 0.014984466891304072,
+          "confidence": 0.381103515625
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0004",
+          "timestamp_ms": 240,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.0224456787109375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0005",
+          "timestamp_ms": 640,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.0202178955078125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0006",
+          "timestamp_ms": 640,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.02618408203125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0007",
+          "timestamp_ms": 1680,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.0128021240234375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0008",
+          "timestamp_ms": 1920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.030548095703125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0009",
+          "timestamp_ms": 2000,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.01982879638671875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0010",
+          "timestamp_ms": 2320,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.02263641357421875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0011",
+          "timestamp_ms": 2720,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.01039886474609375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0012",
+          "timestamp_ms": 3040,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.012847900390625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0013",
+          "timestamp_ms": 3360,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.01645660400390625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0014",
+          "timestamp_ms": 3440,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.02872467041015625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0015",
+          "timestamp_ms": 3840,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.037445068359375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0016",
+          "timestamp_ms": 4080,
+          "label": "throw in",
+          "visual_team": "left",
+          "confidence": 0.013865153305232525
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0017",
+          "timestamp_ms": 4160,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.5174153447151184
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0017",
+            "timestamp_ms": 4160,
+            "label": "pass",
+            "visual_team": "left",
+            "confidence": 0.5174153447151184
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000107-det-000",
+            "timestamp_ms": 4280,
+            "label": "ball",
+            "confidence": 0.299072265625,
+            "bounding_box": {
+              "x_min": 0.279296875,
+              "y_min": 0.3923611111111111,
+              "x_max": 0.287109375,
+              "y_max": 0.40555555555555556
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000107-det-008",
+            "timestamp_ms": 4280,
+            "label": "player",
+            "confidence": 0.60009765625,
+            "bounding_box": {
+              "x_min": 0.24220863978068033,
+              "y_min": 0.3815718756781684,
+              "x_max": 0.25457261403401693,
+              "y_max": 0.4223083778663918
+            },
+            "track_id": 4
+          },
+          "source_prediction_ids": [
+            "soccernet-0017",
+            "ball-frame-000107-det-000",
+            "player-frame-000107-det-008"
+          ],
+          "track_id": 4,
+          "player_id": null,
+          "action_ball_delta_ms": 120,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.03493996444708266,
+          "confidence": 0.299072265625
+        },
+        "reasons": []
+      },
+      {
+        "status": "ambiguous",
+        "action": {
+          "prediction_id": "soccernet-0018",
+          "timestamp_ms": 4320,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.5891926884651184
+        },
+        "candidate": null,
+        "reasons": [
+          "Dos jugadores son espacialmente indistinguibles con la política actual"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0019",
+          "timestamp_ms": 4720,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.03499603271484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0020",
+          "timestamp_ms": 4800,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.0192108154296875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0021",
+          "timestamp_ms": 4880,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.01541900634765625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0022",
+          "timestamp_ms": 5120,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.013692219741642475
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0023",
+          "timestamp_ms": 5200,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.0242462158203125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0024",
+          "timestamp_ms": 5360,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.015045166015625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0025",
+          "timestamp_ms": 5920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.08697509765625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0026",
+          "timestamp_ms": 6160,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.05295562744140625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0027",
+          "timestamp_ms": 6240,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.031940460205078125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0028",
+          "timestamp_ms": 6320,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.02338409423828125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0029",
+          "timestamp_ms": 7280,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.034290313720703125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0030",
+          "timestamp_ms": 7280,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.027370452880859375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0031",
+          "timestamp_ms": 7920,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.0442962646484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0032",
+          "timestamp_ms": 8000,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.066619873046875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0033",
+          "timestamp_ms": 8320,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.1164703369140625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0033",
+            "timestamp_ms": 8320,
+            "label": "drive",
+            "visual_team": "left",
+            "confidence": 0.1164703369140625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000207-det-000",
+            "timestamp_ms": 8280,
+            "label": "ball",
+            "confidence": 0.4853515625,
+            "bounding_box": {
+              "x_min": 0.724609375,
+              "y_min": 0.5916666666666667,
+              "x_max": 0.731640625,
+              "y_max": 0.6041666666666666
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000210-det-002",
+            "timestamp_ms": 8400,
+            "label": "player",
+            "confidence": 0.892578125,
+            "bounding_box": {
+              "x_min": 0.7117279052734375,
+              "y_min": 0.5878659283673322,
+              "x_max": 0.7330684026082357,
+              "y_max": 0.6468102349175348
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0033",
+            "ball-frame-000207-det-000",
+            "player-frame-000210-det-002"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 80,
+          "image_center_distance": 0.020248163507989886,
+          "confidence": 0.1164703369140625
+        },
+        "reasons": []
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0034",
+          "timestamp_ms": 8320,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.113525390625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0034",
+            "timestamp_ms": 8320,
+            "label": "drive",
+            "visual_team": "right",
+            "confidence": 0.113525390625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000207-det-000",
+            "timestamp_ms": 8280,
+            "label": "ball",
+            "confidence": 0.4853515625,
+            "bounding_box": {
+              "x_min": 0.724609375,
+              "y_min": 0.5916666666666667,
+              "x_max": 0.731640625,
+              "y_max": 0.6041666666666666
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000210-det-002",
+            "timestamp_ms": 8400,
+            "label": "player",
+            "confidence": 0.892578125,
+            "bounding_box": {
+              "x_min": 0.7117279052734375,
+              "y_min": 0.5878659283673322,
+              "x_max": 0.7330684026082357,
+              "y_max": 0.6468102349175348
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0034",
+            "ball-frame-000207-det-000",
+            "player-frame-000210-det-002"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 80,
+          "image_center_distance": 0.020248163507989886,
+          "confidence": 0.113525390625
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0035",
+          "timestamp_ms": 8720,
+          "label": "header",
+          "visual_team": "left",
+          "confidence": 0.011590957641601562
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0036",
+          "timestamp_ms": 8720,
+          "label": "header",
+          "visual_team": "right",
+          "confidence": 0.011150360107421875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0037",
+          "timestamp_ms": 9360,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.032810211181640625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0038",
+          "timestamp_ms": 9520,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.24365234375
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0038",
+            "timestamp_ms": 9520,
+            "label": "pass",
+            "visual_team": "right",
+            "confidence": 0.24365234375
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000237-det-000",
+            "timestamp_ms": 9480,
+            "label": "ball",
+            "confidence": 0.161376953125,
+            "bounding_box": {
+              "x_min": 0.7,
+              "y_min": 0.5888888888888889,
+              "x_max": 0.7078125,
+              "y_max": 0.6027777777777777
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000236-det-001",
+            "timestamp_ms": 9440,
+            "label": "player",
+            "confidence": 0.9140625,
+            "bounding_box": {
+              "x_min": 0.7010868708292644,
+              "y_min": 0.5876274391456887,
+              "x_max": 0.7197776158650716,
+              "y_max": 0.6562095924660012
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0038",
+            "ball-frame-000237-det-000",
+            "player-frame-000236-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 80,
+          "image_center_distance": 0.026889130402292773,
+          "confidence": 0.161376953125
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0039",
+          "timestamp_ms": 9840,
+          "label": "header",
+          "visual_team": "left",
+          "confidence": 0.02004528045654297
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0040",
+          "timestamp_ms": 9840,
+          "label": "header",
+          "visual_team": "right",
+          "confidence": 0.02065277099609375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0041",
+          "timestamp_ms": 9840,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.03567314147949219
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0042",
+          "timestamp_ms": 9840,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.04817771911621094
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "ambiguous",
+        "action": {
+          "prediction_id": "soccernet-0043",
+          "timestamp_ms": 9840,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.188720703125
+        },
+        "candidate": null,
+        "reasons": [
+          "Dos jugadores son espacialmente indistinguibles con la política actual"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0044",
+          "timestamp_ms": 10000,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.033416748046875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0045",
+          "timestamp_ms": 10400,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.020778656005859375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0046",
+          "timestamp_ms": 11040,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.262481689453125
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0046",
+            "timestamp_ms": 11040,
+            "label": "pass",
+            "visual_team": "left",
+            "confidence": 0.262481689453125
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000276-det-000",
+            "timestamp_ms": 11040,
+            "label": "ball",
+            "confidence": 0.79248046875,
+            "bounding_box": {
+              "x_min": 0.43046875,
+              "y_min": 0.5923611111111111,
+              "x_max": 0.43984375,
+              "y_max": 0.6076388888888888
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000273-det-008",
+            "timestamp_ms": 10920,
+            "label": "player",
+            "confidence": 0.9013671875,
+            "bounding_box": {
+              "x_min": 0.3750218391418457,
+              "y_min": 0.6384941948784723,
+              "x_max": 0.3947106043497721,
+              "y_max": 0.6983378657588253
+            },
+            "track_id": 68
+          },
+          "source_prediction_ids": [
+            "soccernet-0046",
+            "ball-frame-000276-det-000",
+            "player-frame-000273-det-008"
+          ],
+          "track_id": 68,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.0849107775630963,
+          "confidence": 0.262481689453125
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0047",
+          "timestamp_ms": 11120,
+          "label": "header",
+          "visual_team": "left",
+          "confidence": 0.0370330810546875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0048",
+          "timestamp_ms": 11200,
+          "label": "header",
+          "visual_team": "right",
+          "confidence": 0.014749109745025635
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0049",
+          "timestamp_ms": 11280,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.03882789611816406
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0050",
+          "timestamp_ms": 11280,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.10533905029296875
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0050",
+            "timestamp_ms": 11280,
+            "label": "pass",
+            "visual_team": "right",
+            "confidence": 0.10533905029296875
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000282-det-000",
+            "timestamp_ms": 11280,
+            "label": "ball",
+            "confidence": 0.537109375,
+            "bounding_box": {
+              "x_min": 0.392578125,
+              "y_min": 0.6527777777777778,
+              "x_max": 0.401171875,
+              "y_max": 0.6680555555555555
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000279-det-008",
+            "timestamp_ms": 11160,
+            "label": "player",
+            "confidence": 0.880859375,
+            "bounding_box": {
+              "x_min": 0.3819228172302246,
+              "y_min": 0.6564702351888021,
+              "x_max": 0.4023991902669271,
+              "y_max": 0.7229255393699363
+            },
+            "track_id": 68
+          },
+          "source_prediction_ids": [
+            "soccernet-0050",
+            "ball-frame-000282-det-000",
+            "player-frame-000279-det-008"
+          ],
+          "track_id": 68,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.02965824744026857,
+          "confidence": 0.10533905029296875
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0051",
+          "timestamp_ms": 11920,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.038486480712890625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0052",
+          "timestamp_ms": 12080,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.39630126953125
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0052",
+            "timestamp_ms": 12080,
+            "label": "pass",
+            "visual_team": "left",
+            "confidence": 0.39630126953125
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000301-det-000",
+            "timestamp_ms": 12040,
+            "label": "ball",
+            "confidence": 0.69921875,
+            "bounding_box": {
+              "x_min": 0.5875,
+              "y_min": 0.6208333333333333,
+              "x_max": 0.596875,
+              "y_max": 0.6375
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000305-det-009",
+            "timestamp_ms": 12200,
+            "label": "player",
+            "confidence": 0.87890625,
+            "bounding_box": {
+              "x_min": 0.5750645955403646,
+              "y_min": 0.5760065714518229,
+              "x_max": 0.589772097269694,
+              "y_max": 0.6304479528356481
+            },
+            "track_id": 24
+          },
+          "source_prediction_ids": [
+            "soccernet-0052",
+            "ball-frame-000301-det-000",
+            "player-frame-000305-det-009"
+          ],
+          "track_id": 24,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.027718027869355857,
+          "confidence": 0.39630126953125
+        },
+        "reasons": []
+      },
+      {
+        "status": "ambiguous",
+        "action": {
+          "prediction_id": "soccernet-0053",
+          "timestamp_ms": 12320,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.35793304443359375
+        },
+        "candidate": null,
+        "reasons": [
+          "Dos jugadores son espacialmente indistinguibles con la política actual"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0054",
+          "timestamp_ms": 12480,
+          "label": "header",
+          "visual_team": "left",
+          "confidence": 0.010301589965820312
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0055",
+          "timestamp_ms": 12480,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.048511505126953125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0056",
+          "timestamp_ms": 13120,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.100799560546875
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0056",
+            "timestamp_ms": 13120,
+            "label": "drive",
+            "visual_team": "right",
+            "confidence": 0.100799560546875
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000328-det-000",
+            "timestamp_ms": 13120,
+            "label": "ball",
+            "confidence": 0.78857421875,
+            "bounding_box": {
+              "x_min": 0.80078125,
+              "y_min": 0.7763888888888889,
+              "x_max": 0.81015625,
+              "y_max": 0.7916666666666666
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000331-det-001",
+            "timestamp_ms": 13240,
+            "label": "player",
+            "confidence": 0.9091796875,
+            "bounding_box": {
+              "x_min": 0.7572767257690429,
+              "y_min": 0.7474727489330151,
+              "x_max": 0.7915440241495768,
+              "y_max": 0.8176214712637442
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0056",
+            "ball-frame-000328-det-000",
+            "player-frame-000331-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.031093649463274257,
+          "confidence": 0.100799560546875
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0057",
+          "timestamp_ms": 13840,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.036556243896484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0058",
+          "timestamp_ms": 13920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.185791015625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0058",
+            "timestamp_ms": 13920,
+            "label": "drive",
+            "visual_team": "left",
+            "confidence": 0.185791015625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000348-det-000",
+            "timestamp_ms": 13920,
+            "label": "ball",
+            "confidence": 0.1451416015625,
+            "bounding_box": {
+              "x_min": 0.86015625,
+              "y_min": 0.8069444444444445,
+              "x_max": 0.86953125,
+              "y_max": 0.8236111111111111
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000351-det-001",
+            "timestamp_ms": 14040,
+            "label": "player",
+            "confidence": 0.875,
+            "bounding_box": {
+              "x_min": 0.8368786493937175,
+              "y_min": 0.7678027682834201,
+              "x_max": 0.867548116048177,
+              "y_max": 0.840818504050926
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0058",
+            "ball-frame-000348-det-000",
+            "player-frame-000351-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.016727354025990536,
+          "confidence": 0.1451416015625
+        },
+        "reasons": []
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0059",
+          "timestamp_ms": 13920,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.107421875
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0059",
+            "timestamp_ms": 13920,
+            "label": "pass",
+            "visual_team": "left",
+            "confidence": 0.107421875
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000348-det-000",
+            "timestamp_ms": 13920,
+            "label": "ball",
+            "confidence": 0.1451416015625,
+            "bounding_box": {
+              "x_min": 0.86015625,
+              "y_min": 0.8069444444444445,
+              "x_max": 0.86953125,
+              "y_max": 0.8236111111111111
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000351-det-001",
+            "timestamp_ms": 14040,
+            "label": "player",
+            "confidence": 0.875,
+            "bounding_box": {
+              "x_min": 0.8368786493937175,
+              "y_min": 0.7678027682834201,
+              "x_max": 0.867548116048177,
+              "y_max": 0.840818504050926
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0059",
+            "ball-frame-000348-det-000",
+            "player-frame-000351-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.016727354025990536,
+          "confidence": 0.107421875
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0060",
+          "timestamp_ms": 14160,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.030548095703125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0061",
+          "timestamp_ms": 14240,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.416015625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0061",
+            "timestamp_ms": 14240,
+            "label": "high pass",
+            "visual_team": "left",
+            "confidence": 0.416015625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000356-det-000",
+            "timestamp_ms": 14240,
+            "label": "ball",
+            "confidence": 0.7080078125,
+            "bounding_box": {
+              "x_min": 0.8859375,
+              "y_min": 0.8083333333333333,
+              "x_max": 0.8953125,
+              "y_max": 0.8236111111111111
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000359-det-001",
+            "timestamp_ms": 14360,
+            "label": "player",
+            "confidence": 0.8232421875,
+            "bounding_box": {
+              "x_min": 0.8641833623250326,
+              "y_min": 0.7716827957718461,
+              "x_max": 0.895303471883138,
+              "y_max": 0.8475807472511574
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0061",
+            "ball-frame-000356-det-000",
+            "player-frame-000359-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.012594052625574517,
+          "confidence": 0.416015625
+        },
+        "reasons": []
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0062",
+          "timestamp_ms": 14320,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.1100616455078125
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0062",
+            "timestamp_ms": 14320,
+            "label": "high pass",
+            "visual_team": "right",
+            "confidence": 0.1100616455078125
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000359-det-000",
+            "timestamp_ms": 14360,
+            "label": "ball",
+            "confidence": 0.1171875,
+            "bounding_box": {
+              "x_min": 0.89375,
+              "y_min": 0.8,
+              "x_max": 0.903125,
+              "y_max": 0.8166666666666667
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000361-det-001",
+            "timestamp_ms": 14440,
+            "label": "player",
+            "confidence": 0.90478515625,
+            "bounding_box": {
+              "x_min": 0.8722359975179036,
+              "y_min": 0.7716346458152489,
+              "x_max": 0.9024447123209636,
+              "y_max": 0.846830975567853
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0062",
+            "ball-frame-000359-det-000",
+            "player-frame-000361-det-001"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.011133538900865454,
+          "confidence": 0.1100616455078125
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0063",
+          "timestamp_ms": 14960,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.02864837646484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0064",
+          "timestamp_ms": 14960,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.023632049560546875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0065",
+          "timestamp_ms": 15200,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.034881591796875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0066",
+          "timestamp_ms": 15920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.0461883544921875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0067",
+          "timestamp_ms": 16080,
+          "label": "out",
+          "visual_team": "left",
+          "confidence": 0.013562202453613281
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0068",
+          "timestamp_ms": 16080,
+          "label": "out",
+          "visual_team": "right",
+          "confidence": 0.02642059326171875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0069",
+          "timestamp_ms": 16320,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.07118988037109375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0070",
+          "timestamp_ms": 16480,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.060497283935546875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0071",
+          "timestamp_ms": 16480,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.108734130859375
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0071",
+            "timestamp_ms": 16480,
+            "label": "pass",
+            "visual_team": "right",
+            "confidence": 0.108734130859375
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000413-det-000",
+            "timestamp_ms": 16520,
+            "label": "ball",
+            "confidence": 0.1973876953125,
+            "bounding_box": {
+              "x_min": 0.83671875,
+              "y_min": 0.7034722222222223,
+              "x_max": 0.84453125,
+              "y_max": 0.7173611111111111
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000409-det-014",
+            "timestamp_ms": 16360,
+            "label": "player",
+            "confidence": 0.900390625,
+            "bounding_box": {
+              "x_min": 0.8187922795613607,
+              "y_min": 0.6970071863245081,
+              "x_max": 0.8389577865600586,
+              "y_max": 0.7604671902126736
+            },
+            "track_id": 7
+          },
+          "source_prediction_ids": [
+            "soccernet-0071",
+            "ball-frame-000413-det-000",
+            "player-frame-000409-det-014"
+          ],
+          "track_id": 7,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.021764724552380328,
+          "confidence": 0.108734130859375
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0072",
+          "timestamp_ms": 17280,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.031673431396484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0073",
+          "timestamp_ms": 17360,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.041473388671875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0074",
+          "timestamp_ms": 17520,
+          "label": "out",
+          "visual_team": "left",
+          "confidence": 0.02294158935546875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0075",
+          "timestamp_ms": 17520,
+          "label": "out",
+          "visual_team": "right",
+          "confidence": 0.028564453125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0076",
+          "timestamp_ms": 17920,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.010008811950683594
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0077",
+          "timestamp_ms": 17920,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.03814697265625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0078",
+          "timestamp_ms": 17920,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.0549163818359375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0079",
+          "timestamp_ms": 18480,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.0650177001953125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0080",
+          "timestamp_ms": 18480,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.1684722900390625
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0080",
+            "timestamp_ms": 18480,
+            "label": "drive",
+            "visual_team": "right",
+            "confidence": 0.1684722900390625
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000461-det-000",
+            "timestamp_ms": 18440,
+            "label": "ball",
+            "confidence": 0.1895751953125,
+            "bounding_box": {
+              "x_min": 0.9015625,
+              "y_min": 0.5868055555555556,
+              "x_max": 0.9078125,
+              "y_max": 0.6006944444444444
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000461-det-003",
+            "timestamp_ms": 18440,
+            "label": "player",
+            "confidence": 0.8798828125,
+            "bounding_box": {
+              "x_min": 0.9075576146443685,
+              "y_min": 0.5451907122576678,
+              "x_max": 0.9277830759684245,
+              "y_max": 0.6020666051793981
+            },
+            "track_id": 139
+          },
+          "source_prediction_ids": [
+            "soccernet-0080",
+            "ball-frame-000461-det-000",
+            "player-frame-000461-det-003"
+          ],
+          "track_id": 139,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 40,
+          "image_center_distance": 0.02394624495020227,
+          "confidence": 0.1684722900390625
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0081",
+          "timestamp_ms": 18960,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.021587371826171875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0082",
+          "timestamp_ms": 19520,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.336212158203125
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0082",
+            "timestamp_ms": 19520,
+            "label": "high pass",
+            "visual_team": "right",
+            "confidence": 0.336212158203125
+          },
+          "ball": {
+            "prediction_id": "ball-frame-000488-det-000",
+            "timestamp_ms": 19520,
+            "label": "ball",
+            "confidence": 0.5341796875,
+            "bounding_box": {
+              "x_min": 0.8640625,
+              "y_min": 0.5680555555555555,
+              "x_max": 0.8703125,
+              "y_max": 0.5791666666666667
+            },
+            "track_id": null
+          },
+          "player": {
+            "prediction_id": "player-frame-000491-det-003",
+            "timestamp_ms": 19640,
+            "label": "player",
+            "confidence": 0.6875,
+            "bounding_box": {
+              "x_min": 0.8643157323201497,
+              "y_min": 0.527494529441551,
+              "x_max": 0.8828477223714193,
+              "y_max": 0.5759901258680555
+            },
+            "track_id": 139
+          },
+          "source_prediction_ids": [
+            "soccernet-0082",
+            "ball-frame-000488-det-000",
+            "player-frame-000491-det-003"
+          ],
+          "track_id": 139,
+          "player_id": null,
+          "action_ball_delta_ms": 0,
+          "action_player_delta_ms": 120,
+          "image_center_distance": 0.02278442084426243,
+          "confidence": 0.336212158203125
+        },
+        "reasons": []
+      },
+      {
+        "status": "candidate",
+        "action": {
+          "prediction_id": "soccernet-0083",
+          "timestamp_ms": 19680,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.52508544921875
+        },
+        "candidate": {
+          "action": {
+            "prediction_id": "soccernet-0083",
+            "timestamp_ms": 19680,
+            "label": "pass",
+            "visual_team": "right",
+            "confidence": 0.52508544921875
+          },
+          "ball": {
+            "prediction_id": "player-frame-000491-det-022",
+            "timestamp_ms": 19640,
+            "label": "ball",
+            "confidence": 0.106689453125,
+            "bounding_box": {
+              "x_min": 0.8624612808227539,
+              "y_min": 0.5658218383789062,
+              "x_max": 0.8697682698567708,
+              "y_max": 0.5781914605034723
+            },
+            "track_id": 304
+          },
+          "player": {
+            "prediction_id": "player-frame-000493-det-003",
+            "timestamp_ms": 19720,
+            "label": "player",
+            "confidence": 0.69091796875,
+            "bounding_box": {
+              "x_min": 0.8600912094116211,
+              "y_min": 0.5303632948133681,
+              "x_max": 0.8787551244099935,
+              "y_max": 0.576743005823206
+            },
+            "track_id": 139
+          },
+          "source_prediction_ids": [
+            "soccernet-0083",
+            "player-frame-000491-det-022",
+            "player-frame-000493-det-003"
+          ],
+          "track_id": 139,
+          "player_id": null,
+          "action_ball_delta_ms": 40,
+          "action_player_delta_ms": 40,
+          "image_center_distance": 0.018747722119401924,
+          "confidence": 0.106689453125
+        },
+        "reasons": []
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0084",
+          "timestamp_ms": 19680,
+          "label": "throw in",
+          "visual_team": "right",
+          "confidence": 0.022365570068359375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0085",
+          "timestamp_ms": 20000,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.034671783447265625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0086",
+          "timestamp_ms": 20000,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.0786285400390625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0087",
+          "timestamp_ms": 20400,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.025653839111328125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0088",
+          "timestamp_ms": 20400,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.02048492431640625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0089",
+          "timestamp_ms": 20720,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.015577316284179688
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0090",
+          "timestamp_ms": 21440,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.084930419921875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0091",
+          "timestamp_ms": 21440,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.105377197265625
+        },
+        "candidate": null,
+        "reasons": [
+          "No existe una detección de balón dentro de la ventana temporal"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0092",
+          "timestamp_ms": 21840,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.043384552001953125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0093",
+          "timestamp_ms": 22000,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.02782440185546875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0094",
+          "timestamp_ms": 22480,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.018129348754882812
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0095",
+          "timestamp_ms": 22480,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.017253875732421875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0096",
+          "timestamp_ms": 22880,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.02213287353515625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0097",
+          "timestamp_ms": 23920,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.017034530639648438
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0098",
+          "timestamp_ms": 23920,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.016742706298828125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0099",
+          "timestamp_ms": 24000,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.04049062728881836
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0100",
+          "timestamp_ms": 24000,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.03269481658935547
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0101",
+          "timestamp_ms": 24000,
+          "label": "out",
+          "visual_team": "left",
+          "confidence": 0.012467384338378906
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0102",
+          "timestamp_ms": 24000,
+          "label": "out",
+          "visual_team": "right",
+          "confidence": 0.010111808776855469
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0103",
+          "timestamp_ms": 24000,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.053302764892578125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0104",
+          "timestamp_ms": 24000,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.04315948486328125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0105",
+          "timestamp_ms": 24000,
+          "label": "throw in",
+          "visual_team": "left",
+          "confidence": 0.010471701622009277
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0106",
+          "timestamp_ms": 24960,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.021654129028320312
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0107",
+          "timestamp_ms": 25040,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.016023635864257812
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0108",
+          "timestamp_ms": 25520,
+          "label": "high pass",
+          "visual_team": "left",
+          "confidence": 0.02047884464263916
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0109",
+          "timestamp_ms": 25680,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.046662330627441406
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0110",
+          "timestamp_ms": 25760,
+          "label": "high pass",
+          "visual_team": "right",
+          "confidence": 0.013038396835327148
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0111",
+          "timestamp_ms": 25840,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.03920269012451172
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0112",
+          "timestamp_ms": 26240,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.01715564727783203
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0113",
+          "timestamp_ms": 26480,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.021653175354003906
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0114",
+          "timestamp_ms": 26720,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.016338348388671875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0115",
+          "timestamp_ms": 27360,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.029850006103515625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0116",
+          "timestamp_ms": 27520,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.03394317626953125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0117",
+          "timestamp_ms": 27840,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.027219772338867188
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0118",
+          "timestamp_ms": 27840,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.0247650146484375
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0119",
+          "timestamp_ms": 28400,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.02275848388671875
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0120",
+          "timestamp_ms": 28560,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.023412704467773438
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0121",
+          "timestamp_ms": 28880,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.03979682922363281
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0122",
+          "timestamp_ms": 28880,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.03399467468261719
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0123",
+          "timestamp_ms": 29760,
+          "label": "drive",
+          "visual_team": "left",
+          "confidence": 0.024152755737304688
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0124",
+          "timestamp_ms": 29760,
+          "label": "drive",
+          "visual_team": "right",
+          "confidence": 0.020954132080078125
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0125",
+          "timestamp_ms": 29920,
+          "label": "pass",
+          "visual_team": "left",
+          "confidence": 0.023197174072265625
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      },
+      {
+        "status": "insufficient_evidence",
+        "action": {
+          "prediction_id": "soccernet-0126",
+          "timestamp_ms": 29920,
+          "label": "pass",
+          "visual_team": "right",
+          "confidence": 0.019559860229492188
+        },
+        "candidate": null,
+        "reasons": [
+          "La confianza de la acción no alcanza el umbral"
+        ]
+      }
+    ]
+  },
+  "policy_grid": [
+    {
+      "policy": {
+        "temporal_tolerance_ms": 80,
+        "image_distance_tolerance": 0.08,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 17,
+      "candidates": 11,
+      "suppressed_competing_candidates": 6,
+      "ambiguous": 2,
+      "insufficient_evidence": 108,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "No existe una detección de balón dentro de la ventana temporal": 2,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 2,
+        "El jugador más cercano supera la tolerancia espacial de imagen": 2
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 80,
+        "image_distance_tolerance": 0.12,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 18,
+      "candidates": 11,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 106,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "No existe una detección de balón dentro de la ventana temporal": 2,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 80,
+        "image_distance_tolerance": 0.18,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 18,
+      "candidates": 11,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 106,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "No existe una detección de balón dentro de la ventana temporal": 2,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 120,
+        "image_distance_tolerance": 0.08,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 18,
+      "candidates": 12,
+      "suppressed_competing_candidates": 6,
+      "ambiguous": 2,
+      "insufficient_evidence": 107,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 2,
+        "El jugador más cercano supera la tolerancia espacial de imagen": 2,
+        "No existe una detección de balón dentro de la ventana temporal": 1
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 120,
+        "image_distance_tolerance": 0.12,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 19,
+      "candidates": 12,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 105,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3,
+        "No existe una detección de balón dentro de la ventana temporal": 1
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 120,
+        "image_distance_tolerance": 0.18,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 19,
+      "candidates": 12,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 105,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3,
+        "No existe una detección de balón dentro de la ventana temporal": 1
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 200,
+        "image_distance_tolerance": 0.08,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 18,
+      "candidates": 12,
+      "suppressed_competing_candidates": 6,
+      "ambiguous": 3,
+      "insufficient_evidence": 106,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3,
+        "El jugador más cercano supera la tolerancia espacial de imagen": 2
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 200,
+        "image_distance_tolerance": 0.12,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 19,
+      "candidates": 12,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 105,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3,
+        "El jugador más cercano supera la tolerancia espacial de imagen": 1
+      }
+    },
+    {
+      "policy": {
+        "temporal_tolerance_ms": 200,
+        "image_distance_tolerance": 0.18,
+        "ambiguity_margin": 0.01,
+        "minimum_action_confidence": 0.1
+      },
+      "actions_evaluated": 127,
+      "raw_candidates": 20,
+      "candidates": 13,
+      "suppressed_competing_candidates": 7,
+      "ambiguous": 3,
+      "insufficient_evidence": 104,
+      "reason_counts": {
+        "La confianza de la acción no alcanza el umbral": 104,
+        "Dos jugadores son espacialmente indistinguibles con la política actual": 3
+      }
+    }
+  ],
+  "decision": "experimental_candidates_only",
+  "limitations": [
+    "La distancia pertenece a la imagen, no a coordenadas calibradas del campo.",
+    "SoccerNet no identifica al ejecutor ni entrega posición espacial.",
+    "El equipo left/right de SoccerNet no está asociado todavía a la plantilla.",
+    "Ningún candidato contiene player_id ni se convierte en MatchEvent.",
+    "La validación manual de aciertos y falsos emparejamientos sigue pendiente."
+  ]
+}

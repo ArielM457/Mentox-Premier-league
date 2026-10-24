@@ -148,3 +148,12 @@ select, textarea { font: inherit; }
 @media (max-width: 760px) {
   .event-feed button { grid-template-columns: 64px 1fr auto; }
 }
+.vision-panel { display: grid; gap: 16px; }
+.vision-panel > header { align-items: center; display: flex; justify-content: space-between; }
+.vision-counters { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.vision-counters span { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 12px; display: grid; padding: 12px; }
+.vision-counters strong { font-size: 1.5rem; }
+.vision-feed { display: grid; gap: 8px; max-height: 390px; overflow: auto; }
+.vision-feed article { align-items: center; border-bottom: 1px solid var(--border); display: grid; gap: 12px; grid-template-columns: 72px 1fr; padding: 10px 0; }
+.vision-feed article div { display: grid; gap: 4px; }
+@media (max-width: 720px) { .vision-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

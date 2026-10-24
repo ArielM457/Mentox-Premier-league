@@ -97,4 +97,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ action, video_time_ms: t == null ? null : Math.floor(t) }),
     }),
+  visionStatus: () => request('/api/v1/integration/status'),
+  visionTimeline: (start, end, limit = 40) =>
+    request(`/api/v1/integration/timeline?start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&spatial_limit=${limit}`),
+  visionPlayback: (action, t) =>
+    request(`/api/v1/integration/live/playback/${action}`, {
+      method: 'POST',
+      body: action === 'restart' ? undefined : JSON.stringify({ video_time_ms: Math.floor(t) }),
+    }),
 }

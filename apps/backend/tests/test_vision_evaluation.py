@@ -63,6 +63,16 @@ def test_media_requires_documented_permission() -> None:
         replace(authorized_sample(), permission_reference="")
 
 
+def test_media_accepts_documented_source_terms() -> None:
+    media = replace(
+        authorized_sample(),
+        permission_basis=PermissionBasis.SOURCE_TERMS,
+        permission_reference="https://example.test/source-terms",
+    )
+
+    assert media.permission_basis is PermissionBasis.SOURCE_TERMS
+
+
 def test_model_records_version_classes_revision_and_configuration() -> None:
     model = roboflow_configuration()
 

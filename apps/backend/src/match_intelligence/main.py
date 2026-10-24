@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from .adapters.http.match_router import router as match_router
 from .adapters.http.narrative_router import router as narrative_router
 from .adapters.http.router import router
+from .adapters.http.integration_router import router as integration_router
 from .adapters.http.routing_router import router as routing_router
 from .application.match_session import SessionError
 
@@ -20,6 +21,7 @@ app.include_router(router)
 app.include_router(narrative_router)
 app.include_router(routing_router)
 app.include_router(match_router)
+app.include_router(integration_router)
 
 
 @app.exception_handler(SessionError)

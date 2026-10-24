@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
 import { formatMatchClock } from '../../lib/overlays.js'
 import { Button } from '../ui/Button.jsx'
@@ -168,5 +169,59 @@ export function AnnouncerPanel({ current, metadata, snapshot, timeMs }) {
       </div>
       {!current && <small className="context-badge">{t.match.deadTimeContext}</small>}
     </aside>
+  )
+}
+
+export function VisionPanel({ timeMs, seekVersion }) {
+  const { t } = usePreferences()
+  const [status, setStatus] = useState(null)
+  const [timeline, setTimeline] = useState(null)
+  const [error, setError] = useState(null)
+  const second = Math.floor(timeMs / 1000)
+
+  useEffect(() => {
+    let active = true
+    Promise.all([
+      api.visionStatus(),
+      api.visionTimeline(Math.max(0, second * 1000 - 1000), second * 1000 + 1000),
+    ]).then(([nextStatus, nextTimeline]) => {
+      if (!active) return
+      setStatus(nextStatus)
+      setTimeline(nextTimeline)
+      setError(null)
+    }).catch((reason) => active && setError(reason.message))
+    return () => { active = false }
+  }, [second, seekVersion])
+
+  if (error) {
+    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionUnavailable}: {error}</p></section>
+  }
+  if (!status || !timeline) {
+    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.common.loading}</p></section>
+  }
+  const observations = [
+    ...timeline.temporal_actions.map((item) => ({ ...item, category: t.match.visionAction })),
+    ...timeline.spatial_observations.map((item) => ({ ...item, category: t.match.visionDetection })),
+  ].sort((a, b) => a.timestamp_ms - b.timestamp_ms).slice(0, 40)
+
+  return (
+    <section className="vision-panel">
+      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-live">{status.ready ? t.match.visionReady : t.match.visionUnavailable}</span></header>
+      <p className="panel-note">{t.match.visionNotice}</p>
+      <div className="vision-counters">
+        <span><strong>{timeline.spatial_total}</strong>{t.match.visionDetections}</span>
+        <span><strong>{timeline.temporal_actions.length}</strong>{t.match.visionActions}</span>
+        <span><strong>{timeline.fusion_candidates.length}</strong>{t.match.visionCandidates}</span>
+        <span><strong>{status.fusion.match_events_published}</strong>MatchEvent</span>
+      </div>
+      <div className="vision-feed">
+        {observations.length ? observations.map((item) => (
+          <article key={item.prediction_id}>
+            <time>{(item.timestamp_ms / 1000).toFixed(2)} s</time>
+            <div><strong>{item.category} · {item.label}</strong><small>{t.match.visionConfidence}: {(item.confidence * 100).toFixed(1)}% · track_id: {item.track_id ?? '—'}</small></div>
+          </article>
+        )) : <p>{t.match.visionEmpty}</p>}
+      </div>
+    </section>
   )
 }

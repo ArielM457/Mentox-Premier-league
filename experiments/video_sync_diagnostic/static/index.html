@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mentox · Diagnóstico de sincronización</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Integración final · Datos y visión</p>
+          <h1>Pipeline integrado</h1>
+          <p class="lede">Valida el backend oficial con el vídeo permitido y las salidas reales de Roboflow Sports, SoccerNet y la fusión experimental.</p>
+        </div>
+        <span id="connection" class="badge">Iniciando sesión…</span>
+      </header>
+
+      <section class="notice" aria-label="Límite de evidencia">
+        <strong>Hechos y observaciones permanecen separados.</strong>
+        Los eventos del canal visible son sintéticos; las detecciones, acciones y candidatos provienen de los modelos y nunca se publican automáticamente como hechos.
+      </section>
+
+      <div class="layout">
+        <section class="card video-card">
+          <video id="match-video" preload="metadata" controls>
+            <source src="/media/integration-video.mp4" type="video/mp4" />
+          </video>
+          <div class="controls" aria-label="Controles de diagnóstico">
+            <button id="back" type="button">−5 s</button>
+            <button id="restart" type="button">Reiniciar</button>
+            <button id="forward" type="button">+5 s</button>
+            <button id="export" class="primary" type="button">Exportar registro JSON</button>
+          </div>
+          <p id="error" class="error" role="alert"></p>
+        </section>
+
+        <aside class="card telemetry" aria-labelledby="telemetry-title">
+          <h2 id="telemetry-title">Telemetría</h2>
+          <dl>
+            <div><dt>currentTime</dt><dd id="current-time">0.000 s</dd></div>
+            <div><dt>video_time_ms</dt><dd id="video-time">0</dd></div>
+            <div><dt>Estado</dt><dd id="playback-state">paused</dd></div>
+            <div><dt>Cursor</dt><dd id="cursor">0 / 5</dd></div>
+            <div><dt>Reconstruidos</dt><dd id="reconstructed-count">0</dd></div>
+          </dl>
+        </aside>
+      </div>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Backend oficial</p>
+            <h2>Estado del pipeline</h2>
+          </div>
+          <span id="pipeline-status" class="count">Consultando…</span>
+        </div>
+        <div id="pipeline-summary" class="pipeline-grid"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Canal WebSocket</p>
+            <h2>Observaciones recibidas desde Play</h2>
+          </div>
+          <span id="live-status" class="count">Conectando…</span>
+        </div>
+        <p>El panel comienza vacío. Durante esta prueba reproduce predicciones guardadas y solo muestra las que atravesaron el transporte configurado después de pulsar Play.</p>
+        <div id="live-results" class="events"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Canal visible</p>
+            <h2>Eventos cruzados durante reproducción</h2>
+          </div>
+          <span id="visible-count" class="count">0 eventos</span>
+        </div>
+        <div id="events" class="events" aria-live="polite"></div>
+      </section>
+
+      <section class="card reconstruction">
+        <p class="eyebrow">Estado reconstruido</p>
+        <h2>Historial después de un salto</h2>
+        <p>Este historial actualiza el estado, pero nunca reaparece como mensaje nuevo.</p>
+        <code id="reconstructed-events">Sin eventos anteriores</code>
+      </section>
+    </main>
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>

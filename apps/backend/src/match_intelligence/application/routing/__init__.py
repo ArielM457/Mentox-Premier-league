@@ -12,6 +12,7 @@ from .contracts import (
 )
 from .orchestrator import AgentOrchestrator, FixtureDispatchGateway
 from .service import AgentRoutingService
+from .pipeline import MemoryRoutingTransport, RoutedEventPipeline, RoutingTransport
 
 __all__ = [
     "AgentDispatch",
@@ -25,4 +26,7 @@ __all__ = [
     "RoutingEvaluationRequest",
     "RoutingEvent",
     "RoutingOutcome",
+    "MemoryRoutingTransport",
+    "RoutedEventPipeline",
+    "RoutingTransport",
 ]

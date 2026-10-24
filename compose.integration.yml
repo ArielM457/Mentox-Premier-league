@@ -1,0 +1,31 @@
+services:
+  mentox-integration:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile.integration
+    environment:
+      EVENT_TRANSPORT: ${EVENT_TRANSPORT:-memory}
+      EVENT_PRODUCER: ${EVENT_PRODUCER:-synthetic-generator}
+      EVENT_HUB_FULLY_QUALIFIED_NAMESPACE: ${EVENT_HUB_FULLY_QUALIFIED_NAMESPACE:-}
+      EVENT_HUB_NAME: ${EVENT_HUB_NAME:-}
+      EVENT_HUB_CONSUMER_GROUP: ${EVENT_HUB_CONSUMER_GROUP:-}
+      VISION_OBSERVATION_TRANSPORT: ${VISION_OBSERVATION_TRANSPORT:-memory}
+      VISION_EVENT_HUB_NAME: ${VISION_EVENT_HUB_NAME:-vision-observations}
+      VISION_EVENT_HUB_CONSUMER_GROUP: ${VISION_EVENT_HUB_CONSUMER_GROUP:-backend}
+      AZURE_BLOB_SERVICE_ENDPOINT: ${AZURE_BLOB_SERVICE_ENDPOINT:-}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID:-}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID:-}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET:-}
+      MENTOX_INTEGRATION_VIDEO: /workspace/experiments/authorized-video/input/2e57b9_0.mp4
+    ports:
+      - "8018:8018"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8018/api/v1/integration/live/status', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    volumes:
+      - ./experiments/authorized-video/input:/workspace/experiments/authorized-video/input:ro
+      - ./experiments/roboflow-sports/output-real:/workspace/experiments/roboflow-sports/output-real:ro
+      - ./experiments/soccernet-teamspotting/output-real:/workspace/experiments/soccernet-teamspotting/output-real:ro
+      - ./experiments/fusion-calibration/output:/workspace/experiments/fusion-calibration/output:ro
