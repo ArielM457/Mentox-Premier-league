@@ -216,3 +216,18 @@ Las personas usuarias de este módulo son sobre todo Persona 3 (narración) y Pe
 - La carga de datos se puede repetir sin duplicar y todo lo simulado lleva su origen.
 - Un script despliega Event Hubs, Storage, el registro, la identidad y las Container Apps, sin escribir la cadena de la base en la línea de comandos.
 - Otro script apaga o borra el despliegue para cuidar los créditos.
+
+### EA-US-13 · Explicar un momento con datos en el resumen
+
+**Como** aficionado o analista,
+**quiero** ver por qué un momento es importante y comparar alternativas con cifras medidas,
+**para** entender la jugada sin depender de un texto genérico.
+
+**Prioridad:** P1. **Estado:** verificada localmente. **Evidencia:** [EA-US-13](evidencias/EA-US-13.md).
+
+**Criterios de aceptación:**
+
+- El resumen muestra la prioridad, los motivos con sus puntos y los hechos con unidades del momento.
+- La cancha usa las posiciones reales del instante y marca a los jugadores de la alternativa elegida.
+- Cada alternativa del laboratorio muestra el valor real y el alternativo, o explica por qué no aplica.
+- Todo usa solo eventos ocurridos hasta el momento y declara el origen de las posiciones.

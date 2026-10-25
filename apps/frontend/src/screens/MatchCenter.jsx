@@ -250,7 +250,7 @@ function LiveMatch({ match }) {
             <StatsPanel metadata={metadata} snapshot={snapshot} timeMs={clock.time} />
           ) : activeTab === 'summary' ? (
             <div className="match-summary">
-              <MomentWorkspace events={pastEvents} metadata={metadata} moment={selectedMoment} onOpen={openMoment} />
+              <MomentWorkspace events={pastEvents} matchId={matchId} metadata={metadata} moment={selectedMoment} onOpen={openMoment} />
               <InsightsPanel events={pastEvents} metadata={metadata} moments={history} onOpen={openMoment} />
             </div>
           ) : activeTab === 'tactical' ? (

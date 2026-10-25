@@ -161,6 +161,7 @@
   .live-tactical-lab.agent-open .live-tactic-choices { grid-template-columns: 1fr; }
   .live-tactical-stage .preview-pitch { min-height: 320px; }
   .moment-workspace-grid, .commentary-stage { grid-template-columns: 1fr; }
+  .moment-evidence { grid-template-columns: 1fr; }
   .insight-list > button { grid-template-columns: 100px minmax(0,1fr); }
   .insight-list > button > .icon { display: none; }
   .commentary-preview .pitch { aspect-ratio: 1.45; }

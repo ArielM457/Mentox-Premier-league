@@ -113,6 +113,42 @@ Desde el 25 de octubre de 2026, `MatchEvent 1.0` trae faltas, tarjetas y detenci
 | Detención de 12 s | `stoppage_seconds = 12` con su límite | `test_injury_stoppage_reports_the_event_duration_and_its_limit` |
 | Partido en vivo de Persona 4 | El modo casual ve tarjetas y lesión; las faltas solo el analista | `test_casual_viewers_see_cards_but_not_every_foul` |
 
+## Lecturas «¿qué habría pasado si…?» (`what_if@1`)
+
+El laboratorio de jugadas de la pestaña Resumen ya no muestra un texto fijo. Cada opción compara el instante real del momento con una alternativa concreta, medida con las posiciones del seguimiento:
+
+| Lectura | Alternativa | Cifras que compara |
+|---|---|---|
+| `earlier_pass` | El último pase del momento, 1 s antes | Espacio del pasador y del receptor (distancia al rival más cercano) |
+| `early_shot` | El último remate, 1 s antes | Distancia y ángulo a la portería desde donde estaba el rematador, y su espacio |
+| `supporting_run` | El apoyo hacia el compañero más libre a menos de 25 m | Espacio y distancia al poseedor del compañero más cercano frente al más libre |
+| `keeper_steps` | El arquero rival 3 m más cerca del balón | Distancia al balón y a su línea de gol |
+
+Reglas:
+
+- Una posición solo se usa si hay una muestra de esa pista a menos de 0,3 s del instante; si falta, la lectura dice por qué no aplica.
+- Cada lectura lleva el origen de las posiciones.
+- Cada lectura avisa que compara espacios y no predice el resultado. No reemplaza al agente contrafactual de Persona 3.
+
+`GET /api/v1/matches/{match_id}/moments/{candidate_id}/analysis` devuelve, con los eventos ocurridos hasta el momento:
+
+- la prioridad y los motivos del motor de atención para el perfil;
+- los hechos con unidades;
+- las posiciones del instante;
+- las cuatro lecturas.
+
+Funciona con el motor real y con el provisional, porque los dos identifican un momento como `moment-<evento ancla>`.
+
+| Caso | Prueba |
+|---|---|
+| Pase un segundo antes con geometría conocida | `test_earlier_pass_compares_passer_and_receiver_space_one_second_before` |
+| Compañero más libre a menos de 25 m | `test_supporting_run_points_to_the_freest_teammate_within_25_m` |
+| Arquero 3 m más adelante | `test_keeper_steps_moves_the_rival_goalkeeper_three_metres_towards_the_ball` |
+| Remate un segundo antes | `test_early_shot_measures_distance_angle_and_space_one_second_before` |
+| Sin pase, sin remate o sin muestra cercana | `test_readings_explain_why_they_are_unavailable` |
+| Sin eventos futuros | `test_moment_analysis_uses_only_events_until_the_moment` |
+| La ruta con los dos motores | `test_moment_analysis_route_works_with_both_engines` |
+
 ## Motor de atención (`attention@1`, RF-14)
 
 ### Fusión

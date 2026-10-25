@@ -43,15 +43,106 @@ export function MomentSelector({ moments, selected, onSelect }) {
   )
 }
 
-export function MomentWorkspace({ moment, events, metadata, onOpen }) {
-  const { t } = usePreferences()
+const WHAT_IF_ORDER = ['earlier_pass', 'keeper_steps', 'supporting_run', 'early_shot']
+
+// Análisis de Persona 2 para el momento: motivos, hechos, posiciones y lecturas alternativas.
+function useMomentAnalysis(matchId, moment, prefs) {
+  const [state, setState] = useState({ key: null, data: null, error: null })
+  const key = moment && matchId
+    ? [matchId, moment.candidate_id, prefs.language, prefs.mode, prefs.favoriteTeamId, prefs.favoritePlayerId].join('|')
+    : null
+  useEffect(() => {
+    if (!key) return undefined
+    let active = true
+    api.momentAnalysis(matchId, moment.candidate_id, prefs, moment.source_event_ids?.at(-1))
+      .then((data) => { if (active) setState({ key, data, error: null }) })
+      .catch((error) => { if (active) setState({ key, data: null, error: error.message }) })
+    return () => { active = false }
+  }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
+  if (!key || state.key !== key) return { loading: Boolean(key), data: null, error: null }
+  return { loading: false, data: state.data, error: state.error }
+}
+
+// Pasa un TrackingFrame (metros) a porcentajes de la cancha para ``Pitch``.
+function snapshotOf(frame, metadata) {
+  if (!frame) return null
+  const toPct = (value, size) => Math.max(0, Math.min(100, (value / size) * 100))
+  const players = new Map()
+  let ball = null
+  for (const item of frame.objects) {
+    const point = { x: toPct(item.x_m, metadata.pitch_length_m), y: toPct(item.y_m, metadata.pitch_width_m) }
+    if (item.kind === 'ball') ball = point
+    else if (item.player_id) players.set(item.player_id, point)
+  }
+  return { players, ball }
+}
+
+function formatValue(value, unit, t) {
+  if (value === null || value === undefined) return t.match.analysis.noData
+  const shown = Number(value).toLocaleString(t.match.analysis.locale, { maximumFractionDigits: 1 })
+  return `${shown}${t.match.analysis.units[unit] ?? ''}`
+}
+
+// El avance también llega en metros: se omite su versión en porcentaje del campo.
+const HIDDEN_FACTS = new Set(['forward_progress'])
+
+function WhatIfResult({ reading, metadata, t }) {
+  if (!reading) return null
+  if (!reading.available) {
+    return (
+      <div className="counterfactual-result unavailable">
+        <strong>{t.match.analysis.notApplicable}</strong>
+        <p>{t.match.analysis.unavailable(reading.unavailable_reason)}</p>
+      </div>
+    )
+  }
+  const name = (id) => playerName(metadata, id)
+  return (
+    <div className="counterfactual-result">
+      <strong>{t.match.estimatedResult}</strong>
+      <p>{t.match.analysis.whatIfSummary[reading.scenario](reading.comparisons, name)}</p>
+      <table className="what-if-table">
+        <thead>
+          <tr><th>{t.match.analysis.measure}</th><th>{t.match.analysis.actual}</th><th>{t.match.analysis.alternative[reading.scenario]}</th></tr>
+        </thead>
+        <tbody>
+          {reading.comparisons.map((item) => {
+            const delta = item.actual !== null && item.alternative !== null ? item.alternative - item.actual : null
+            return (
+              <tr key={item.key}>
+                <th scope="row">{t.match.analysis.comparisonLabels[item.key] ?? item.key}</th>
+                <td>{formatValue(item.actual, item.unit, t)}</td>
+                <td>
+                  {formatValue(item.alternative, item.unit, t)}
+                  {delta !== null && Math.abs(delta) >= 0.05 && (
+                    <small className={delta > 0 ? 'up' : 'down'}> {delta > 0 ? '+' : '−'}{formatValue(Math.abs(delta), item.unit, t)}</small>
+                  )}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
+  const { t, apiPreferences } = usePreferences()
   const [change, setChange] = useState('earlier_pass')
+  const { loading, data: analysis, error } = useMomentAnalysis(matchId, moment, apiPreferences)
+  const snapshot = useMemo(() => snapshotOf(analysis?.frame, metadata), [analysis, metadata])
   if (!moment) {
     return <section className="moment-workspace empty-comments"><h2>{t.match.noMomentSelected}</h2><p>{t.match.noMoments}</p></section>
   }
   const sources = eventsOf(moment, events)
-  const author = sources.slice().reverse().find((event) => event.player_id)
-  const changeLabel = t.match.counterfactualOptions[change]
+  const reading = analysis?.what_if.find((item) => item.scenario === change) ?? null
+  const marked = reading?.available
+    ? [reading.player_id, ...reading.comparisons.flatMap((item) => [item.player_id, item.alternative_player_id])].filter(Boolean)
+    : []
+  const simulated = analysis?.frame?.source !== 'video_model'
+  const reasons = analysis?.reasons.filter((reason) => reason.points !== 0 || reason.code === 'decisive_fact') ?? []
+  const facts = analysis?.facts.filter((fact) => fact.available && !HIDDEN_FACTS.has(fact.key)).slice(0, 6) ?? []
   return (
     <section className="moment-workspace">
       <header>
@@ -63,21 +154,64 @@ export function MomentWorkspace({ moment, events, metadata, onOpen }) {
         <Button onClick={() => onOpen(moment)} variant="ghost">{t.match.openFullAnalysis} <Icon name="arrow" size={16} /></Button>
       </header>
       <div className="moment-workspace-grid">
-        <Pitch events={sources} highlightIds={moment.source_event_ids} homeTeamId={metadata.home_team.team_id} label={moment.headline} players={metadata.players} trail={Math.max(1, sources.length)} />
+        <div className="moment-main">
+          <Pitch events={sources} highlightIds={moment.source_event_ids} homeTeamId={metadata.home_team.team_id} label={moment.headline} markedPlayerIds={marked} players={metadata.players} snapshot={snapshot} trail={Math.max(1, sources.length)} />
+          {snapshot && <small className="pitch-caption">{simulated ? t.match.analysis.positionsSimulated : t.match.analysis.positionsVideo}</small>}
+          <div className="moment-evidence">
+            {loading && <p className="moment-evidence-status">{t.match.analysis.loading}</p>}
+            {error && <p className="moment-evidence-status">{t.match.analysis.error}</p>}
+            {analysis && !analysis.found_in_engine && <p className="moment-evidence-status">{t.match.analysis.notInEngine}</p>}
+            {analysis?.found_in_engine && (
+              <div className="moment-why">
+                <h3>{t.match.analysis.whyKicker}</h3>
+                <div className="moment-priority">
+                  <strong>{analysis.priority}</strong>
+                  <span>{t.match.analysis.priority(analysis.threshold)}</span>
+                </div>
+                <ul className="reason-chips">
+                  {reasons.map((reason) => (
+                    <li key={reason.code} title={reason.detail}>
+                      {t.match.analysis.reasonLabels[reason.code] ?? reason.code}
+                      {reason.points !== 0 && <b>{reason.points > 0 ? `+${reason.points}` : reason.points}</b>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {facts.length > 0 && (
+              <div className="moment-facts">
+                <h3>{t.match.analysis.factsKicker}</h3>
+                <dl>
+                  {facts.map((fact, index) => (
+                    <div key={`${fact.key}-${fact.team_id}-${fact.player_id}-${index}`}>
+                      <dt>
+                        {t.match.analysis.factLabels[fact.key] ?? fact.key}
+                        {fact.player_id ? ` · ${playerName(metadata, fact.player_id)}` : fact.team_id ? ` · ${teamName(metadata, fact.team_id)}` : ''}
+                      </dt>
+                      <dd>{formatValue(fact.value, fact.unit, t)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </div>
+        </div>
         <aside className="counterfactual-panel">
           <span className="section-kicker">{t.match.counterfactualKicker}</span>
           <h3>{t.match.counterfactualTitle}</h3>
           <p>{t.match.counterfactualCopy}</p>
           <div className="counterfactual-options">
-            {Object.entries(t.match.counterfactualOptions).map(([key, label]) => (
-              <button className={change === key ? 'active' : ''} key={key} onClick={() => setChange(key)} type="button">{label}</button>
-            ))}
+            {WHAT_IF_ORDER.map((key) => {
+              const option = analysis?.what_if.find((item) => item.scenario === key)
+              return (
+                <button className={[change === key ? 'active' : '', option && !option.available ? 'muted' : ''].join(' ').trim()} key={key} onClick={() => setChange(key)} type="button">
+                  {t.match.counterfactualOptions[key]}
+                </button>
+              )
+            })}
           </div>
-          <div className="counterfactual-result">
-            <strong>{t.match.estimatedResult}</strong>
-            <p>{t.match.counterfactualResult(changeLabel, playerName(metadata, author?.player_id), sources.length)}</p>
-          </div>
-          <small className="simulation-disclaimer">{t.match.counterfactualDisclaimer}</small>
+          {loading ? <p className="moment-evidence-status">{t.match.analysis.loading}</p> : <WhatIfResult metadata={metadata} reading={reading} t={t} />}
+          <small className="simulation-disclaimer">{simulated ? t.match.counterfactualDisclaimer : t.match.counterfactualDisclaimerVideo}</small>
         </aside>
       </div>
     </section>

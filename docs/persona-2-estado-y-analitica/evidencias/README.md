@@ -18,6 +18,7 @@ Cada historia se da por verificada solo si sus criterios pasan con una prueba o 
 | EA-US-10 · Medir velocidad y distancia desde posiciones | Verificada con observaciones simuladas en el formato de Persona 1; vídeo real pendiente | [EA-US-10](EA-US-10.md) |
 | EA-US-11 · Presentar la analítica en un tablero | Verificada localmente | [EA-US-11](EA-US-11.md) |
 | EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase | Verificada en local; despliegue en Azure pendiente | [EA-US-12](EA-US-12.md) |
+| EA-US-13 · Explicar un momento con datos en el resumen | Verificada localmente | [EA-US-13](EA-US-13.md) |
 
 ## Entorno común de verificación
 

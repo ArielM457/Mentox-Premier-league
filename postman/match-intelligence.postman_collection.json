@@ -209,6 +209,281 @@
       ]
     },
     {
+      "name": "Integración de visión",
+      "item": [
+        {
+          "name": "GET Estado del enrutamiento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/agent-routing/status",
+            "description": "Consulta los contadores de ingreso, métricas y eventos importantes."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Estado de integración",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/status",
+            "description": "Comprueba artefactos, transporte y configuración de la integración."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Línea temporal integrada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/timeline?start_ms=0&end_ms=30000&spatial_limit=20",
+            "description": "Obtiene acciones y detecciones normalizadas dentro de una ventana."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Observación en vivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/integration/live/observations",
+            "description": "Publica una observación sintética en el canal en vivo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"observation_id\": \"postman-observation-001\",\n  \"source\": \"synthetic-replay\",\n  \"kind\": \"spatial_detection\",\n  \"timestamp_ms\": 1000,\n  \"payload\": {\"class_name\": \"player\", \"confidence\": 0.9}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 202', () => pm.response.to.have.status(202));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Estado del canal en vivo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/live/status",
+            "description": "Consulta observaciones publicadas y estado de reproducción."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reiniciar reproducción de visión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/live/playback/restart",
+            "description": "Reinicia el cursor y limpia el canal visible."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Reproducir visión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/integration/live/playback/play",
+            "description": "Inicia la captura desde la posición del vídeo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_time_ms\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Avanzar reproducción de visión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/integration/live/playback/advance",
+            "description": "Publica las observaciones que cruza el reloj del vídeo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_time_ms\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Pausar reproducción de visión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/integration/live/playback/pause",
+            "description": "Pausa la publicación de observaciones.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_time_ms\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Buscar posición de visión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/integration/live/playback/seek",
+            "description": "Mueve el cursor sin presentar eventos anteriores como nuevos.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"video_time_ms\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Enrutamiento de agentes",
       "item": [
         {
@@ -776,6 +1051,30 @@
           ]
         },
         {
+          "name": "GET Análisis de un momento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-live-001/moments/moment-live-018/analysis?mode=analyst",
+            "description": "Motivos, hechos, posiciones del instante y lecturas «¿qué habría pasado si…?» de un momento."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Momento del motor de Persona 2', () => pm.expect(body.found_in_engine && body.kind === 'yellow_card').to.equal(true));",
+                  "pm.test('Cuatro lecturas alternativas', () => pm.expect(body.what_if.length).to.equal(4));",
+                  "pm.test('Posiciones del instante', () => pm.expect(body.frame.objects.length).to.be.above(21));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GET Estado tras el gol",
           "request": {
             "method": "GET",
@@ -1233,116 +1532,6 @@
               }
             }
           ]
-        }
-      ]
-    },
-    {
-      "name": "Integración de visión",
-      "item": [
-        {
-          "name": "GET Estado del enrutamiento",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/agent-routing/status",
-            "description": "Consulta los contadores de ingreso, métricas y eventos importantes."
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "GET Estado de integración",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/status",
-            "description": "Comprueba artefactos, transporte y configuración de la integración."
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "GET Línea temporal integrada",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/timeline?start_ms=0&end_ms=30000&spatial_limit=20",
-            "description": "Obtiene acciones y detecciones normalizadas dentro de una ventana."
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Observación en vivo",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{baseUrl}}/api/v1/integration/live/observations",
-            "description": "Publica una observación sintética en el canal en vivo.",
-            "body": {"mode": "raw", "raw": "{\n  \"observation_id\": \"postman-observation-001\",\n  \"source\": \"synthetic-replay\",\n  \"kind\": \"spatial_detection\",\n  \"timestamp_ms\": 1000,\n  \"payload\": {\"class_name\": \"player\", \"confidence\": 0.9}\n}", "options": {"raw": {"language": "json"}}}
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 202', () => pm.response.to.have.status(202));"]}}]
-        },
-        {
-          "name": "GET Estado del canal en vivo",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/live/status",
-            "description": "Consulta observaciones publicadas y estado de reproducción."
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Reiniciar reproducción de visión",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/live/playback/restart",
-            "description": "Reinicia el cursor y limpia el canal visible."
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Reproducir visión",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{baseUrl}}/api/v1/integration/live/playback/play",
-            "description": "Inicia la captura desde la posición del vídeo.",
-            "body": {"mode": "raw", "raw": "{\n  \"video_time_ms\": 0\n}", "options": {"raw": {"language": "json"}}}
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Avanzar reproducción de visión",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{baseUrl}}/api/v1/integration/live/playback/advance",
-            "description": "Publica las observaciones que cruza el reloj del vídeo.",
-            "body": {"mode": "raw", "raw": "{\n  \"video_time_ms\": 1000\n}", "options": {"raw": {"language": "json"}}}
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Pausar reproducción de visión",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{baseUrl}}/api/v1/integration/live/playback/pause",
-            "description": "Pausa la publicación de observaciones.",
-            "body": {"mode": "raw", "raw": "{\n  \"video_time_ms\": 1000\n}", "options": {"raw": {"language": "json"}}}
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
-        },
-        {
-          "name": "POST Buscar posición de visión",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{baseUrl}}/api/v1/integration/live/playback/seek",
-            "description": "Mueve el cursor sin presentar eventos anteriores como nuevos.",
-            "body": {"mode": "raw", "raw": "{\n  \"video_time_ms\": 5000\n}", "options": {"raw": {"language": "json"}}}
-          },
-          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
         }
       ]
     }

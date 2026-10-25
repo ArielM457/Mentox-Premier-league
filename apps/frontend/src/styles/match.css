@@ -155,8 +155,35 @@
 .counterfactual-options { display: grid; gap: 6px; margin: 14px 0; }
 .counterfactual-options button { padding: 9px 10px; color: #d6d1e2; background: #19162e; border: 1px solid #3c3656; border-radius: 9px; text-align: left; font-size: 10px; }
 .counterfactual-options button.active { color: var(--navy); background: var(--lime); border-color: var(--lime); font-weight: 800; }
-.counterfactual-result { padding: 12px; background: rgba(130,87,245,.12); border-left: 3px solid var(--violet); border-radius: 8px; }
+.counterfactual-result { padding: 12px; background: rgba(130,87,245,.12); border: 1px solid rgba(130,87,245,.35); border-radius: 10px; }
 .simulation-disclaimer { display: block; margin-top: 11px; color: #f3c27c; font-size: 9px; line-height: 1.45; }
+
+/* Análisis del momento (Persona 2): motivos, datos medidos y lecturas alternativas. */
+.moment-main { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.pitch-caption { color: #aaa5bd; font-size: 10px; }
+.moment-evidence { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 12px; }
+.moment-evidence-status { grid-column: 1 / -1; margin: 0; color: #aaa5bd; font-size: 11px; }
+.moment-why, .moment-facts { padding: 14px 16px; background: #24203d; border-radius: 14px; }
+.moment-why h3, .moment-facts h3 { margin: 0 0 10px; font-size: 13px; }
+.moment-priority { margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; }
+.moment-priority strong { color: var(--lime); font-size: 30px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+.moment-priority span { color: #aaa5bd; font-size: 10px; line-height: 1.4; }
+.reason-chips { margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+.reason-chips li { padding: 5px 9px; display: inline-flex; align-items: baseline; gap: 6px; color: #d6d1e2; background: #19162e; border: 1px solid #3c3656; border-radius: 999px; font-size: 10px; }
+.reason-chips b { color: var(--lime); font-variant-numeric: tabular-nums; }
+.moment-facts dl { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; }
+.moment-facts dt { color: #aaa5bd; font-size: 10px; line-height: 1.35; }
+.moment-facts dd { margin: 2px 0 0; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.counterfactual-options button.muted { color: #8d88a3; }
+.counterfactual-options button.muted.active { color: var(--navy); }
+.counterfactual-result strong { display: block; margin-bottom: 4px; }
+.counterfactual-result.unavailable { background: rgba(255,255,255,.04); border-color: #494261; }
+.what-if-table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 10px; }
+.what-if-table th, .what-if-table td { padding: 6px 4px; text-align: left; border-top: 1px solid rgba(255,255,255,.08); }
+.what-if-table thead th { color: #aaa5bd; font-size: 9px; font-weight: 800; border-top: 0; }
+.what-if-table tbody th { color: #d6d1e2; font-weight: 600; }
+.what-if-table td { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.what-if-table td small { margin-left: 4px; color: #aaa5bd; font-weight: 700; }
 
 .tactical-panel > header label { display: grid; gap: 5px; color: #aaa5bd; font-size: 9px; font-weight: 800; text-transform: uppercase; }
 .tactical-panel select { min-height: 38px; padding: 0 32px 0 11px; color: white; background: #24203d; border: 1px solid #494261; border-radius: 9px; }

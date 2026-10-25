@@ -24,7 +24,7 @@ from match_intelligence.application.video_sync import (
 )
 from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
 from match_intelligence.application.analytics.tracking_input import tracks_from_observations
-from match_intelligence.domain.analytics.tracking import TrackingFrame, tracking_frames
+from match_intelligence.domain.analytics.tracking import TrackingFrame, TrackSet, tracking_frames
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
 from match_intelligence.domain.presentation import (
     ContentKind,
@@ -113,6 +113,7 @@ class MatchSession:
     _clock: Callable[[], datetime] = field(default=lambda: datetime.now(UTC))
     _replay: VideoSynchronizedReplay | None = None
     _tracking_frames: tuple[TrackingFrame, ...] | None = field(default=None, init=False, repr=False)
+    _track_set: TrackSet | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         missing = [e.event_id for e in self.events if e.video_time_ms is None]
@@ -174,13 +175,17 @@ class MatchSession:
             result.append(after)
         return result
 
-    def _tracking(self) -> tuple[TrackingFrame, ...]:
-        # Observaciones simuladas con el formato de Persona 1, convertidas por la
-        # analítica de Persona 2 en pistas y luego en cuadros para la cancha.
-        if self._tracking_frames is None:
+    def track_set(self) -> TrackSet:
+        """Pistas del partido: observaciones simuladas con el formato de Persona 1,
+        convertidas por la analítica de Persona 2."""
+        if self._track_set is None:
             observations = generate_mock_tracking(self.metadata, self.events)
-            tracks = tracks_from_observations(self.metadata, self.events, observations).tracks
-            self._tracking_frames = tuple(tracking_frames(tracks))
+            self._track_set = tracks_from_observations(self.metadata, self.events, observations).tracks
+        return self._track_set
+
+    def _tracking(self) -> tuple[TrackingFrame, ...]:
+        if self._tracking_frames is None:
+            self._tracking_frames = tuple(tracking_frames(self.track_set()))
         return self._tracking_frames
 
     # ----- mensajes para pantalla -------------------------------------------

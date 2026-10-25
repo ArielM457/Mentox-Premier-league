@@ -33,17 +33,19 @@ function positionFor(player, index, teamPlayers, homeTeamId, events, timeMs) {
 }
 
 // Dibuja las últimas acciones ocurridas con sus posiciones reales.
-export function Pitch({ events, homeTeamId, players, trail = 6, playing = false, highlightIds, onSelectPlayer, label, selectedPlayerId = null, timeMs = 0 }) {
+// ``snapshot`` (opcional) fija las posiciones reales de un instante: { players: Map(player_id → {x, y}), ball }.
+// ``markedPlayerIds`` resalta jugadores además de los de los eventos.
+export function Pitch({ events, homeTeamId, players, trail = 6, playing = false, highlightIds, onSelectPlayer, label, selectedPlayerId = null, timeMs = 0, snapshot = null, markedPlayerIds = [] }) {
   const shown = events.slice(-trail)
   const last = shown[shown.length - 1]
-  const ballAt = last?.start ? (() => {
+  const ballAt = snapshot?.ball ?? (last?.start ? (() => {
     const target = last.end ?? last.start
     const progress = Math.max(0, Math.min(1, (timeMs - last.video_time_ms) / 900))
     return {
       x: last.start.x + (target.x - last.start.x) * progress,
       y: last.start.y + (target.y - last.start.y) * progress,
     }
-  })() : null
+  })() : null)
   const playerById = new Map(players.map((p) => [p.player_id, p]))
   const isHighlighted = (event) => (highlightIds ? highlightIds.includes(event.event_id) : event === last)
   const byTeam = new Map()
@@ -67,9 +69,12 @@ export function Pitch({ events, homeTeamId, players, trail = 6, playing = false,
       </svg>
       {players.map((player, index) => {
         const home = player.team_id === homeTeamId
-        const position = positionFor(player, index, byTeam.get(player.team_id) ?? [], homeTeamId, shown, timeMs)
+        const fixed = snapshot?.players.get(player.player_id)
+        const position = fixed
+          ? { x: fixed.x, y: fixed.y, event: shown.findLast((event) => event.player_id === player.player_id) ?? null }
+          : positionFor(player, index, byTeam.get(player.team_id) ?? [], homeTeamId, shown, timeMs)
         const focused = selectedPlayerId === player.player_id
-        const involved = position.event && isHighlighted(position.event)
+        const involved = (position.event && isHighlighted(position.event)) || markedPlayerIds.includes(player.player_id)
         return (
           <button
             aria-label={player.name}

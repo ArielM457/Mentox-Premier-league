@@ -1,5 +1,15 @@
 // Textos de la interfaz por idioma (RF-27). Las narraciones llegan ya traducidas desde la API.
 
+// Lecturas «¿qué habría pasado si…?»: cada comparación trae el valor real y el alternativo.
+const pick = (items, key) => items.find((item) => item.key === key) ?? {}
+const numberIn = (locale) => (value) => (
+  value === null || value === undefined ? '—' : Number(value).toLocaleString(locale, { maximumFractionDigits: 1 })
+)
+const numEs = numberIn('es')
+const numEn = numberIn('en')
+// Diferencias menores no cambian la lectura: se informan como «casi igual».
+const SAME_SPACE_M = 0.5
+
 const es = {
   brand: 'The Prime Moment',
   common: {
@@ -217,11 +227,88 @@ const es = {
     momentSelector: 'Selector de momentos', previousMoment: 'Momento anterior', nextMoment: 'Momento siguiente', openInMoments: 'Abrir en Resumen',
     selectedMoment: 'Momento seleccionado', noMomentSelected: 'Selecciona un momento', openFullAnalysis: 'Ver análisis completo',
     counterfactualKicker: 'Laboratorio de jugadas', counterfactualTitle: '¿Qué habría pasado si…?',
-    counterfactualCopy: 'Cambia una condición para obtener una lectura estimada a partir de las posiciones disponibles.',
+    counterfactualCopy: 'Elige una alternativa: la analítica la compara con el instante real usando las posiciones registradas.',
     counterfactualOptions: { earlier_pass: 'El pase salía antes', keeper_steps: 'El arquero adelantaba su posición', supporting_run: 'Un apoyo cambiaba su recorrido', early_shot: 'El remate salía antes' },
     estimatedResult: 'Resultado estimado',
     counterfactualResult: (change, player, events) => `${change}: la alternativa modifica los espacios alrededor de ${player}. La estimación usa ${events} eventos registrados; sirve para comparar la decisión, no para afirmar un resultado.`,
-    counterfactualDisclaimer: 'Simulación local orientativa. Todavía no es una respuesta del agente contrafactual ni un hecho del partido.',
+    counterfactualDisclaimer: 'Lectura con posiciones simuladas: muestra el método y compara espacios; no predice cómo terminaba la jugada ni reemplaza al agente contrafactual.',
+    counterfactualDisclaimerVideo: 'Lectura con posiciones de vídeo: compara espacios, no predice cómo terminaba la jugada.',
+    analysis: {
+      locale: 'es',
+      loading: 'Calculando con la analítica…',
+      error: 'No se pudo obtener la analítica de este momento.',
+      notInEngine: 'La analítica no detecta un momento en este evento; se muestran solo las posiciones.',
+      positionsSimulated: 'Posiciones del instante · seguimiento simulado',
+      positionsVideo: 'Posiciones del instante · vídeo',
+      whyKicker: 'Por qué es un momento',
+      priority: (threshold) => (threshold === null || threshold === undefined ? 'de prioridad' : `de prioridad · tu perfil muestra desde ${threshold}`),
+      factsKicker: 'Datos medidos',
+      noData: 'sin datos',
+      notApplicable: 'No aplica a este momento',
+      unavailable: (reason) => reason ?? 'Faltan datos para calcular esta lectura.',
+      measure: 'Medida',
+      actual: 'En la jugada',
+      alternative: { earlier_pass: '1 s antes', early_shot: '1 s antes', supporting_run: 'Más libre', keeper_steps: '3 m adelante' },
+      units: { meters: ' m', seconds: ' s', degrees: '°', percent: '%', pitch_percent: '% del campo', count: '', 'km/h': ' km/h', index_0_100: '/100' },
+      reasonLabels: {
+        base_kind: 'Tipo de jugada', measured_fact: 'Dato medido', combined_signals: 'Varias señales',
+        novelty: 'Primera del partido', repetition: 'Repetida hace poco', favorite_team: 'Tu equipo',
+        favorite_player: 'Tu jugador', analyst_mode: 'Modo analista', casual_mode: 'Modo aficionado',
+        player_mode_involved: 'Participa tu jugador', player_mode_not_involved: 'No participa tu jugador',
+        decisive_fact: 'Hecho decisivo', below_threshold: 'Bajo el umbral',
+      },
+      factLabels: {
+        goals: 'Goles', shots: 'Tiros', shot_distance_m: 'Distancia del remate', shot_angle_deg: 'Ángulo del remate',
+        sequence_passes: 'Pases de la jugada', sequence_duration_s: 'Duración de la jugada',
+        forward_progress: 'Avance', forward_progress_m: 'Avance', seconds_since_recovery: 'Desde la recuperación',
+        pass_forward_gain_m: 'Avance del pase', pass_distance_m: 'Largo del pase', match_longest_pass_m: 'Pase más largo del partido',
+        high_recoveries: 'Recuperaciones altas', defensive_actions_opponent_half: 'Acciones defensivas arriba',
+        ball_wins_opponent_half: 'Balones ganados arriba', pass_accuracy: 'Precisión de pase', control_index: 'Índice de control',
+        chaos_index: 'Índice de caos', recoveries: 'Recuperaciones', passes_completed: 'Pases completados',
+        progressive_passes: 'Pases progresivos', fouls: 'Faltas', yellow_cards: 'Amarillas', red_cards: 'Rojas',
+        stoppage_seconds: 'Detención',
+      },
+      comparisonLabels: {
+        passer_space_m: 'Espacio del pasador', receiver_space_m: 'Espacio del receptor',
+        shot_distance_m: 'Distancia al arco', shot_angle_deg: 'Ángulo de remate', shooter_space_m: 'Espacio del rematador',
+        support_space_m: 'Espacio del apoyo', support_distance_m: 'Distancia al poseedor',
+        keeper_ball_distance_m: 'Arquero al balón', keeper_goal_line_m: 'Arquero a su línea',
+      },
+      whatIfSummary: {
+        earlier_pass: (items, name) => {
+          const passer = pick(items, 'passer_space_m')
+          const receiver = pick(items, 'receiver_space_m')
+          const gap = passer.alternative - passer.actual
+          const first = Math.abs(gap) < SAME_SPACE_M
+            ? `Un segundo antes, ${name(passer.player_id)} tenía casi el mismo espacio: ${numEs(passer.alternative)} m frente a ${numEs(passer.actual)} m al pasar.`
+            : gap > 0
+              ? `Un segundo antes, ${name(passer.player_id)} tenía ${numEs(passer.alternative)} m hasta el rival más cercano; al pasar tenía ${numEs(passer.actual)} m.`
+              : `Un segundo antes, ${name(passer.player_id)} tenía menos espacio (${numEs(passer.alternative)} m frente a ${numEs(passer.actual)} m): esperar le dio margen.`
+          return receiver.key
+            ? `${first} El receptor, ${name(receiver.player_id)}, tenía ${numEs(receiver.alternative)} m libres un segundo antes y ${numEs(receiver.actual)} m al recibir.`
+            : first
+        },
+        early_shot: (items, name) => {
+          const distance = pick(items, 'shot_distance_m')
+          const angle = pick(items, 'shot_angle_deg')
+          const space = pick(items, 'shooter_space_m')
+          return `Un segundo antes, ${name(distance.player_id)} estaba a ${numEs(distance.alternative)} m del arco con ${numEs(angle.alternative)}° de ángulo y ${numEs(space.alternative)} m de espacio. Remató a ${numEs(distance.actual)} m, con ${numEs(angle.actual)}° y ${numEs(space.actual)} m.`
+        },
+        supporting_run: (items, name) => {
+          const space = pick(items, 'support_space_m')
+          const distance = pick(items, 'support_distance_m')
+          if (space.alternative_player_id === space.player_id) {
+            return `El apoyo más cercano, ${name(space.player_id)}, ya era el más libre: ${numEs(space.actual)} m hasta su marcador.`
+          }
+          return `El apoyo más cercano, ${name(space.player_id)}, tenía ${numEs(space.actual)} m hasta su marcador. ${name(space.alternative_player_id)}, a ${numEs(distance.alternative)} m del balón, tenía ${numEs(space.alternative)} m: un apoyo hacia esa zona daba más espacio.`
+        },
+        keeper_steps: (items, name) => {
+          const ball = pick(items, 'keeper_ball_distance_m')
+          const line = pick(items, 'keeper_goal_line_m')
+          return `Con 3 m más de salida, ${name(ball.player_id)} quedaba a ${numEs(ball.alternative)} m del balón (estaba a ${numEs(ball.actual)} m) y a ${numEs(line.alternative)} m de su línea de gol (estaba a ${numEs(line.actual)} m).`
+        },
+      },
+    },
     tacticalKicker: 'Lectura del partido', tacticalTitle: 'Tácticas observadas', focusTeam: 'Enfocar equipo', bothTeams: 'Ambos equipos',
     patterns: { pressure: 'Presión sostenida', circulation: 'Circulación paciente', transition: 'Transición rápida', finalThird: 'Ataque en zona de definición', unconfirmed: 'Sin patrón confirmado todavía' },
     patternEvidence: 'Los nombres se activan solo cuando los eventos ocurridos aportan evidencia del patrón.',
@@ -564,11 +651,88 @@ const en = {
     momentSelector: 'Moment selector', previousMoment: 'Previous moment', nextMoment: 'Next moment', openInMoments: 'Open in Summary',
     selectedMoment: 'Selected moment', noMomentSelected: 'Select a moment', openFullAnalysis: 'View full analysis',
     counterfactualKicker: 'Play lab', counterfactualTitle: 'What if…?',
-    counterfactualCopy: 'Change one condition to get an estimate based on the available positions.',
+    counterfactualCopy: 'Pick an alternative: analytics compares it with the real instant using the recorded positions.',
     counterfactualOptions: { earlier_pass: 'The pass was released earlier', keeper_steps: 'The goalkeeper stepped forward', supporting_run: 'A supporting player changed his run', early_shot: 'The shot was taken earlier' },
     estimatedResult: 'Estimated outcome',
     counterfactualResult: (change, player, events) => `${change}: the alternative changes the space around ${player}. The estimate uses ${events} recorded events; it compares the decision without claiming an outcome.`,
-    counterfactualDisclaimer: 'Local illustrative simulation. It is not yet an answer from the counterfactual agent or a match fact.',
+    counterfactualDisclaimer: 'Reading based on simulated positions: it shows the method and compares space; it does not predict how the play ended or replace the counterfactual agent.',
+    counterfactualDisclaimerVideo: 'Reading based on video positions: it compares space and does not predict how the play ended.',
+    analysis: {
+      locale: 'en',
+      loading: 'Computing analytics…',
+      error: 'Analytics for this moment could not be loaded.',
+      notInEngine: 'Analytics found no moment on this event; only positions are shown.',
+      positionsSimulated: 'Positions at this instant · simulated tracking',
+      positionsVideo: 'Positions at this instant · video',
+      whyKicker: 'Why it is a moment',
+      priority: (threshold) => (threshold === null || threshold === undefined ? 'priority' : `priority · your profile shows from ${threshold}`),
+      factsKicker: 'Measured facts',
+      noData: 'no data',
+      notApplicable: 'Not applicable to this moment',
+      unavailable: () => 'There is not enough data for this reading.',
+      measure: 'Measure',
+      actual: 'In the play',
+      alternative: { earlier_pass: '1 s earlier', early_shot: '1 s earlier', supporting_run: 'Freest', keeper_steps: '3 m forward' },
+      units: { meters: ' m', seconds: ' s', degrees: '°', percent: '%', pitch_percent: '% of pitch', count: '', 'km/h': ' km/h', index_0_100: '/100' },
+      reasonLabels: {
+        base_kind: 'Type of play', measured_fact: 'Measured fact', combined_signals: 'Several signals',
+        novelty: 'First of the match', repetition: 'Repeated recently', favorite_team: 'Your team',
+        favorite_player: 'Your player', analyst_mode: 'Analyst mode', casual_mode: 'Casual mode',
+        player_mode_involved: 'Your player takes part', player_mode_not_involved: 'Your player is not involved',
+        decisive_fact: 'Decisive fact', below_threshold: 'Below threshold',
+      },
+      factLabels: {
+        goals: 'Goals', shots: 'Shots', shot_distance_m: 'Shot distance', shot_angle_deg: 'Shot angle',
+        sequence_passes: 'Passes in the move', sequence_duration_s: 'Move duration',
+        forward_progress: 'Progress', forward_progress_m: 'Progress', seconds_since_recovery: 'Since the recovery',
+        pass_forward_gain_m: 'Pass progress', pass_distance_m: 'Pass length', match_longest_pass_m: 'Longest pass of the match',
+        high_recoveries: 'High recoveries', defensive_actions_opponent_half: 'Defensive actions up the pitch',
+        ball_wins_opponent_half: 'Balls won up the pitch', pass_accuracy: 'Pass accuracy', control_index: 'Control index',
+        chaos_index: 'Chaos index', recoveries: 'Recoveries', passes_completed: 'Completed passes',
+        progressive_passes: 'Progressive passes', fouls: 'Fouls', yellow_cards: 'Yellow cards', red_cards: 'Red cards',
+        stoppage_seconds: 'Stoppage',
+      },
+      comparisonLabels: {
+        passer_space_m: 'Passer space', receiver_space_m: 'Receiver space',
+        shot_distance_m: 'Distance to goal', shot_angle_deg: 'Shot angle', shooter_space_m: 'Shooter space',
+        support_space_m: 'Support space', support_distance_m: 'Distance to the ball carrier',
+        keeper_ball_distance_m: 'Keeper to ball', keeper_goal_line_m: 'Keeper to goal line',
+      },
+      whatIfSummary: {
+        earlier_pass: (items, name) => {
+          const passer = pick(items, 'passer_space_m')
+          const receiver = pick(items, 'receiver_space_m')
+          const gap = passer.alternative - passer.actual
+          const first = Math.abs(gap) < SAME_SPACE_M
+            ? `One second earlier, ${name(passer.player_id)} had almost the same space: ${numEn(passer.alternative)} m vs ${numEn(passer.actual)} m when passing.`
+            : gap > 0
+              ? `One second earlier, ${name(passer.player_id)} had ${numEn(passer.alternative)} m to the nearest opponent; when passing, ${numEn(passer.actual)} m.`
+              : `One second earlier, ${name(passer.player_id)} had less space (${numEn(passer.alternative)} m vs ${numEn(passer.actual)} m): waiting gave him room.`
+          return receiver.key
+            ? `${first} The receiver, ${name(receiver.player_id)}, had ${numEn(receiver.alternative)} m free one second earlier and ${numEn(receiver.actual)} m when receiving.`
+            : first
+        },
+        early_shot: (items, name) => {
+          const distance = pick(items, 'shot_distance_m')
+          const angle = pick(items, 'shot_angle_deg')
+          const space = pick(items, 'shooter_space_m')
+          return `One second earlier, ${name(distance.player_id)} was ${numEn(distance.alternative)} m from goal with a ${numEn(angle.alternative)}° angle and ${numEn(space.alternative)} m of space. The shot came from ${numEn(distance.actual)} m, with ${numEn(angle.actual)}° and ${numEn(space.actual)} m.`
+        },
+        supporting_run: (items, name) => {
+          const space = pick(items, 'support_space_m')
+          const distance = pick(items, 'support_distance_m')
+          if (space.alternative_player_id === space.player_id) {
+            return `The nearest support, ${name(space.player_id)}, was already the freest: ${numEn(space.actual)} m from his marker.`
+          }
+          return `The nearest support, ${name(space.player_id)}, had ${numEn(space.actual)} m to his marker. ${name(space.alternative_player_id)}, ${numEn(distance.alternative)} m from the ball, had ${numEn(space.alternative)} m: support towards that area offered more space.`
+        },
+        keeper_steps: (items, name) => {
+          const ball = pick(items, 'keeper_ball_distance_m')
+          const line = pick(items, 'keeper_goal_line_m')
+          return `Stepping 3 m further out, ${name(ball.player_id)} would be ${numEn(ball.alternative)} m from the ball (was ${numEn(ball.actual)} m) and ${numEn(line.alternative)} m from his goal line (was ${numEn(line.actual)} m).`
+        },
+      },
+    },
     tacticalKicker: 'Match reading', tacticalTitle: 'Observed tactics', focusTeam: 'Focus team', bothTeams: 'Both teams',
     patterns: { pressure: 'Sustained press', circulation: 'Patient circulation', transition: 'Quick transition', finalThird: 'Final-third attack', unconfirmed: 'No confirmed pattern yet' },
     patternEvidence: 'A tactic name appears only when the events already played provide evidence for it.',

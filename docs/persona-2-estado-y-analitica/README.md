@@ -63,6 +63,9 @@ MatchEvent 1.0
 | Analítica de seguimiento | `domain/analytics/tracking.py` |
 | Entrada desde las observaciones de visión de Persona 1 | `application/analytics/tracking_input.py` |
 | `AnalyticsPort` de Persona 4 con el motor real | `application/analytics/presentation.py` |
+| Análisis de un momento para el resumen y su ruta | `application/analytics/moment_analysis.py`, `adapters/http/analytics_router.py` |
+| Lecturas «¿qué habría pasado si…?» (`what_if@1`) | `domain/analytics/what_if.py` |
+| Situaciones del partido: faltas, tarjetas y lesiones (`situation@1`) | `domain/analytics/situations.py` |
 | Partidos y análisis en Supabase (PostgreSQL) | `adapters/storage/supabase_store.py` |
 | Escenario sintético de 178 eventos (la API lo carga como segundo partido) | `adapters/sources/analytics_scenarios.py` |
 | Infraestructura | `infra/azure/analytics.bicep`, `infra/azure/analytics-platform.bicep` y `infra/supabase/migrations/` |

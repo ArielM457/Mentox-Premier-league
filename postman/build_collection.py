@@ -112,6 +112,18 @@ def match_experience_items() -> list[dict]:
             "Ventana acotada de TrackingFrame v1 para interpolar el movimiento del partido en vivo.",
         ),
         get(
+            "GET Análisis de un momento",
+            "/api/v1/matches/synthetic-live-001/moments/moment-live-018/analysis?mode=analyst",
+            [
+                status(200),
+                body,
+                "pm.test('Momento del motor de Persona 2', () => pm.expect(body.found_in_engine && body.kind === 'yellow_card').to.equal(true));",
+                "pm.test('Cuatro lecturas alternativas', () => pm.expect(body.what_if.length).to.equal(4));",
+                "pm.test('Posiciones del instante', () => pm.expect(body.frame.objects.length).to.be.above(21));",
+            ],
+            "Motivos, hechos, posiciones del instante y lecturas «¿qué habría pasado si…?» de un momento.",
+        ),
+        get(
             "GET Estado tras el gol",
             base + "/state?video_time_ms=34000",
             [status(200), body, "pm.test('Marcador 1-0', () => pm.expect(body.score['team-aurora']).to.equal(1));"],

@@ -54,6 +54,11 @@ export const api = {
   match: (id) => request(base(id)),
   preview: (id) => request(`${base(id)}/preview`),
   tracking: (id, from, to) => request(`${base(id)}/tracking?from_video_ms=${Math.floor(from)}&to_video_ms=${Math.floor(to)}`),
+  momentAnalysis: (id, candidateId, prefs, anchorEventId) => {
+    const params = prefsQuery(prefs)
+    if (anchorEventId) params.set('anchor_event_id', anchorEventId)
+    return request(`${base(id)}/moments/${encodeURIComponent(candidateId)}/analysis?${params}`)
+  },
   events: (id, until) => request(`${base(id)}/events?until_video_ms=${Math.floor(until)}`),
   state: (id, t) => request(`${base(id)}/state?video_time_ms=${Math.floor(t)}`),
   overlays: (id, prefs, until) => {
