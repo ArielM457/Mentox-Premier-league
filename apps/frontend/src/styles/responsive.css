@@ -8,11 +8,15 @@
   .sidebar-profile { width: 52px; grid-template-columns: 1fr; }
   .sidebar-profile > div, .sidebar-profile > .icon { display: none; }
   .match-layout { grid-template-columns: minmax(0, 1fr); }
+  .match-agent-rail { width: min(320px, calc(100% - 42px)); position: absolute; z-index: 12; inset: 0 0 0 auto; filter: drop-shadow(-18px 8px 28px rgba(0,0,0,.35)); }
+  .match-layout.agent-open .agent-rail-toggle { right: min(320px, calc(100% - 42px)); }
   .assistant { min-height: 0; }
   .hero { grid-template-columns: .9fr 1.1fr; }
   .hero-art { min-height: 560px; }
   .hero h1 { font-size: 58px; }
   .team-grid { grid-template-columns: repeat(3, 1fr); }
+  .live-tactical-grid { grid-template-columns: 1fr; }
+  .live-tactic-choices { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 760px) {
@@ -106,7 +110,8 @@
   .mobile-nav button.active { color: var(--violet); }
   .dark-shell .mobile-nav button.active { color: var(--lime); }
   .discover-content, .recap-content, .profile-content { padding: 30px 18px 50px; }
-  .page-header { align-items: flex-start; }
+  .page-header { gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .page-header > div { min-width: 0; }
   .profile-chip > div { display: none; }
   .match-grid, .loading-cards { grid-template-columns: 1fr; }
   .global-match-filters { align-items: flex-start; flex-direction: column; }
@@ -116,6 +121,8 @@
   .all-match-controls .match-filters button { padding: 0 8px; justify-content: center; font-size: 11px; }
   .favorite-match-row { grid-template-columns: 1fr; }
   .favorite-club-section { padding: 16px; }
+  .favorite-club-section .section-heading,
+  .discover-fixtures-section .section-heading { gap: 12px; align-items: flex-start; flex-wrap: wrap; }
   .match-filters { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
   .match-filters button { padding: 0 8px; justify-content: center; font-size: 11px; }
   .match-filters button .live-dot { display: none; }
@@ -134,6 +141,10 @@
   .score-center { min-width: 90px; }
   .score-center b { font-size: 26px; }
   .pitch-wrap { padding: 8px; }
+  .match-view-controls { align-items: stretch; }
+  .live-comments-switch { flex: 1; justify-content: space-between; }
+  .pitch-column:fullscreen { padding: 8px; }
+  .pitch-column:fullscreen .pitch { min-height: 0; max-height: none; }
   .simulation-toolbar { align-items: stretch; flex-direction: column; }
   .live-toolbar-actions { justify-content: stretch; }
   .live-mode-switch { flex: 1; }
@@ -142,6 +153,13 @@
   .moment-selector-current small { display: none; }
   .moment-workspace, .tactical-panel, .insight-list, .commentary-stage { padding: 14px; }
   .moment-workspace > header, .tactical-panel > header { align-items: stretch; flex-direction: column; }
+  .tactical-mode-switch button { flex: 1; }
+  .initial-lineup-bar { grid-template-columns: 1fr; }
+  .initial-lineup-bar > div:last-child { justify-content: flex-start; text-align: left; }
+  .lineup-lock { justify-self: start; }
+  .live-tactic-choices { grid-template-columns: 1fr; }
+  .live-tactical-lab.agent-open .live-tactic-choices { grid-template-columns: 1fr; }
+  .live-tactical-stage .preview-pitch { min-height: 320px; }
   .moment-workspace-grid, .commentary-stage { grid-template-columns: 1fr; }
   .insight-list > button { grid-template-columns: 100px minmax(0,1fr); }
   .insight-list > button > .icon { display: none; }
@@ -151,6 +169,10 @@
   .pitch { min-height: 0; aspect-ratio: 1.45; }
   .player-dot { width: 18px; height: 18px; }
   .player-dot.involved { width: 23px; height: 23px; }
+  .live-player-dot { width: 18px; height: 18px; }
+  .live-player-dot:hover { width: 22px; height: 22px; }
+  .live-player-dot.focused { width: 27px; height: 27px; }
+  .tracking-source { right: 7px; bottom: 7px; max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .playback { grid-template-columns: auto minmax(0, 1fr); }
   .playback > .btn-ghost { display: none; }
   .assistant { margin-top: 4px; }

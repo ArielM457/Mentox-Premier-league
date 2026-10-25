@@ -36,7 +36,14 @@ def test_different_seeds_change_the_generated_positions() -> None:
 def test_acceptance_match_contains_every_required_event_type() -> None:
     match = generate_acceptance_match()
 
-    assert {event.type for event in match.events} == set(EventType)
+    assert {event.type for event in match.events} == {
+        EventType.PASS,
+        EventType.SHOT,
+        EventType.TACKLE,
+        EventType.POSSESSION_CHANGE,
+        EventType.PRESSURE,
+        EventType.RECOVERY,
+    }
 
 
 def test_acceptance_match_contains_control_transition_and_decisive_moment() -> None:

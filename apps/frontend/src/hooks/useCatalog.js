@@ -9,13 +9,15 @@ async function fetchCatalog() {
   const list = await api.listMatches()
   const matches = await Promise.all(
     list.map(async (item) => {
+      const upcoming = item.status === 'UPCOMING'
       const [detail, final, events] = await Promise.all([
         api.match(item.match_id),
-        api.state(item.match_id, item.duration_ms),
-        api.events(item.match_id, item.duration_ms),
+        upcoming ? Promise.resolve({ score: {} }) : api.state(item.match_id, item.duration_ms),
+        upcoming ? Promise.resolve({ events: [] }) : api.events(item.match_id, item.duration_ms),
       ])
       return {
         id: item.match_id,
+        status: item.status,
         metadata: detail.metadata,
         durationMs: detail.duration_ms,
         eventCount: detail.event_count,

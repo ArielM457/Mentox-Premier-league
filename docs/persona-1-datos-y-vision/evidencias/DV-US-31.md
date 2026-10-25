@@ -115,3 +115,38 @@ Se debe adjuntar la salida sin secretos y probar `/health/ready` e inferencia an
 
 Context7 confirmó el patrón recomendado de FastAPI para cargar recursos de aprendizaje automático una sola vez mediante `lifespan`: la carga ocurre antes de aceptar solicitudes y el mismo modelo se comparte entre ellas. Las dos APIs aplican ese patrón y ejecutan Uvicorn con un solo worker para no duplicar pesos en la GPU.
 
+## Integración con `develop`
+
+El 25 de octubre de 2026 se creó la rama
+`integration/modelos-frontend-20261025` desde `origin/main`. Primero se registraron
+los despliegues de modelos en el commit `01a0ba2` y después se fusionó
+`origin/develop` sin modificar `main`.
+
+La resolución conservó:
+
+- el escenario sintético en vivo, seguimiento y previa táctica procedentes de
+  `develop`;
+- el cliente y el panel de visión de `main`;
+- una pestaña `Visión IA` dentro del nuevo centro de partidos, sin exponer al
+  navegador la clave de las APIs de modelos.
+
+Verificación reproducible posterior a la fusión:
+
+```bash
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 --extra dev \
+  pytest -q apps/backend/tests
+
+npm run lint:frontend
+npm run build:frontend
+git diff --check
+```
+
+Resultados:
+
+- backend: `387 passed, 1 skipped` en 14,54 segundos;
+- frontend: lint sin errores y tres advertencias preexistentes sobre
+  `set-state-in-effect`;
+- frontend: compilación Vite correcta, 56 módulos transformados;
+- Git: sin marcadores de conflicto ni errores de espacios.
+

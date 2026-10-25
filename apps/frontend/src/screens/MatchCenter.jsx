@@ -1,25 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 import { useLiveChannel } from '../hooks/useLiveChannel.js'
 import { useMatchClock } from '../hooks/useMatchClock.js'
+import { useTrackingFrames } from '../hooks/useTrackingFrames.js'
 import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Assistant } from '../components/match/Assistant.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
+import { LiveTrackingPitch } from '../components/match/LiveTrackingPitch.jsx'
 import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
-import { Pitch } from '../components/match/Pitch.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
-import { AnnouncerPanel, InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
+import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
-const TABS = ['overview', 'events', 'stats', 'tactical', 'insights']
+const TABS = ['match', 'summary', 'stats', 'tactical', 'vision']
 const SPEEDS = [1, 2, 4, 8]
 const notify = (promise) => promise.catch(() => {})
 
@@ -54,23 +55,36 @@ function LiveMatch({ match }) {
   const matchId = match.id
   const metadata = match.metadata
   const videoRef = useRef(null)
-  const liveDurationMs = Math.min(match.durationMs, 300_000)
+  const matchViewRef = useRef(null)
+  const liveDurationMs = match.durationMs
   const clock = useMatchClock(liveDurationMs, videoRef)
   const [seekVersion, setSeekVersion] = useState(0)
   const [snapshot, setSnapshot] = useState(null)
-  const [tab, setTab] = useState('overview')
+  const [tab, setTab] = useState('match')
   const [popover, setPopover] = useState(null)
   const [actionError, setActionError] = useState(null)
   const [simulating, setSimulating] = useState(false)
   const [simulationStarted, setSimulationStarted] = useState(false)
+  const [assistantOpen, setAssistantOpen] = useState(() => window.localStorage.getItem('itg:match-agent-open') !== 'false')
+  const [fullscreen, setFullscreen] = useState(false)
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedMomentId, setSelectedMomentId] = useState(null)
-  const tabs = preferences.mode === 'analyst' && preferences.liveComments ? [...TABS, 'comments'] : TABS
-  const activeTab = tabs.includes(tab) ? tab : 'overview'
+  const activeTab = TABS.includes(tab) ? tab : 'match'
+  const matchAgentOpen = activeTab === 'match' && assistantOpen
 
   useEffect(() => {
     recordExperience(matchId)
   }, [matchId])
+
+  useEffect(() => {
+    window.localStorage.setItem('itg:match-agent-open', String(assistantOpen))
+  }, [assistantOpen])
+
+  useEffect(() => {
+    const syncFullscreen = () => setFullscreen(document.fullscreenElement === matchViewRef.current)
+    document.addEventListener('fullscreenchange', syncFullscreen)
+    return () => document.removeEventListener('fullscreenchange', syncFullscreen)
+  }, [])
 
   const live = useLiveChannel({
     matchId,
@@ -80,9 +94,15 @@ function LiveMatch({ match }) {
     timeRef: clock.timeRef,
     seekVersion,
   })
+  const tracking = useTrackingFrames({
+    durationMs: liveDurationMs,
+    matchId,
+    seekVersion,
+    timeMs: clock.time,
+  })
 
-  const pastEvents = live.events.filter((e) => e.video_time_ms <= clock.time)
-  const crossed = pastEvents.length
+  const crossed = live.events.filter((event) => event.video_time_ms <= clock.time).length
+  const pastEvents = useMemo(() => live.events.slice(0, crossed), [live.events, crossed])
   useEffect(() => {
     let active = true
     api.state(matchId, clock.timeRef.current)
@@ -149,12 +169,21 @@ function LiveMatch({ match }) {
 
   function selectMoment(moment, openTab = false) {
     setSelectedMomentId(moment.message_id)
-    if (openTab) setTab('events')
+    if (openTab) setTab('summary')
   }
 
   function changeMode(mode) {
-    update({ mode, liveComments: mode === 'analyst' ? true : preferences.liveComments })
-    if (mode !== 'analyst' && tab === 'comments') setTab('overview')
+    update({ mode })
+  }
+
+  async function toggleFullscreen() {
+    setActionError(null)
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen()
+      else await matchViewRef.current?.requestFullscreen()
+    } catch {
+      setActionError(t.match.fullscreenUnavailable)
+    }
   }
 
   function onKeyDown(event) {
@@ -166,18 +195,10 @@ function LiveMatch({ match }) {
     }
   }
 
-  const pitchProps = {
-    homeTeamId: metadata.home_team.team_id,
-    players: metadata.players,
-    playing: clock.playing,
-    onSelectPlayer: (player, event) => {
-      const next = selectedPlayerId === player.player_id ? null : player.player_id
-      setSelectedPlayerId(next)
-      setPopover(next ? { player, event } : null)
-    },
-    selectedPlayerId,
-    timeMs: clock.time,
-    label: t.match.timeline,
+  const selectPlayer = (player, event) => {
+    const next = selectedPlayerId === player.player_id ? null : player.player_id
+    setSelectedPlayerId(next)
+    setPopover(next ? { player, event } : null)
   }
 
   return (
@@ -203,14 +224,14 @@ function LiveMatch({ match }) {
         </div>
       </div>
       <nav className="match-tabs" role="tablist">
-        {tabs.map((item) => (
+        {TABS.map((item) => (
           <button aria-selected={activeTab === item} className={activeTab === item ? 'active' : ''} key={item} onClick={() => setTab(item)} role="tab" type="button">
             {t.match.tabs[item]}
           </button>
         ))}
       </nav>
 
-      <ErrorNotice message={actionError || live.error} onRetry={() => { setActionError(null); live.resync() }} retryLabel={t.common.retry} />
+      <ErrorNotice message={actionError || live.error || tracking.error} onRetry={() => { setActionError(null); live.resync(); setSeekVersion((value) => value + 1) }} retryLabel={t.common.retry} />
 
       {finished && (
         <div className="finished-banner" role="status">
@@ -223,47 +244,79 @@ function LiveMatch({ match }) {
         </div>
       )}
 
-      <div className="match-layout">
-        <div className="pitch-column">
-          {activeTab === 'comments' ? (
-            <LiveCommentsPanel events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />
-          ) : activeTab === 'stats' ? (
+      <div className={`match-layout ${matchAgentOpen ? 'agent-open' : 'agent-closed'}`}>
+        <div className="pitch-column" ref={matchViewRef}>
+          {activeTab === 'stats' ? (
             <StatsPanel metadata={metadata} snapshot={snapshot} timeMs={clock.time} />
-          ) : activeTab === 'events' ? (
-            <MomentWorkspace events={pastEvents} metadata={metadata} moment={selectedMoment} onOpen={openMoment} />
-          ) : activeTab === 'insights' ? (
-            <InsightsPanel events={pastEvents} metadata={metadata} moments={history} onOpen={openMoment} />
-          ) : activeTab === 'tactical' ? (
-            <TacticalPanel events={pastEvents} metadata={metadata} playing={clock.playing} timeMs={clock.time} />
-          ) : (
-            <div className="pitch-wrap">
-              <div className="pitch-meta">
-                <span>
-                  <Icon name="spark" size={16} /> {activeTab === 'tactical' ? t.match.tacticalCopy : t.match.selected}
-                </span>
-                <strong>{current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
-                <span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>
-              </div>
-              <Pitch {...pitchProps} events={pastEvents} trail={6} />
-              <div className="overlay-zone" aria-live="assertive" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>
-              {popover?.player && (
-                <button className="player-popover" onClick={() => setPopover(null)} type="button">
-                  <strong>
-                    {popover.player.shirt_number ? `${popover.player.shirt_number} · ` : ''}
-                    {popover.player.name}
-                  </strong>
-                  <span>
-                    {popover.event ? `${t.moment.eventTypes[popover.event.type] ?? popover.event.type} · ${formatClock(popover.event.video_time_ms)}` : t.match.playerReady} — {t.match.tapToClose}
-                  </span>
-                  <Icon name="close" size={15} />
-                </button>
-              )}
-              <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
+          ) : activeTab === 'summary' ? (
+            <div className="match-summary">
+              <MomentWorkspace events={pastEvents} metadata={metadata} moment={selectedMoment} onOpen={openMoment} />
+              <InsightsPanel events={pastEvents} metadata={metadata} moments={history} onOpen={openMoment} />
             </div>
+          ) : activeTab === 'tactical' ? (
+            <TacticalPanel compact={false} events={pastEvents} matchId={matchId} metadata={metadata} />
+          ) : activeTab === 'vision' ? (
+            <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />
+          ) : (
+            <>
+              <div className="pitch-wrap">
+                <div className="match-view-controls">
+                  <label className="live-comments-switch">
+                    <span>{t.match.liveCommentsToggle}</span>
+                    <input checked={preferences.liveComments} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
+                    <span aria-hidden="true" className="switch-track"><i /></span>
+                  </label>
+                  <Button
+                    aria-label={fullscreen ? t.match.exitFullscreen : t.match.enterFullscreen}
+                    className="match-fullscreen-toggle"
+                    onClick={toggleFullscreen}
+                    title={fullscreen ? t.match.exitFullscreen : t.match.enterFullscreen}
+                    variant="ghost"
+                  >
+                    <Icon name={fullscreen ? 'fullscreenExit' : 'fullscreen'} size={18} />
+                  </Button>
+                </div>
+                <div className="pitch-meta">
+                  <span><Icon name="spark" size={16} /> {t.match.selected}</span>
+                  <strong>{current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
+                  <span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>
+                </div>
+                <LiveTrackingPitch
+                  events={pastEvents}
+                  eventTypeLabels={t.moment.eventTypes}
+                  frames={tracking.frames}
+                  homeTeamId={metadata.home_team.team_id}
+                  label={t.match.timeline}
+                  loading={tracking.loading}
+                  onSelectPlayer={selectPlayer}
+                  pitchLengthM={metadata.pitch_length_m}
+                  pitchWidthM={metadata.pitch_width_m}
+                  players={metadata.players}
+                  playing={clock.playing}
+                  selectedPlayerId={selectedPlayerId}
+                  situationLabels={t.match.situations}
+                  sourceLabel={tracking.source === 'video_model' ? t.match.trackingVideo : t.match.trackingSynthetic}
+                  speed={clock.speed}
+                  timeMs={clock.time}
+                />
+                <div className="overlay-zone" aria-live="assertive" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>
+                {popover?.player && (
+                  <button className="player-popover" onClick={() => setPopover(null)} type="button">
+                    <strong>
+                      {popover.player.shirt_number ? `${popover.player.shirt_number} · ` : ''}
+                      {popover.player.name}
+                    </strong>
+                    <span>
+                      {popover.event ? `${t.moment.eventTypes[popover.event.type] ?? popover.event.type} · ${formatClock(popover.event.video_time_ms)}` : t.match.playerReady} — {t.match.tapToClose}
+                    </span>
+                    <Icon name="close" size={15} />
+                  </button>
+                )}
+                <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
+              </div>
+              {preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
+            </>
           )}
-
-          {activeTab === 'overview' && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}
-
           <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>
               {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
@@ -282,16 +335,33 @@ function LiveMatch({ match }) {
               </Button>
             </div>
           </div>
-          <div className="event-chips">
-            {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
-              <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
-                {formatMatchClock(m, t.match.period)} · {t.kinds[m.kind] ?? m.kind}
-              </button>
-            ))}
-          </div>
+          {activeTab === 'match' && (
+            <div className="event-chips">
+              {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
+                <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
+                  {formatMatchClock(m, t.match.period)} · {t.kinds[m.kind] ?? m.kind}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        {activeTab === 'comments' ? <AnnouncerPanel current={overlay} metadata={metadata} snapshot={snapshot} timeMs={clock.time} /> : (
-          <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+        {activeTab === 'match' && (
+          <button
+            aria-controls="match-agent-panel"
+            aria-expanded={assistantOpen}
+            aria-label={assistantOpen ? t.match.hideAgent : t.match.showAgent}
+            className="agent-rail-toggle"
+            onClick={() => setAssistantOpen((currentValue) => !currentValue)}
+            title={assistantOpen ? t.match.hideAgent : t.match.showAgent}
+            type="button"
+          >
+            <Icon name={assistantOpen ? 'arrow' : 'back'} size={18} />
+          </button>
+        )}
+        {matchAgentOpen && (
+          <div className="match-agent-rail" id="match-agent-panel">
+            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+          </div>
         )}
       </div>
     </div>

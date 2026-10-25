@@ -11,6 +11,8 @@ Cuando selecciones, configures o cambies modelos, agentes, búsqueda web o recup
 
 Para trabajos del equipo, consulta `docs/plan-de-desarrollo/README.md` y el documento de la persona responsable antes de cambiar módulos compartidos.
 
+La marca visible del producto es The Prime Moment. Usa ese nombre en la interfaz, la documentación y las instrucciones de agentes; conserva los identificadores técnicos ya establecidos.
+
 Construye un flujo comprobable desde eventos sintéticos hasta estado, métricas, explicación y mensaje temporizado. Conserva identificadores de origen en cada transformación. Calcula las cifras con lógica reproducible y usa IA para seleccionar, explicar o adaptar contenido cuando aporte valor. Comprueba que las narraciones no inventen hechos que los eventos no sostienen.
 
 Demuestra diferencias reales entre los modos de analista y casual. Las preferencias de club, jugador e idioma deben afectar la selección o redacción del contenido cuando estén implementadas. No declares una función completa hasta probar su entrada, salida e interfaz en ejecución.

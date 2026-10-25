@@ -159,27 +159,10 @@ class Persona3NarrativeAdapter:
         ))
         if outcome.draft is not None and outcome.draft.source_event_ids:
             draft = self._humanize(_draft(outcome.draft), metadata)
-            additions = []
-            if preferences.level.value in {"normal", "advanced"}:
-                additions.append(
-                    f"La jugada se apoya en {len(candidate.source_event_ids)} eventos registrados."
-                    if preferences.language.value == "es"
-                    else f"The move is backed by {len(candidate.source_event_ids)} recorded events."
-                )
-            if preferences.level.value == "advanced":
-                additions.append(
-                    f"Prioridad {candidate.priority}/100."
-                    if preferences.language.value == "es"
-                    else f"Priority {candidate.priority}/100."
-                )
-            if preferences.mode.value == "analyst":
-                additions.append(
-                    f"Vista analista con {len(candidate.facts)} hechos calculados."
-                    if preferences.language.value == "es"
-                    else f"Analyst view with {len(candidate.facts)} calculated facts."
-                )
+            presentation = self.fallback.live(metadata, snapshot, candidate, preferences)
             return draft.model_copy(update={
-                "explanation": " ".join([draft.explanation, *additions]),
+                "headline": presentation.headline,
+                "explanation": presentation.explanation,
                 "source_event_ids": list(candidate.source_event_ids),
             })
         if outcome.decision.action == "unavailable":

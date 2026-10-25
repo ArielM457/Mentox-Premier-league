@@ -14,9 +14,9 @@ El contrato de metadatos usa `schema_version`, `match_id`, `home_team`, `away_te
 
 **2. Tiempo.** `period` indica la parte del encuentro. `clock_ms` son milisegundos desde el inicio de ese período, incluido el tiempo añadido. `video_time_ms` son milisegundos desde el inicio del archivo o señal de vídeo y pueden faltar si aún no hay sincronización. Se guardan ambos tiempos porque el reloj de partido y el vídeo no son equivalentes.
 
-**3. Autor.** `team_id` identifica al equipo responsable y `player_id` al jugador cuando se conoce. Un evento de cambio de posesión puede carecer de jugador.
+**3. Autor y receptor.** `team_id` identifica al equipo responsable y `player_id` al jugador cuando se conoce. `receiver_player_id` identifica al receptor previsto de un pase o una reanudación. Un evento de cambio de posesión puede carecer de jugador.
 
-**4. Tipo.** La primera versión admite `pass`, `shot`, `tackle`, `possession_change`, `pressure` y `recovery`. Los adaptadores deben traducir sus nombres externos a estos valores.
+**4. Tipo.** La primera versión admite `pass`, `shot`, `tackle`, `possession_change`, `pressure`, `recovery`, `foul`, `yellow_card`, `red_card`, `injury_stoppage` y `restart`. Los adaptadores deben traducir sus nombres externos a estos valores.
 
 **5. Posición.** `start` y `end` usan `x` y `y` entre 0 y 100. Son coordenadas normalizadas de un campo fijo. Para calcular distancias reales se necesitan las dimensiones del partido. La posición puede faltar cuando la fuente no la conoce.
 
@@ -25,6 +25,8 @@ El contrato de metadatos usa `schema_version`, `match_id`, `home_team`, `away_te
 **7. Procedencia.** `source` distingue un generador sintético de una inferencia de vídeo. `confidence` se usa solo si la fuente produce una estimación. Un valor desconocido no se inventa.
 
 **8. Relaciones.** `related_event_ids` permite vincular una jugada con sus acciones. Las explicaciones y métricas deben conservar estos identificadores.
+
+**9. Situación y paro.** `situation` describe el propósito sintético de la acción, por ejemplo `long_switch`, `through_ball` o `tactical_foul`. No reemplaza el tipo del evento. `stoppage_ms` indica cuánto permanece detenido el juego desde una falta o lesión y vale cero cuando no corresponde.
 
 ## **Ejemplo**
 
@@ -39,11 +41,14 @@ El contrato de metadatos usa `schema_version`, `match_id`, `home_team`, `away_te
   "type": "pass",
   "team_id": "team-a",
   "player_id": "player-7",
+  "receiver_player_id": "player-11",
   "start": {"x": 43.0, "y": 51.0},
   "end": {"x": 62.0, "y": 46.0},
   "outcome": "success",
   "source": "synthetic",
   "confidence": null,
+  "situation": "through_ball",
+  "stoppage_ms": 0,
   "related_event_ids": []
 }
 ```

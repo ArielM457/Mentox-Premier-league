@@ -78,18 +78,27 @@
 .section-heading h2 { margin: 0; font-size: 25px; }
 .section-heading button, .section-heading > span { background: transparent; color: var(--violet); font-weight: 700; font-size: 13px; }
 .match-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.match-card { min-width: 0; padding: 21px; display: flex; flex-direction: column; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 21px; text-align: left; box-shadow: 0 10px 35px rgba(21,19,41,.05); transition: transform 200ms, box-shadow 200ms, border 200ms; }
+.match-card { min-width: 0; padding: 21px; position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; color: white; background: transparent; border: 1px solid rgba(255,255,255,.14); border-radius: 21px; text-align: left; box-shadow: 0 10px 35px rgba(21,19,41,.12); transition: transform 200ms, box-shadow 200ms, border 200ms; }
+.match-card::before { content: ''; position: absolute; z-index: 0; inset: 0; background: linear-gradient(180deg, rgba(12,9,26,.05), rgba(12,9,26,.45)), linear-gradient(108deg, var(--home-card) 0 49%, var(--away-card) 51% 100%); }
+.match-card::after { content: ''; width: 54px; position: absolute; z-index: 2; inset-block: -15px; left: calc(50% - 27px); background: #090812; clip-path: polygon(42% 0, 100% 0, 63% 43%, 91% 43%, 26% 100%, 0 100%, 33% 55%, 8% 55%); transform: rotate(2deg); pointer-events: none; }
+.match-card > *:not(.match-card-motion) { position: relative; z-index: 3; }
+.match-card-motion { display: none; position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
+.match-live .match-card-motion { display: block; }
+.match-live .match-card-motion::before { content: ''; width: 46%; height: 150%; position: absolute; left: -8%; top: -25%; background: radial-gradient(circle, rgba(255,255,255,.28), rgba(216,255,101,.1) 32%, transparent 68%); filter: blur(8px); animation: live-card-orbit 6s ease-in-out infinite alternate; }
+.match-live .match-card-motion::after { content: ''; width: 22%; height: 170%; position: absolute; top: -35%; left: -32%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent); transform: rotate(18deg); animation: live-card-sweep 4.5s ease-in-out infinite; }
 .match-card:hover { transform: translateY(-5px); border-color: #bba7f7; box-shadow: 0 20px 40px rgba(45,30,90,.11); }
-.match-live:first-child { color: white; background: linear-gradient(135deg, #24204c, #151329); border-color: transparent; }
 .match-card-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; }
+.match-card-top > span:first-child { min-width: 0; line-height: 1.35; white-space: normal; overflow-wrap: anywhere; }
+.match-card-top .status { flex: 0 0 auto; }
 .match-labels { display: flex; align-items: center; gap: 6px; }
 .favorite-row { min-height: 26px; padding-top: 10px; display: flex; align-items: center; }
 .favorite-label, .favorite-player-label { display: inline-flex; align-items: center; gap: 6px; color: var(--violet-dark); background: var(--lime); border-radius: 999px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
 .favorite-label { padding: 5px 8px; }
 .favorite-player-label { margin: 0 0 14px; padding: 7px 10px; color: var(--navy); }
-.match-live:first-child .match-card-top { color: #bdb8d0; }
-.status { padding: 4px 8px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+.match-card .match-card-top, .match-card .card-score small { color: rgba(255,255,255,.78); }
+.status { padding: 4px 8px; display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: .08em; }
 .status-live { color: white; background: var(--red); }
+.status-live .icon { filter: drop-shadow(0 0 4px rgba(255,255,255,.75)); animation: live-signal 1.6s ease-in-out infinite; }
 .status-ft { color: var(--violet-dark); background: var(--lavender); }
 .status-upcoming { color: var(--navy); background: var(--lime); }
 .match-card-main { padding: 22px 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
@@ -97,9 +106,16 @@
 .match-card-main strong { font-size: 13px; }
 .card-score { font: 700 30px "Space Grotesk"; white-space: nowrap; }
 .card-score small { margin-top: 3px; display: block; color: var(--muted); font: 500 11px "DM Sans"; }
-.match-live:first-child .card-score small { color: #bdb8d0; }
 .explore-label { padding-top: 14px; display: flex; justify-content: center; align-items: center; gap: 7px; border-top: 1px solid rgba(127,120,150,.2); color: var(--violet); font-size: 12px; font-weight: 800; }
-.match-live:first-child .explore-label { color: var(--lime); }
+.match-card .explore-label { color: white; border-color: rgba(255,255,255,.24); }
+@keyframes live-card-orbit { from { transform: translate3d(-8%, -4%, 0) scale(.9); } to { transform: translate3d(135%, 8%, 0) scale(1.15); } }
+@keyframes live-card-sweep { 0%, 18% { left: -32%; opacity: 0; } 40%, 72% { opacity: .85; } 100% { left: 118%; opacity: 0; } }
+@keyframes live-signal { 0%, 100% { opacity: .68; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) {
+  .match-live .match-card-motion::before,
+  .match-live .match-card-motion::after,
+  .status-live .icon { animation: none; }
+}
 .loading-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .loading-cards span { height: 245px; border-radius: 21px; background: linear-gradient(100deg, #eceaf1 25%, #f8f7fc 45%, #eceaf1 65%); background-size: 200% 100%; animation: shimmer 1s infinite; }
 .empty-state { padding: 55px; text-align: center; border: 1px dashed #c9c3d5; border-radius: 22px; }
@@ -109,6 +125,8 @@
 .player-matches-section { background: linear-gradient(135deg, #e8f4ff, white); border-color: #bfdcf4; }
 .player-matches-section .player-icon { background: #285f9e; }
 .favorite-club-section .section-heading { margin-bottom: 15px; }
+.live-home-section .favorite-match-row { grid-template-columns: 1fr; }
+.live-home-section .match-card { min-height: 230px; }
 .favorite-club-section .section-heading > div > div { display: block; }
 .favorite-club-section .section-heading small { display: block; color: var(--violet); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
 .favorite-club-section .section-heading h2 { margin-top: 2px; }

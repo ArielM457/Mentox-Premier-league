@@ -22,7 +22,13 @@ from match_intelligence.domain.contracts import EventOutcome, EventType, MatchEv
 POSSESSION_RULE_VERSION = "possession@1"
 
 POSSESSION_EVENT_TYPES = frozenset(
-    {EventType.PASS, EventType.SHOT, EventType.RECOVERY, EventType.POSSESSION_CHANGE}
+    {
+        EventType.PASS,
+        EventType.SHOT,
+        EventType.RECOVERY,
+        EventType.POSSESSION_CHANGE,
+        EventType.RESTART,
+    }
 )
 SHOT_ON_TARGET_OUTCOMES = frozenset({EventOutcome.GOAL, EventOutcome.SAVED})
 

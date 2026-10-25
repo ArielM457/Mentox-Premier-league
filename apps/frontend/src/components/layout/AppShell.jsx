@@ -40,7 +40,7 @@ export function AppShell({ active, children }) {
     <main className={`app-shell ${preferences.theme === 'light' ? 'light-shell' : 'dark-shell'}`}>
       <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-top">
-          <button className="brand-link" type="button" onClick={() => navigate(paths.landing())} aria-label="Inside the Game">
+          <button className="brand-link" type="button" onClick={() => navigate(paths.landing())} aria-label={t.brand}>
             <Brand />
           </button>
           <button aria-label={collapsed ? 'Expandir menú' : 'Contraer menú'} className="collapse-sidebar" onClick={toggle} type="button">

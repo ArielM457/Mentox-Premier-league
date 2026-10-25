@@ -3,7 +3,7 @@
 Este documento registra lo implementado por Persona 4, cómo se verificó y qué falta. El plan original está en [el plan de Persona 4](../plan-de-desarrollo/persona-4-api-y-frontend.md).
 
 - **Estado:** verificado localmente con datos sintéticos y adaptadores provisionales.
-- **Última verificación:** 14 de octubre de 2026.
+- **Última verificación:** 23 de octubre de 2026.
 - **Ramas:** `feat/persona-4-api-frontend` (API) y `feat/persona-4-figma-ui` (interfaz con el diseño de Persona 5).
 
 ## **Qué existe ahora**
@@ -14,7 +14,9 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 |---|---|
 | `GET /matches` · `POST /matches` | Listar y cargar un partido sintético. `scenario`: `acceptance` (partido corto de Persona 1) o `analytics` (partido de dos tiempos de Persona 2). `inject_error_in` provoca un error controlado para la demo. |
 | `GET /matches/{id}` | Metadatos, duración y fuente de vídeo. |
+| `GET /matches/{id}/preview` | Formaciones, tácticas reproducibles e información previa sintética aprobada. |
 | `GET /matches/{id}/events?until_video_ms=` | Eventos ya ocurridos; nunca futuros. |
+| `GET /matches/{id}/tracking?from_video_ms=&to_video_ms=` | Ventana de posiciones de 22 jugadores y balón para interpolación; máximo 30 segundos. |
 | `GET /matches/{id}/state?video_time_ms=` | `MatchSnapshot v1`. |
 | `GET /matches/{id}/overlays?until_video_ms=&preferencias` | `OverlayMessage v1` planificados hasta ese tiempo. |
 | `GET /matches/{id}/stream?from_video_ms=&speed=&preferencias` | Canal en directo con Server-Sent Events. |
@@ -30,15 +32,16 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 
 Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`casual`, `analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`.
 
-**Frontend.** `apps/frontend` implementa el diseño de Figma de Persona 5 («Inside the Game») en React y JavaScript, como fija la [decisión técnica 3](../07-decisiones-tomadas.md), conectado a la API real.
+**Frontend.** `apps/frontend` implementa el diseño de Figma de Persona 5 para The Prime Moment en React y JavaScript, como fija la [decisión técnica 3](../07-decisiones-tomadas.md), conectado a la API real.
 
 | Pantalla | Ruta | Qué muestra |
 |---|---|---|
 | Inicio | `#/` | Presentación del producto, modos y ejemplo con cifras reales del partido de aceptación. |
 | Configuración | `#/onboarding` | Idioma, club, jugador y modo, con los equipos y jugadores que entrega la API. |
-| Descubrir | `#/discover` | Partidos del club favorito, partidos y acciones del jugador favorito. |
+| Descubrir | `#/discover` | Partido en vivo cuando exista, partido más reciente, próximo partido y acceso a su previa. |
+| Previa | `#/match/{id}/preview` | Duelo visual, formaciones, tácticas ofensivas por equipo e informe previo extensible y buscable. |
 | Partidos | `#/matches` | Búsqueda, filtros en vivo, próximos y resúmenes, y filtro por jugador. |
-| Centro del partido | `#/match/{id}` | Sesión persistente entre pestañas; campo con todos los jugadores y foco individual; selector y laboratorio de momentos; estadísticas por tiempo; lectura táctica por equipo; explicaciones y comentarios para analistas. |
+| Centro del partido | `#/match/{id}` | Sesión persistente entre Partido, Resumen, Estadísticas y Vista táctica; seguimiento interpolado de once jugadores por equipo y balón, con foco individual; comentarios activables, pantalla completa, agente lateral con flecha; selector y laboratorio de momentos; estadísticas por tiempo; repetición y simulación táctica por equipo. |
 | Momento | `#/match/{id}/moment/{momento}` | Autor, situación, equipo y tiempo; explicación breve, cifras, jugadores, eventos de origen y reporte de errores. |
 | Resumen | `#/recap/{id}` | Marcador final, resumen pendiente o aprobado y los tres momentos principales. |
 | Mi experiencia | `#/profile` | Preferencias, historial local de partidos y resúmenes, contenido del jugador seguido y comentarios para analistas. |
@@ -121,6 +124,10 @@ npm run build:frontend
 
 Resultado del 18 de octubre de 2026 en el árbol de trabajo: 323 pruebas superadas, compilación correcta y tres advertencias previas del linter por cargar datos dentro de efectos. La simulación integrada con el proveedor fixture devolvió seis rutas, siete mensajes y un recorte pendiente. La revisión visual en navegador de las pantallas nuevas sigue pendiente.
 
+**Seguimiento 11 contra 11, 24 de octubre de 2026.** El partido en vivo ahora consume ventanas de `TrackingFrame v1` a 5 cuadros por segundo y mueve 22 jugadores y el balón mediante interpolación sincronizada con el reloj. La forma base es 4-3-3; al defender se asigna un presionante y los jugadores de líneas retrasadas ajustan coberturas o marcas por carril. La API limita cada ventana a 30 segundos y declara `synthetic_mock`. Se superaron 16 pruebas específicas y las 340 pruebas del backend, además del lint y la compilación de producción del frontend. La vista de escritorio a 1440 px se comprobó en Chrome local; queda pendiente la revisión manual móvil y durante una reproducción prolongada.
+
+**Situaciones coordinadas, 24 de octubre de 2026.** `synthetic-live-001` usa un escenario distinto del partido analítico. Los pases declaran receptor y propósito; el seguimiento prepara la recepción y mantiene unido al balón con la jugada. Se añadieron recuperación y contraataque, cambios largos, pases al espacio, falta, tarjeta amarilla, paro por lesión y reanudación. La cancha muestra la situación actual y las pausas también producen una narración con sus eventos de origen. Esta versión es un guion reproducible con validaciones tácticas; todavía no selecciona el pase en cada cuadro entre todas las opciones disponibles.
+
 **Actualización del centro del partido, 19 de octubre de 2026.** Se conectó el inicio de la simulación al reloj local y se mantuvo la sesión al cambiar de pestaña. Se añadieron controles globales de pausa, continuación y reinicio; cambio inmediato entre Aficionado y Analista; todos los jugadores en el campo con foco individual; selector de un momento; laboratorio contrafactual local; estadísticas con balance visual; tácticas por equipo; explicaciones con vista previa; comentarios sincronizados y locutor contextual. `npm run lint:frontend` terminó sin errores y conservó las tres advertencias anteriores. `npm run build:frontend` terminó correctamente con Vite 8.3.3. La revisión visual manual en navegador queda pendiente.
 
 El laboratorio contrafactual actual es una estimación determinista de interfaz y está marcado como tal. No se considera implementación de RF-44 mediante IA: falta definir y conectar el contrato del agente que reciba posiciones de jugadores, balón y arquero y devuelva supuesto, método, evidencia y límites.
@@ -142,7 +149,7 @@ La verificación final ejecutó 330 pruebas del backend correctamente, además d
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
 - **Analítica provisional.** Narrativa ya admite Persona 3, pero algunas operaciones conservan respaldo determinista. Ver la decisión 6.
 - **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.
-- **Partidos de la demo.** Hay dos: el corto de aceptación (42 s) y el de dos tiempos de Persona 2 (11:30). Los dos enfrentan a Aurora FC y Río Unido.
+- **Partidos de la demo.** Hay tres: el corto finalizado de aceptación, el próximo partido analítico de dos tiempos y otro escenario analítico marcado en vivo para revisar el centro del partido con once jugadores por equipo. Los tres enfrentan a Aurora FC y Río Unido.
 - **Estado en memoria.** Revisiones y reportes se pierden al reiniciar el backend. Para la demo alcanza; para producción haría falta guardarlos.
 - **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.
 - **Sin vídeo real.** La interfaz nueva usa el campo sintético; el reproductor de la primera versión aceptaba una URL de vídeo y puede recuperarse cuando el equipo elija el vídeo.

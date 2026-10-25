@@ -163,7 +163,7 @@ def test_mock_tracking_is_deterministic_and_plausible() -> None:
     assert {f.period for f in frames} == {1, 2}
     metrics = tracking_metrics(frames, ("team-aurora", "team-rio"), match.events)
     players = [m for m in metrics if m.player_id and m.key == "top_speed_kmh"]
-    assert len(players) == 14
+    assert len(players) == 22
     assert all(10 <= m.value <= 31.5 for m in players)
     distances = [m.value for m in metrics if m.key == "distance_covered_m"]
     assert all(250 <= value <= 1_500 for value in distances)  # unos 9,9 minutos de juego
