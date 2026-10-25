@@ -97,6 +97,22 @@ El momento de un gol cita todos los eventos de su jugada y el marcador resultant
 
 Ambos indicadores llevan en `evidence_limits` que son escalas del equipo y no estadísticas oficiales.
 
+### Situaciones del partido (`situation@1`)
+
+Desde el 25 de octubre de 2026, `MatchEvent 1.0` trae faltas, tarjetas y detenciones como eventos propios (rama `develop`). La regla no infiere nada: cada `foul`, `yellow_card`, `red_card` o `injury_stoppage` es un momento.
+
+- Las faltas y tarjetas citan el conteo del equipo y del jugador hasta ese evento (`fouls`, `yellow_cards`, `red_cards`).
+- La detención cita `stoppage_seconds`, que sale de `stoppage_ms`, y avisa en `evidence_limits` que no es un diagnóstico médico.
+- La roja se emite siempre, como el gol.
+- Una falta repetida en menos de 2 minutos pierde 20 puntos por repetición, así que no todas se muestran.
+
+| Caso | Resultado | Prueba |
+|---|---|---|
+| Dos faltas y una amarilla del mismo jugador | Conteos 1 y 2; la segunda falta se descarta por repetición | `test_cards_and_fouls_count_per_team_and_player` |
+| Roja en modo casual | Se emite siempre | `test_red_card_is_always_emitted_and_events_without_situations_are_not` |
+| Detención de 12 s | `stoppage_seconds = 12` con su límite | `test_injury_stoppage_reports_the_event_duration_and_its_limit` |
+| Partido en vivo de Persona 4 | El modo casual ve tarjetas y lesión; las faltas solo el analista | `test_casual_viewers_see_cards_but_not_every_foul` |
+
 ## Motor de atención (`attention@1`, RF-14)
 
 ### Fusión
@@ -113,7 +129,7 @@ La prioridad es la suma visible de estos puntos, recortada entre 0 y 100. Cada p
 
 | Código | Puntos | Cuándo |
 |---|---|---|
-| `base_kind` | goal 80, recovery_to_shot 50, fast_progression 50, sustained_pressure 50, control_shift 50, shot 45, chaos_phase 45, player_milestone 40, high_recovery 35, progressive_pass 25 | Siempre |
+| `base_kind` | goal 80, red_card 80, yellow_card 55, injury_stoppage 50, recovery_to_shot 50, fast_progression 50, sustained_pressure 50, control_shift 50, shot 45, chaos_phase 45, player_milestone 40, high_recovery 35, foul 30, progressive_pass 25 | Siempre |
 | `measured_fact` | 0 a 15 | Fuerza del hecho según la regla, por ejemplo +6 por tiro a puerta o +3 si es a menos de 16,5 m |
 | `combined_signals` | +5 por señal extra, máximo +10 | Otras reglas en el mismo evento |
 | `novelty` | +10 | Primer momento emitido de ese tipo para ese equipo |
@@ -124,7 +140,7 @@ La prioridad es la suma visible de estos puntos, recortada entre 0 y 100. Cada p
 | `casual_mode` | −10 | Modo casual y `control_shift` o `chaos_phase` |
 | `player_mode_involved` | +20 | Modo jugador y participa |
 | `player_mode_not_involved` | −30 | Modo jugador, no participa y no es gol |
-| `decisive_fact` | 0 | Los goles se emiten siempre, también los del rival (RF-24) |
+| `decisive_fact` | 0 | Los goles y las rojas se emiten siempre, también los del rival (RF-24) |
 | `below_threshold` | 0 | Motivo del descarte |
 
 ### Umbral por perfil
@@ -178,3 +194,6 @@ La narración debe cubrir estos valores de `kind`:
 | `player_milestone` | Hito de un jugador | contador alcanzado o `match_longest_pass_m` |
 | `high_recovery` | Balón ganado en campo rival | `high_recoveries` del equipo |
 | `progressive_pass` | Pase que acerca el balón a la portería rival | `pass_forward_gain_m`, `pass_distance_m` |
+| `foul` | Falta | `fouls` del equipo y del jugador |
+| `yellow_card`, `red_card` | Tarjeta | `yellow_cards` o `red_cards` del equipo y del jugador |
+| `injury_stoppage` | Juego detenido por lesión | `stoppage_seconds` |

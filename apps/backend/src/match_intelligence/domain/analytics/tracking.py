@@ -155,6 +155,66 @@ class TrackSet:
         ]
 
 
+class TrackingSource(StrEnum):
+    """Origen de las posiciones en la vista para pantalla (vocabulario de la API)."""
+
+    SYNTHETIC_MOCK = "synthetic_mock"
+    VIDEO_MODEL = "video_model"
+
+
+class TrackedObject(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    track_id: str = Field(min_length=1)
+    kind: TrackedKind
+    team_id: str | None = None
+    player_id: str | None = None
+    x_m: float
+    y_m: float
+    confidence: float | None = Field(default=None, ge=0, le=1)
+
+
+class TrackingFrame(BaseModel):
+    """``TrackingFrame v1``: posiciones de un instante para dibujar la cancha.
+
+    Es una vista de salida de un ``TrackSet``; la entrada sigue siendo la de
+    Persona 1. ``source`` traduce el origen: ``simulated_fixture`` se muestra
+    como ``synthetic_mock`` y ``actual_model`` como ``video_model``.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1"] = "1"
+    match_id: str = Field(min_length=1)
+    period: int = Field(ge=1, le=4)
+    clock_ms: int = Field(ge=0)
+    video_time_ms: int | None = Field(default=None, ge=0)
+    source: TrackingSource
+    objects: list[TrackedObject] = Field(default_factory=list)
+
+
+def tracking_frames(tracks: TrackSet) -> list[TrackingFrame]:
+    """Un cuadro por instante, en orden deportivo, con todas las pistas visibles."""
+    source = TrackingSource.SYNTHETIC_MOCK if tracks.is_simulated else TrackingSource.VIDEO_MODEL
+    return [
+        TrackingFrame(
+            match_id=tracks.match_id,
+            period=instant.period,
+            clock_ms=instant.clock_ms,
+            video_time_ms=instant.video_time_ms,
+            source=source,
+            objects=[
+                TrackedObject(
+                    track_id=track.track_id, kind=track.kind, team_id=track.team_id,
+                    player_id=track.player_id, x_m=round(x, 2), y_m=round(y, 2),
+                )
+                for track, x, y in instant.positions
+            ],
+        )
+        for instant in tracks.instants()
+    ]
+
+
 @dataclass(frozen=True, slots=True)
 class Movement:
     """Resumen de movimiento de una pista."""

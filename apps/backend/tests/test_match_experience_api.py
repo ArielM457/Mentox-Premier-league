@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from match_intelligence.adapters.http.registry import (
     DEMO_MATCH_ID,
+    LIVE_MATCH_ID,
     _default_registry,
     get_registry,
 )
@@ -125,6 +126,51 @@ def test_levels_change_detail_not_facts(client: TestClient) -> None:
     lengths = [len(by_level[level][goal]["explanation"]) for level in ("simple", "normal", "advanced")]
     assert lengths == sorted(lengths) and len(set(lengths)) == 3
     assert len({tuple(by_level[level][goal]["source_event_ids"]) for level in by_level}) == 1
+
+
+def test_live_comments_use_friendly_text_and_keep_evidence_separate(
+    client: TestClient,
+) -> None:
+    """La pantalla no expone claves internas, pero la evidencia sigue disponible."""
+    response = client.get(
+        f"/api/v1/matches/{LIVE_MATCH_ID}/overlays",
+        params={"mode": "analyst", "level": "advanced"},
+    )
+    assert response.status_code == 200
+    shot = next(
+        message
+        for message in response.json()["overlays"]
+        if message["candidate_id"] == "moment-live-032"
+    )
+
+    assert shot["explanation"] == "Río Unido genera una ocasión clara."
+    assert not shot["explanation"].startswith("[")
+    assert all(
+        marker not in shot["explanation"]
+        for marker in ("Datos:", "Eventos:", "shot=", "live-032")
+    )
+    assert shot["source_event_ids"] == ["live-032"]
+
+    sources = client.get(
+        f"/api/v1/matches/{LIVE_MATCH_ID}/drafts/{shot['draft_id']}/sources"
+    )
+    assert sources.status_code == 200
+    assert [event["event_id"] for event in sources.json()["events"]] == ["live-032"]
+
+    progressive = next(
+        message
+        for message in response.json()["overlays"]
+        if message["candidate_id"] == "moment-live-003"
+    )
+    assert progressive["explanation"] == "Aurora FC rompe una línea y hace avanzar la jugada."
+    for message in response.json()["overlays"]:
+        assert all(
+            marker not in message["explanation"]
+            for marker in (
+                "Datos:", "Eventos:", "forward_progress", "pitch_percent",
+                "coordenadas de campo", "no en metros", "live-",
+            )
+        )
 
 
 @pytest.mark.parametrize("team", ["team-aurora", "team-rio"])
@@ -333,3 +379,265 @@ def test_two_half_scenario_from_persona_2_is_playable(client: TestClient) -> Non
 def test_unknown_scenario_is_rejected(client: TestClient) -> None:
     response = client.post("/api/v1/matches", json={"scenario": "real-premier-league"})
     assert response.status_code == 422
+
+
+def test_catalog_exposes_recent_upcoming_and_optional_live_matches(client: TestClient) -> None:
+    matches = client.get("/api/v1/matches").json()
+    by_id = {match["match_id"]: match for match in matches}
+    assert by_id["synthetic-acceptance-001"]["status"] == "FT"
+    assert by_id["synthetic-analytics-001"]["status"] == "UPCOMING"
+    assert by_id[LIVE_MATCH_ID]["status"] == "LIVE"
+    assert all(match["status"] in {"LIVE", "UPCOMING", "FT"} for match in matches)
+
+
+def test_prematch_agent_returns_ui_data_for_both_teams(client: TestClient) -> None:
+    response = client.get("/api/v1/matches/synthetic-analytics-001/preview")
+    assert response.status_code == 200
+    preview = response.json()
+    assert preview["generated_by"] == "prematch-tactics-agent"
+    assert preview["status"] == "UPCOMING"
+    assert len(preview["home"]["formations"]) >= 2
+    assert len(preview["away"]["formations"]) >= 2
+    assert len(preview["simulations"]) == 10
+    assert {simulation["team_id"] for simulation in preview["simulations"]} == {
+        preview["home"]["team_id"], preview["away"]["team_id"]
+    }
+    for team in (preview["home"], preview["away"]):
+        for formation in team["formations"]:
+            assert len(formation["players"]) == 11
+            assert all(player["team_id"] == team["team_id"] for player in formation["players"])
+            assert all(0 <= player["position"][axis] <= 100 for player in formation["players"] for axis in ("x", "y"))
+    for simulation in preview["simulations"]:
+        attacking_team = (
+            preview["home"] if simulation["team_id"] == preview["home"]["team_id"] else preview["away"]
+        )
+        attacking_ids = [player["player_id"] for player in attacking_team["formations"][0]["players"]]
+        attacks_right = simulation["team_id"] == preview["home"]["team_id"]
+
+        def attacking_x(position: dict) -> float:
+            return position["x"] if attacks_right else 100 - position["x"]
+
+        assert simulation["frames"][-1]["phase"] == "Gol simulado"
+        assert len(simulation["frames"]) == 13
+        assert [frame["at_ms"] for frame in simulation["frames"]] == sorted(
+            frame["at_ms"] for frame in simulation["frames"]
+        )
+        assert all(
+            current["at_ms"] - previous["at_ms"] <= 1_000
+            for previous, current in zip(simulation["frames"], simulation["frames"][1:], strict=False)
+        )
+        assert all(frame["action"] for frame in simulation["frames"])
+        assert all(len(frame["players"]) == 22 for frame in simulation["frames"])
+        assert all(len({player["player_id"] for player in frame["players"]}) == 22 for frame in simulation["frames"])
+        for frame in simulation["frames"]:
+            involved = set(frame["involved_player_ids"])
+            assert 2 <= len(involved) < 22
+            assert involved <= {player["player_id"] for player in frame["players"]}
+            assert {
+                player["team_id"] for player in frame["players"]
+                if player["player_id"] in involved
+            } == {preview["home"]["team_id"], preview["away"]["team_id"]}
+        assert simulation["frames"][-1]["ball_owner_id"] is None
+        assert simulation["frames"][-1]["ball"]["x"] <= 3 or simulation["frames"][-1]["ball"]["x"] >= 97
+        assert len(simulation["frames"][:-1]) >= 10
+        assert len({frame["ball_owner_id"] for frame in simulation["frames"][:-1]}) >= 5
+        for frame in simulation["frames"][:-1]:
+            owner = next(
+                player for player in frame["players"]
+                if player["player_id"] == frame["ball_owner_id"]
+            )
+            assert owner["position"] == frame["ball"]
+        assert all(
+            {player["team_id"] for player in frame["players"]}
+            == {preview["home"]["team_id"], preview["away"]["team_id"]}
+            for frame in simulation["frames"]
+        )
+        assert len({(frame["ball"]["x"], frame["ball"]["y"]) for frame in simulation["frames"]}) > 4
+        defending_team_id = (
+            preview["away"]["team_id"]
+            if simulation["team_id"] == preview["home"]["team_id"]
+            else preview["home"]["team_id"]
+        )
+        for previous, current in zip(
+            simulation["frames"], simulation["frames"][1:], strict=False
+        ):
+            previous_by_id = {
+                player["player_id"]: player for player in previous["players"]
+            }
+            moving_defenders = [
+                player
+                for player in current["players"]
+                if player["team_id"] == defending_team_id
+                and (
+                    abs(
+                        player["position"]["x"]
+                        - previous_by_id[player["player_id"]]["position"]["x"]
+                    ) > 0.05
+                    or abs(
+                        player["position"]["y"]
+                        - previous_by_id[player["player_id"]]["position"]["y"]
+                    ) > 0.05
+                )
+            ]
+            assert len(moving_defenders) >= 9
+            moving_attackers = [
+                player
+                for player in current["players"]
+                if player["team_id"] == simulation["team_id"]
+                and (
+                    abs(
+                        player["position"]["x"]
+                        - previous_by_id[player["player_id"]]["position"]["x"]
+                    ) > 0.05
+                    or abs(
+                        player["position"]["y"]
+                        - previous_by_id[player["player_id"]]["position"]["y"]
+                    ) > 0.05
+                )
+            ]
+            assert len(moving_attackers) >= 9
+        positions_by_player = {
+            player["player_id"]: {
+                (frame_player["position"]["x"], frame_player["position"]["y"])
+                for frame in simulation["frames"]
+                for frame_player in frame["players"]
+                if frame_player["player_id"] == player["player_id"]
+            }
+            for player in simulation["frames"][0]["players"]
+        }
+        assert all(len(positions) > 1 for positions in positions_by_player.values())
+
+        # La estructura conserva las funciones: portero en inicio y defensores
+        # como cobertura, incluso cuando el equipo presiona en campo rival.
+        for frame in simulation["frames"]:
+            by_id = {player["player_id"]: player for player in frame["players"]}
+            assert attacking_x(by_id[attacking_ids[0]]["position"]) <= 25
+            assert all(
+                attacking_x(by_id[player_id]["position"]) <= 55
+                for player_id in attacking_ids[1:3]
+            )
+
+        # Después de pasar, el jugador continúa desde donde estaba y no vuelve
+        # de golpe a la coordenada original de la formación.
+        for previous, current in zip(simulation["frames"], simulation["frames"][1:], strict=False):
+            previous_owner = previous["ball_owner_id"]
+            current_owner = current["ball_owner_id"]
+            if current_owner is not None and current_owner != previous_owner:
+                prepared_receiver = next(
+                    p for p in previous["players"] if p["player_id"] == current_owner
+                )
+                assert abs(prepared_receiver["position"]["x"] - current["ball"]["x"]) <= 12
+                assert abs(prepared_receiver["position"]["y"] - current["ball"]["y"]) <= 12
+            if previous_owner is None or previous_owner == current["ball_owner_id"]:
+                continue
+            previous_player = next(p for p in previous["players"] if p["player_id"] == previous_owner)
+            current_player = next(p for p in current["players"] if p["player_id"] == previous_owner)
+            assert abs(current_player["position"]["x"] - previous_player["position"]["x"]) <= 12
+            assert abs(current_player["position"]["y"] - previous_player["position"]["y"]) <= 12
+
+    information = preview["information"]
+    assert information["source"] == {
+        "document_id": "prematch-synthetic-analytics-001-v1",
+        "storage_kind": "local_fixture",
+        "approved": True,
+        "synthetic": True,
+        "updated_at": "2026-10-23",
+    }
+    assert len(information["teams"]) == 2
+    assert all(len(team["recent_results"]) == 5 for team in information["teams"])
+    assert all(team["availability"] for team in information["teams"])
+
+
+def test_prematch_includes_full_field_counterattacks_and_forward_progression(
+    client: TestClient,
+) -> None:
+    preview = client.get(f"/api/v1/matches/{LIVE_MATCH_ID}/preview").json()
+    expected_keys = {"full_field_counter", "vertical_progression"}
+
+    for team in (preview["home"], preview["away"]):
+        simulations = {
+            simulation["simulation_id"].removeprefix(f'{team["team_id"]}-'): simulation
+            for simulation in preview["simulations"]
+            if simulation["team_id"] == team["team_id"]
+        }
+        assert expected_keys <= simulations.keys()
+        attacks_right = team["team_id"] == preview["home"]["team_id"]
+        defending_team_id = (
+            preview["away"]["team_id"]
+            if attacks_right
+            else preview["home"]["team_id"]
+        )
+
+        for tactic_key in expected_keys:
+            simulation = simulations[tactic_key]
+            progress = [
+                frame["ball"]["x"] if attacks_right else 100 - frame["ball"]["x"]
+                for frame in simulation["frames"]
+            ]
+            assert progress[0] <= 25
+            assert progress[-1] >= 97
+            assert sum(current > previous for previous, current in zip(progress, progress[1:])) >= 10
+
+            for frame in simulation["frames"]:
+                outfield_x = [
+                    player["position"]["x"]
+                    if attacks_right
+                    else 100 - player["position"]["x"]
+                    for player in frame["players"]
+                    if player["shirt_number"] != 1
+                ]
+                assert min(outfield_x) <= 40
+                assert max(outfield_x) >= 70
+
+                closest_pressure = min(
+                    (
+                        (player["position"]["x"] - frame["ball"]["x"]) ** 2
+                        + (player["position"]["y"] - frame["ball"]["y"]) ** 2
+                    ) ** 0.5
+                    for player in frame["players"]
+                    if player["team_id"] == defending_team_id
+                    and player["shirt_number"] != 1
+                )
+                assert closest_pressure <= 12
+
+
+def test_prematch_includes_a_striker_shot_from_outside_the_box(
+    client: TestClient,
+) -> None:
+    preview = client.get(f"/api/v1/matches/{LIVE_MATCH_ID}/preview").json()
+
+    for team in (preview["home"], preview["away"]):
+        simulation = next(
+            item
+            for item in preview["simulations"]
+            if item["simulation_id"] == f'{team["team_id"]}-outside_box_shot'
+        )
+        attacks_right = team["team_id"] == preview["home"]["team_id"]
+        shot = next(frame for frame in simulation["frames"] if frame["phase"] == "Remate lejano")
+        shot_x = shot["ball"]["x"] if attacks_right else 100 - shot["ball"]["x"]
+        forwards = {
+            player["player_id"] for player in team["formations"][0]["players"][-3:]
+        }
+
+        assert simulation["title"] == "Remate desde fuera del área"
+        assert 75 <= shot_x <= 83
+        assert shot["ball_owner_id"] in forwards
+        assert simulation["frames"][-1]["ball_owner_id"] is None
+
+
+def test_live_match_has_enough_players_and_touches_for_coordinated_tactics(client: TestClient) -> None:
+    response = client.get(f"/api/v1/matches/{LIVE_MATCH_ID}/preview")
+    assert response.status_code == 200
+    preview = response.json()
+    assert len(preview["home"]["formations"][0]["players"]) == 11
+    assert len(preview["away"]["formations"][0]["players"]) == 11
+    for simulation in preview["simulations"]:
+        contact_frames = [frame for frame in simulation["frames"] if frame["ball_owner_id"]]
+        assert len(contact_frames) >= 10
+        assert len({frame["ball_owner_id"] for frame in contact_frames}) >= 5
+        for frame in contact_frames:
+            owner = next(
+                player for player in frame["players"]
+                if player["player_id"] == frame["ball_owner_id"]
+            )
+            assert owner["position"] == frame["ball"]

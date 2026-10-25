@@ -68,7 +68,11 @@ def match_experience_items() -> list[dict]:
         get(
             "GET Partidos cargados",
             "/api/v1/matches",
-            [status(200), body, "pm.test('Incluye el partido', () => pm.expect(body.map(m => m.match_id)).to.include('synthetic-acceptance-001'));"],
+            [
+                status(200),
+                body,
+                "pm.test('Incluye los tres estados', () => { const byId = Object.fromEntries(body.map(m => [m.match_id, m.status])); pm.expect(byId['synthetic-acceptance-001']).to.equal('FT'); pm.expect(byId['synthetic-analytics-001']).to.equal('UPCOMING'); pm.expect(byId['synthetic-live-001']).to.equal('LIVE'); });",
+            ],
             "Lista los partidos disponibles para la interfaz.",
         ),
         get(
@@ -78,10 +82,34 @@ def match_experience_items() -> list[dict]:
             "Metadatos, duración y fuente de vídeo.",
         ),
         get(
+            "GET Previa táctica del próximo partido",
+            "/api/v1/matches/synthetic-analytics-001/preview",
+            [
+                status(200),
+                body,
+                "pm.test('Formaciones de ambos equipos', () => { pm.expect(body.home.formations.length).to.be.above(1); pm.expect(body.away.formations.length).to.be.above(1); });",
+                "pm.test('Tres tácticas para cada equipo', () => { pm.expect(body.simulations.length).to.equal(6); pm.expect(new Set(body.simulations.map(s => s.team_id)).size).to.equal(2); });",
+                "pm.test('Jugadas con ambos equipos y pases', () => pm.expect(body.simulations.every(s => s.frames.length === 7 && s.frames.every(f => f.players.length === 14 && f.action && f.ball_owner_id))).to.equal(true));",
+                "pm.test('Documento previo local aprobado', () => { pm.expect(body.information.source.storage_kind).to.equal('local_fixture'); pm.expect(body.information.source.approved).to.equal(true); pm.expect(body.information.teams.length).to.equal(2); });",
+            ],
+            "Contrato estructurado del agente con alineaciones, tácticas y documento previo sintético.",
+        ),
+        get(
             "GET Eventos hasta 20 s",
             base + "/events?until_video_ms=20000",
             [status(200), body, "pm.test('Sin eventos futuros', () => pm.expect(body.events.every(e => e.video_time_ms <= 20000)).to.equal(true));"],
             "Nunca devuelve eventos posteriores al tiempo del vídeo.",
+        ),
+        get(
+            "GET Seguimiento 11 contra 11",
+            "/api/v1/matches/synthetic-live-001/tracking?from_video_ms=3000&to_video_ms=6000",
+            [
+                status(200),
+                body,
+                "pm.test('Fuente sintética declarada', () => pm.expect(body.source).to.equal('synthetic_mock'));",
+                "pm.test('Veintidós jugadores identificados', () => pm.expect(body.frames.every(f => f.objects.filter(o => o.player_id).length === 22)).to.equal(true));",
+            ],
+            "Ventana acotada de TrackingFrame v1 para interpolar el movimiento del partido en vivo.",
         ),
         get(
             "GET Estado tras el gol",

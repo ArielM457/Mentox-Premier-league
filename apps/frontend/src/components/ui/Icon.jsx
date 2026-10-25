@@ -17,6 +17,9 @@ const PATHS = {
   ball: (<><circle cx="12" cy="12" r="9" /><path d="m9 9 3-2 3 2-1 4h-4L9 9ZM6 5l3 4M15 9l3-4M10 13l-3 5M14 13l3 5" /></>),
   shield: (<><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6l-8-3Z" /><path d="m9 12 2 2 4-4" /></>),
   flag: (<><path d="M5 21V4" /><path d="M5 4h11l-2 4 2 4H5" /></>),
+  broadcast: (<><circle cx="12" cy="12" r="2.2" /><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7" /><path d="M5.5 5.5a9.2 9.2 0 0 0 0 13M18.5 5.5a9.2 9.2 0 0 1 0 13" /></>),
+  fullscreen: <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />,
+  fullscreenExit: <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5" />,
 }
 
 export function Icon({ name, size = 20 }) {

@@ -128,13 +128,14 @@ def event_row(event: MatchEvent, sequence: int) -> tuple[Any, ...]:
         start.x if start else None, start.y if start else None,
         end.x if end else None, end.y if end else None,
         event.outcome.value, event.source.value, event.confidence, list(event.related_event_ids),
+        event.receiver_player_id, event.situation, event.stoppage_ms,
     )
 
 
 EVENT_COLUMNS = (
     "match_id, event_id, sequence, schema_version, period, clock_ms, video_time_ms, type, "
     "team_id, player_id, start_x, start_y, end_x, end_y, outcome, source, confidence, "
-    "related_event_ids"
+    "related_event_ids, receiver_player_id, situation, stoppage_ms"
 )
 
 
@@ -159,6 +160,9 @@ def event_from_row(row: dict[str, Any]) -> MatchEvent:
         "source": row["source"],
         "confidence": row["confidence"],
         "related_event_ids": list(row["related_event_ids"] or []),
+        "receiver_player_id": row.get("receiver_player_id"),
+        "situation": row.get("situation"),
+        "stoppage_ms": row.get("stoppage_ms") or 0,
     })
 
 

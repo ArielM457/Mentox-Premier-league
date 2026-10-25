@@ -22,6 +22,9 @@ from match_intelligence.application.video_sync import (
     VideoSynchronizedReplay,
     VideoSyncError,
 )
+from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
+from match_intelligence.application.analytics.tracking_input import tracks_from_observations
+from match_intelligence.domain.analytics.tracking import TrackingFrame, tracking_frames
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
 from match_intelligence.domain.presentation import (
     ContentKind,
@@ -39,6 +42,7 @@ from match_intelligence.domain.presentation import (
 CASUAL_MIN_PRIORITY = 50
 PLAYER_QUIET_GAP_MS = 10_000
 END_PADDING_MS = 8_000
+MAX_TRACKING_WINDOW_MS = 30_000
 ALWAYS_SHOWN_KINDS = {"goal"}
 
 
@@ -108,6 +112,7 @@ class MatchSession:
     _draft_cache: dict[str, NarrativeDraft] = field(default_factory=dict)
     _clock: Callable[[], datetime] = field(default=lambda: datetime.now(UTC))
     _replay: VideoSynchronizedReplay | None = None
+    _tracking_frames: tuple[TrackingFrame, ...] | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         missing = [e.event_id for e in self.events if e.video_time_ms is None]
@@ -136,6 +141,47 @@ class MatchSession:
         return self.analytics.snapshot(
             self.metadata, self.events_until(video_time_ms), video_time_ms=video_time_ms
         )
+
+    def tracking_frames(self, from_video_ms: int, to_video_ms: int) -> list[TrackingFrame]:
+        """Devuelve una ventana y sus cuadros limítrofes para interpolar sin saltos."""
+        self._check_time(from_video_ms)
+        self._check_time(to_video_ms)
+        if to_video_ms < from_video_ms:
+            raise SessionError("to_video_ms debe ser mayor o igual que from_video_ms")
+        if to_video_ms - from_video_ms > MAX_TRACKING_WINDOW_MS:
+            raise SessionError(
+                f"La ventana de seguimiento no puede superar {MAX_TRACKING_WINDOW_MS} ms"
+            )
+        frames = self._tracking()
+        if not frames:
+            return []
+        before: TrackingFrame | None = None
+        inside: list[TrackingFrame] = []
+        after: TrackingFrame | None = None
+        for frame in frames:
+            frame_time = frame.video_time_ms
+            if frame_time is None:
+                continue
+            if frame_time < from_video_ms:
+                before = frame
+            elif frame_time <= to_video_ms:
+                inside.append(frame)
+            else:
+                after = frame
+                break
+        result = ([before] if before is not None else []) + inside
+        if after is not None:
+            result.append(after)
+        return result
+
+    def _tracking(self) -> tuple[TrackingFrame, ...]:
+        # Observaciones simuladas con el formato de Persona 1, convertidas por la
+        # analítica de Persona 2 en pistas y luego en cuadros para la cancha.
+        if self._tracking_frames is None:
+            observations = generate_mock_tracking(self.metadata, self.events)
+            tracks = tracks_from_observations(self.metadata, self.events, observations).tracks
+            self._tracking_frames = tuple(tracking_frames(tracks))
+        return self._tracking_frames
 
     # ----- mensajes para pantalla -------------------------------------------
     def overlays(

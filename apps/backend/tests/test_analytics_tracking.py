@@ -4,7 +4,7 @@ import pytest
 from analytics_builders import A, B, Events, metadata
 
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
-from tracking_mock import generate_mock_tracking
+from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
 from match_intelligence.application.analytics.pipeline import MatchAnalytics, build_snapshot
 from match_intelligence.application.analytics.tracking_input import (
     TrackingInput,
@@ -248,7 +248,7 @@ def test_mock_produces_persona_1_observations_and_plausible_values() -> None:
     assert mock == generate_mock_tracking(match.metadata, match.events)
     assert mock.origin is PredictionOrigin.SIMULATED_FIXTURE
     assert all(isinstance(o, VisualTrackObservation) for o in mock.observations)
-    assert len(mock.identities) == 14 and mock.goalkeeper_player_ids == {"aurora-1", "rio-1"}
+    assert len(mock.identities) == 22 and mock.goalkeeper_player_ids == {"aurora-1", "rio-1"}
     conversion = tracks_from_observations(match.metadata, match.events, mock)
     assert conversion.skipped_observation_ids == () and conversion.conflicting_track_ids == ()
     tracks = conversion.tracks
@@ -256,7 +256,7 @@ def test_mock_produces_persona_1_observations_and_plausible_values() -> None:
 
     metrics = tracking_metrics(tracks, ("team-aurora", "team-rio"), match.events)
     speeds = [m for m in metrics if m.player_id and m.key == "top_speed_kmh"]
-    assert len(speeds) == 14 and all(10 <= m.value <= 31.5 for m in speeds)
+    assert len(speeds) == 22 and all(10 <= m.value <= 31.5 for m in speeds)
     assert all(250 <= m.value <= 1_500 for m in metrics if m.key == "distance_covered_m")
     assert 80 <= next(m for m in metrics if m.key == "ball_speed_kmh").value <= 144
     for item in metrics:

@@ -29,6 +29,7 @@ from match_intelligence.domain.analytics.indicators import (
     momentum_index,
 )
 from match_intelligence.domain.analytics.milestones import MilestoneDetector
+from match_intelligence.domain.analytics.situations import SituationDetector
 from match_intelligence.domain.analytics.models import (
     InsightCandidate,
     MatchSnapshot,
@@ -80,6 +81,7 @@ def default_detectors() -> list[Detector]:
         ChaosPhaseDetector(),
         HighRecoveryDetector(),
         ProgressivePassDetector(),
+        SituationDetector(),
     ]
 
 

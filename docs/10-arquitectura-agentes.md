@@ -125,6 +125,30 @@ Debe devolver `AgentDispatch v1` con agente de destino, prioridad, tiempo máxim
 
 **3. Narrador.** Prepara el guion a partir de hechos verificados del partido y de la base previa aprobada. Durante el juego prioriza lo que sucede en el campo. En tiempos muertos puede proponer datos de jugadores, estadio, cuerpo técnico, fútbol del país, sucesos recientes autorizados, próximos eventos del canal o promociones.
 
+## **Agente de previa táctica**
+
+El agente de previa es independiente del narrador y del agente contrafactual. Recibe los metadatos de un partido sintético, incluidos equipos y jugadores. Devuelve posibles formaciones para ambos equipos y simulaciones reproducibles con fotogramas ordenados.
+
+Sus instrucciones exigen estas reglas:
+
+**1.** Trabajar solo con los equipos y jugadores recibidos.
+
+**2.** Entregar datos estructurados y no generar HTML ni decisiones visuales.
+
+**3.** Mantener todas las posiciones dentro de una cancha de 0 a 100.
+
+**4.** Producir varias tácticas seleccionables para cada equipo con posiciones de ambos conjuntos, poseedor, recorrido del balón, acción, fase y resultado.
+
+**5.** Marcar cada jugada como simulada. No debe presentarla como hecho ni predicción.
+
+**6.** No modificar eventos, marcador ni estado del partido.
+
+**7.** Consumir información editorial solo desde un documento aprobado. El agente no inventa lesiones, sanciones ni resultados recientes durante la solicitud.
+
+La interfaz puede reutilizar las alineaciones y simulaciones del agente durante un partido en vivo. Las repeticiones de jugadas pasadas no requieren una nueva llamada al agente: se reconstruyen con eventos ya ocurridos y mantienen `source_event_ids`. Las jugadas futuras conservan la marca de simulación y no se mezclan con la evidencia histórica.
+
+La primera implementación es determinista y vive en `apps/backend/src/match_intelligence/application/prematch_agent.py`. La ruta `GET /api/v1/matches/{match_id}/preview` entrega su contrato a la interfaz.
+
 **4. Agente de respuesta.** Responde preguntas con una proyección del estado, métricas y contexto aprobado. Debe indicar cuando la evidencia no alcanza.
 
 **5. Agente de resumen.** Produce un resumen de medio tiempo pensado para una pieza de tres a cuatro minutos y un resumen final más amplio. Recibe el acumulado completo, los momentos seleccionados y las métricas que no se narraron en directo. Los tiempos indicados son objetivos editoriales y deberán validarse con lectura o voz real.

@@ -1,7 +1,8 @@
 """Seguimiento simulado (mock) a partir de eventos sintéticos.
 
-Sirve para probar la analítica de seguimiento mientras Persona 1 no entregue
-observaciones reales de vídeo (DV-US-19). Produce lo mismo que entregará
+Sirve para probar la analítica de seguimiento y para dibujar la cancha en vivo
+de la API mientras Persona 1 no entregue observaciones reales de vídeo
+(DV-US-19). Produce lo mismo que entregará
 Persona 1: ``VisualTrackObservation`` por pista e instante, e identidades
 resueltas con su ``PlayerIdentityResolver``. No es una medición: el origen es
 ``PredictionOrigin.SIMULATED_FIXTURE`` y las posiciones salen de una
@@ -16,7 +17,10 @@ Modelo:
   desplaza con el balón y avanza si su equipo tiene la posesión.
 * Si entre dos eventos el balón tendría que ir a más de 32 m/s, se omite en esos
   cuadros, como cuando un seguimiento real lo pierde.
-* El jugador de un evento va hacia el lugar del evento desde 4 s antes.
+* El jugador de un evento va hacia el lugar del evento desde 4 s antes y el
+  receptor de un pase ataca su punto de recepción.
+* Faltas y lesiones conservan el balón detenido y reducen el movimiento hasta
+  el reinicio indicado por los eventos.
 * Velocidad máxima de 8,5 m/s para quien va a la acción, 5,5 m/s para el resto y
   5 m/s para porteros y árbitro; aceleración máxima de 3,5 m/s².
 """
@@ -60,12 +64,19 @@ BALL_VISIBLE_MAX_MS = 32.0
 
 # Zonas en el marco de ataque (x' hacia la portería rival, y a lo ancho).
 SCENARIO_ANCHORS: dict[str, tuple[float, float]] = {
-    "aurora-4": (24, 30), "aurora-5": (24, 70), "aurora-8": (42, 42), "aurora-10": (48, 64),
-    "aurora-11": (62, 24), "aurora-9": (66, 50),
-    "rio-5": (24, 34), "rio-6": (26, 66), "rio-8": (44, 46), "rio-10": (50, 58),
-    "rio-7": (62, 72), "rio-9": (66, 46),
+    "aurora-2": (23, 16), "aurora-3": (18, 38), "aurora-4": (18, 62),
+    "aurora-5": (23, 84), "aurora-6": (39, 50), "aurora-8": (49, 34),
+    "aurora-10": (49, 66), "aurora-7": (68, 18), "aurora-9": (73, 50),
+    "aurora-11": (68, 82),
+    "rio-2": (23, 16), "rio-3": (18, 38), "rio-4": (18, 62),
+    "rio-5": (23, 84), "rio-6": (39, 50), "rio-8": (49, 34),
+    "rio-10": (49, 66), "rio-7": (68, 18), "rio-9": (73, 50),
+    "rio-11": (68, 82),
 }
-DEFAULT_ANCHORS = ((24, 32), (24, 68), (44, 44), (50, 62), (64, 28), (68, 52), (36, 50), (56, 40))
+DEFAULT_ANCHORS = (
+    (23, 16), (18, 38), (18, 62), (23, 84),
+    (39, 50), (49, 34), (49, 66), (68, 18), (73, 50), (68, 82),
+)
 
 
 @dataclass(slots=True)
@@ -75,6 +86,7 @@ class _Body:
     team_id: str | None
     player_id: str | None
     anchor: tuple[float, float]
+    slot: int = 0
     x: float = 0.0
     y: float = 0.0
     vx: float = 0.0
@@ -85,7 +97,7 @@ def _bodies(metadata: MatchMetadata) -> list[_Body]:
     bodies: list[_Body] = []
     for team in (metadata.home_team, metadata.away_team):
         outfield = 0
-        for player in [p for p in metadata.players if p.team_id == team.team_id]:
+        for slot, player in enumerate([p for p in metadata.players if p.team_id == team.team_id]):
             keeper = player.shirt_number == 1
             if keeper:
                 anchor = (5.0, 50.0)
@@ -95,7 +107,7 @@ def _bodies(metadata: MatchMetadata) -> list[_Body]:
             bodies.append(_Body(
                 track_id=f"trk-{player.player_id}",
                 kind=TrackedKind.GOALKEEPER if keeper else TrackedKind.PLAYER,
-                team_id=team.team_id, player_id=player.player_id, anchor=anchor,
+                team_id=team.team_id, player_id=player.player_id, anchor=anchor, slot=slot,
             ))
     bodies.append(_Body("trk-ref-1", TrackedKind.UNASSIGNED, None, None, (50.0, 40.0)))
     return bodies
@@ -108,7 +120,9 @@ def _ball_keypoints(frame: PitchFrame, events: Sequence[MatchEvent]) -> list[tup
             continue
         start = (event.start.x * frame.length_m / 100, event.start.y * frame.width_m / 100)
         keys[event.clock_ms] = start
-        if event.end is None or event.type not in {EventType.PASS, EventType.SHOT}:
+        if event.stoppage_ms:
+            keys[event.clock_ms + event.stoppage_ms] = start
+        if event.end is None or event.type not in {EventType.PASS, EventType.RESTART, EventType.SHOT}:
             continue
         end = (event.end.x * frame.length_m / 100, event.end.y * frame.width_m / 100)
         speed = SHOT_SPEED_MS if event.type is EventType.SHOT else PASS_SPEED_MS
@@ -179,11 +193,16 @@ def generate_mock_tracking(
         cursor = 0
         bodies = _bodies(metadata)
         actions: dict[str, tuple[list[int], list[tuple[float, float]]]] = {}
+        receptions: dict[str, tuple[list[int], list[tuple[float, float]]]] = {}
         for e in period_events:
             if e.player_id and e.start is not None:
                 clocks, points = actions.setdefault(e.player_id, ([], []))
                 clocks.append(e.clock_ms)
                 points.append((e.start.x * length / 100, e.start.y * width / 100))
+            if e.receiver_player_id and e.end is not None:
+                clocks, points = receptions.setdefault(e.receiver_player_id, ([], []))
+                clocks.append(e.clock_ms + 1_000)
+                points.append((e.end.x * length / 100, e.end.y * width / 100))
         first = True
 
         for t in range(0, period_events[-1].clock_ms + tail_ms + 1, step_ms):
@@ -191,8 +210,23 @@ def generate_mock_tracking(
                 state.apply(period_events[cursor])
                 cursor += 1
             ball = _ball_at(keys, t)
+            stoppage = next(
+                (
+                    e for e in reversed(period_events[:cursor])
+                    if e.stoppage_ms and e.clock_ms <= t <= e.clock_ms + e.stoppage_ms
+                ),
+                None,
+            )
             for body in bodies:
-                target, limit = _target(body, pitch, period, ball, state.possession_team_id, actions, t)
+                target, limit = _target(
+                    body, bodies, pitch, period, ball, state.possession_team_id,
+                    actions, receptions, t
+                )
+                if stoppage is not None:
+                    if body.player_id == stoppage.player_id:
+                        target, limit = (body.x, body.y), 0.0
+                    elif body.kind is not TrackedKind.UNASSIGNED:
+                        limit = min(limit, 1.2)
                 if first:
                     body.x, body.y = target
                 _move(body, target, limit, dt, rng, length, width)
@@ -224,8 +258,12 @@ def generate_mock_tracking(
 
 
 def _target(
-    body: _Body, pitch: PitchFrame, period: int, ball: tuple[float, float] | None,
-    possession: str | None, actions: dict[str, tuple[list[int], list[tuple[float, float]]]], t: int,
+    body: _Body, bodies: Sequence[_Body], pitch: PitchFrame, period: int,
+    ball: tuple[float, float] | None,
+    possession: str | None,
+    actions: dict[str, tuple[list[int], list[tuple[float, float]]]],
+    receptions: dict[str, tuple[list[int], list[tuple[float, float]]]],
+    t: int,
 ) -> tuple[tuple[float, float], float]:
     length, width = pitch.length_m, pitch.width_m
     if body.kind is TrackedKind.UNASSIGNED:
@@ -239,6 +277,13 @@ def _target(
     if left < right:
         nearest = min(range(left, right), key=lambda i: abs(clocks[i] - t))
         return points[nearest], ACTOR_MAX_MS
+
+    receive_clocks, receive_points = receptions.get(body.player_id or "", ([], []))
+    left = bisect_left(receive_clocks, t - ACTION_TAIL_MS)
+    right = bisect_right(receive_clocks, t + ACTION_LEAD_MS)
+    if left < right:
+        nearest = min(range(left, right), key=lambda i: abs(receive_clocks[i] - t))
+        return receive_points[nearest], ACTOR_MAX_MS
 
     team = body.team_id or ""
     ball_attack_x, ball_y = 50.0, 50.0
@@ -256,8 +301,51 @@ def _target(
         y = min(97.0, max(3.0, anchor_y + 0.2 * (ball_y - 50)))
         limit = PLAYER_MAX_MS
     # Sin dirección conocida se supone izquierda a derecha.
-    fixed_x = 100 - x_attack if pitch.attack_x(team, period, 0.0) == 100.0 else x_attack
-    return (fixed_x * length / 100, y * width / 100), limit
+    attacks_right_to_left = pitch.attack_x(team, period, 0.0) == 100.0
+    fixed_x = 100 - x_attack if attacks_right_to_left else x_attack
+    base = (fixed_x * length / 100, y * width / 100)
+
+    if ball is None or possession in {None, team}:
+        return base, limit
+
+    teammates = [
+        item for item in bodies
+        if item.team_id == team and item.kind is TrackedKind.PLAYER
+    ]
+    presser = min(teammates, key=lambda item: hypot(item.x - ball[0], item.y - ball[1]))
+    if body.player_id == presser.player_id:
+        own_goal_x = length if attacks_right_to_left else 0.0
+        direction = 1.0 if own_goal_x > ball[0] else -1.0
+        return (
+            min(length, max(0.0, ball[0] + direction * 1.2)),
+            min(width, max(0.0, ball[1])),
+        ), PLAYER_MAX_MS
+
+    # La línea defensiva protege su portería y toma una marca de su carril.
+    # La mezcla con la posición base evita que todos persigan al mismo rival.
+    if body.anchor[0] <= 49:
+        opponents = [
+            item for item in bodies
+            if item.team_id not in {None, team}
+            and item.kind is TrackedKind.PLAYER
+            and (item.x != 0.0 or item.y != 0.0)
+        ]
+        if opponents:
+            opponent = min(
+                opponents,
+                key=lambda item: abs(item.y - body.y) + 0.35 * hypot(item.x - body.x, item.y - body.y),
+            )
+            own_goal_x = length if attacks_right_to_left else 0.0
+            cover_x = opponent.x + (1.8 if own_goal_x > opponent.x else -1.8)
+            marked = (
+                min(length, max(0.0, cover_x)),
+                min(width, max(0.0, opponent.y)),
+            )
+            return (
+                base[0] * 0.45 + marked[0] * 0.55,
+                base[1] * 0.45 + marked[1] * 0.55,
+            ), limit
+    return base, limit
 
 
 def _move(

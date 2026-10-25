@@ -52,19 +52,27 @@ OK, KO = EventOutcome.SUCCESS, EventOutcome.FAILURE
 
 _PLAYERS = (
     ("aurora-1", HOME, "S. Roca", 1),
+    ("aurora-2", HOME, "E. Norte", 2),
+    ("aurora-3", HOME, "B. Sierra", 3),
     ("aurora-4", HOME, "A. Vega", 4),
     ("aurora-5", HOME, "R. Brisa", 5),
+    ("aurora-6", HOME, "V. Puna", 6),
+    ("aurora-7", HOME, "D. Rayo", 7),
     ("aurora-8", HOME, "L. Sol", 8),
     ("aurora-10", HOME, "T. Cumbre", 10),
     ("aurora-11", HOME, "N. Alba", 11),
     ("aurora-9", HOME, "M. Luz", 9),
     ("rio-1", AWAY, "G. Fondo", 1),
+    ("rio-2", AWAY, "H. Orilla", 2),
+    ("rio-3", AWAY, "S. Junco", 3),
+    ("rio-4", AWAY, "M. Estuario", 4),
     ("rio-5", AWAY, "D. Sur", 5),
     ("rio-6", AWAY, "I. Lago", 6),
     ("rio-8", AWAY, "C. Valle", 8),
     ("rio-10", AWAY, "P. Cauce", 10),
     ("rio-7", AWAY, "F. Ribera", 7),
     ("rio-9", AWAY, "J. Delta", 9),
+    ("rio-11", AWAY, "A. Marea", 11),
 )
 
 Point = tuple[float, float]

@@ -1,6 +1,6 @@
 import { formatClock } from '../../lib/overlays.js'
 
-const SYMBOL = { goal: '⚽', shot: '◎', recovery: '✦', turnover: '✦', pressure: '✦', progressive_pass: '→', player_quiet: '·' }
+const SYMBOL = { goal: '⚽', shot: '◎', recovery: '✦', turnover: '✦', pressure: '✦', progressive_pass: '→', foul: '!', yellow_card: '■', red_card: '■', injury_stoppage: '+', player_quiet: '·' }
 
 // Solo muestra momentos ya ocurridos para no adelantar el partido.
 export function Timeline({ moments, durationMs, time, selectedId, onSeek, label }) {

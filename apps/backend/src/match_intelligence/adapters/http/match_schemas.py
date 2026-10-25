@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
+from match_intelligence.domain.analytics.tracking import TrackingFrame, TrackingSource
 from match_intelligence.domain.presentation import (
     EditorialStatus,
     MatchSnapshot,
@@ -22,9 +23,9 @@ class ErrorResponse(BaseModel):
 class LoadMatchRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    scenario: Literal["acceptance", "analytics"] = Field(
+    scenario: Literal["acceptance", "analytics", "live"] = Field(
         default="acceptance",
-        description="acceptance: partido corto de Persona 1. analytics: partido de dos tiempos de Persona 2",
+        description="acceptance: partido corto. analytics: dos tiempos. live: situaciones y seguimiento 11 contra 11",
     )
     seed: int | None = Field(default=None, description="Semilla del generador; por defecto la del escenario")
     match_id: str = Field(default="synthetic-acceptance-001", min_length=1)
@@ -44,6 +45,7 @@ class MatchListItem(BaseModel):
     match_id: str
     home_team: str
     away_team: str
+    status: Literal["LIVE", "UPCOMING", "FT"] = "LIVE"
     duration_ms: int
     event_count: int
     created_at: datetime
@@ -59,6 +61,13 @@ class MatchDetailResponse(BaseModel):
 class EventsResponse(BaseModel):
     until_video_ms: int
     events: list[MatchEvent]
+
+
+class TrackingFramesResponse(BaseModel):
+    from_video_ms: int
+    to_video_ms: int
+    source: TrackingSource | None = None
+    frames: list[TrackingFrame]
 
 
 class OverlaysResponse(BaseModel):

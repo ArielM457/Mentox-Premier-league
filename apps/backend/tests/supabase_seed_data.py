@@ -17,6 +17,7 @@ from datetime import UTC, datetime
 
 from match_intelligence.adapters.messaging.insights_memory import InMemoryInsightPublisher
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.live_scenario import generate_live_scenario
 from match_intelligence.adapters.sources.synthetic import SyntheticMatch, generate_acceptance_match
 from match_intelligence.adapters.storage.analytics_files import InMemoryAnalyticsWriter
 from match_intelligence.adapters.storage.supabase_store import CatalogEntry, SupabaseMatchStore
@@ -30,12 +31,13 @@ from match_intelligence.application.analytics.tracking_input import (
 )
 from match_intelligence.domain.analytics.tracking import tracking_alerts, tracking_metrics
 
-from tracking_mock import generate_mock_tracking
+from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
 
 PRODUCED_BY = "supabase-seed"
 GENERATORS = {
     "acceptance": generate_acceptance_match,
     "analytics": generate_analytics_scenario,
+    "live": generate_live_scenario,
 }
 
 
@@ -56,6 +58,10 @@ DEFAULT_MATCHES: tuple[SeedMatch, ...] = (
     SeedMatch(
         "analytics", 7, "synthetic-analytics-001", "dos tiempos para la analítica",
         datetime(2026, 10, 21, 19, 0, tzinfo=UTC),
+    ),
+    SeedMatch(
+        "live", 19, "synthetic-live-001", "partido en vivo con faltas, tarjetas y lesión",
+        datetime(2026, 10, 22, 19, 0, tzinfo=UTC),
     ),
 )
 

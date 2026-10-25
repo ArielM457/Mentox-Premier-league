@@ -1,5 +1,6 @@
 from match_intelligence.adapters.agents.narrative_port import Persona3NarrativeAdapter
 from match_intelligence.adapters.provisional.analytics import ProvisionalAnalytics
+from match_intelligence.adapters.sources.live_scenario import generate_live_scenario
 from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
 from match_intelligence.domain.presentation import VerificationStatus, ViewerPreferences
 
@@ -61,6 +62,30 @@ def test_fixture_live_moment_uses_names_instead_of_internal_ids() -> None:
 
     assert "M. Luz" in f"{moment.headline} {moment.explanation}"
     assert "aurora-9" not in f"{moment.headline} {moment.explanation}"
+
+
+def test_fixture_live_moment_hides_internal_metrics_and_evidence_labels() -> None:
+    match = generate_live_scenario()
+    analytics = ProvisionalAnalytics()
+    preferences = ViewerPreferences(mode="analyst", level="advanced")
+    snapshot = analytics.snapshot(match.metadata, match.events, video_time_ms=20_000)
+    candidates = analytics.candidates(match.metadata, match.events, preferences)
+    progressive = next(candidate for candidate in candidates if candidate.candidate_id == "moment-live-003")
+
+    moment = Persona3NarrativeAdapter.fixture().live(
+        match.metadata, snapshot, progressive, preferences
+    )
+
+    assert moment.headline == "Pase vertical de V. Puna"
+    assert moment.explanation == "Aurora FC rompe una línea y hace avanzar la jugada."
+    assert moment.source_event_ids == ["live-003"]
+    assert all(
+        marker not in moment.explanation
+        for marker in (
+            "Datos:", "Eventos:", "forward_progress", "pitch_percent",
+            "coordenadas de campo", "no en metros", "live-003",
+        )
+    )
 
 
 def test_open_question_uses_latest_recorded_action() -> None:

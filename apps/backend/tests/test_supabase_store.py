@@ -15,6 +15,7 @@ import pytest
 
 from match_intelligence.adapters.messaging.insights_memory import InMemoryInsightPublisher
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.live_scenario import generate_live_scenario
 from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
 from match_intelligence.adapters.storage.analytics_files import InMemoryAnalyticsWriter
 from match_intelligence.adapters.storage.analytics_sinks import (
@@ -49,7 +50,7 @@ from match_intelligence.application.analytics.stream import (
 from match_intelligence.application.analytics.tracking_input import tracks_from_observations
 from match_intelligence.application.vision_evaluation import PredictionOrigin
 
-from tracking_mock import generate_mock_tracking
+from match_intelligence.adapters.sources.tracking_mock import generate_mock_tracking
 
 MIGRATIONS = Path(__file__).resolve().parents[3] / "infra" / "supabase" / "migrations"
 TEST_DB_URL = os.getenv("SUPABASE_TEST_DB_URL", "")
@@ -62,8 +63,9 @@ def _columns(names: str) -> list[str]:
 # ----- filas <-> contratos, sin base de datos ---------------------------------
 
 
-def test_event_rows_round_trip_every_field() -> None:
-    match = generate_analytics_scenario()
+@pytest.mark.parametrize("generate", [generate_analytics_scenario, generate_live_scenario])
+def test_event_rows_round_trip_every_field(generate) -> None:
+    match = generate()
     columns = _columns(EVENT_COLUMNS)
     for sequence, event in enumerate(match.events):
         row = dict(zip(columns, event_row(event, sequence), strict=True))

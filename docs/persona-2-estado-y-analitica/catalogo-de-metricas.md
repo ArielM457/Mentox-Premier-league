@@ -39,6 +39,8 @@ Dan la posesión: `pass`, `shot`, `recovery` y `possession_change` con cualquier
 | `tackles_won` | equipo, jugador | count | `tackle` con `success` | tipo, resultado | 0 |
 | `pressures` | equipo, jugador | count | `pressure` | tipo | 0 |
 | `involvement` | jugador | count | Eventos con su `player_id` | `player_id` | Solo se publica si tiene eventos |
+| `fouls`, `yellow_cards`, `red_cards` | equipo, jugador | count | Eventos `foul`, `yellow_card` o `red_card` hasta el momento (`situation@1`); solo como hechos de su momento | tipo | 0 |
+| `stoppage_seconds` | evento | seconds | `stoppage_ms` / 1000 del evento `injury_stoppage` (`situation@1`) | `stoppage_ms` | No disponible si el evento no indica la duración |
 
 ## Calidad de pase y territorio (RF-10)
 

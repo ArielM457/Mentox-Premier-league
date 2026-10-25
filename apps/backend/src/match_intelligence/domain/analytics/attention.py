@@ -30,6 +30,9 @@ from .signals import Signal
 
 BASE_PRIORITY: dict[str, int] = {
     "goal": 80,
+    "red_card": 80,
+    "yellow_card": 55,
+    "injury_stoppage": 50,
     "shot": 45,
     "recovery_to_shot": 50,
     "fast_progression": 50,
@@ -39,9 +42,10 @@ BASE_PRIORITY: dict[str, int] = {
     "player_milestone": 40,
     "high_recovery": 35,
     "progressive_pass": 25,
+    "foul": 30,
 }
 KIND_RANK = tuple(BASE_PRIORITY)
-ALWAYS_EMITTED = frozenset({"goal"})
+ALWAYS_EMITTED = frozenset({"goal", "red_card"})
 ANALYTIC_KINDS = frozenset(
     {"recovery_to_shot", "fast_progression", "sustained_pressure", "control_shift",
      "chaos_phase", "player_milestone", "high_recovery", "progressive_pass"}

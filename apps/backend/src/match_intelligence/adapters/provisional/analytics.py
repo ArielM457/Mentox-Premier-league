@@ -26,7 +26,12 @@ PROGRESSIVE_PASS_MIN_X = 15.0
 FAVORITE_TEAM_BONUS = 10
 FAVORITE_PLAYER_BONUS = 15
 
-_POSSESSION_EVENTS = {EventType.PASS, EventType.RECOVERY, EventType.POSSESSION_CHANGE}
+_POSSESSION_EVENTS = {
+    EventType.PASS,
+    EventType.RECOVERY,
+    EventType.POSSESSION_CHANGE,
+    EventType.RESTART,
+}
 
 
 class ProvisionalAnalytics:
@@ -230,6 +235,29 @@ def _candidate_for(
             40,
             [MetricValue(key="pressure", team_id=event.team_id, player_id=event.player_id, value=1, unit="count", source_event_ids=[event.event_id])],
             ["Una sola presión no demuestra un patrón sostenido"],
+        )
+
+    if event.type is EventType.FOUL:
+        return build(
+            "foul",
+            62,
+            [MetricValue(key="foul", team_id=event.team_id, player_id=event.player_id, value=1, unit="count", source_event_ids=[event.event_id])],
+        )
+
+    if event.type in {EventType.YELLOW_CARD, EventType.RED_CARD}:
+        kind = "red_card" if event.type is EventType.RED_CARD else "yellow_card"
+        return build(
+            kind,
+            92 if event.type is EventType.RED_CARD else 76,
+            [MetricValue(key=kind, team_id=event.team_id, player_id=event.player_id, value=1, unit="count", source_event_ids=[event.event_id])],
+        )
+
+    if event.type is EventType.INJURY_STOPPAGE:
+        return build(
+            "injury_stoppage",
+            68,
+            [MetricValue(key="stoppage_seconds", team_id=event.team_id, player_id=event.player_id, value=event.stoppage_ms / 1_000, unit="seconds", source_event_ids=[event.event_id])],
+            ["Paro sintético del escenario; no es un diagnóstico médico"],
         )
     return None
 
