@@ -7,6 +7,8 @@ Esta carpeta contiene el plan detallado de Persona 1. Su objetivo es entregar un
 - [Overview para pruebas de modelos](overview-para-pruebas-de-modelos.md): contexto breve, alcance y ruta de trabajo para la persona o IA que ejecutará Roboflow y SoccerNet en una computadora GPU.
 - [Evaluación de costos de modelos en la nube](evaluacion-costos-modelos-en-la-nube.md): rendimiento medido, recursos Azure, estimaciones, WebGPU y alternativas de GPU.
 - [Comparativa de proveedores GPU](comparativa-proveedores-gpu.md): precios, riesgos y arquitectura híbrida recomendada para ejecutar los modelos fuera de Azure.
+- [Despliegue del primer detector en Azure](../../deploy/azure-roboflow-player/README.md): API GPU, ACR privado, identidad administrada y script reproducible para Roboflow Player Detection.
+- [Despliegue de los modelos para el equipo](despliegue-modelos-azure-equipo.md): suite Roboflow, TeamSpotting, escala, pruebas y límite explícito de GameState.
 - [Guía de integración del backend](guia-integracion-backend.md): un solo comando para modelos, fusión, API, pruebas, Azure opcional y evidencias sin frontend.
 - [Guía de instalación y ejecución desde cero](guia-ejecucion-desde-cero.md): preparación de Ubuntu, GPU, Docker, modelos e interfaz para una persona principiante.
 - [Plan general](plan-general.md): alcance, arquitectura, fases, entregables y estrategia de Azure.

@@ -1,0 +1,110 @@
+# Desplegar los modelos de visión en Azure
+
+Esta guía permite que un integrante del equipo despliegue los modelos que ya tienen una entrada válida para Mentox. Los recursos comparten el ACR, el entorno de Container Apps y el perfil T4, pero cada servicio tiene su propia identidad y API.
+
+## Qué se despliega
+
+| Servicio | Entrada | Resultado | Estado |
+|---|---|---|---|
+| Roboflow Suite | Imagen JPEG, PNG o WebP | Jugadores, árbitro, balón y puntos del campo | Preparado para desplegar |
+| SoccerNet TeamSpotting | Clip MP4 de hasta 90 segundos | Candidatos de acciones con tiempo, equipo y confianza | Preparado para desplegar |
+| SoccerNet GameState | Dataset SoccerNet GSR/TrackLab | Estado, tracking, equipo, dorsal y calibración | Bloqueado hasta crear y verificar el adaptador para MP4 |
+
+GameState no se crea en Azure todavía. Su script de preflight explica el bloqueo y evita generar costos por un contenedor que no acepta la entrada de la aplicación.
+
+## Requisitos del equipo
+
+1. Ubuntu o WSL con Docker funcionando.
+2. Azure CLI con la sesión iniciada en la suscripción correcta.
+3. Bicep no es necesario para estos modelos.
+4. Permiso para crear ACR, identidades, roles y Container Apps.
+5. Cuota `Consumption-GPU-NC8as-T4` en `northcentralus`.
+6. Haber leído las condiciones descritas en los README de `deploy/`.
+
+Compruebe la cuenta antes de continuar:
+
+```bash
+az account show --query "{suscripcion:name,estado:state,id:id}" --output table
+sudo docker info --format 'Docker Server: {{.ServerVersion}}'
+```
+
+## Desplegar todo lo preparado
+
+Ejecute desde la raíz del proyecto:
+
+```bash
+export MENTOX_AZURE_RESOURCE_GROUP="rg-mentox-dev"
+export MENTOX_AZURE_LOCATION="northcentralus"
+export MENTOX_MODEL_API_KEY="$(openssl rand -hex 32)"
+export MENTOX_ACCEPT_MODEL_LICENSES=1
+export MENTOX_IMAGE_BUILD_MODE=local
+export MENTOX_MIN_REPLICAS=0
+
+bash infra/azure/deploy-remaining-vision-models.sh
+```
+
+Conserve `MENTOX_MODEL_API_KEY` en un gestor seguro. No la pegue en Git, capturas ni documentos. El modo `local` es intencional: Azure for Students bloqueó ACR Tasks durante la prueba real.
+
+El proceso puede tardar porque construye y sube dos imágenes CUDA. Si se interrumpe después de subir una imagen, repita el wrapper correspondiente con la misma huella:
+
+```bash
+export MENTOX_IMAGE_BUILD_MODE=existing
+bash infra/azure/deploy-roboflow-suite.sh
+```
+
+## Desplegar solo un servicio
+
+```bash
+bash infra/azure/deploy-roboflow-suite.sh
+bash infra/azure/deploy-soccernet-teamspotting.sh
+```
+
+Los scripts son idempotentes: actualizan la aplicación si ya existe. La etiqueta se calcula a partir del contenido del paquete, por lo que un ZIP modificado genera una etiqueta nueva aunque no tenga un commit nuevo.
+
+## Probar y entregar evidencia
+
+Cada script imprime su FQDN. Espere a que la réplica termine el arranque en frío y pruebe:
+
+```bash
+curl --fail-with-body "https://<fqdn-roboflow>/health/ready"
+curl --fail-with-body "https://<fqdn-teamspotting>/health/ready"
+```
+
+Las pruebas de inferencia están en los README de cada paquete. Comparta sin secretos:
+
+- salida de ambas sondas de salud;
+- identificador de imagen y revisión activa;
+- respuesta JSON sobre material autorizado;
+- nombre de GPU y tiempo de procesamiento;
+- estado de réplica después de volver a escala cero;
+- errores completos si alguna operación falla.
+
+## Encender y apagar para la demostración
+
+Para retirar el arranque en frío, encienda únicamente el servicio necesario:
+
+```bash
+az containerapp update --resource-group "rg-mentox-dev" \
+  --name "ca-mentox-roboflow-dev" --min-replicas 1
+```
+
+Al terminar:
+
+```bash
+az containerapp update --resource-group "rg-mentox-dev" \
+  --name "ca-mentox-roboflow-dev" --min-replicas 0
+
+az containerapp update --resource-group "rg-mentox-dev" \
+  --name "ca-mentox-teamspotting-dev" --min-replicas 0
+```
+
+Una réplica T4 encendida factura mientras está asignada. ACR Basic conserva un costo pequeño aunque las aplicaciones estén en cero.
+
+## GameState
+
+```bash
+bash infra/azure/preflight-soccernet-gamestate.sh
+```
+
+El código de salida `2` es deliberado. El siguiente trabajo es ejecutar DV-US-27, adaptar MP4 a TrackLab, convertir el resultado a `VisionObservation` y verificarlo antes de autorizar un despliegue.
+
