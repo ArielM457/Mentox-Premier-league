@@ -20,8 +20,7 @@ export function AllMatches() {
   const [followOnly, setFollowOnly] = useState(false)
   const player = playerOf(catalog, preferences.favoritePlayerId)
 
-  // La demo no tiene partidos programados: cada partido de la API se puede ver en vivo o como resumen.
-  const byFilter = (status) => (status === 'UPCOMING' ? [] : catalog?.matches ?? [])
+  const byFilter = (status) => catalog?.matches.filter((match) => match.status === status) ?? []
   const favoriteFirst = (list) =>
     [...list].sort((a, b) => Number(involves(b, preferences.favoriteTeamId)) - Number(involves(a, preferences.favoriteTeamId)))
   const visible = favoriteFirst(byFilter(filter)).filter(
@@ -50,7 +49,7 @@ export function AllMatches() {
           <div className="match-filters" role="group">
             {FILTERS.map((value) => (
               <button aria-pressed={filter === value} className={filter === value ? 'active' : ''} key={value} onClick={() => setFilter(value)} type="button">
-                {value === 'LIVE' && <span className="live-dot" />}
+                {value === 'LIVE' && <Icon name="broadcast" size={14} />}
                 {copy.filters[value]}
                 <small>{byFilter(value).length}</small>
               </button>
@@ -72,7 +71,7 @@ export function AllMatches() {
         <section className="discover-section all-matches-section">
           <div className="section-heading">
             <div>
-              {filter === 'LIVE' && <span className="live-dot" />}
+              {filter === 'LIVE' && <Icon name="broadcast" size={18} />}
               <h2>{followOnly && player ? copy.relatedTo(player.name) : copy.headings[filter]}</h2>
             </div>
             <span>{copy.results(visible.length)}</span>
@@ -89,7 +88,7 @@ export function AllMatches() {
             <div className="empty-state">
               <Icon name="search" size={30} />
               <h3>{copy.emptyTitle}</h3>
-              <p>{filter === 'UPCOMING' ? copy.emptyUpcoming : copy.emptyCopy}</p>
+              <p>{copy.emptyCopy}</p>
               <Button onClick={() => { setQuery(''); setFollowOnly(false); setFilter('LIVE') }}>{copy.clear}</Button>
             </div>
           )}

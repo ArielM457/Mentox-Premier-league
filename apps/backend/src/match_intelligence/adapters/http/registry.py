@@ -2,6 +2,7 @@ import os
 from collections.abc import Callable
 
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
+from match_intelligence.adapters.sources.live_scenario import generate_live_scenario
 from match_intelligence.adapters.sources.synthetic import SyntheticMatch, generate_acceptance_match
 from match_intelligence.application.match_session import MatchSession, NotFoundError
 from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
@@ -9,14 +10,16 @@ from match_intelligence.application.ports import AnalyticsPort, NarrativePort
 
 DEMO_MATCH_ID = "synthetic-acceptance-001"
 ANALYTICS_MATCH_ID = "synthetic-analytics-001"
+LIVE_MATCH_ID = "synthetic-live-001"
 
-# Escenarios sintéticos disponibles: el partido corto de aceptación de Persona 1
-# y el partido de dos tiempos que usa Persona 2 para validar su analítica.
+# Escenarios sintéticos disponibles: el partido corto de aceptación de Persona 1,
+# su sesión separada marcada en vivo y el partido de dos tiempos de Persona 2.
 SCENARIOS: dict[str, Callable[..., SyntheticMatch]] = {
     "acceptance": generate_acceptance_match,
     "analytics": generate_analytics_scenario,
+    "live": generate_live_scenario,
 }
-DEFAULT_SEEDS = {"acceptance": 2026, "analytics": 7}
+DEFAULT_SEEDS = {"acceptance": 2026, "analytics": 7, "live": 19}
 
 
 class MatchRegistry:
@@ -95,6 +98,7 @@ def _default_registry() -> MatchRegistry:
     )
     registry.load_synthetic()
     registry.load_synthetic(scenario="analytics", match_id=ANALYTICS_MATCH_ID)
+    registry.load_synthetic(scenario="live", match_id=LIVE_MATCH_ID)
     return registry
 
 

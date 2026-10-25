@@ -1,5 +1,7 @@
 # Instrucciones del proyecto
 
+La marca visible del producto es The Prime Moment. Usa ese nombre en la interfaz, la documentación y las instrucciones de agentes. Conserva los nombres del repositorio y los identificadores técnicos existentes, salvo que el usuario pida cambiarlos.
+
 Antes de trabajar en este proyecto, lee `docs/README.md` y los documentos que correspondan a la tarea.
 
 Para respuestas y documentos en español de Ariel, aplica `C:/Users/ariel/.codex/skills/escritura-simple-ariel/SKILL.md`, salvo que el usuario pida otro estilo. Al convertir un texto existente a Markdown, conserva su contenido y corrige solo la ortografía. Estas preferencias no alteran código, comandos ni formatos técnicos.

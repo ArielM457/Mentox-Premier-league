@@ -52,6 +52,8 @@ export const api = {
   listMatches: () => request('/api/v1/matches'),
   loadMatch: (body) => request('/api/v1/matches', { method: 'POST', body: JSON.stringify(body) }),
   match: (id) => request(base(id)),
+  preview: (id) => request(`${base(id)}/preview`),
+  tracking: (id, from, to) => request(`${base(id)}/tracking?from_video_ms=${Math.floor(from)}&to_video_ms=${Math.floor(to)}`),
   events: (id, until) => request(`${base(id)}/events?until_video_ms=${Math.floor(until)}`),
   state: (id, t) => request(`${base(id)}/state?video_time_ms=${Math.floor(t)}`),
   overlays: (id, prefs, until) => {

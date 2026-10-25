@@ -1,6 +1,6 @@
 # **Documentación del proyecto**
 
-Este proyecto nace de un reto de hackathon. La solución debe convertir eventos sintéticos de fútbol en información explicable para una transmisión en directo y en experiencias personalizadas para distintos aficionados.
+The Prime Moment nace de un reto de hackathon. El proyecto convierte eventos sintéticos de fútbol en información explicable para una transmisión en directo y en experiencias personalizadas para distintos aficionados.
 
 La documentación distingue el alcance del reto, las decisiones del equipo y lo que ya existe en el repositorio. La ingesta sintética, el estado calculado, la analítica y la narrativa tienen módulos propios. La experiencia completa del partido todavía debe conectar esos módulos con la interfaz.
 

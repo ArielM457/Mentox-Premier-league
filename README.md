@@ -1,6 +1,6 @@
-# **Inteligencia de partidos**
+# **The Prime Moment**
 
-Monorepo inicial para el hackathon. La [documentación](docs/README.md) contiene el alcance, las decisiones, los casos de uso y el contrato de eventos.
+Monorepo de The Prime Moment, una experiencia que convierte eventos sintéticos de fútbol en explicaciones y momentos personalizados. La [documentación](docs/README.md) contiene el alcance, las decisiones, los casos de uso y el contrato de eventos.
 
 ## **Estructura**
 

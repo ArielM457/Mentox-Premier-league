@@ -2,6 +2,10 @@
 
 Este documento registra lo acordado por el equipo el 6 y el 8 de octubre de 2026. Describe elecciones de diseño, no funciones ya terminadas.
 
+## **Identidad del producto**
+
+**1.** El nombre de marca del producto es The Prime Moment. Debemos usarlo en la interfaz, la documentación y las instrucciones de agentes. Los nombres del repositorio, módulos, paquetes y claves internas se mantienen como identificadores técnicos, salvo que se acuerde cambiarlos por separado.
+
 ## **Datos y eventos**
 
 **1.** Definimos un formato interno común para los eventos. El contrato inicial y sus campos están en [formato de eventos](08-formato-de-eventos.md). Los adaptadores de cualquier fuente deben entregar ese mismo formato al núcleo del sistema.
@@ -29,6 +33,20 @@ La distribución inicial de trabajo y el flujo de revisión están en [equipo de
 El 11 de octubre de 2026 acordamos una asignación por demanda. GPT-4.1 mini será la base para clasificación, selección breve y validación semántica. GPT-4.1 se usará en narración, explicación de peligro, redacción de simulaciones, respuestas complejas, resúmenes e investigación. Los servicios deterministas no usarán modelos. La política completa está en [política de modelos de IA](12-politica-modelos-ia.md).
 
 La investigación previa usará GPT-4.1 con una herramienta de búsqueda web. Los embeddings se reservan para recuperación semántica dentro de información aprobada y no reemplazan la búsqueda en Internet.
+
+La previa táctica usa un agente independiente del narrador en vivo. En la primera versión funciona con reglas deterministas y datos sintéticos para que las formaciones y simulaciones sean reproducibles. El agente entrega un contrato con posiciones y fotogramas; React se limita a representarlos. Esta salida se marca como simulación y no se presenta como predicción del resultado.
+
+La información editorial de la previa parte de un documento JSON local aprobado y sintético. Su estructura toma como referencia las secciones habituales de una previa periodística —forma reciente, bajas, jugadores clave, duelo táctico y alineación probable— sin copiar datos reales. El contrato conserva la procedencia para sustituir el lector local por Blob Storage sin cambiar la interfaz.
+
+La vista táctica en vivo reutiliza la alineación inicial y las propuestas del agente de previa. Mantiene separados dos resultados. Repetir se calcula de forma determinista con los eventos que ya ocurrieron y conserva sus identificadores de origen. Simular usa las jugadas sintéticas del agente como posibilidades futuras y no cambia el estado ni el marcador.
+
+Las propuestas tácticas comparten los principios de movimiento del seguimiento en vivo. El defensor más cercano sale a presionar y el resto ajusta marcas y coberturas por carril según el balón y los atacantes. Además de los ataques posicionales, cada equipo tiene una transición desde campo propio y una progresión vertical para mostrar desplazamientos de campo completo y pases hacia adelante.
+
+El conjunto de cinco propuestas por equipo incluye una jugada que libera al delantero frente al área. El último contacto se mantiene fuera del área y el fotograma siguiente representa el recorrido del remate hasta el arco.
+
+Las tarjetas reutilizables de partidos comparten la presentación de dos colores y el rayo central en todos los estados. En vivo se distingue mediante un icono de transmisión y luces ambientales suaves. Estas animaciones son decorativas y se desactivan con la preferencia de movimiento reducido del sistema.
+
+El Centro del Partido organiza la experiencia en Partido, Resumen, Estadísticas y Vista táctica. Resumen reúne el análisis de momentos y las explicaciones importantes. Los comentarios en vivo se activan dentro de Partido mediante una palanca y dejan de ocupar una pestaña propia. El agente solo aparece junto al campo en un panel derecho controlado por una flecha; la vista del partido puede pasar a pantalla completa sin crear otra sesión de reproducción.
 
 Los agentes podrán proponer interpretaciones y deducir conclusiones desde evidencia disponible. Los cálculos de cifras y el estado del partido serán reproducibles. La verificación contrastará cualquier conclusión con eventos y métricas. Si detecta un error, el flujo debe registrar el reporte, corregir o retirar la conclusión y volver a verificarla.
 
@@ -60,6 +78,10 @@ La infraestructura de esta parte se definirá con Bicep y se desplegará mediant
 
 **14.** Usaremos Supabase como base de datos de la experiencia para conservar partidos, eventos normalizados, momentos y conversaciones del asistente. React no recibe la clave secreta. El backend realiza las escrituras mediante un adaptador y conserva el modo en memoria cuando la base está deshabilitada o no responde. El esquema se administra con migraciones versionadas bajo `supabase/migrations`.
 
+**15.** El movimiento del partido en vivo tendrá un flujo separado de los eventos narrativos. El backend entregará ventanas de hasta 30 segundos de `TrackingFrame v1` a 5 cuadros por segundo, con un cuadro anterior y otro posterior para interpolar sin saltos. React moverá los 22 jugadores y el balón con `requestAnimationFrame`, sincronizado con el mismo reloj que controla eventos y mensajes. El mock actual conserva una forma 4-3-3, asigna un presionante y marcas por carril cuando se defiende, limita velocidad y aceleración y declara `source=synthetic_mock`. Un adaptador de vídeo futuro podrá entregar el mismo contrato con `source=video_model` sin cambiar la cancha.
+
+**16.** Los partidos marcados en vivo usarán un escenario propio con situaciones coordinadas. `MatchEvent 1.0` conserva campos opcionales para receptor, situación y duración del paro. Los pases hacia atrás mayores a ocho unidades requieren una razón táctica declarada; los cambios de orientación y pases al espacio tienen mínimos de distancia o progresión. Faltas, tarjetas, lesiones y reanudaciones siguen el mismo reloj y la interfaz muestra su estado sobre la cancha. Esta primera versión usa un guion sintético validado; el siguiente paso será sustituir la selección del pase por un motor que evalúe opciones en cada cuadro.
+
 ## **Estado actual**
 
-El monorepo y los proyectos iniciales de frontend y backend están preparados. La ingesta sintética y la analítica de Persona 2 tienen módulos y pruebas propios. El flujo de la experiencia usa el adaptador de narrativa de Persona 3 y puede seleccionar el proveedor provisional, fixture o Azure. El filtro, el catálogo inicial, el despacho reproducible, la simulación local de rutas y la revisión de recortes están implementados. El canal durable real, el corte físico del vídeo, la investigación previa, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía están pendientes.
+El monorepo y los proyectos iniciales de frontend y backend están preparados. La ingesta sintética y la analítica de Persona 2 tienen módulos y pruebas propios. El flujo de la experiencia usa el adaptador de narrativa de Persona 3 y puede seleccionar el proveedor provisional, fixture o Azure. El filtro, el catálogo inicial, el despacho reproducible, la simulación local de rutas, la revisión de recortes y la previa táctica determinista están implementados. El canal durable real, el corte físico del vídeo, la investigación previa con fuentes externas, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía están pendientes.

@@ -9,6 +9,7 @@ import { MatchCenter } from './screens/MatchCenter.jsx'
 import { MomentDetail } from './screens/MomentDetail.jsx'
 import { Onboarding } from './screens/Onboarding.jsx'
 import { Profile } from './screens/Profile.jsx'
+import { PrematchPreview } from './screens/PrematchPreview.jsx'
 import { Recap } from './screens/Recap.jsx'
 
 export default function App() {
@@ -27,6 +28,9 @@ export default function App() {
       break
     case 'match':
       screen = <MatchCenter key={params[0]} matchId={params[0]} />
+      break
+    case 'preview':
+      screen = <PrematchPreview key={params[0]} matchId={params[0]} />
       break
     case 'moment':
       screen = <MomentDetail key={params.join('/')} matchId={params[0]} momentId={params[1]} />

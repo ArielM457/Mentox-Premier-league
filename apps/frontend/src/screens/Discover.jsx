@@ -14,9 +14,11 @@ export function Discover() {
   const copy = t.discover
   const club = teamOf(catalog, preferences.favoriteTeamId)
   const player = playerOf(catalog, preferences.favoritePlayerId)
-  const clubMatches = club ? catalog.matches.filter((m) => involves(m, club.team_id)) : []
   const playerMatches = player ? catalog.matches.filter((m) => m.metadata.players.some((p) => p.player_id === player.player_id)) : []
   const actions = player ? catalog.actions[player.player_id] ?? 0 : 0
+  const liveMatches = catalog?.matches.filter((match) => match.status === 'LIVE') ?? []
+  const recentMatch = catalog?.matches.find((match) => match.status === 'FT')
+  const upcomingMatch = catalog?.matches.find((match) => match.status === 'UPCOMING')
 
   return (
     <AppShell active="discover">
@@ -25,10 +27,6 @@ export function Discover() {
           <div>
             <span className="section-kicker">{copy.kicker}</span>
             <h1>{copy.greeting()}</h1>
-            <p>
-              {club ? copy.firstClub(club.name) : copy.exploreAll}
-              {copy.insightsIn} <strong>{t.modes[preferences.mode].name}</strong>.
-            </p>
           </div>
           <LanguageSwitch />
         </header>
@@ -36,25 +34,25 @@ export function Discover() {
         <ErrorNotice message={error && t.common.apiDown} onRetry={reload} retryLabel={t.common.retry} />
         {!catalog && !error && <LoadingCards />}
 
-        {catalog && (
-          <section className="favorite-club-section">
+        {catalog && liveMatches.length > 0 && (
+          <section className="favorite-club-section live-home-section">
             <div className="section-heading">
               <div>
                 <span className="favorite-club-icon">
-                  <Icon name="spark" size={17} />
+                  <Icon name="broadcast" size={19} />
                 </span>
                 <div>
-                  <small>{club ? copy.favoriteClub : t.matches.kicker}</small>
-                  <h2>{club ? copy.clubMatches(club.name) : t.matches.headings.LIVE}</h2>
+                  <small>{t.matches.kicker}</small>
+                  <h2>{t.matches.headings.LIVE}</h2>
                 </div>
               </div>
               <button onClick={() => navigate(paths.matches())} type="button">
                 {copy.seeAll} <Icon name="arrow" size={15} />
               </button>
             </div>
-            {(club ? clubMatches : catalog.matches).length ? (
+            {liveMatches.length ? (
               <div className="favorite-match-row">
-                {(club ? clubMatches : catalog.matches).map((match) => (
+                {liveMatches.map((match) => (
                   <MatchCard favorite={Boolean(club)} key={match.id} match={match} onOpen={openMatch} status="LIVE" />
                 ))}
               </div>
@@ -67,6 +65,37 @@ export function Discover() {
                 </span>
               </div>
             )}
+          </section>
+        )}
+
+        {catalog && (recentMatch || upcomingMatch) && (
+          <section className="discover-fixtures-section">
+            <div className="section-heading">
+              <div>
+                <span className="favorite-club-icon"><Icon name="match" size={18} /></span>
+                <div>
+                  <small>{copy.scheduleKicker}</small>
+                  <h2>{copy.scheduleTitle}</h2>
+                </div>
+              </div>
+              <button onClick={() => navigate(paths.matches())} type="button">
+                {copy.seeAll} <Icon name="arrow" size={15} />
+              </button>
+            </div>
+            <div className="fixture-pair">
+              {recentMatch && (
+                <article>
+                  <span>{copy.latestMatch}</span>
+                  <MatchCard match={recentMatch} onOpen={openMatch} status="FT" />
+                </article>
+              )}
+              {upcomingMatch && (
+                <article>
+                  <span>{copy.nextMatch}</span>
+                  <MatchCard match={upcomingMatch} onOpen={openMatch} status="UPCOMING" />
+                </article>
+              )}
+            </div>
           </section>
         )}
 

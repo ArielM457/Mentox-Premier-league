@@ -17,7 +17,7 @@ La documentación OpenAPI queda en `http://localhost:8000/docs`.
 
 Abre la colección en Postman y usa Run collection. También puedes enviar las peticiones una por una. Cada petición comprueba el código HTTP y el resultado esperado. No necesitas importar un entorno aparte.
 
-La colección cubre salud, validación de eventos individuales y por lote, validación de partidos, filtro y enrutamiento de agentes, narración en directo, preguntas, resumen final, reportes de error y la experiencia del partido (estado, mensajes en pantalla, fuentes, revisión editorial y reproducción). Incluye casos válidos y casos de rechazo. Los cuerpos contienen solo datos sintéticos.
+La colección cubre salud, validación de eventos individuales y por lote, validación de partidos, filtro y enrutamiento de agentes, narración en directo, preguntas, resumen final, reportes de error y la experiencia del partido. Esta experiencia incluye la previa táctica, el estado, los mensajes en pantalla, las fuentes, la revisión editorial y la reproducción. Incluye casos válidos y casos de rechazo. Los cuerpos contienen solo datos sintéticos.
 
 Las peticiones de enrutamiento muestran dos caminos. Un pase normal actualiza métricas sin llamar agentes. Un tiro peligroso produce una solicitud pequeña y un despacho para el agente de peligro y simulación. Este flujo todavía no guarda estado entre peticiones ni usa un canal durable.
 

@@ -7,6 +7,7 @@ const ROUTES = [
   ['onboarding', /^\/onboarding$/],
   ['discover', /^\/discover$/],
   ['matches', /^\/matches$/],
+  ['preview', /^\/match\/([^/]+)\/preview$/],
   ['match', /^\/match\/([^/]+)$/],
   ['moment', /^\/match\/([^/]+)\/moment\/([^/]+)$/],
   ['recap', /^\/recap\/([^/]+)$/],
@@ -33,6 +34,7 @@ export const paths = {
   discover: () => '/discover',
   matches: () => '/matches',
   match: (matchId) => `/match/${encodeURIComponent(matchId)}`,
+  preview: (matchId) => `/match/${encodeURIComponent(matchId)}/preview`,
   moment: (matchId, momentId) => `/match/${encodeURIComponent(matchId)}/moment/${encodeURIComponent(momentId)}`,
   recap: (matchId) => `/recap/${encodeURIComponent(matchId)}`,
   profile: () => '/profile',
@@ -41,7 +43,7 @@ export const paths = {
 
 // Un partido "FT" abre su resumen; uno en vivo abre el centro del partido.
 export function openMatch(match, status) {
-  navigate(status === 'FT' ? paths.recap(match.id) : paths.match(match.id))
+  navigate(status === 'FT' ? paths.recap(match.id) : status === 'UPCOMING' ? paths.preview(match.id) : paths.match(match.id))
 }
 
 export function useRoute() {

@@ -25,6 +25,7 @@ from match_intelligence.application.live_simulation import (
     run_local_simulation,
     simulation_store,
 )
+from match_intelligence.application.prematch_agent import PrematchPreview, PrematchTacticsAgent
 from match_intelligence.domain.presentation import (
     DetailLevel,
     Language,
@@ -51,9 +52,10 @@ from .match_schemas import (
     ReportResponse,
     ReviewRequest,
     SourcesResponse,
+    TrackingFramesResponse,
     VideoSource,
 )
-from .registry import MatchRegistry, get_registry
+from .registry import ANALYTICS_MATCH_ID, DEMO_MATCH_ID, MatchRegistry, get_registry
 
 STREAM_TICK_S = 0.2
 STREAM_LOOKAHEAD_MS = 1_000
@@ -133,12 +135,30 @@ def list_matches(registry: Registry) -> list[MatchListItem]:
             match_id=s.match_id,
             home_team=s.metadata.home_team.name,
             away_team=s.metadata.away_team.name,
+            status=(
+                "FT" if s.match_id == DEMO_MATCH_ID
+                else "UPCOMING" if s.match_id == ANALYTICS_MATCH_ID
+                else "LIVE"
+            ),
             duration_ms=s.duration_ms,
             event_count=len(s.events),
             created_at=s.created_at,
         )
         for s in registry.all()
     ]
+
+
+@router.get(
+    "/{match_id}/preview",
+    response_model=PrematchPreview,
+    summary="Generar previa, alineaciones y simulaciones tácticas",
+    description=(
+        "El agente de previa devuelve solo datos estructurados. La interfaz decide cómo "
+        "mostrar las formaciones y reproducir los fotogramas sin modificar el partido real."
+    ),
+)
+def get_prematch_preview(session: Session) -> PrematchPreview:
+    return PrematchTacticsAgent().generate(session.metadata)
 
 
 @router.post(
@@ -171,6 +191,30 @@ def get_match(session: Session) -> MatchDetailResponse:
 )
 def get_events(session: Session, until_video_ms: Annotated[int, Query(ge=0)]) -> EventsResponse:
     return EventsResponse(until_video_ms=until_video_ms, events=session.events_until(until_video_ms))
+
+
+@router.get(
+    "/{match_id}/tracking",
+    response_model=TrackingFramesResponse,
+    summary="Cuadros de seguimiento para la cancha en vivo",
+    description=(
+        "Devuelve hasta 30 segundos de TrackingFrame v1. Incluye como máximo un cuadro "
+        "anterior y uno posterior para que la interfaz interpole sin saltos. La fuente "
+        "synthetic_mock identifica que las posiciones son simuladas y no provienen de vídeo."
+    ),
+)
+def get_tracking(
+    session: Session,
+    from_video_ms: Annotated[int, Query(ge=0)] = 0,
+    to_video_ms: Annotated[int, Query(ge=0)] = 20_000,
+) -> TrackingFramesResponse:
+    frames = session.tracking_frames(from_video_ms, to_video_ms)
+    return TrackingFramesResponse(
+        from_video_ms=from_video_ms,
+        to_video_ms=to_video_ms,
+        source=frames[0].source if frames else None,
+        frames=frames,
+    )
 
 
 @router.get("/{match_id}/state", response_model=MatchSnapshot, summary="Estado del partido (MatchSnapshot v1)")

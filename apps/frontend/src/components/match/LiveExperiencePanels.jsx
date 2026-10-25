@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
 import { formatMatchClock } from '../../lib/overlays.js'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
+import { TeamBadge } from '../ui/TeamBadge.jsx'
 import { Pitch } from './Pitch.jsx'
+import { TacticalSimulationPitch } from './TacticalSimulationPitch.jsx'
 
 const IMPORTANT_KINDS = new Set(['goal', 'shot'])
 
@@ -81,31 +84,261 @@ export function MomentWorkspace({ moment, events, metadata, onOpen }) {
   )
 }
 
-function patternsFor(teamId, events, t) {
-  const teamEvents = events.filter((event) => !teamId || event.team_id === teamId)
-  const patterns = []
-  if (teamEvents.filter((event) => event.type === 'pressure').length >= 2) patterns.push(t.match.patterns.pressure)
-  if (teamEvents.filter((event) => event.type === 'pass').length >= 3) patterns.push(t.match.patterns.circulation)
-  if (teamEvents.some((event) => event.type === 'recovery') && teamEvents.some((event) => event.type === 'pass' && event.end?.x > event.start?.x)) patterns.push(t.match.patterns.transition)
-  if (teamEvents.some((event) => event.type === 'shot' && event.start?.x >= 70)) patterns.push(t.match.patterns.finalThird)
-  return patterns.length ? patterns : [t.match.patterns.unconfirmed]
+function replayTitle(sequence, t) {
+  if (sequence.some((event) => event.type === 'recovery')) return t.match.replayPatterns.recovery
+  if (sequence.filter((event) => event.type === 'pass').length >= 3) return t.match.replayPatterns.circulation
+  if (sequence.some((event) => event.type === 'pressure')) return t.match.replayPatterns.pressure
+  return t.match.replayPatterns.attack
 }
 
-export function TacticalPanel({ events, metadata, timeMs, playing }) {
-  const { t } = usePreferences()
-  const [teamId, setTeamId] = useState('')
-  const options = [{ team_id: '', name: t.match.bothTeams }, metadata.home_team, metadata.away_team]
-  const visible = teamId ? events.filter((event) => event.team_id === teamId) : events
-  const patterns = patternsFor(teamId, events, t)
+function replayFrames(sequence, homePlayers, awayPlayers, t) {
+  const current = new Map([...homePlayers, ...awayPlayers].map((player) => [player.player_id, { ...player, position: { ...player.position } }]))
+  const basePositions = new Map([...current].map(([playerId, player]) => [playerId, { ...player.position }]))
+  const goalkeepers = new Set([homePlayers[0]?.player_id, awayPlayers[0]?.player_id].filter(Boolean))
+  const frames = []
+  const players = () => [...current.values()].map((item) => ({ ...item, position: { ...item.position } }))
+  const step = (value, target, amount) => value + Math.max(-amount, Math.min(amount, target - value))
+  const movePlayer = (playerId, point) => {
+    const player = current.get(playerId)
+    if (playerId && player && point) current.set(playerId, { ...player, position: { ...point } })
+  }
+  const moveBlocks = (attackingTeamId, point) => {
+    current.forEach((player, playerId) => {
+      const base = basePositions.get(playerId)
+      const attacking = player.team_id === attackingTeamId
+      const intensity = goalkeepers.has(playerId) ? .6 : attacking ? 2.5 : 2.1
+      const horizontalShift = (point.x - 50) * (attacking ? .18 : .12)
+      const verticalShift = (point.y - 50) * (attacking ? .16 : .2)
+      const target = {
+        x: Math.max(4, Math.min(96, base.x + horizontalShift)),
+        y: Math.max(7, Math.min(93, base.y + verticalShift)),
+      }
+      current.set(playerId, {
+        ...player,
+        position: {
+          x: Number(step(player.position.x, target.x, intensity).toFixed(2)),
+          y: Number(step(player.position.y, target.y, intensity).toFixed(2)),
+        },
+      })
+    })
+  }
+  const closestDefenders = (attackingTeamId, point) => [...current.values()]
+    .filter((player) => player.team_id !== attackingTeamId)
+    .sort((left, right) => (
+      ((left.position.x - point.x) ** 2 + (left.position.y - point.y) ** 2)
+      - ((right.position.x - point.x) ** 2 + (right.position.y - point.y) ** 2)
+    ))
+    .slice(0, 2)
+    .map((player) => player.player_id)
+  const addFrame = (event, ball, ownerId, action, involvedPlayerIds) => {
+    const defenders = closestDefenders(event.team_id, ball)
+    frames.push({
+      at_ms: frames.length * 900,
+      phase: t.moment.eventTypes[event.type] ?? event.type,
+      action,
+      ball,
+      ball_owner_id: ownerId,
+      involved_player_ids: [...new Set([...involvedPlayerIds, ...defenders].filter(Boolean))],
+      players: players(),
+    })
+  }
+
+  sequence.forEach((event, index) => {
+    const start = event.start ?? event.end ?? { x: 50, y: 50 }
+    moveBlocks(event.team_id, start)
+    movePlayer(event.player_id, start)
+    addFrame(
+      event,
+      start,
+      event.player_id,
+      t.match.recordedAction(t.moment.eventTypes[event.type] ?? event.type, formatMatchClock(event, t.match.period)),
+      [event.player_id],
+    )
+
+    if (!event.end) return
+    if (event.type === 'shot') {
+      moveBlocks(event.team_id, event.end)
+      addFrame(event, event.end, null, t.match.recordedShotPath, [event.player_id])
+      return
+    }
+    if (event.type === 'pass') {
+      const receiverEvent = sequence.slice(index + 1).find((candidate) => (
+        candidate.team_id === event.team_id
+        && candidate.player_id
+        && candidate.player_id !== event.player_id
+        && candidate.start
+      ))
+      const receiver = current.get(receiverEvent?.player_id)
+      moveBlocks(event.team_id, event.end)
+      movePlayer(receiver?.player_id, event.end)
+      addFrame(
+        event,
+        event.end,
+        receiver?.player_id ?? null,
+        t.match.recordedReception(receiver?.name ?? '—'),
+        [event.player_id, receiver?.player_id],
+      )
+      return
+    }
+    moveBlocks(event.team_id, event.end)
+    movePlayer(event.player_id, event.end)
+    addFrame(event, event.end, event.player_id, t.match.recordedMove, [event.player_id])
+  })
+
+  return frames
+}
+
+function usedTactics(team, events, homePlayers, awayPlayers, t) {
+  const teamEvents = events.filter((event) => event.team_id === team.team_id && event.start)
+  if (!teamEvents.length) return []
+  const finishes = teamEvents.filter((event) => event.type === 'shot')
+  const ends = finishes.length ? finishes.slice(-3) : [teamEvents[teamEvents.length - 1]]
+  return ends.map((ending) => {
+    const endIndex = teamEvents.findIndex((event) => event.event_id === ending.event_id)
+    const sequence = teamEvents.slice(Math.max(0, endIndex - 5), endIndex + 1)
+    const title = replayTitle(sequence, t)
+    return {
+      simulation_id: `recorded-${team.team_id}-${ending.event_id}`,
+      team_id: team.team_id,
+      title: `${title} · ${formatMatchClock(ending, t.match.period)}`,
+      summary: t.match.recordedSummary(sequence.length),
+      result: ending.type === 'shot' ? t.match.recordedFinish : t.match.recordedSequence,
+      frames: replayFrames(sequence, homePlayers, awayPlayers, t),
+      source_event_ids: sequence.map((event) => event.event_id),
+    }
+  })
+}
+
+function TacticalChoiceCard({ team, options, selectedId, onSelect, onPlay, activeId, copy, mode }) {
+  const selected = options.find((option) => option.simulation_id === selectedId) ?? options[0]
   return (
-    <section className="tactical-panel">
+    <article className={`live-tactic-card ${activeId === selected?.simulation_id ? 'active' : ''}`}>
+      <header><TeamBadge team={team} /><div><span>{team.role}</span><h3>{team.team_name}</h3></div></header>
+      {selected ? (
+        <>
+          <label>{mode === 'replay' ? copy.usedTactics : copy.possibleTactics}</label>
+          <select onChange={(event) => onSelect(event.target.value)} value={selected.simulation_id}>
+            {options.map((option) => <option key={option.simulation_id} value={option.simulation_id}>{option.title}</option>)}
+          </select>
+          <p>{selected.summary}</p>
+          <Button onClick={() => onPlay(selected.simulation_id)}>
+            <Icon name={activeId === selected.simulation_id ? 'replay' : 'play'} size={15} />
+            {mode === 'replay' ? copy.replayMode : copy.simulateMode}
+          </Button>
+        </>
+      ) : <p className="no-used-tactic">{copy.noUsedTactics}</p>}
+    </article>
+  )
+}
+
+export function TacticalPanel({ compact = false, events, matchId, metadata }) {
+  const { t } = usePreferences()
+  const [preview, setPreview] = useState(null)
+  const [error, setError] = useState(null)
+  const [mode, setMode] = useState('replay')
+  const [selected, setSelected] = useState({})
+  const [playingId, setPlayingId] = useState(null)
+  const [frameIndex, setFrameIndex] = useState(0)
+  const [runToken, setRunToken] = useState(0)
+
+  useEffect(() => {
+    let active = true
+    api.preview(matchId).then((data) => active && setPreview(data)).catch((reason) => active && setError(reason.message))
+    return () => { active = false }
+  }, [matchId])
+
+  const homeFormation = preview?.home.formations[0]
+  const awayFormation = preview?.away.formations[0]
+  const recorded = useMemo(() => {
+    if (!preview || !homeFormation || !awayFormation) return []
+    return [
+      ...usedTactics(preview.home, events, homeFormation.players, awayFormation.players, t),
+      ...usedTactics(preview.away, events, homeFormation.players, awayFormation.players, t),
+    ]
+  }, [events, preview, homeFormation, awayFormation, t])
+  const options = mode === 'replay' ? recorded : preview?.simulations ?? []
+  const active = options.find((option) => option.simulation_id === playingId) ?? null
+  const frame = active?.frames[frameIndex] ?? null
+  const previousFrame = active && frameIndex > 0 ? active.frames[frameIndex - 1] : null
+
+  useEffect(() => {
+    if (!active) return undefined
+    const timer = window.setInterval(() => {
+      setFrameIndex((current) => {
+        if (current >= active.frames.length - 1) {
+          window.clearInterval(timer)
+          return current
+        }
+        return current + 1
+      })
+    }, 950)
+    return () => window.clearInterval(timer)
+  }, [active, runToken])
+
+  function changeMode(nextMode) {
+    setMode(nextMode)
+    setPlayingId(null)
+    setFrameIndex(0)
+  }
+
+  function play(optionId) {
+    setPlayingId(optionId)
+    setFrameIndex(0)
+    setRunToken((value) => value + 1)
+  }
+
+  return (
+    <section className={`tactical-panel live-tactical-lab ${compact ? 'agent-open' : ''}`}>
       <header>
-        <div><span className="section-kicker">{t.match.tacticalKicker}</span><h2>{t.match.tacticalTitle}</h2></div>
-        <label>{t.match.focusTeam}<select onChange={(event) => setTeamId(event.target.value)} value={teamId}>{options.map((team) => <option key={team.team_id || 'both'} value={team.team_id}>{team.name}</option>)}</select></label>
+        <div><span className="section-kicker">{t.match.tacticalKicker}</span><h2>{t.match.liveTacticalTitle}</h2><p>{t.match.liveTacticalCopy}</p></div>
+        <div className="tactical-mode-switch" aria-label={t.match.tacticalMode} role="group">
+          <button aria-pressed={mode === 'replay'} className={mode === 'replay' ? 'active' : ''} onClick={() => changeMode('replay')} type="button">{t.match.replayMode}</button>
+          <button aria-pressed={mode === 'simulate'} className={mode === 'simulate' ? 'active' : ''} onClick={() => changeMode('simulate')} type="button">{t.match.simulateMode}</button>
+        </div>
       </header>
-      <div className="tactical-patterns">{patterns.map((pattern) => <span key={pattern}>{pattern}</span>)}</div>
-      <Pitch events={visible} homeTeamId={metadata.home_team.team_id} label={t.match.tacticalTitle} players={metadata.players} playing={playing} timeMs={timeMs} trail={15} />
-      <p className="panel-note">{t.match.patternEvidence}</p>
+      {error && <p className="panel-note">{error}</p>}
+      {preview && homeFormation && awayFormation && (
+        <>
+          <div className="initial-lineup-bar">
+            <div><TeamBadge team={metadata.home_team} size="sm" /><span><strong>{metadata.home_team.name} · {homeFormation.name}</strong><small>{homeFormation.players.map((player) => player.name).join(' · ')}</small></span></div>
+            <span className="lineup-lock"><Icon name="shield" size={14} /> {t.match.lineupUntilHalftime}</span>
+            <div><TeamBadge team={metadata.away_team} size="sm" /><span><strong>{metadata.away_team.name} · {awayFormation.name}</strong><small>{awayFormation.players.map((player) => player.name).join(' · ')}</small></span></div>
+          </div>
+          <div className="live-tactical-grid">
+            <div className="live-tactic-choices">
+              {[preview.home, preview.away].map((team) => (
+                <TacticalChoiceCard
+                  activeId={playingId}
+                  copy={t.match}
+                  key={`${mode}-${team.team_id}`}
+                  mode={mode}
+                  onPlay={play}
+                  onSelect={(optionId) => setSelected((current) => ({ ...current, [`${mode}-${team.team_id}`]: optionId }))}
+                  options={options.filter((option) => option.team_id === team.team_id)}
+                  selectedId={selected[`${mode}-${team.team_id}`]}
+                  team={team}
+                />
+              ))}
+            </div>
+            <div className="live-tactical-stage">
+              <TacticalSimulationPitch
+                awayPlayers={awayFormation.players}
+                frame={frame}
+                homeId={preview.home.team_id}
+                homePlayers={homeFormation.players}
+                label={t.match.liveTacticalTitle}
+                previousFrame={previousFrame}
+              />
+              <div className="live-tactical-status">
+                <span>{frame ? `${frameIndex + 1}/${active.frames.length}` : mode === 'replay' ? t.match.recordedReady : t.match.simulationReady}</span>
+                <strong>{frame?.phase ?? (mode === 'replay' ? t.match.chooseRecorded : t.match.choosePossible)}</strong>
+                <p>{frameIndex === active?.frames.length - 1 ? active.result : frame?.action ?? t.match.lineupBaseCopy}</p>
+              </div>
+            </div>
+          </div>
+          <p className="panel-note">{mode === 'replay' ? t.match.recordedEvidence : t.match.simulatedEvidence}</p>
+        </>
+      )}
     </section>
   )
 }
@@ -132,20 +365,26 @@ export function InsightsPanel({ moments, events, metadata, onOpen }) {
   )
 }
 
-export function LiveCommentsPanel({ moments, events, metadata, timeMs }) {
+export function LiveCommentsPanel({ moments, events, metadata, timeMs, compact = false }) {
   const { t } = usePreferences()
   const visible = moments.filter((moment) => !moment.suppressed).slice(0, 8)
   const recentEvents = events.filter((event) => event.video_time_ms <= timeMs)
+  const comments = (
+    <div className={`commentary-flow ${compact ? 'commentary-inline' : ''}`} aria-live="polite">
+      <header><span className="live-dot" /><div><strong>{t.match.liveCommentsTitle}</strong><small>{t.match.liveCommentsCopy}</small></div></header>
+      {visible.length ? visible.map((moment) => <article key={moment.message_id}><time>{formatMatchClock(moment, t.match.period)}</time><div><strong>{moment.headline}</strong><p>{moment.explanation}</p></div></article>) : <p className="feed-empty">{t.match.waitingCommentary}</p>}
+    </div>
+  )
+
+  if (compact) return comments
+
   return (
     <section className="commentary-stage">
       <div className="commentary-preview">
         <span className="section-kicker">{t.match.matchPreview}</span>
         <Pitch events={recentEvents} homeTeamId={metadata.home_team.team_id} label={t.match.matchPreview} players={metadata.players} playing timeMs={timeMs} trail={6} />
       </div>
-      <div className="commentary-flow" aria-live="polite">
-        <header><span className="live-dot" /><div><strong>{t.match.liveCommentsTitle}</strong><small>{t.match.liveCommentsCopy}</small></div></header>
-        {visible.length ? visible.map((moment) => <article key={moment.message_id}><time>{formatMatchClock(moment, t.match.period)}</time><div><strong>{moment.headline}</strong><p>{moment.explanation}</p></div></article>) : <p className="feed-empty">{t.match.waitingCommentary}</p>}
-      </div>
+      {comments}
     </section>
   )
 }

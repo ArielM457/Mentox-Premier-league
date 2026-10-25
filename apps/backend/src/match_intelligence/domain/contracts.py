@@ -11,6 +11,11 @@ class EventType(StrEnum):
     POSSESSION_CHANGE = "possession_change"
     PRESSURE = "pressure"
     RECOVERY = "recovery"
+    FOUL = "foul"
+    YELLOW_CARD = "yellow_card"
+    RED_CARD = "red_card"
+    INJURY_STOPPAGE = "injury_stoppage"
+    RESTART = "restart"
 
 
 class EventOutcome(StrEnum):
@@ -89,9 +94,12 @@ class MatchEvent(BaseModel):
     type: EventType
     team_id: str = Field(min_length=1)
     player_id: str | None = None
+    receiver_player_id: str | None = None
     start: Position | None = None
     end: Position | None = None
     outcome: EventOutcome = EventOutcome.UNKNOWN
     source: EventSource
     confidence: float | None = Field(default=None, ge=0, le=1)
+    situation: str | None = Field(default=None, max_length=80)
+    stoppage_ms: int = Field(default=0, ge=0, le=120_000)
     related_event_ids: list[str] = Field(default_factory=list)

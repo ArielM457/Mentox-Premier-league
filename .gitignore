@@ -15,3 +15,4 @@ __pycache__/
 data/raw/
 apps/frontend/src/assets/hero.png
 infra/azure/*.bicepparam
+/docs/sistema-diseno-ui.md

@@ -1,5 +1,5 @@
 {
-  "name": "match-intelligence-monorepo",
+  "name": "the-prime-moment-monorepo",
   "private": true,
   "workspaces": [
     "apps/frontend"

@@ -1,0 +1,77 @@
+{
+  "contract_version": "1",
+  "match_id": "synthetic-analytics-001",
+  "source": {
+    "document_id": "prematch-synthetic-analytics-001-v1",
+    "storage_kind": "local_fixture",
+    "approved": true,
+    "synthetic": true,
+    "updated_at": "2026-10-23"
+  },
+  "headline": "Una noche para romper el equilibrio",
+  "overview": "Aurora FC y Río Unido llegan separados por detalles. Aurora quiere imponer su circulación; Río apuesta por recuperar arriba y atacar con pocos pases.",
+  "match_facts": [
+    {"label": "Escenario", "value": "Duelo sintético de preparación"},
+    {"label": "Momento", "value": "Próximo partido"},
+    {"label": "Historial reciente", "value": "2 victorias por lado y 1 empate"},
+    {"label": "Dato para mirar", "value": "Ambos marcaron en sus últimos 3 partidos sintéticos"}
+  ],
+  "teams": [
+    {
+      "team_id": "team-aurora",
+      "overview": "Aurora llega con confianza después de mejorar su salida desde el fondo. Su reto es sostener el control cuando pierde el balón.",
+      "form_summary": "Cuatro partidos sin perder y al menos dos goles en tres de sus últimas cinco presentaciones.",
+      "recent_results": [
+        {"opponent": "Monte Azul", "score": "2-1", "result": "Victoria", "note": "Remontó con dos llegadas por dentro"},
+        {"opponent": "Atlético Bruma", "score": "1-1", "result": "Empate", "note": "Controló la posesión, pero concedió al final"},
+        {"opponent": "Norte Solar", "score": "3-0", "result": "Victoria", "note": "Su mejor actuación ofensiva del tramo"},
+        {"opponent": "Puerto Verde", "score": "2-2", "result": "Empate", "note": "Rescató el resultado en los últimos minutos"},
+        {"opponent": "Estrella Central", "score": "1-0", "result": "Victoria", "note": "Mantuvo el arco en cero"}
+      ],
+      "availability": [
+        {"player": "N. Alba", "status": "Duda", "reason": "Molestia muscular; será evaluado antes del partido"},
+        {"player": "E. Niebla", "status": "Suspendido", "reason": "Acumulación de tarjetas amarillas"},
+        {"player": "A. Vega", "status": "Disponible", "reason": "Volvió a entrenar con normalidad"}
+      ],
+      "key_players": [
+        {"player": "M. Luz", "role": "Finalizador", "reason": "Ataca el espacio entre central y lateral y llega rápido al área"},
+        {"player": "L. Sol", "role": "Organizador", "reason": "Marca el ritmo y activa los cambios de orientación"}
+      ],
+      "tactical_keys": [
+        "Mover el balón de un lado al otro antes de acelerar.",
+        "Evitar pérdidas con los laterales adelantados.",
+        "Buscar a M. Luz con pases atrás, no solo con centros altos.",
+        "Presionar los primeros cinco segundos después de perder el balón."
+      ],
+      "probable_lineup": ["S. Roca", "A. Vega", "R. Brisa", "L. Sol", "T. Cumbre", "N. Alba", "M. Luz"]
+    },
+    {
+      "team_id": "team-rio",
+      "overview": "Río Unido compite mejor cuando recupera cerca del área rival. Su presión puede decidir el partido, pero también deja espacio a su espalda.",
+      "form_summary": "Tres victorias en cinco partidos y una racha de seis encuentros marcando al menos un gol.",
+      "recent_results": [
+        {"opponent": "Valle Rojo", "score": "3-1", "result": "Victoria", "note": "Dos goles nacieron de presión alta"},
+        {"opponent": "Costa Norte", "score": "0-1", "result": "Derrota", "note": "Le costó atacar una defensa cerrada"},
+        {"opponent": "Unión Horizonte", "score": "2-0", "result": "Victoria", "note": "Dominó las segundas jugadas"},
+        {"opponent": "Bosque FC", "score": "2-2", "result": "Empate", "note": "Perdió una ventaja de dos goles"},
+        {"opponent": "Real Cumbre", "score": "2-1", "result": "Victoria", "note": "Gol decisivo después de una recuperación"}
+      ],
+      "availability": [
+        {"player": "D. Sur", "status": "Duda", "reason": "Golpe en el tobillo durante el último entrenamiento"},
+        {"player": "T. Estuario", "status": "Suspendido", "reason": "Tarjeta roja en el partido anterior"},
+        {"player": "P. Cauce", "status": "Disponible", "reason": "Completó la semana de trabajo"}
+      ],
+      "key_players": [
+        {"player": "P. Cauce", "role": "Conector", "reason": "Recibe entre líneas y acelera la última combinación"},
+        {"player": "J. Delta", "role": "Atacante", "reason": "Fija a los defensores y abre espacio para las llegadas del medio"}
+      ],
+      "tactical_keys": [
+        "Cerrar el pase hacia L. Sol para cortar la salida de Aurora.",
+        "Presionar con tres jugadores sin romper la línea del medio.",
+        "Atacar el espacio libre detrás de los laterales.",
+        "Juntar al equipo alrededor del balón después de cada rechazo."
+      ],
+      "probable_lineup": ["G. Fondo", "D. Sur", "I. Lago", "C. Valle", "P. Cauce", "F. Ribera", "J. Delta"]
+    }
+  ]
+}

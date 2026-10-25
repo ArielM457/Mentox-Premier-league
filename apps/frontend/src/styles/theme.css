@@ -115,7 +115,6 @@
 :root[data-theme='dark'] .profile-modes button,
 :root[data-theme='dark'] .club-logo-grid button,
 :root[data-theme='dark'] .review-list li { background: #211d38; border-color: var(--line); }
-:root[data-theme='dark'] .match-live:first-child { background: linear-gradient(135deg, #24204c, #151329); }
 :root[data-theme='dark'] .favorite-club-section { background: linear-gradient(135deg, #302849, #211d38); border-color: var(--line); }
 :root[data-theme='dark'] .player-matches-section { background: linear-gradient(135deg, #193349, #211d38); }
 :root[data-theme='dark'] .favorite-filter-empty { color: var(--violet-light); background: #302849; border-color: var(--line); }

@@ -45,6 +45,53 @@ def _num(value: float | None) -> str:
     return str(int(value)) if float(value).is_integer() else str(value)
 
 
+def _simple_live_explanation(kind: str, why: str, *, es: bool) -> str:
+    """Resume el momento sin exponer datos internos de la canalización."""
+    summaries = {
+        "goal": ("Cambia el marcador.", "It changes the score."),
+        "shot": ("Ocasión clara.", "Clear chance."),
+        "recovery": ("Recuperación en campo rival.", "The ball is won back high up the pitch."),
+        "turnover": ("Cambio de posesión.", "Possession changes hands."),
+        "progressive_pass": ("El equipo avanza con un pase vertical.", "The team advances with a forward pass."),
+        "pressure": ("El rival juega con prisa.", "The opponent is forced to rush."),
+        "foul": ("El juego se detiene.", "Play stops."),
+        "yellow_card": ("El jugador queda amonestado.", "The player is booked."),
+        "red_card": ("El equipo queda con diez jugadores.", "The team is reduced to ten players."),
+        "injury_stoppage": ("El juego se detiene por lesión.", "Play stops because of an injury."),
+    }
+    if kind in summaries:
+        return summaries[kind][0 if es else 1]
+    return why.split(".")[0] + "." if why else ""
+
+
+def _friendly_fact_context(candidate: InsightCandidate, *, es: bool) -> str:
+    """Convierte métricas útiles en contexto legible y omite marcadores redundantes."""
+    phrases: list[str] = []
+    for fact in candidate.facts:
+        if not fact.available or fact.value is None:
+            continue
+        value = _num(fact.value)
+        if fact.key == "passes_in_build_up":
+            phrases.append(
+                f"La jugada enlazó {value} pases."
+                if es
+                else f"The move linked {value} passes."
+            )
+        elif fact.key == "seconds_since_recovery":
+            phrases.append(
+                f"El gol llegó {value} segundos después de recuperar el balón."
+                if es
+                else f"The goal came {value} seconds after winning the ball back."
+            )
+        elif fact.key == "stoppage_seconds":
+            phrases.append(
+                f"La pausa duró {value} segundos."
+                if es
+                else f"The stoppage lasted {value} seconds."
+            )
+    return " ".join(dict.fromkeys(phrases))
+
+
 def _normalize(text: str) -> str:
     text = unicodedata.normalize("NFKD", text.lower())
     return "".join(c for c in text if not unicodedata.combining(c))
@@ -96,7 +143,6 @@ class ProvisionalNarrative:
         player = self._player(metadata, main_id)
         if self._inject_error_in == candidate.kind:
             player = self._wrong_teammate(metadata, candidate)
-        minute = _clock(candidate.clock_ms)
         es = lang is Language.ES
         analyst = preferences.mode is ViewerMode.ANALYST
         kind = candidate.kind
@@ -144,14 +190,13 @@ class ProvisionalNarrative:
                 else f"{team} breaks the opponent's build-up and changes possession."
             )
         elif kind == "progressive_pass":
-            gain = _num(_fact(candidate, "forward_progress"))
             headline = (
                 f"Pase vertical de {player}" if es else f"Forward pass by {player}"
             )
             why = (
-                f"{team} avanza {gain} unidades de campo con un solo pase."
+                f"{team} rompe una línea y hace avanzar la jugada."
                 if es
-                else f"{team} moves {gain} pitch units forward with a single pass."
+                else f"{team} breaks a line and moves the attack forward."
             )
         elif kind == "pressure":
             headline = f"{team} presiona arriba" if es else f"{team} press high"
@@ -160,11 +205,36 @@ class ProvisionalNarrative:
                 if es
                 else f"{player} forces the opponent to rush."
             )
+        elif kind == "foul":
+            headline = f"Falta de {player}" if es else f"Foul by {player}"
+            why = (
+                "El juego se detiene y el rival dispone de una reanudación."
+                if es else "Play stops and the opponent has the restart."
+            )
+        elif kind == "yellow_card":
+            headline = f"Tarjeta amarilla para {player}" if es else f"Yellow card for {player}"
+            why = (
+                f"{team} debe gestionar el resto del partido con un jugador amonestado."
+                if es else f"{team} must manage the rest of the match with a booked player."
+            )
+        elif kind == "red_card":
+            headline = f"Tarjeta roja para {player}" if es else f"Red card for {player}"
+            why = (
+                f"{team} queda con un jugador menos."
+                if es else f"{team} are reduced to ten players."
+            )
+        elif kind == "injury_stoppage":
+            seconds = _num(_fact(candidate, "stoppage_seconds"))
+            headline = f"Partido detenido por lesión de {player}" if es else f"Injury stoppage for {player}"
+            why = (
+                f"La simulación detiene el balón durante {seconds} segundos antes de reanudar."
+                if es else f"The simulation holds the ball for {seconds} seconds before restarting."
+            )
         else:
             headline = kind
             why = ""
 
-        explanation = self._by_level(preferences, candidate, why, minute)
+        explanation = self._by_level(preferences, candidate, why)
         return NarrativeDraft(
             draft_id=f"draft-{candidate.candidate_id}-{lang.value}-{preferences.mode.value}-{preferences.level.value}",
             candidate_id=candidate.candidate_id,
@@ -186,25 +256,18 @@ class ProvisionalNarrative:
         preferences: ViewerPreferences,
         candidate: InsightCandidate,
         why: str,
-        minute: str,
     ) -> str:
         es = preferences.language is Language.ES
         level = preferences.level
         if preferences.mode is ViewerMode.ANALYST and level is DetailLevel.SIMPLE:
             level = DetailLevel.NORMAL
         if level is DetailLevel.SIMPLE:
-            return why.split(".")[0] + "." if why else ""
-        text = f"[{minute}] {why}"
+            return _simple_live_explanation(candidate.kind, why, es=es)
+        text = why
         if level is DetailLevel.ADVANCED or preferences.mode is ViewerMode.ANALYST:
-            facts = ", ".join(
-                f"{f.key}={_num(f.value)}{'' if f.unit == 'count' else ' ' + f.unit}"
-                for f in candidate.facts
-            )
-            label = "Datos" if es else "Data"
-            text += f" {label}: {facts}. "
-            text += ("Eventos: " if es else "Events: ") + ", ".join(candidate.source_event_ids) + "."
-            if candidate.evidence_limits:
-                text += (" Límite: " if es else " Limit: ") + "; ".join(candidate.evidence_limits) + "."
+            context = _friendly_fact_context(candidate, es=es)
+            if context:
+                text += f" {context}"
         return text.strip()
 
     @staticmethod
