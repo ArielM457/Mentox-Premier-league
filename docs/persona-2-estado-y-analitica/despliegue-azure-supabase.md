@@ -1,5 +1,7 @@
 # Despliegue en Azure y datos ficticios en Supabase
 
+La guía para que cualquier integrante cree el entorno está en [despliegue en Azure paso a paso](../14-despliegue-en-azure.md). Este documento detalla los recursos y las decisiones.
+
 Esta guía deja la analítica funcionando en la nube con datos guardados, en lugar de calcularla con adaptadores provisionales en memoria. Un solo script despliega todos los servicios de la analítica en Azure, y otro carga datos ficticios en Supabase.
 
 - **Estado:** datos cargados en Supabase y despliegue en curso en Azure for Students (`eastus2`).

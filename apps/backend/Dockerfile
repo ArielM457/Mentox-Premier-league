@@ -12,11 +12,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN pip install --no-cache-dir uv==0.13.1
 
-WORKDIR /app
+# El código queda en la misma ruta relativa que en el repositorio: algunos módulos
+# ubican archivos subiendo carpetas desde su propio archivo (data/prematch y la
+# raíz del repositorio), así que la instalación es editable y conserva src/.
+WORKDIR /srv/repo/apps/backend
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --extra db --no-install-project
 COPY src ./src
-RUN uv sync --frozen --extra db --no-editable
+RUN uv sync --frozen --extra db
+COPY data ./data
 COPY scripts ./scripts
 
 RUN useradd --create-home --uid 10001 app
