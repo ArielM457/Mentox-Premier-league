@@ -1,8 +1,9 @@
 import json
+import asyncio
 from pathlib import Path
 
+import httpx
 import pytest
-from fastapi.testclient import TestClient
 
 from match_intelligence.application.routing import (
     AgentOrchestrator,
@@ -81,21 +82,30 @@ def test_progression_context_is_compact_and_traceable():
 
 
 def test_http_route_exposes_filter_result():
-    scenario = FIXTURE["scenarios"][2]
-    response = TestClient(app).post(
-        "/api/v1/agent-routing/evaluate",
-        json=request_for(scenario).model_dump(mode="json"),
-    )
-    assert response.status_code == 200
-    body = response.json()
-    assert body["decision"]["route"] == "danger_immediate"
-    assert body["dispatch"]["target_agent"] == "danger_simulation"
-    assert body["agent_request"]["source_event_ids"] == [
-        "evt-010",
-        "evt-011",
-        "evt-012",
-        "evt-020",
-    ]
+    async def scenario() -> None:
+        transport = httpx.ASGITransport(app=app)
+        async with httpx.AsyncClient(
+            transport=transport,
+            base_url="http://testserver",
+        ) as client:
+            fixture = FIXTURE["scenarios"][2]
+            response = await client.post(
+                "/api/v1/agent-routing/evaluate",
+                json=request_for(fixture).model_dump(mode="json"),
+            )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["decision"]["route"] == "danger_immediate"
+        assert body["dispatch"]["target_agent"] == "danger_simulation"
+        assert body["agent_request"]["source_event_ids"] == [
+            "evt-010",
+            "evt-011",
+            "evt-012",
+            "evt-020",
+        ]
+
+    asyncio.run(scenario())
 
 
 class WrongDispatchGateway:

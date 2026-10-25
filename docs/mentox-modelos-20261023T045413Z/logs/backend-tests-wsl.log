@@ -1,0 +1,50 @@
+Using CPython 3.12.15
+Creating virtual environment at: /tmp/mentox-backend-venv
+   Building match-intelligence-api @ file:///mnt/c/Users/Usuario/Downloads/Mentox-Premier-league/apps/backend
+Downloading pygments (1.2MiB)
+Downloading aiohttp (1.8MiB)
+Downloading cryptography (4.5MiB)
+Downloading uvloop (4.3MiB)
+Downloading pydantic-core (2.0MiB)
+ Downloaded pygments
+ Downloaded aiohttp
+ Downloaded pydantic-core
+ Downloaded uvloop
+ Downloaded cryptography
+      Built match-intelligence-api @ file:///mnt/c/Users/Usuario/Downloads/Mentox-Premier-league/apps/backend
+Installed 51 packages in 48ms
+.................................................................FF..... [ 44%]
+........................................................................ [ 89%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_real_artifacts_share_media_and_remain_candidates _____________
+
+>   ???
+E   assert 16324 == 16018
+
+/home/university/league/Mentox-Premier-league/apps/backend/tests/test_integrated_acceptance.py:37: AssertionError
+__ test_pipeline_status_and_timeline_expose_real_outputs_without_match_event ___
+
+>   ???
+
+/home/university/league/Mentox-Premier-league/apps/backend/tests/test_integrated_pipeline_api.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   assert 16324 == 16018
+
+/home/university/league/Mentox-Premier-league/apps/backend/tests/test_integrated_pipeline_api.py:23: AssertionError
+=========================== short test summary info ============================
+FAILED apps/backend/tests/test_integrated_acceptance.py::test_real_artifacts_share_media_and_remain_candidates
+FAILED apps/backend/tests/test_integrated_pipeline_api.py::test_pipeline_status_and_timeline_expose_real_outputs_without_match_event
+2 failed, 159 passed in 7.63s

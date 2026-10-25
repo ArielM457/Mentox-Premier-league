@@ -3,13 +3,15 @@
 ## Identificación
 
 - **Historia:** DV-US-08 · Cambiar entre transporte local y Azure.
-- **Estado:** selección y equivalencia verificadas localmente; Azure real pendiente.
+- **Estado:** memoria y Azure comprobados mediante DV-US-15.
 - **Prioridad:** P0.
-- **Última verificación:** 9 de octubre de 2026.
+- **Última verificación:** 13 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
 - **Requisitos relacionados:** DV-RF-11, DV-RF-12, DV-RF-13 y DV-RNF-02.
 
 ## Objetivo comprobado
+
+> **Actualización de integración:** Event Hubs real aprobó el 13 de octubre de 2026 y, después, la configuración en memoria volvió a aprobar sus pruebas. La evidencia conjunta está en [DV-US-15](DV-US-15.md). Las referencias posteriores a Azure pendiente describen el corte local original.
 
 Un desarrollador puede elegir `memory` o `azure_event_hubs` mediante `EVENT_TRANSPORT` sin cambiar el generador, el contrato deportivo ni el reproductor. Las fábricas construyen el adaptador correspondiente y ambos recorridos entregan objetos `MatchEvent` equivalentes para la misma secuencia sintética.
 

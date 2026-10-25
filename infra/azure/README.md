@@ -5,12 +5,17 @@ Esta carpeta despliega los recursos de DV-US-06 mediante Azure CLI y Bicep. Cada
 ## Recursos
 
 - Namespace Standard de Azure Event Hubs.
-- Event hub `match-events` con dos particiones y un día de retención.
-- Grupos de consumidores `backend` y `diagnostics`.
+- Event hub `match-events` para hechos deportivos confirmados.
+- Event hub `vision-observations` para detecciones, acciones y candidatos experimentales.
+- Event hub `match-metrics` para actualizaciones reconstruibles y tolerantes a pérdida.
+- Cola opcional `important-events` en Service Bus Basic para jugadas que deben reintentarse y conservarse.
+- Grupos de consumidores `backend` y `diagnostics` en ambos hubs.
 - Cuenta `StorageV2` con redundancia local.
 - Contenedores privados `matches`, `authorized-videos` y `observations`.
 
 La autenticación local mediante claves compartidas está deshabilitada. Las aplicaciones deberán usar una identidad de Azure con roles RBAC. La asignación de roles se hará por cuenta o entorno y no forma parte de esta plantilla compartida.
+
+La cola durable está desactivada por defecto para no generar un recurso con costo sin revisión. Para desplegarla, establezca `deployDurableImportantQueue = true`, ejecute `what-if` y confirme la cuota de `Microsoft.ServiceBus` en la región elegida.
 
 ## Requisitos
 
@@ -114,7 +119,21 @@ Después del despliegue y de asignar el rol `Azure Event Hubs Data Owner`, confi
 export EVENT_HUB_FULLY_QUALIFIED_NAMESPACE="<namespace>.servicebus.windows.net"
 export EVENT_HUB_NAME="match-events"
 export EVENT_HUB_CONSUMER_GROUP="diagnostics"
+export VISION_OBSERVATION_TRANSPORT="azure_event_hubs"
+export VISION_EVENT_HUB_NAME="vision-observations"
+export VISION_EVENT_HUB_CONSUMER_GROUP="backend"
 ```
+
+Para ejecutar el enrutamiento de tres canales desde el backend:
+
+```bash
+export ROUTING_TRANSPORT="azure"
+export METRICS_EVENT_HUB_NAME="match-metrics"
+export SERVICE_BUS_FULLY_QUALIFIED_NAMESPACE="<namespace-service-bus>.servicebus.windows.net"
+export IMPORTANT_EVENTS_QUEUE_NAME="important-events"
+```
+
+La identidad necesita `Azure Event Hubs Data Sender` en el namespace de Event Hubs y `Azure Service Bus Data Sender` en la cola o namespace de Service Bus. En desarrollo local, omita esas variables: `ROUTING_TRANSPORT=memory` es el valor predeterminado y conserva los mismos tres canales de forma reproducible.
 
 Ejecute la prueba de ida y vuelta de DV-US-07:
 
@@ -124,6 +143,28 @@ uv run --project apps/backend --python 3.12 \
 ```
 
 La prueba inicia un consumidor, publica dos veces el mismo evento sintético y espera un aceptado y un duplicado. La salida incluye duraciones de publicación y latencia de transporte. No imprime tokens ni utiliza cadenas de conexión.
+
+Para añadir únicamente el canal visual a un namespace ya desplegado, sin reconciliar otros recursos:
+
+```bash
+az deployment group what-if \
+  --resource-group "<grupo>" \
+  --template-file infra/azure/vision-observations.bicep \
+  --parameters eventHubNamespaceName="<namespace>"
+
+az deployment group create \
+  --name "mentox-vision-observations" \
+  --resource-group "<grupo>" \
+  --template-file infra/azure/vision-observations.bicep \
+  --parameters eventHubNamespaceName="<namespace>"
+```
+
+Después se comprueba productor, consumidor y deduplicación sin crear `MatchEvent`:
+
+```bash
+uv run --project apps/backend --python 3.12 \
+  python apps/backend/scripts/vision_event_hubs_smoke.py
+```
 
 ## Probar Blob Storage con identidad de Azure
 

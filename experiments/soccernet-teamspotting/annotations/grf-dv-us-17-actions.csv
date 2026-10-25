@@ -1,0 +1,3 @@
+annotation_id,video_time_ms,class,evidence
+ann-pass-005,5000,pass,manual_alignment_from_dv_us_18
+ann-pass-015,15000,pass,manual_alignment_from_dv_us_18

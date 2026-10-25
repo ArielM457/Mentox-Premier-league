@@ -3,3 +3,5 @@ using './main.bicep'
 // Use entre 3 y 9 caracteres en minúsculas. Cambie este valor en cada cuenta.
 param projectPrefix = 'mentoxdev'
 param environmentName = 'dev'
+// Manténgalo en false hasta revisar costo/cuota; true crea Service Bus Basic.
+param deployDurableImportantQueue = false

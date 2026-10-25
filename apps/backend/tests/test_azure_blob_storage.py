@@ -130,6 +130,23 @@ def test_blob_name_and_metadata_preserve_match_and_origin() -> None:
     asyncio.run(scenario())
 
 
+def test_store_rejects_overwriting_an_existing_artifact() -> None:
+    async def scenario() -> None:
+        client = MemoryBlobService()
+        store = AzureBlobArtifactStore(client)
+        sample = artifact(ArtifactKind.OBSERVATION)
+
+        location = await store.store(sample)
+
+        with pytest.raises(FileExistsError, match="already exists"):
+            await store.store(sample)
+
+        restored = await store.retrieve(location)
+        assert restored.content == sample.content
+
+    asyncio.run(scenario())
+
+
 def test_retrieve_returns_the_exact_same_content() -> None:
     async def scenario() -> None:
         client = MemoryBlobService()

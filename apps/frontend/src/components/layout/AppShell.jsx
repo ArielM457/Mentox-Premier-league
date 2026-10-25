@@ -22,8 +22,8 @@ function readCollapsed() {
 }
 
 // Marco común de las pantallas internas: barra lateral en escritorio y barra inferior en móvil.
-export function AppShell({ active, dark = false, children }) {
-  const { t } = usePreferences()
+export function AppShell({ active, children }) {
+  const { preferences, t } = usePreferences()
   const [collapsed, setCollapsed] = useState(readCollapsed)
 
   function toggle() {
@@ -37,7 +37,7 @@ export function AppShell({ active, dark = false, children }) {
   }
 
   return (
-    <main className={`app-shell ${dark ? 'dark-shell' : 'light-shell'}`}>
+    <main className={`app-shell ${preferences.theme === 'light' ? 'light-shell' : 'dark-shell'}`}>
       <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-top">
           <button className="brand-link" type="button" onClick={() => navigate(paths.landing())} aria-label="Inside the Game">

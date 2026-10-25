@@ -85,9 +85,24 @@ export const api = {
       body: JSON.stringify({ draft_id: draftId, message_id: messageId || null, reason }),
     }),
   reports: (id) => request(`${base(id)}/reports`),
+  simulate: (id, prefs) => request(`${base(id)}/simulation?${prefsQuery(prefs)}`, { method: 'POST' }),
+  highlights: (id) => request(`${base(id)}/highlights`),
+  reviewHighlight: (id, clipId, decision, reviewer) =>
+    request(`${base(id)}/highlights/${encodeURIComponent(clipId)}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ decision, reviewer }),
+    }),
   playback: (id, action, t) =>
     request(`${base(id)}/playback`, {
       method: 'POST',
       body: JSON.stringify({ action, video_time_ms: t == null ? null : Math.floor(t) }),
+    }),
+  visionStatus: () => request('/api/v1/integration/status'),
+  visionTimeline: (start, end, limit = 40) =>
+    request(`/api/v1/integration/timeline?start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&spatial_limit=${limit}`),
+  visionPlayback: (action, t) =>
+    request(`/api/v1/integration/live/playback/${action}`, {
+      method: 'POST',
+      body: action === 'restart' ? undefined : JSON.stringify({ video_time_ms: Math.floor(t) }),
     }),
 }

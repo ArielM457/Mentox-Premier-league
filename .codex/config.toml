@@ -2,3 +2,9 @@
 # Cada integrante autentica su propia cuenta; no se guardan claves en Git.
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp/oauth"
+
+# Azure MCP Server oficial. Usa las credenciales locales disponibles, como la
+# sesión iniciada mediante `az login`; no se guardan secretos en este archivo.
+[mcp_servers.azure]
+command = "npx"
+args = ["-y", "@azure/mcp@latest", "server", "start"]

@@ -104,10 +104,14 @@ def test_provisional_narrative_names_every_persona_2_moment(language: str) -> No
         language=presentation.Language(language), mode=presentation.ViewerMode.ANALYST
     )
     narrative = ProvisionalNarrative()
-    candidates = PresentationAnalytics().candidates(match.metadata, match.events, preferences)
+    analytics = PresentationAnalytics()
+    candidates = analytics.candidates(match.metadata, match.events, preferences)
     assert {c.kind for c in candidates} >= {"control_shift", "chaos_phase", "player_milestone"}
     for candidate in candidates:
-        draft = narrative.live(match.metadata, candidate, preferences)
+        moment_ms = max(e.video_time_ms for e in match.events if e.event_id in candidate.source_event_ids)
+        events = [e for e in match.events if e.video_time_ms <= moment_ms]
+        snapshot = analytics.snapshot(match.metadata, events, video_time_ms=moment_ms)
+        draft = narrative.live(match.metadata, snapshot, candidate, preferences)
         assert draft.headline != candidate.kind
         assert "?" not in draft.headline
 

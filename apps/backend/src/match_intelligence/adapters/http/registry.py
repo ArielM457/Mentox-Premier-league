@@ -4,6 +4,7 @@ from collections.abc import Callable
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
 from match_intelligence.adapters.sources.synthetic import SyntheticMatch, generate_acceptance_match
 from match_intelligence.application.match_session import MatchSession, NotFoundError
+from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
 from match_intelligence.application.ports import AnalyticsPort, NarrativePort
 
 DEMO_MATCH_ID = "synthetic-acceptance-001"
@@ -29,9 +30,11 @@ class MatchRegistry:
         self,
         analytics: Callable[[], AnalyticsPort],
         narrative: Callable[[str | None], NarrativePort],
+        persistence: MatchPersistence | None = None,
     ) -> None:
         self._analytics = analytics
         self._narrative = narrative
+        self._persistence = persistence or NullMatchPersistence()
         self._sessions: dict[str, MatchSession] = {}
 
     def load_synthetic(
@@ -56,7 +59,9 @@ class MatchRegistry:
             analytics=self._analytics(),
             narrative=self._narrative(inject_error_in),
             correction_narrative=self._narrative(None),
+            persistence=self._persistence,
         )
+        self._persistence.save_match(match.metadata, match.events)
         self._sessions[match.metadata.match_id] = session
         return session
 
@@ -121,6 +126,19 @@ def _stored_matches(load_tracking: bool) -> tuple[list[SyntheticMatch], dict]:
 
 def _default_registry() -> MatchRegistry:
     from match_intelligence.adapters.provisional.narrative import ProvisionalNarrative
+    from match_intelligence.adapters.storage.supabase_match import SupabaseMatchRepository
+
+    provider = os.getenv("NARRATIVE_PROVIDER", "provisional").lower()
+    if provider == "azure":
+        from match_intelligence.adapters.agents.narrative_port import Persona3NarrativeAdapter
+
+        narrative = lambda inject: Persona3NarrativeAdapter.azure(inject)
+    elif provider == "fixture":
+        from match_intelligence.adapters.agents.narrative_port import Persona3NarrativeAdapter
+
+        narrative = lambda inject: Persona3NarrativeAdapter.fixture(inject)
+    else:
+        narrative = lambda inject: ProvisionalNarrative(inject_error_in=inject)
 
     engine = _setting("ANALYTICS_ENGINE", "provisional", ANALYTICS_ENGINES)
     source = _setting("MATCH_SOURCE", "synthetic", MATCH_SOURCES)
@@ -128,7 +146,8 @@ def _default_registry() -> MatchRegistry:
 
     registry = MatchRegistry(
         analytics=_analytics_factory(engine, tracks),
-        narrative=lambda inject: ProvisionalNarrative(inject_error_in=inject),
+        narrative=narrative,
+        persistence=SupabaseMatchRepository.from_environment(),
     )
     for match in matches:
         registry.load_match(match)

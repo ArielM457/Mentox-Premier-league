@@ -11,14 +11,14 @@ function metricValue(snapshot, key, teamId) {
 }
 
 // Estadísticas del MatchSnapshot v1. Una métrica sin datos se muestra como tal, nunca como cero.
-export function StatsPanel({ snapshot, metadata }) {
+export function StatsPanel({ snapshot, metadata, timeMs = 0 }) {
   const { t } = usePreferences()
   const home = metadata.home_team
   const away = metadata.away_team
   const possession = [home, away].find((team) => team.team_id === snapshot?.possession_team_id)
   return (
     <div className="stats-panel">
-      <h2>{t.match.statsTitle}</h2>
+      <div className="stats-heading"><h2>{t.match.statsTitle}</h2><span><i /> {t.match.statsUpdated(formatMatchClock({ clock_ms: timeMs, period: snapshot?.period ?? 1 }, t.match.period))}</span></div>
       <div className="stat-teams">
         <strong>{home.name}</strong>
         <strong>{away.name}</strong>
@@ -34,8 +34,9 @@ export function StatsPanel({ snapshot, metadata }) {
             <b>{show(a)}</b>
             <div>
               <span>{t.match.metrics[key]}</span>
-              <i>
-                <em style={{ width: `${share}%` }} />
+              <i className="stat-balance" style={{ '--home-share': `${share}%` }}>
+                <em />
+                <b />
               </i>
             </div>
             <b>{show(b)}</b>

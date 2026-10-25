@@ -16,7 +16,14 @@ from match_intelligence.application.match_session import (
     EditorialRecord,
     ErrorReport,
     MatchSession,
+    NotFoundError,
     ReviewDecision,
+)
+from match_intelligence.application.live_simulation import (
+    HighlightClip,
+    SimulationReport,
+    run_local_simulation,
+    simulation_store,
 )
 from match_intelligence.domain.presentation import (
     DetailLevel,
@@ -32,6 +39,7 @@ from .match_schemas import (
     EditorialRecordResponse,
     ErrorResponse,
     EventsResponse,
+    HighlightReviewRequest,
     LoadMatchRequest,
     MatchDetailResponse,
     MatchListItem,
@@ -337,6 +345,41 @@ def get_playback(session: Session) -> PlaybackResponse:
 async def control_playback(session: Session, body: PlaybackRequest) -> PlaybackResponse:
     await session.control(body.action, body.video_time_ms)
     return _playback(session)
+
+
+@router.post(
+    "/{match_id}/simulation",
+    response_model=SimulationReport,
+    summary="Simular las colas y el procesamiento de agentes",
+)
+async def start_simulation(session: Session, prefs: Preferences) -> SimulationReport:
+    """Ejecuta datos sintéticos por ingreso, métricas, importantes y agentes."""
+    from match_intelligence.adapters.http.routing_router import routing_pipeline
+
+    return await run_local_simulation(session, prefs, routing_pipeline)
+
+
+@router.get(
+    "/{match_id}/highlights",
+    response_model=list[HighlightClip],
+    summary="Listar recortes destacados propuestos",
+)
+def list_highlights(session: Session) -> list[HighlightClip]:
+    return simulation_store.clips(session.match_id)
+
+
+@router.post(
+    "/{match_id}/highlights/{clip_id}/review",
+    response_model=HighlightClip,
+    summary="Confirmar o rechazar un recorte destacado",
+)
+def review_highlight(
+    session: Session, clip_id: str, body: HighlightReviewRequest
+) -> HighlightClip:
+    try:
+        return simulation_store.review(session.match_id, clip_id, body.decision, body.reviewer)
+    except KeyError as exc:
+        raise NotFoundError(f"No existe el recorte {clip_id}") from exc
 
 
 def _playback(session: MatchSession) -> PlaybackResponse:

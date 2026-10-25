@@ -23,7 +23,10 @@ def test_template_declares_required_event_hubs_resources() -> None:
 
     assert "Microsoft.EventHub/namespaces@2024-01-01" in template
     assert "Microsoft.EventHub/namespaces/eventhubs@2024-01-01" in template
-    assert template.count("namespaces/eventhubs/consumerGroups@2024-01-01") == 2
+    assert template.count("namespaces/eventhubs@2024-01-01") == 3
+    assert template.count("namespaces/eventhubs/consumerGroups@2024-01-01") == 5
+    assert "match-metrics" in template
+    assert "vision-observations" in template
     assert "name: 'backend'" in template
     assert "name: 'diagnostics'" in template
 
@@ -67,10 +70,12 @@ def test_template_exposes_names_and_endpoints_without_secrets() -> None:
         "eventHubNamespaceName",
         "eventHubFullyQualifiedNamespace",
         "eventHubName",
+        "visionEventHubName",
         "eventHubEndpoint",
         "storageAccountName",
         "blobServiceEndpoint",
         "containerNames",
+        "visionBackendConsumerGroupName",
     ):
         assert f"output {output_name}" in template
 

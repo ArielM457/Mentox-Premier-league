@@ -1,0 +1,15 @@
+Fecha UTC: 2026-10-23T04:54:13+00:00
+Sistema: Linux LAPTOP-RCFMG904 6.18.33.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+NVIDIA:
+0, NVIDIA GeForce RTX 3060 Laptop GPU, 592.82, 6144 MiB
+
+Docker:
+Cliente=29.9.2 Servidor=29.9.2
+Docker Compose version v5.6.1
+
+uv:
+uv 0.13.5 (x86_64-unknown-linux-gnu)
+
+Vídeo autorizado (solo huella; el archivo no se copia):
+7788719b32b944e42d8f1024fb4802f681bc2053d6301218a5bff6705b549f96  /mnt/c/Users/Usuario/Downloads/Mentox-Premier-league/experiments/authorized-video/input/2e57b9_0.mp4

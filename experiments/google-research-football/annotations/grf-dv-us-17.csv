@@ -1,0 +1,4 @@
+annotation_id,video_time_ms,frame,class,x_min_px,y_min_px,x_max_px,y_max_px,x_min_norm,y_min_norm,x_max_norm,y_max_norm,annotator,review_status,notes
+ann-ball-005,5000,50,ball,313,158,329,176,0.39125,0.351111,0.41125,0.391111,manual,reviewed,Letra B blanca que representa el balón
+ann-ball-015,15000,150,ball,437,191,452,208,0.54625,0.424444,0.565,0.462222,manual,reviewed,Letra B blanca que representa el balón
+ann-ball-025,25000,250,ball,501,358,519,377,0.62625,0.795556,0.64875,0.837778,manual,reviewed,Letra B blanca entre jugadores agrupados

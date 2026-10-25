@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { strings } from '../i18n/strings.js'
 import { DEFAULT_PREFERENCES, PreferencesContext, STORAGE_KEY } from './preferences.js'
 
@@ -12,6 +12,11 @@ function load() {
 
 export function PreferencesProvider({ children }) {
   const [preferences, setPreferences] = useState(load)
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = preferences.theme === 'light' ? 'light' : 'dark'
+    document.documentElement.style.colorScheme = preferences.theme === 'light' ? 'light' : 'dark'
+  }, [preferences.theme])
 
   useEffect(() => {
     document.documentElement.lang = preferences.language

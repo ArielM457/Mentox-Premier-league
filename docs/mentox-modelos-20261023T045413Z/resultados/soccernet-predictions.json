@@ -1,0 +1,1198 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-23T04:51:54.594637+00:00",
+  "provider": "SoccerNet Team Ball Action Spotting",
+  "source_repository": "https://github.com/SoccerNet/sn-teamspotting",
+  "source_revision": "091fed2fc35c33f7489f3596958a2fe385e37d65",
+  "code_license": "GPL-3.0",
+  "checkpoint_license_status": "not_declared_separately",
+  "checkpoint_distribution": "not_redistributed",
+  "checkpoint_sha256": "ed7c558d575eba1918be8f67813571723962eeff807dba68a12a2d794dd1c72a",
+  "media_sha256": "7788719b32b944e42d8f1024fb4802f681bc2053d6301218a5bff6705b549f96",
+  "environment": {
+    "python": "3.12.15",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "device": "cuda:0",
+    "automatic_mixed_precision": true,
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "gpu_name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "gpu_count": 1,
+    "gpu_memory_bytes": 6441926656,
+    "versions": {
+      "torch": "2.5.0+cu124",
+      "torchvision": "0.20.0+cu124",
+      "timm": "1.0.11",
+      "opencv-python-headless": "4.10.0.84"
+    }
+  },
+  "parameters": {
+    "classes": 12,
+    "confidence": 0.01,
+    "clip_length": 100,
+    "clip_overlap": 75,
+    "source_fps": 25,
+    "stride": 2,
+    "model_fps": 12.5,
+    "resolution": [
+      796,
+      448
+    ],
+    "nms_window_frames": 12
+  },
+  "video": {
+    "source_fps": 25.0,
+    "source_frames": 750,
+    "model_fps": 12.5,
+    "model_frames": 375,
+    "duration_ms": 30000,
+    "target_width": 796,
+    "target_height": 448
+  },
+  "processing_time_ms": 5659.922817999814,
+  "predictions": [
+    {
+      "frame": 2,
+      "timestamp_ms": 160,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.294677734375,
+      "prediction_id": "soccernet-0000",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 2,
+      "timestamp_ms": 160,
+      "label": "out",
+      "team": "left",
+      "confidence": 0.01314544677734375,
+      "prediction_id": "soccernet-0001",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 2,
+      "timestamp_ms": 160,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.3798828125,
+      "prediction_id": "soccernet-0002",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 3,
+      "timestamp_ms": 240,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.381103515625,
+      "prediction_id": "soccernet-0003",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 3,
+      "timestamp_ms": 240,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.0224456787109375,
+      "prediction_id": "soccernet-0004",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 8,
+      "timestamp_ms": 640,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.0202178955078125,
+      "prediction_id": "soccernet-0005",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 8,
+      "timestamp_ms": 640,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.02618408203125,
+      "prediction_id": "soccernet-0006",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 21,
+      "timestamp_ms": 1680,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.0128021240234375,
+      "prediction_id": "soccernet-0007",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 24,
+      "timestamp_ms": 1920,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.030548095703125,
+      "prediction_id": "soccernet-0008",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 25,
+      "timestamp_ms": 2000,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.01982879638671875,
+      "prediction_id": "soccernet-0009",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 29,
+      "timestamp_ms": 2320,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.02263641357421875,
+      "prediction_id": "soccernet-0010",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 34,
+      "timestamp_ms": 2720,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.01039886474609375,
+      "prediction_id": "soccernet-0011",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 38,
+      "timestamp_ms": 3040,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.012847900390625,
+      "prediction_id": "soccernet-0012",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 42,
+      "timestamp_ms": 3360,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.01645660400390625,
+      "prediction_id": "soccernet-0013",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 43,
+      "timestamp_ms": 3440,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.02872467041015625,
+      "prediction_id": "soccernet-0014",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 48,
+      "timestamp_ms": 3840,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.037445068359375,
+      "prediction_id": "soccernet-0015",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 51,
+      "timestamp_ms": 4080,
+      "label": "throw in",
+      "team": "left",
+      "confidence": 0.013865153305232525,
+      "prediction_id": "soccernet-0016",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 52,
+      "timestamp_ms": 4160,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.5174153447151184,
+      "prediction_id": "soccernet-0017",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 54,
+      "timestamp_ms": 4320,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.5891926884651184,
+      "prediction_id": "soccernet-0018",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 59,
+      "timestamp_ms": 4720,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.03499603271484375,
+      "prediction_id": "soccernet-0019",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 60,
+      "timestamp_ms": 4800,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.0192108154296875,
+      "prediction_id": "soccernet-0020",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 61,
+      "timestamp_ms": 4880,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.01541900634765625,
+      "prediction_id": "soccernet-0021",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 64,
+      "timestamp_ms": 5120,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.013692219741642475,
+      "prediction_id": "soccernet-0022",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 65,
+      "timestamp_ms": 5200,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.0242462158203125,
+      "prediction_id": "soccernet-0023",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 67,
+      "timestamp_ms": 5360,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.015045166015625,
+      "prediction_id": "soccernet-0024",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 74,
+      "timestamp_ms": 5920,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.08697509765625,
+      "prediction_id": "soccernet-0025",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 77,
+      "timestamp_ms": 6160,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.05295562744140625,
+      "prediction_id": "soccernet-0026",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 78,
+      "timestamp_ms": 6240,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.031940460205078125,
+      "prediction_id": "soccernet-0027",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 79,
+      "timestamp_ms": 6320,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.02338409423828125,
+      "prediction_id": "soccernet-0028",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 91,
+      "timestamp_ms": 7280,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.034290313720703125,
+      "prediction_id": "soccernet-0029",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 91,
+      "timestamp_ms": 7280,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.027370452880859375,
+      "prediction_id": "soccernet-0030",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 99,
+      "timestamp_ms": 7920,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.0442962646484375,
+      "prediction_id": "soccernet-0031",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 100,
+      "timestamp_ms": 8000,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.066619873046875,
+      "prediction_id": "soccernet-0032",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 104,
+      "timestamp_ms": 8320,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.1164703369140625,
+      "prediction_id": "soccernet-0033",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 104,
+      "timestamp_ms": 8320,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.113525390625,
+      "prediction_id": "soccernet-0034",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 109,
+      "timestamp_ms": 8720,
+      "label": "header",
+      "team": "left",
+      "confidence": 0.011590957641601562,
+      "prediction_id": "soccernet-0035",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 109,
+      "timestamp_ms": 8720,
+      "label": "header",
+      "team": "right",
+      "confidence": 0.011150360107421875,
+      "prediction_id": "soccernet-0036",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 117,
+      "timestamp_ms": 9360,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.032810211181640625,
+      "prediction_id": "soccernet-0037",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 119,
+      "timestamp_ms": 9520,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.24365234375,
+      "prediction_id": "soccernet-0038",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 123,
+      "timestamp_ms": 9840,
+      "label": "header",
+      "team": "left",
+      "confidence": 0.02004528045654297,
+      "prediction_id": "soccernet-0039",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 123,
+      "timestamp_ms": 9840,
+      "label": "header",
+      "team": "right",
+      "confidence": 0.02065277099609375,
+      "prediction_id": "soccernet-0040",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 123,
+      "timestamp_ms": 9840,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.03567314147949219,
+      "prediction_id": "soccernet-0041",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 123,
+      "timestamp_ms": 9840,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.04817771911621094,
+      "prediction_id": "soccernet-0042",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 123,
+      "timestamp_ms": 9840,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.188720703125,
+      "prediction_id": "soccernet-0043",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 125,
+      "timestamp_ms": 10000,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.033416748046875,
+      "prediction_id": "soccernet-0044",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 130,
+      "timestamp_ms": 10400,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.020778656005859375,
+      "prediction_id": "soccernet-0045",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 138,
+      "timestamp_ms": 11040,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.262481689453125,
+      "prediction_id": "soccernet-0046",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 139,
+      "timestamp_ms": 11120,
+      "label": "header",
+      "team": "left",
+      "confidence": 0.0370330810546875,
+      "prediction_id": "soccernet-0047",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 140,
+      "timestamp_ms": 11200,
+      "label": "header",
+      "team": "right",
+      "confidence": 0.014749109745025635,
+      "prediction_id": "soccernet-0048",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 141,
+      "timestamp_ms": 11280,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.03882789611816406,
+      "prediction_id": "soccernet-0049",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 141,
+      "timestamp_ms": 11280,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.10533905029296875,
+      "prediction_id": "soccernet-0050",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 149,
+      "timestamp_ms": 11920,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.038486480712890625,
+      "prediction_id": "soccernet-0051",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 151,
+      "timestamp_ms": 12080,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.39630126953125,
+      "prediction_id": "soccernet-0052",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 154,
+      "timestamp_ms": 12320,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.35793304443359375,
+      "prediction_id": "soccernet-0053",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 156,
+      "timestamp_ms": 12480,
+      "label": "header",
+      "team": "left",
+      "confidence": 0.010301589965820312,
+      "prediction_id": "soccernet-0054",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 156,
+      "timestamp_ms": 12480,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.048511505126953125,
+      "prediction_id": "soccernet-0055",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 164,
+      "timestamp_ms": 13120,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.100799560546875,
+      "prediction_id": "soccernet-0056",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 173,
+      "timestamp_ms": 13840,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.036556243896484375,
+      "prediction_id": "soccernet-0057",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 174,
+      "timestamp_ms": 13920,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.185791015625,
+      "prediction_id": "soccernet-0058",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 174,
+      "timestamp_ms": 13920,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.107421875,
+      "prediction_id": "soccernet-0059",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 177,
+      "timestamp_ms": 14160,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.030548095703125,
+      "prediction_id": "soccernet-0060",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 178,
+      "timestamp_ms": 14240,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.416015625,
+      "prediction_id": "soccernet-0061",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 179,
+      "timestamp_ms": 14320,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.1100616455078125,
+      "prediction_id": "soccernet-0062",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 187,
+      "timestamp_ms": 14960,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.02864837646484375,
+      "prediction_id": "soccernet-0063",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 187,
+      "timestamp_ms": 14960,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.023632049560546875,
+      "prediction_id": "soccernet-0064",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 190,
+      "timestamp_ms": 15200,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.034881591796875,
+      "prediction_id": "soccernet-0065",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 199,
+      "timestamp_ms": 15920,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.0461883544921875,
+      "prediction_id": "soccernet-0066",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 201,
+      "timestamp_ms": 16080,
+      "label": "out",
+      "team": "left",
+      "confidence": 0.013562202453613281,
+      "prediction_id": "soccernet-0067",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 201,
+      "timestamp_ms": 16080,
+      "label": "out",
+      "team": "right",
+      "confidence": 0.02642059326171875,
+      "prediction_id": "soccernet-0068",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 204,
+      "timestamp_ms": 16320,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.07118988037109375,
+      "prediction_id": "soccernet-0069",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 206,
+      "timestamp_ms": 16480,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.060497283935546875,
+      "prediction_id": "soccernet-0070",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 206,
+      "timestamp_ms": 16480,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.108734130859375,
+      "prediction_id": "soccernet-0071",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 216,
+      "timestamp_ms": 17280,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.031673431396484375,
+      "prediction_id": "soccernet-0072",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 217,
+      "timestamp_ms": 17360,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.041473388671875,
+      "prediction_id": "soccernet-0073",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 219,
+      "timestamp_ms": 17520,
+      "label": "out",
+      "team": "left",
+      "confidence": 0.02294158935546875,
+      "prediction_id": "soccernet-0074",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 219,
+      "timestamp_ms": 17520,
+      "label": "out",
+      "team": "right",
+      "confidence": 0.028564453125,
+      "prediction_id": "soccernet-0075",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 224,
+      "timestamp_ms": 17920,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.010008811950683594,
+      "prediction_id": "soccernet-0076",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 224,
+      "timestamp_ms": 17920,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.03814697265625,
+      "prediction_id": "soccernet-0077",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 224,
+      "timestamp_ms": 17920,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.0549163818359375,
+      "prediction_id": "soccernet-0078",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 231,
+      "timestamp_ms": 18480,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.0650177001953125,
+      "prediction_id": "soccernet-0079",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 231,
+      "timestamp_ms": 18480,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.1684722900390625,
+      "prediction_id": "soccernet-0080",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 237,
+      "timestamp_ms": 18960,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.021587371826171875,
+      "prediction_id": "soccernet-0081",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 244,
+      "timestamp_ms": 19520,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.336212158203125,
+      "prediction_id": "soccernet-0082",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 246,
+      "timestamp_ms": 19680,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.52508544921875,
+      "prediction_id": "soccernet-0083",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 246,
+      "timestamp_ms": 19680,
+      "label": "throw in",
+      "team": "right",
+      "confidence": 0.022365570068359375,
+      "prediction_id": "soccernet-0084",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 250,
+      "timestamp_ms": 20000,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.034671783447265625,
+      "prediction_id": "soccernet-0085",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 250,
+      "timestamp_ms": 20000,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.0786285400390625,
+      "prediction_id": "soccernet-0086",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 255,
+      "timestamp_ms": 20400,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.025653839111328125,
+      "prediction_id": "soccernet-0087",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 255,
+      "timestamp_ms": 20400,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.02048492431640625,
+      "prediction_id": "soccernet-0088",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 259,
+      "timestamp_ms": 20720,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.015577316284179688,
+      "prediction_id": "soccernet-0089",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 268,
+      "timestamp_ms": 21440,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.084930419921875,
+      "prediction_id": "soccernet-0090",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 268,
+      "timestamp_ms": 21440,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.105377197265625,
+      "prediction_id": "soccernet-0091",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 273,
+      "timestamp_ms": 21840,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.043384552001953125,
+      "prediction_id": "soccernet-0092",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 275,
+      "timestamp_ms": 22000,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.02782440185546875,
+      "prediction_id": "soccernet-0093",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 281,
+      "timestamp_ms": 22480,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.018129348754882812,
+      "prediction_id": "soccernet-0094",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 281,
+      "timestamp_ms": 22480,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.017253875732421875,
+      "prediction_id": "soccernet-0095",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 286,
+      "timestamp_ms": 22880,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.02213287353515625,
+      "prediction_id": "soccernet-0096",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 299,
+      "timestamp_ms": 23920,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.017034530639648438,
+      "prediction_id": "soccernet-0097",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 299,
+      "timestamp_ms": 23920,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.016742706298828125,
+      "prediction_id": "soccernet-0098",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.04049062728881836,
+      "prediction_id": "soccernet-0099",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.03269481658935547,
+      "prediction_id": "soccernet-0100",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "out",
+      "team": "left",
+      "confidence": 0.012467384338378906,
+      "prediction_id": "soccernet-0101",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "out",
+      "team": "right",
+      "confidence": 0.010111808776855469,
+      "prediction_id": "soccernet-0102",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.053302764892578125,
+      "prediction_id": "soccernet-0103",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.04315948486328125,
+      "prediction_id": "soccernet-0104",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 300,
+      "timestamp_ms": 24000,
+      "label": "throw in",
+      "team": "left",
+      "confidence": 0.010471701622009277,
+      "prediction_id": "soccernet-0105",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 312,
+      "timestamp_ms": 24960,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.021654129028320312,
+      "prediction_id": "soccernet-0106",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 313,
+      "timestamp_ms": 25040,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.016023635864257812,
+      "prediction_id": "soccernet-0107",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 319,
+      "timestamp_ms": 25520,
+      "label": "high pass",
+      "team": "left",
+      "confidence": 0.02047884464263916,
+      "prediction_id": "soccernet-0108",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 321,
+      "timestamp_ms": 25680,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.046662330627441406,
+      "prediction_id": "soccernet-0109",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 322,
+      "timestamp_ms": 25760,
+      "label": "high pass",
+      "team": "right",
+      "confidence": 0.013038396835327148,
+      "prediction_id": "soccernet-0110",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 323,
+      "timestamp_ms": 25840,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.03920269012451172,
+      "prediction_id": "soccernet-0111",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 328,
+      "timestamp_ms": 26240,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.01715564727783203,
+      "prediction_id": "soccernet-0112",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 331,
+      "timestamp_ms": 26480,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.021653175354003906,
+      "prediction_id": "soccernet-0113",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 334,
+      "timestamp_ms": 26720,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.016338348388671875,
+      "prediction_id": "soccernet-0114",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 342,
+      "timestamp_ms": 27360,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.029850006103515625,
+      "prediction_id": "soccernet-0115",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 344,
+      "timestamp_ms": 27520,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.03394317626953125,
+      "prediction_id": "soccernet-0116",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 348,
+      "timestamp_ms": 27840,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.027219772338867188,
+      "prediction_id": "soccernet-0117",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 348,
+      "timestamp_ms": 27840,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.0247650146484375,
+      "prediction_id": "soccernet-0118",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 355,
+      "timestamp_ms": 28400,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.02275848388671875,
+      "prediction_id": "soccernet-0119",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 357,
+      "timestamp_ms": 28560,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.023412704467773438,
+      "prediction_id": "soccernet-0120",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 361,
+      "timestamp_ms": 28880,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.03979682922363281,
+      "prediction_id": "soccernet-0121",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 361,
+      "timestamp_ms": 28880,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.03399467468261719,
+      "prediction_id": "soccernet-0122",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 372,
+      "timestamp_ms": 29760,
+      "label": "drive",
+      "team": "left",
+      "confidence": 0.024152755737304688,
+      "prediction_id": "soccernet-0123",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 372,
+      "timestamp_ms": 29760,
+      "label": "drive",
+      "team": "right",
+      "confidence": 0.020954132080078125,
+      "prediction_id": "soccernet-0124",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 374,
+      "timestamp_ms": 29920,
+      "label": "pass",
+      "team": "left",
+      "confidence": 0.023197174072265625,
+      "prediction_id": "soccernet-0125",
+      "prediction_origin": "actual_model"
+    },
+    {
+      "frame": 374,
+      "timestamp_ms": 29920,
+      "label": "pass",
+      "team": "right",
+      "confidence": 0.019559860229492188,
+      "prediction_id": "soccernet-0126",
+      "prediction_origin": "actual_model"
+    }
+  ]
+}

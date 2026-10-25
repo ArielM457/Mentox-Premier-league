@@ -4,6 +4,7 @@ import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { formatMatchClock, momentIdOf } from '../lib/overlays.js'
+import { recordExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -23,6 +24,7 @@ export function Recap({ matchId }) {
 
   useEffect(() => {
     if (!match) return undefined
+    recordExperience(matchId, 'recap')
     let active = true
     Promise.all([api.summary(matchId, apiPreferences), api.overlays(matchId, apiPreferences, match.durationMs)])
       .then(([record, batch]) => {

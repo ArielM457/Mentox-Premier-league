@@ -43,6 +43,7 @@ class NarrativePort(Protocol):
     def live(
         self,
         metadata: MatchMetadata,
+        snapshot: MatchSnapshot,
         candidate: InsightCandidate,
         preferences: ViewerPreferences,
     ) -> NarrativeDraft: ...

@@ -25,6 +25,8 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 | `GET /matches/{id}/editorial/{draft_id}/published` | Responde `409` mientras falte la aprobación. |
 | `POST /matches/{id}/reports` · `GET …/reports` | Reportar un error y consultar la verificación. |
 | `GET /matches/{id}/playback` · `POST …/playback` | Reproducir, pausar, adelantar y reiniciar con `VideoSynchronizedReplay` de Persona 1. |
+| `POST /matches/{id}/simulation` | Ejecutar localmente las seis rutas del filtro y los agentes configurados. |
+| `GET /matches/{id}/highlights` · `POST …/highlights/{clip_id}/review` | Consultar, confirmar o rechazar recortes propuestos. |
 
 Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`casual`, `analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`.
 
@@ -36,10 +38,10 @@ Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`
 | Configuración | `#/onboarding` | Idioma, club, jugador y modo, con los equipos y jugadores que entrega la API. |
 | Descubrir | `#/discover` | Partidos del club favorito, partidos y acciones del jugador favorito. |
 | Partidos | `#/matches` | Búsqueda, filtros en vivo, próximos y resúmenes, y filtro por jugador. |
-| Centro del partido | `#/match/{id}` | Reproducción sincronizada, campo con posiciones reales, mensaje en pantalla, línea de tiempo, estadísticas, vista táctica, retraso del canal y asistente de preguntas. |
-| Momento | `#/match/{id}/moment/{momento}` | Explicación, cifras y jugadores de la jugada, sus eventos de origen y reporte de errores. |
+| Centro del partido | `#/match/{id}` | Sesión persistente entre pestañas; campo con todos los jugadores y foco individual; selector y laboratorio de momentos; estadísticas por tiempo; lectura táctica por equipo; explicaciones y comentarios para analistas. |
+| Momento | `#/match/{id}/moment/{momento}` | Autor, situación, equipo y tiempo; explicación breve, cifras, jugadores, eventos de origen y reporte de errores. |
 | Resumen | `#/recap/{id}` | Marcador final, resumen pendiente o aprobado y los tres momentos principales. |
-| Mi experiencia | `#/profile` | Idioma, club, jugador, modo y nivel de explicación. |
+| Mi experiencia | `#/profile` | Preferencias, historial local de partidos y resúmenes, contenido del jugador seguido y comentarios para analistas. |
 | Revisión | `#/editorial` | Aprobar o rechazar resúmenes, ver reportes y recargar un partido con un error controlado. |
 
 Estructura del código:
@@ -78,13 +80,13 @@ Decisiones de la implementación:
 
 **5. Selección por modo.** Casual muestra momentos con prioridad ≥ 50; analista muestra todos; el modo jugador muestra los momentos donde interviene el jugador y avisa «Sin novedades» cada 10 s sin intervención. Los goles se muestran siempre, también los del rival (RF-24).
 
-**6. Puertos hacia Persona 2 y Persona 3.** La API solo depende de `AnalyticsPort` y `NarrativePort` (`application/ports.py`). Hoy los implementan `adapters/provisional/analytics.py` y `adapters/provisional/narrative.py`: conteos simples y plantillas, **sin xG, xT, VAEP ni modelos de lenguaje**. Están marcados como provisionales y no deben presentarse como el trabajo final de Persona 2 o 3.
+**6. Puertos hacia Persona 2 y Persona 3.** La API solo depende de `AnalyticsPort` y `NarrativePort` (`application/ports.py`). La analítica sigue usando el adaptador provisional. Narrativa puede usar `provisional`, `fixture` o el adaptador de Persona 3 con Azure mediante `NARRATIVE_PROVIDER`. Ningún proveedor añade xG, xT o VAEP por sí mismo.
 
 ## **Cómo integrar los módulos reales**
 
 1. Persona 2 implementa `AnalyticsPort` (`snapshot` y `candidates`) devolviendo `MatchSnapshot v1` e `InsightCandidate v1`.
-2. Persona 3 implementa `NarrativePort` (`live`, `player_quiet`, `answer`, `summary` y `verify`) devolviendo `NarrativeDraft v1`.
-3. En `adapters/http/registry.py`, `_default_registry()` cambia las fábricas provisionales por las reales. Las rutas y el frontend no cambian.
+2. Persona 3 ya se conecta mediante `Persona3NarrativeAdapter`. `player_quiet` y la verificación posterior a reportes aún usan el respaldo determinista.
+3. `adapters/http/registry.py` selecciona el proveedor por configuración. Las rutas y el frontend no cambian.
 4. Las pruebas de `tests/test_match_experience_api.py` deben seguir pasando; las que dependen de textos concretos de las plantillas se ajustan a los textos reales.
 
 ## **Cobertura de requisitos**
@@ -117,7 +119,19 @@ npm run lint:frontend
 npm run build:frontend
 ```
 
-Resultado del 14 de octubre de 2026 sobre `main` actualizado: 316 pruebas superadas (incluye Personas 1, 2 y 3 y la colección de Postman), compilación del frontend correcta y tres advertencias del linter por cargar datos dentro de efectos, que es el patrón esperado.
+Resultado del 18 de octubre de 2026 en el árbol de trabajo: 323 pruebas superadas, compilación correcta y tres advertencias previas del linter por cargar datos dentro de efectos. La simulación integrada con el proveedor fixture devolvió seis rutas, siete mensajes y un recorte pendiente. La revisión visual en navegador de las pantallas nuevas sigue pendiente.
+
+**Actualización del centro del partido, 19 de octubre de 2026.** Se conectó el inicio de la simulación al reloj local y se mantuvo la sesión al cambiar de pestaña. Se añadieron controles globales de pausa, continuación y reinicio; cambio inmediato entre Aficionado y Analista; todos los jugadores en el campo con foco individual; selector de un momento; laboratorio contrafactual local; estadísticas con balance visual; tácticas por equipo; explicaciones con vista previa; comentarios sincronizados y locutor contextual. `npm run lint:frontend` terminó sin errores y conservó las tres advertencias anteriores. `npm run build:frontend` terminó correctamente con Vite 8.3.3. La revisión visual manual en navegador queda pendiente.
+
+El laboratorio contrafactual actual es una estimación determinista de interfaz y está marcado como tal. No se considera implementación de RF-44 mediante IA: falta definir y conectar el contrato del agente que reciba posiciones de jugadores, balón y arquero y devuelva supuesto, método, evidencia y límites.
+
+**Corrección del flujo en vivo y persistencia, 19 de octubre de 2026.** Encontramos que el proveedor Azure devolvía `401` y el adaptador retenía todas las narraciones. Esto dejaba vacías las vistas Momentos y Explicaciones. El adaptador ahora usa una narración local verificada cuando el proveedor no está disponible y abre un circuito para no repetir llamadas fallidas durante la misma sesión. El asistente recibe métricas y fuentes del tiempo consultado, reconoce nombres de equipos y jugadores y responde preguntas abiertas con la última acción registrada.
+
+El campo interpola cada pase y remate en un máximo de 900 ms. La secuencia final del partido corto conecta el pase de N. Alba con el remate y gol de M. Luz. El balón se representa en blanco y ya no usa un movimiento decorativo separado de los eventos.
+
+La persistencia opcional usa Supabase desde el backend. La migración `supabase/migrations/202610190001_match_intelligence.sql` crea `matches`, `match_events`, `moments` y `assistant_messages` con RLS activo. `SUPABASE_ENABLED=false` mantiene la demo en memoria. El `.env` ignorado contiene la URL, la clave y la referencia del proyecto. Para aplicar la migración remota falta autenticar la CLI, corregir la clave que actualmente responde `401` y completar `SUPABASE_DB_PASSWORD`.
+
+La verificación final ejecutó 330 pruebas del backend correctamente, además de `npm run lint:frontend` sin errores y `npm run build:frontend` correctamente. La API local devolvió siete momentos para el partido corto, incluido `Gol de M. Luz`, y el asistente respondió una pregunta abierta con las fuentes `evt-006`, `evt-007`, `evt-009` y `evt-010`. La conexión remota de Supabase respondió `401`; la migración no se aplicó porque la CLI no tiene sesión y la clave actual no autentica contra el proyecto indicado.
 
 **Prueba en navegador de la interfaz con el diseño** (14 de octubre, escritorio y 375 px): configuración inicial con club y jugador de la API; centro del partido de dos tiempos a 8× con mensajes, marcador por período y canal en directo; pregunta «¿Cuántos tiros tiene M. Luz?» respondida con `sc-009` y `sc-036`; estadísticas y momentos; detalle de un momento; resumen pendiente y aprobado desde Revisión; error controlado reportado, retirado y corregido; interfaz en inglés; las nueve pantallas sin desbordamiento horizontal a 375 px.
 
@@ -126,7 +140,8 @@ Resultado del 14 de octubre de 2026 sobre `main` actualizado: 316 pruebas supera
 ## **Limitaciones y pendientes**
 
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
-- **Analítica y narración provisionales.** Ver la decisión 6.
+- **Analítica provisional.** Narrativa ya admite Persona 3, pero algunas operaciones conservan respaldo determinista. Ver la decisión 6.
+- **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.
 - **Partidos de la demo.** Hay dos: el corto de aceptación (42 s) y el de dos tiempos de Persona 2 (11:30). Los dos enfrentan a Aurora FC y Río Unido.
 - **Estado en memoria.** Revisiones y reportes se pierden al reiniciar el backend. Para la demo alcanza; para producción haría falta guardarlos.
 - **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.

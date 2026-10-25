@@ -46,9 +46,11 @@ class CrewAIGateway:
     def __init__(self, *, timeout_seconds: int = 20) -> None:
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        router_deployment = os.getenv("AZURE_OPENAI_ROUTER_DEPLOYMENT", deployment)
+        narrative_deployment = os.getenv("AZURE_OPENAI_NARRATIVE_DEPLOYMENT", deployment)
         api_key = os.getenv("AZURE_OPENAI_API_KEY")
         api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-06-01")
-        if not all((endpoint, deployment, api_key)):
+        if not all((endpoint, deployment, router_deployment, narrative_deployment, api_key)):
             raise ValueError(
                 "Set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT and AZURE_OPENAI_API_KEY"
             )
@@ -60,17 +62,20 @@ class CrewAIGateway:
         except ImportError as exc:
             raise RuntimeError("Install the backend agents extra to use CrewAI") from exc
 
-        deployment_url = f"{endpoint.rstrip('/')}/openai/deployments/{deployment}"
-        self._llm = LLM(
-            model=f"azure/{deployment}",
-            endpoint=deployment_url,
-            api_key=api_key,
-            api_version=api_version,
-            temperature=0,
-            max_tokens=512,
-            timeout=timeout_seconds,
-            max_retries=0,
-        )
+        def llm_for(name: str):
+            return LLM(
+                model=f"azure/{name}",
+                endpoint=f"{endpoint.rstrip('/')}/openai/deployments/{name}",
+                api_key=api_key,
+                api_version=api_version,
+                temperature=0,
+                max_tokens=512,
+                timeout=timeout_seconds,
+                max_retries=0,
+            )
+
+        self._fast_llm = llm_for(router_deployment)
+        self._quality_llm = llm_for(narrative_deployment)
 
     def plan(
         self,
@@ -103,7 +108,7 @@ class CrewAIGateway:
             role="Match evidence observer",
             goal="Identify exact indexed facts that answer the request",
             backstory="You cite provided events and do not infer new statistics.",
-            llm=self._llm,
+            llm=self._fast_llm,
             allow_delegation=False,
             verbose=False,
         )
@@ -111,7 +116,7 @@ class CrewAIGateway:
             role="Evidence analyst",
             goal="Choose a cautious interpretation and state any evidence limit",
             backstory="You distinguish observed facts from unproven tactics and causes.",
-            llm=self._llm,
+            llm=self._quality_llm,
             allow_delegation=False,
             verbose=False,
         )
@@ -119,7 +124,7 @@ class CrewAIGateway:
             role="Narrative selector",
             goal="Choose relevant fact indexes and an angle for this viewer",
             backstory="You adapt focus but never change facts or numbers.",
-            llm=self._llm,
+            llm=self._quality_llm,
             allow_delegation=False,
             verbose=False,
         )
@@ -127,7 +132,7 @@ class CrewAIGateway:
             role="Narrative verifier",
             goal="Reject unsupported selections and explanations",
             backstory="You reject invented causes, players, events or figures.",
-            llm=self._llm,
+            llm=self._fast_llm,
             allow_delegation=False,
             verbose=False,
         )

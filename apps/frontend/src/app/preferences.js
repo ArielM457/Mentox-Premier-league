@@ -4,10 +4,12 @@ export const STORAGE_KEY = 'itg:preferences'
 
 export const DEFAULT_PREFERENCES = {
   language: 'es',
+  theme: 'dark',
   mode: 'casual',
   level: 'normal',
   favoriteTeamId: '',
   favoritePlayerId: '',
+  liveComments: true,
   onboarded: false,
 }
 
