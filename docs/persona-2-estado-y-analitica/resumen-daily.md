@@ -21,8 +21,9 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Interfaz: <https://ca-mentoxp2-web.politegrass-7d829700.eastus2.azurecontainerapps.io>
   - API: <https://ca-mentoxp2-api.politegrass-7d829700.eastus2.azurecontainerapps.io/docs>
   - El tablero local sigue en [`demo/tablero.html`](demo/tablero.html).
+- **Flujo continuo probado en Azure:** 178 eventos por Event Hubs, todos aplicados a tiempo, con 51 ms de transporte medio y 27 ms de procesamiento. El registro quedó en Blob y en Supabase.
 - **Siguiente:**
-  - Probar en Azure el flujo continuo: repetir un partido por Event Hubs con el procesador encendido.
+  - Unir la rama `integration/modelos-frontend-20261025` de Persona 1 (modelos de visión en Azure).
   - Acordar los contratos con Persona 3.
   - Subir la rama y abrir el PR cuando el equipo lo decida.
 - **Bloqueos y avisos:**
@@ -106,6 +107,12 @@ Antes, el «resultado estimado» era el mismo texto para cualquier momento y la 
   - el arquero 3 m más adelante: distancia al balón y a su línea de gol.
 
 Si una opción no aplica, la pestaña lo dice («el momento no incluye un remate»). Las posiciones son simuladas y la pestaña lo avisa: compara espacios, no predice el resultado. Funciona con el motor real y con el provisional, y ya responde desde Azure.
+
+### Ramas nuevas
+
+`integration/modelos-frontend-20261025` (Persona 1) une `develop` con su visión y prepara el despliegue de sus modelos con GPU en Azure (Roboflow y SoccerNet, DV-US-30 y DV-US-31). No toca la analítica.
+
+Al unirla habrá 2 conflictos en la interfaz. Su solución es mejor que la nuestra: el panel de visión pasa a una pestaña propia, «Visión IA». Hay que conservar el `matchId` que el Resumen usa para cargar el análisis. Las demás ramas no tienen nada que falte en la nuestra.
 
 ### Guía para el equipo
 
@@ -246,8 +253,9 @@ Trabajo replay ──► Event Hubs · match-events ──► procesador continu
 - La API con el motor real, que lee Supabase.
 - La interfaz, el análisis de momentos y la previa táctica.
 
+**Flujo continuo verificado el 25 de octubre:** el trabajo `replay` publicó en `match-events` los 178 eventos del partido de analítica a 8× (como `synthetic-analytics-001-live-20261026003858`). El procesador los aplicó todos a tiempo, con un transporte medio de 51 ms (p95 71 ms) y un procesamiento medio de 27 ms (p95 35 ms). Propuso momentos en 19 eventos y, 30 s después del último, guardó el registro `run-c57436ad-…` con 7 archivos en Blob y en Supabase.
+
 **Falta:**
-- Probar en Azure el flujo continuo: encender el procesador, lanzar el trabajo `replay` y ver el análisis en Supabase. Los comandos están en la guía.
 - La prueba de humo `analytics_azure_smoke.py`.
 - Cerrar con Persona 3 que el canal sigue siendo Event Hubs.
 

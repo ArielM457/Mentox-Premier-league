@@ -207,7 +207,7 @@ Las personas usuarias de este módulo son sobre todo Persona 3 (narración) y Pe
 **quiero** que la API use la analítica real con partidos guardados en una base y que un script despliegue todo en Azure,
 **para** dejar de depender de adaptadores provisionales y mostrar el flujo completo en la nube.
 
-**Prioridad:** P1. **Estado:** verificada en local y en Azure; falta probar el flujo continuo en Azure. **Evidencia:** [EA-US-12](evidencias/EA-US-12.md).
+**Prioridad:** P1. **Estado:** verificada en local y en Azure, con el flujo continuo. **Evidencia:** [EA-US-12](evidencias/EA-US-12.md).
 
 **Criterios de aceptación:**
 

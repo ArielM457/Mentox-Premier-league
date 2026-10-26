@@ -3,7 +3,7 @@
 ## Identificación
 
 - **Historia:** EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase.
-- **Estado:** verificada en local y en Azure. Falta probar en Azure el flujo continuo (procesador encendido y trabajo `replay`).
+- **Estado:** verificada en local y en Azure, incluido el flujo continuo con Event Hubs.
 - **Prioridad:** P1.
 - **Última verificación:** 18 de octubre de 2026.
 - **Responsable:** Persona 2 · Estado y analítica.
@@ -30,6 +30,7 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 | El script sigue los pasos en orden y no expone la cadena de Supabase | Ejecución con dobles de `az`, `docker` e `Invoke-RestMethod`; la carga real corrió contra PostgreSQL local | Cumplido con dobles |
 | Carga de datos en Supabase | `supabase_seed.py --schema` contra el proyecto real: 2 partidos, 49 222 observaciones y 2 análisis; la consulta de `attention_decisions` devuelve los momentos | Cumplido |
 | Plantilla aceptada por Azure | `what-if` (20 recursos para crear y 3 asignaciones de roles que no se pueden calcular antes) y `az deployment group validate` de las dos fases | Cumplido |
+| Flujo continuo en Azure | Flujo continuo verificado el 25 de octubre de 2026: el trabajo `replay` publicó en `match-events` los 178 eventos del partido de analítica a 8× (como `synthetic-analytics-001-live-20261026003858`). El procesador los aplicó todos a tiempo, con un transporte medio de 51 ms (p95 71 ms) y un procesamiento medio de 27 ms (p95 35 ms). Propuso momentos en 19 eventos y, 30 s después del último, guardó el registro `run-c57436ad-…` con 7 archivos en Blob y en Supabase. | Cumplido |
 | Despliegue en Azure | Tres intentos. Primero, Azure creó el entorno en modo Express y rechazó el trabajo `replay`. Después suspendió el cómputo del entorno recreado con el mismo nombre (`ManagedClusterSuspended`). Por último, la API no alcanzaba Supabase porque la cadena era la directa, solo IPv6. Con la plantilla en modo `WorkloadProfiles`, el entorno `…-wp`, la cadena del Session pooler y la API resistente a la base, el 25 de octubre de 2026, en Azure for Students (`eastus2`), el entorno `cae-mentoxp2-demo-wp` sigue activo, la API lee los 3 partidos y su seguimiento desde Supabase, y la interfaz, el análisis de momentos y la previa responden (imagen `0635142`). | Cumplido |
 
 ## Decisiones técnicas
