@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 from collections.abc import Callable
 
 from match_intelligence.adapters.sources.analytics_scenarios import generate_analytics_scenario
@@ -10,6 +11,15 @@ from match_intelligence.application.persistence import MatchPersistence, NullMat
 from match_intelligence.application.ports import AnalyticsPort, NarrativePort
 
 logger = logging.getLogger(__name__)
+
+# Con una cadena mal escrita, el driver repite parte de ella en el error: la contraseña no
+# debe llegar a los registros.
+_DSN_PASSWORD = re.compile(r"(://[^:/@\s]+:)[^@\s]+@")
+_KEY_PASSWORD = re.compile(r"(password\s*=\s*)\S+", re.IGNORECASE)
+
+
+def _redact(message: str) -> str:
+    return _KEY_PASSWORD.sub(r"\1***", _DSN_PASSWORD.sub(r"\1***@", message))
 
 DEMO_MATCH_ID = "synthetic-acceptance-001"
 ANALYTICS_MATCH_ID = "synthetic-analytics-001"
@@ -133,7 +143,7 @@ def _stored_matches(load_tracking: bool) -> tuple[list[SyntheticMatch], dict]:
         # arranca con los partidos sintéticos y lo deja escrito en los registros.
         logger.warning(
             "No se pudo leer Supabase (%s: %s). Se cargan los partidos sintéticos.",
-            type(error).__name__, str(error).splitlines()[0] if str(error) else "",
+            type(error).__name__, _redact(str(error).splitlines()[0]) if str(error) else "",
         )
         return [], {}
     return matches, tracks

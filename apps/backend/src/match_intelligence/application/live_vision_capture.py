@@ -165,6 +165,13 @@ class LiveVisionCapture:
             "failures": self.failures,
         }
 
+    def ensure_accepting(self, match_id: str, content_type: str) -> None:
+        """Rechaza la captura antes de leer el fotograma: en pausa o con un tipo no admitido."""
+        if match_id not in self._playing:
+            raise CaptureNotPlayingError("La captura está pausada para este partido")
+        if content_type not in {"image/jpeg", "image/png", "image/webp"}:
+            raise ValueError("Use JPEG, PNG o WebP")
+
     async def capture(
         self,
         *,
@@ -174,10 +181,7 @@ class LiveVisionCapture:
         content_type: str,
     ) -> dict[str, object]:
         self.frames_received += 1
-        if match_id not in self._playing:
-            raise CaptureNotPlayingError("La captura está pausada para este partido")
-        if content_type not in {"image/jpeg", "image/png", "image/webp"}:
-            raise ValueError("Use JPEG, PNG o WebP")
+        self.ensure_accepting(match_id, content_type)
         if not image or len(image) > self.settings.max_image_bytes:
             raise ValueError("El fotograma está vacío o supera el límite permitido")
 

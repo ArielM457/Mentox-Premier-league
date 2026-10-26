@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import Response
+from fastapi.responses import StreamingResponse
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import BlobServiceClient
 from pydantic import BaseModel, ConfigDict, Field
@@ -52,6 +52,8 @@ live_vision_capture = LiveVisionCapture(
     live_vision_settings,
 )
 observation_playback: ObservationPlaybackSession | None = None
+# Cada respuesta parcial del vídeo lleva como máximo esto; el navegador pide la parte siguiente.
+VIDEO_RANGE_MAX_BYTES = 4 * 1024 * 1024
 
 
 def get_observation_playback() -> ObservationPlaybackSession:
@@ -246,8 +248,8 @@ async def playback_restart(
 
 
 @router.get("/live/video")
-async def live_video(request: Request) -> Response:
-    """Sirve un MP4 privado de Blob Storage con soporte de rangos del navegador."""
+async def live_video(request: Request) -> StreamingResponse:
+    """Sirve un MP4 privado de Blob Storage por partes, sin cargarlo entero en memoria."""
     endpoint = os.getenv("AZURE_BLOB_SERVICE_ENDPOINT")
     blob_name = os.getenv("VISION_VIDEO_BLOB_NAME")
     container = os.getenv("VISION_VIDEO_CONTAINER", "synthetic-videos")
@@ -256,6 +258,11 @@ async def live_video(request: Request) -> Response:
 
     credential = DefaultAzureCredential()
     service = BlobServiceClient(account_url=endpoint, credential=credential)
+
+    async def close() -> None:
+        await service.close()
+        await credential.close()
+
     try:
         blob = service.get_blob_client(container=container, blob=blob_name)
         properties = await blob.get_blob_properties()
@@ -270,26 +277,48 @@ async def live_video(request: Request) -> Response:
                 if unit != "bytes" or not first:
                     raise ValueError
                 start = int(first)
-                end = min(int(last) if last else total - 1, total - 1)
+                end = min(int(last) if last else total - 1, total - 1, start + VIDEO_RANGE_MAX_BYTES - 1)
                 if start < 0 or start > end:
                     raise ValueError
                 status_code = 206
             except ValueError as error:
                 raise HTTPException(status_code=416, detail="Rango de vídeo inválido") from error
         downloader = await blob.download_blob(offset=start, length=end - start + 1)
-        content = await downloader.readall()
-    finally:
-        await service.close()
-        await credential.close()
+    except BaseException:
+        await close()
+        raise
+
+    # Sin rango, el archivo completo también se envía por bloques: nunca queda entero en memoria.
+    async def body():
+        try:
+            async for chunk in downloader.chunks():
+                yield chunk
+        finally:
+            await close()
 
     headers = {
         "Accept-Ranges": "bytes",
-        "Content-Length": str(len(content)),
+        "Content-Length": str(end - start + 1),
         "Cache-Control": "private, max-age=60",
     }
     if status_code == 206:
         headers["Content-Range"] = f"bytes {start}-{end}/{total}"
-    return Response(content, status_code=status_code, media_type="video/mp4", headers=headers)
+    return StreamingResponse(body(), status_code=status_code, media_type="video/mp4", headers=headers)
+
+
+async def _read_frame(request: Request, limit: int) -> bytes:
+    """Lee el fotograma por partes y corta en cuanto supera ``limit``, sin cargarlo entero."""
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > limit:
+        raise HTTPException(status_code=413, detail="El fotograma supera el límite permitido")
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            raise HTTPException(status_code=413, detail="El fotograma supera el límite permitido")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 @router.post("/live/capture/frame", status_code=202)
@@ -301,10 +330,13 @@ async def capture_live_frame(
     """Recibe el fotograma visible; la credencial del modelo nunca sale del backend."""
     content_type = request.headers.get("content-type", "").split(";", 1)[0].lower()
     try:
+        # Pausa y tipo se comprueban antes de leer el cuerpo, que nunca supera el límite.
+        live_vision_capture.ensure_accepting(match_id, content_type)
+        image = await _read_frame(request, live_vision_capture.settings.max_image_bytes)
         return await live_vision_capture.capture(
             match_id=match_id,
             video_time_ms=video_time_ms,
-            image=await request.body(),
+            image=image,
             content_type=content_type,
         )
     except CaptureNotPlayingError as error:

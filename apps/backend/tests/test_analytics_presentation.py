@@ -171,3 +171,28 @@ def test_unreachable_supabase_falls_back_to_synthetic_matches(
         [DEMO_MATCH_ID, ANALYTICS_MATCH_ID, "synthetic-live-001"]
     )
     assert "No se pudo leer Supabase" in caplog.text and "OSError" in caplog.text
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        'missing "=" after "postgresql://postgres.ref:S3creta!@aws-0-us-east-1.pooler.supabase.com:5432/postgres"',
+        "invalid connection option: host=db.ref.supabase.co password=S3creta! user=postgres",
+    ],
+)
+def test_supabase_warning_never_logs_the_password(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, message: str
+) -> None:
+    """Con una cadena mal escrita, el driver la repite en el error."""
+    from match_intelligence.adapters.storage import supabase_store
+
+    class Malformed:
+        def load_matches(self):
+            raise ValueError(message)
+
+    monkeypatch.setenv("MATCH_SOURCE", "supabase")
+    monkeypatch.setattr(supabase_store.SupabaseMatchStore, "from_env", classmethod(lambda cls: Malformed()))
+    with caplog.at_level("WARNING"):
+        _default_registry()
+    assert "No se pudo leer Supabase" in caplog.text
+    assert "S3creta" not in caplog.text and "***" in caplog.text
