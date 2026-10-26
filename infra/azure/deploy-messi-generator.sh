@@ -128,8 +128,10 @@ identity_id="$(az identity show --resource-group "${resource_group}" --name "${i
 principal_id="$(az identity show --resource-group "${resource_group}" --name "${identity_name}" --query principalId --output tsv)"
 identity_client_id="$(az identity show --resource-group "${resource_group}" --name "${identity_name}" --query clientId --output tsv)"
 acr_id="$(az acr show --resource-group "${resource_group}" --name "${acr_name}" --query id --output tsv)"
+# El Job solo escribe en su contenedor: el permiso no abarca el resto de la cuenta.
+container_scope="${storage_id}/blobServices/default/containers/${container_name}"
 
-for role_and_scope in "AcrPull|${acr_id}" "Storage Blob Data Contributor|${storage_id}"; do
+for role_and_scope in "AcrPull|${acr_id}" "Storage Blob Data Contributor|${container_scope}"; do
   role="${role_and_scope%%|*}"
   scope="${role_and_scope#*|}"
   if [[ "$(az role assignment list --assignee-object-id "${principal_id}" --scope "${scope}" --role "${role}" --query 'length(@)' --output tsv)" == "0" ]]; then
