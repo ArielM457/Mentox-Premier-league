@@ -155,6 +155,8 @@ Quedan para decidir en equipo:
 - **Campos y barras.** Todos los select comparten un estilo con los colores del tema; en Chrome y Edge, también la lista desplegable. Las barras de desplazamiento son finas y siguen el tema.
 - **Modo claro.** Los comentarios en vivo, los interruptores y el select de velocidad seguían oscuros sobre fondo blanco. Ahora siguen el tema.
 
+Ya está en Azure, junto con la revisión general: la API, la interfaz, el procesador y el trabajo `replay` usan la imagen `5fd326b`. Solo cambió la imagen. La visión responde `ready`, la API sigue leyendo los 3 partidos de Supabase y las revisiones nuevas están sanas.
+
 ### Guía para el equipo
 
 [`docs/14-despliegue-en-azure.md`](../14-despliegue-en-azure.md) explica, paso a paso:
