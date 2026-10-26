@@ -13,7 +13,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Base de datos con partidos ficticios en Supabase.
   - Script que despliega todo en Azure.
   - La API usa la analítica real.
-  - Unión con `main` y con `develop`.
+  - Unión con `main`, con `develop` y con `integration/modelos-frontend-20261025` (Persona 1).
   - Dos reglas nuevas: situaciones del partido y lecturas «¿qué habría pasado si…?».
   - Pestaña Resumen con datos.
   - Guía para que cualquiera del equipo cree el entorno.
@@ -23,7 +23,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - El tablero local sigue en [`demo/tablero.html`](demo/tablero.html).
 - **Flujo continuo probado en Azure:** 178 eventos por Event Hubs, todos aplicados a tiempo, con 51 ms de transporte medio y 27 ms de procesamiento. El registro quedó en Blob y en Supabase.
 - **Siguiente:**
-  - Unir la rama `integration/modelos-frontend-20261025` de Persona 1 (modelos de visión en Azure).
+  - Volver a desplegar en Azure para que la demo muestre la pestaña «Visión IA».
   - Acordar los contratos con Persona 3.
   - Subir la rama y abrir el PR cuando el equipo lo decida.
 - **Bloqueos y avisos:**
@@ -72,7 +72,7 @@ Llegar hasta aquí costó tres intentos. Quedaron resueltos en el script y docum
   - `MATCH_SOURCE=supabase` lee los partidos de la base.
 - En Azure, la API comprobada lee los 3 partidos y el seguimiento de Supabase: el estado trae las velocidades de los 22 jugadores.
 
-### Unión con `main` y `develop`
+### Unión con `main`, `develop` y la integración de Persona 1
 
 - **`main` trajo la integración de Persona 1:** visión, enrutamiento de eventos y su propia persistencia en Supabase (esquema `public`). No choca con la nuestra.
 - **`develop` trajo la experiencia en vivo de Persona 4:**
@@ -90,7 +90,7 @@ Lo que adapté:
 | Cancha en vivo | `develop` la construyó sobre el formato viejo de seguimiento. Ahora usa nuestro modelo y entrega el mismo JSON (`TrackingFrame v1`), sin cambios en la interfaz. La simulación de posiciones volvió a `src/` porque la API la usa al ejecutarse |
 | Faltas, tarjetas y lesiones | Regla nueva `situation@1`. Ahora el motor real también las propone como momentos: la roja siempre, amarillas y lesión en todos los modos, faltas solo para el analista |
 | Campos nuevos de los eventos | Migración nueva en Supabase para guardar receptor, situación y duración de la detención |
-| Pestañas de la interfaz | Se conserva la estructura nueva de `develop`; el panel de visión de `main` se muestra en la pestaña Partido |
+| Pestañas de la interfaz | Se conserva la estructura nueva de `develop`, y la visión de Persona 1 tiene su propia pestaña, «Visión IA» (ver la unión con su rama más abajo) |
 | Imagen de Docker | Conserva la estructura del repositorio para que la previa táctica encuentre sus datos en Azure |
 
 ### Pestaña Resumen con analítica
@@ -108,11 +108,16 @@ Antes, el «resultado estimado» era el mismo texto para cualquier momento y la 
 
 Si una opción no aplica, la pestaña lo dice («el momento no incluye un remate»). Las posiciones son simuladas y la pestaña lo avisa: compara espacios, no predice el resultado. Funciona con el motor real y con el provisional, y ya responde desde Azure.
 
-### Ramas nuevas
+### Unión con `integration/modelos-frontend-20261025`
 
-`integration/modelos-frontend-20261025` (Persona 1) une `develop` con su visión y prepara el despliegue de sus modelos con GPU en Azure (Roboflow y SoccerNet, DV-US-30 y DV-US-31). No toca la analítica.
+Esta rama de Persona 1 une `develop` con su visión. También prepara el despliegue de sus modelos con GPU en Azure: Roboflow y SoccerNet, con las historias DV-US-30 y DV-US-31. No toca la analítica.
 
-Al unirla habrá 2 conflictos en la interfaz. Su solución es mejor que la nuestra: el panel de visión pasa a una pestaña propia, «Visión IA». Hay que conservar el `matchId` que el Resumen usa para cargar el análisis. Las demás ramas no tienen nada que falte en la nuestra.
+- **Ya está unida** a nuestra rama (commit `5d2b136`).
+- **Conflictos:** hubo 2, en la interfaz, y se resolvieron con su solución. El panel de visión pasa a una pestaña propia, «Visión IA», en lugar de ir dentro de la pestaña Partido. Así deja de pedir datos de visión en la pestaña principal.
+- **Resumen:** conserva el `matchId` con el que carga el análisis del momento.
+- **Comprobación:** las pruebas dan el mismo resultado (413 pasan; las 10 que fallan son las de `main`). La interfaz compila y en local muestra las cinco pestañas sin errores.
+
+Ahora nuestra rama contiene `main`, `develop` y esta integración; las demás ramas no tienen nada que falte en la nuestra. La demo en Azure mostrará la pestaña nueva cuando se vuelva a desplegar.
 
 ### Guía para el equipo
 
