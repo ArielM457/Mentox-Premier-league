@@ -413,9 +413,18 @@ if (-not $ImageTag) {
 }
 $apiImage = "$loginServer/match-intelligence-api:$ImageTag"
 $webImage = "$loginServer/match-intelligence-web:$ImageTag"
-$builds = @(@{ Image = $apiImage; Name = "match-intelligence-api:$ImageTag"; Context = (Join-Path $RepoRoot 'apps/backend') })
+# La API se construye desde la raíz: copia también los resultados de visión de
+# Persona 1 que están en docs/ (el .dockerignore de la raíz limita lo que se envía).
+$builds = @(@{
+        Image = $apiImage; Name = "match-intelligence-api:$ImageTag"; Context = $RepoRoot
+        File = (Join-Path $RepoRoot 'apps/backend/Dockerfile')
+    })
 if (-not $SkipWeb) {
-    $builds += @{ Image = $webImage; Name = "match-intelligence-web:$ImageTag"; Context = (Join-Path $RepoRoot 'apps/frontend') }
+    $frontend = Join-Path $RepoRoot 'apps/frontend'
+    $builds += @{
+        Image = $webImage; Name = "match-intelligence-web:$ImageTag"; Context = $frontend
+        File = (Join-Path $frontend 'Dockerfile')
+    }
 }
 
 Write-Step "Construyendo y publicando imágenes ($ImageTag)"
@@ -424,13 +433,14 @@ if ($useDocker) {
 }
 foreach ($build in $builds) {
     if ($useDocker) {
-        Invoke-Native 'docker' @('build', '--platform', 'linux/amd64', '--tag', $build.Image, $build.Context)
+        Invoke-Native 'docker' @('build', '--platform', 'linux/amd64', '--file', $build.File,
+            '--tag', $build.Image, $build.Context)
         Invoke-Native 'docker' @('push', $build.Image)
     }
     else {
         # Algunas suscripciones de estudiante no permiten ACR Tasks; en ese caso use Docker.
         Invoke-Native 'az' @('acr', 'build', '--registry', $registryName, '--image', $build.Name,
-            '--platform', 'linux/amd64', $build.Context)
+            '--platform', 'linux/amd64', '--file', $build.File, $build.Context)
     }
 }
 

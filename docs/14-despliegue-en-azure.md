@@ -194,6 +194,18 @@ $env:MENTOX_FUSION_ARTIFACT = "$r/dv-us-21-report-recalculado.json"
 
 Use el informe `recalculado`, que corresponde a las predicciones actuales. `.gitattributes` evita que Git cambie los finales de línea de esa carpeta; si la descargó antes, vuelva a obtenerla con `git checkout -- docs/mentox-modelos-20261023T045413Z`. Sin `MATCH_SOURCE`, la API usa los partidos sintéticos en memoria y no necesita Supabase.
 
+En Azure no hace falta definir nada: la imagen de la API copia esos tres archivos y trae las tres variables. Por eso se construye desde la raíz del repositorio, y el `.dockerignore` de la raíz envía solo el backend y esos resultados (unos 10 MB). Para probarla en su equipo:
+
+```powershell
+docker build -f apps/backend/Dockerfile -t mentox-local/api .
+```
+
+```powershell
+docker run --rm -p 8000:8000 -e ANALYTICS_ENGINE=persona2 mentox-local/api
+```
+
+`http://localhost:8000/api/v1/integration/status` debe responder `"status": "ready"`. La imagen no incluye el video, así que `video_available` sale en `false`; la pestaña no lo necesita.
+
 ## **7. Secretos**
 
 - La cadena de Supabase, las claves `sb_secret_…` y las contraseñas viven solo en variables de la terminal o en `apps/backend/.env`, que Git ignora.
@@ -214,7 +226,8 @@ Use el informe `recalculado`, que corresponde a las predicciones actuales. `.git
 | `ManagedClusterSuspended` | Azure suspendió el cómputo del entorno (nos ocurrió con un entorno recién recreado con el mismo nombre) | Ejecute con `-RecreateEnvironment`. Si se repite, deje la API y la interfaz en un entorno Express y corra el procesador desde un equipo |
 | La API no responde y sus registros dicen `connection is bad: connection to server at "2600:…" … Cannot assign requested address` | Se usó la conexión directa de Supabase (`db.<ref>.supabase.co`), que solo tiene IPv6; Container Apps sale por IPv4 | Use la del **Session pooler** (`…pooler.supabase.com`, usuario `postgres.<ref>`) y vuelva a desplegar. El script ahora la rechaza antes de desplegar, y la API arranca con los partidos sintéticos si no alcanza la base |
 | `MaxNumberOfRegionalEnvironmentsInSubExceeded` | Solo se permite un entorno por región | Borre el anterior (el script lo ofrece) o use otra región |
-| «Visión no disponible: No existe el artefacto requerido…» o `503` en `/api/v1/integration/*` | La API busca los resultados de visión de Persona 1 en `experiments/…/output-real`, que solo existen en su equipo | Apunte las tres variables `MENTOX_*_ARTIFACT` a `docs/mentox-modelos-20261023T045413Z/resultados` (sección 6) |
+| «Visión no disponible: No existe el artefacto requerido…» o `503` en `/api/v1/integration/*` | La API busca los resultados de visión de Persona 1 en `experiments/…/output-real`, que solo existen en su equipo | En local, apunte las tres variables `MENTOX_*_ARTIFACT` a `docs/mentox-modelos-20261023T045413Z/resultados` (sección 6). En Azure, vuelva a desplegar: las imágenes anteriores al 25 de octubre no traen esos archivos |
+| `COPY failed` o `not found` al construir la API | Se construyó con `apps/backend` como contexto, o el `.dockerignore` de la raíz no deja pasar un archivo nuevo | Construya desde la raíz con `-f apps/backend/Dockerfile .` y agregue el archivo al `.dockerignore` |
 | «El informe de fusión no corresponde a los archivos de predicciones actuales» | Git convirtió esos archivos a finales CRLF en Windows y cambió su huella SHA-256, o se usó el informe antiguo | `git checkout -- docs/mentox-modelos-20261023T045413Z` (con el `.gitattributes` actual) y use `dv-us-21-report-recalculado.json` |
 | Docker no responde | Docker Desktop cerrado | Ábralo y espere a que diga que está en marcha |
 | ACR Tasks no permitido | Algunas suscripciones de estudiante lo bloquean | Use Docker local (es lo predeterminado); no use `-UseAcrBuild` |

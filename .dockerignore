@@ -1,0 +1,22 @@
+# Contexto de las imágenes que se construyen desde la raíz del repositorio:
+#   apps/backend/Dockerfile              API, procesador continuo y repetición (Azure)
+#   apps/backend/Dockerfile.integration  compose.integration.yml
+# Se envía solo lo que copian. Si una de ellas copia algo nuevo, agréguelo aquí.
+*
+!apps/backend/pyproject.toml
+!apps/backend/uv.lock
+!apps/backend/src
+!apps/backend/data
+!apps/backend/scripts
+!experiments/video_sync_diagnostic
+
+# Resultados de los modelos de visión de Persona 1 para la pestaña «Visión IA».
+!docs/mentox-modelos-20261023T045413Z/resultados/roboflow-sports-predictions.json
+!docs/mentox-modelos-20261023T045413Z/resultados/soccernet-predictions.json
+!docs/mentox-modelos-20261023T045413Z/resultados/dv-us-21-report-recalculado.json
+
+**/__pycache__
+**/*.pyc
+**/*.egg-info
+**/.env
+**/.env.*

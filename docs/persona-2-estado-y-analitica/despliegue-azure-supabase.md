@@ -235,7 +235,8 @@ La API lee los partidos al arrancar. Si vuelve a cargar los datos, reinicie la A
 | `scripts/analytics_stream_worker.py` | Con `SUPABASE_DB_URL`, también lee metadatos y guarda registros en Supabase |
 | `scripts/replay_match_to_event_hubs.py` | Repite un partido de Supabase en `match-events` |
 | `scripts/supabase_seed.py` y `tests/supabase_seed_data.py` | Carga de los datos ficticios |
-| `apps/backend/Dockerfile`, `apps/frontend/Dockerfile`, `apps/frontend/nginx/` | Imágenes de la API y de la interfaz |
+| `apps/backend/Dockerfile`, `apps/frontend/Dockerfile`, `apps/frontend/nginx/` | Imágenes de la API y de la interfaz. La de la API se construye desde la raíz y copia los resultados de visión de Persona 1 |
+| `.dockerignore` (raíz) | Lo único que se envía al construir desde la raíz: el backend, los tres resultados de visión y el diagnóstico de `compose.integration.yml` |
 | `infra/azure/analytics-platform.bicep`, `modules/analytics-roles.bicep` | Plataforma completa |
 | `infra/azure/deploy-analytics.ps1`, `remove-analytics.ps1` | Despliegue y borrado |
 | `infra/supabase/migrations/` | Esquema `match_analytics` |

@@ -56,9 +56,11 @@ SUPABASE_TEST_DB_URL=postgresql://postgres@127.0.0.1:55432/postgres .venv/Script
 ```
 
 ```bash
-docker build -t mentox-local/match-intelligence-api:test apps/backend
+docker build -f apps/backend/Dockerfile -t mentox-local/match-intelligence-api:test .
 docker build -t mentox-local/match-intelligence-web:test apps/frontend
 ```
+
+La imagen de la API se construye desde la raíz desde el 25 de octubre de 2026 (ver «Resultados de visión en la imagen»).
 
 ## Resultado
 
