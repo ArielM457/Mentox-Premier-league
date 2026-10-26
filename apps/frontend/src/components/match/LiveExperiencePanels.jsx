@@ -25,7 +25,7 @@ function teamName(metadata, teamId) {
 
 export function MomentSelector({ moments, selected, onSelect }) {
   const { t } = usePreferences()
-  if (!moments.length) return <p className="moment-selector empty">{t.match.noMoments}</p>
+  if (!moments.length) return null
   const index = Math.max(0, moments.findIndex((moment) => moment.message_id === selected?.message_id))
   const move = (amount) => onSelect(moments[(index + amount + moments.length) % moments.length])
   return (
@@ -194,7 +194,7 @@ export function VisionPanel({ timeMs, seekVersion }) {
   }, [second, seekVersion])
 
   if (error) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionUnavailable}: {error}</p></section>
+    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionMissing}</p></section>
   }
   if (!status || !timeline) {
     return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.common.loading}</p></section>

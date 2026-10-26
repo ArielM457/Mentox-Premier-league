@@ -29,7 +29,11 @@ export function PreferencesProvider({ children }) {
 
   const value = useMemo(() => {
     const update = (changes) => setPreferences((current) => ({ ...current, ...changes }))
-    // Lo que se envía a la API. Sin jugador favorito, el modo jugador cae a casual en vez de fallar.
+    return { preferences, update, t: strings[preferences.language] }
+  }, [preferences])
+
+  // Los cambios visuales no reinician las consultas ni el canal del partido.
+  const apiPreferences = useMemo(() => {
     const apiPreferences = {
       language: preferences.language,
       mode: preferences.mode === 'player' && !preferences.favoritePlayerId ? 'casual' : preferences.mode,
@@ -37,8 +41,8 @@ export function PreferencesProvider({ children }) {
       favoriteTeamId: preferences.favoriteTeamId,
       favoritePlayerId: preferences.favoritePlayerId,
     }
-    return { preferences, update, apiPreferences, t: strings[preferences.language] }
-  }, [preferences])
+    return apiPreferences
+  }, [preferences.language, preferences.mode, preferences.level, preferences.favoriteTeamId, preferences.favoritePlayerId])
 
-  return <PreferencesContext.Provider value={value}>{children}</PreferencesContext.Provider>
+  return <PreferencesContext.Provider value={{ ...value, apiPreferences }}>{children}</PreferencesContext.Provider>
 }

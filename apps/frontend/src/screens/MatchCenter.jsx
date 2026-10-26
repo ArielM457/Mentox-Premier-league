@@ -16,7 +16,8 @@ import { Pitch } from '../components/match/Pitch.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
 import { AnnouncerPanel, InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
+import { Tabs } from '../components/ui/Tabs.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
 const TABS = ['overview', 'events', 'stats', 'tactical', 'insights']
@@ -33,15 +34,13 @@ export function MatchCenter({ matchId }) {
       <section className="match-content">
         <header className="dark-header">
           <div>
-            <span className="section-kicker">{t.match.kicker} · {t.matches.scenario[matchId] ?? matchId}</span>
             <h1>{t.match.title}</h1>
           </div>
-          <div className="header-live">
-            <span className="live-dot" /> {t.match.live}
-          </div>
+          <span className="replay-notice">{t.common.syntheticData}</span>
         </header>
         <ErrorNotice message={error && t.common.apiDown} onRetry={reload} retryLabel={t.common.retry} />
         {catalog && !match && <ErrorNotice message={`404 · ${matchId}`} />}
+        {!catalog && !error && <LoadingScreen />}
         {match && <LiveMatch key={match.id} match={match} />}
       </section>
     </AppShell>
@@ -54,17 +53,18 @@ function LiveMatch({ match }) {
   const matchId = match.id
   const metadata = match.metadata
   const videoRef = useRef(null)
-  const liveDurationMs = Math.min(match.durationMs, 300_000)
-  const clock = useMatchClock(liveDurationMs, videoRef)
+  const liveDurationMs = match.durationMs
+  const clock = useMatchClock(liveDurationMs, videoRef, matchId)
   const [seekVersion, setSeekVersion] = useState(0)
   const [snapshot, setSnapshot] = useState(null)
   const [tab, setTab] = useState('overview')
   const [popover, setPopover] = useState(null)
   const [actionError, setActionError] = useState(null)
   const [simulating, setSimulating] = useState(false)
-  const [simulationStarted, setSimulationStarted] = useState(false)
+  const [simulationStarted, setSimulationStarted] = useState(() => clock.time > 0)
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedMomentId, setSelectedMomentId] = useState(null)
+  const [visionOpen, setVisionOpen] = useState(false)
   const tabs = preferences.mode === 'analyst' && preferences.liveComments ? [...TABS, 'comments'] : TABS
   const activeTab = tabs.includes(tab) ? tab : 'overview'
 
@@ -94,12 +94,14 @@ function LiveMatch({ match }) {
   const seek = useCallback((value) => {
     const next = Math.min(Math.max(0, value), liveDurationMs)
     clock.seek(next)
+    if (next > 0) setSimulationStarted(true)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'seek', next))
     notify(api.visionPlayback('seek', next))
   }, [clock, liveDurationMs, matchId])
 
   const play = () => {
+    setSimulationStarted(true)
     clock.play()
     notify(api.playback(matchId, 'play', clock.timeRef.current))
     notify(api.visionPlayback('play', clock.timeRef.current))
@@ -110,6 +112,7 @@ function LiveMatch({ match }) {
     notify(api.visionPlayback('pause', clock.timeRef.current))
   }
   const replay = () => {
+    setSimulationStarted(true)
     clock.seek(0)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'restart'))
@@ -121,6 +124,7 @@ function LiveMatch({ match }) {
   const history = pastOverlays(live.overlays, clock.time)
   const current = overlay ?? history[0] ?? null
   const moments = history.filter((moment) => !moment.suppressed)
+  const timelineMoments = moments.filter((moment) => ['goal', 'shot', 'recovery', 'turnover'].includes(moment.kind) || moment.priority >= 70)
   const selectedMoment = moments.find((moment) => moment.message_id === selectedMomentId) ?? current
   const finished = clock.time >= liveDurationMs
   const minute = snapshot
@@ -133,13 +137,14 @@ function LiveMatch({ match }) {
   }
 
   async function startSimulation() {
-    setSimulationStarted(true)
     setSimulating(true)
     setActionError(null)
-    if (finished) replay()
-    else play()
+    if (finished) seek(0)
+    pause()
     try {
       await api.simulate(matchId, apiPreferences)
+      play()
+      live.resync()
     } catch (error) {
       setActionError(error.message)
     } finally {
@@ -153,7 +158,7 @@ function LiveMatch({ match }) {
   }
 
   function changeMode(mode) {
-    update({ mode, liveComments: mode === 'analyst' ? true : preferences.liveComments })
+    update({ mode })
     if (mode !== 'analyst' && tab === 'comments') setTab('overview')
   }
 
@@ -177,23 +182,23 @@ function LiveMatch({ match }) {
     },
     selectedPlayerId,
     timeMs: clock.time,
-    label: t.match.timeline,
+    label: t.match.tabs.overview,
   }
 
   return (
     <div onKeyDown={onKeyDown}>
-      <MatchScore metadata={metadata} minute={minute} score={snapshot?.score} status="LIVE" statusLabel={t.matches.status.LIVE} />
+      <MatchScore metadata={metadata} minute={minute} score={snapshot?.score} status={finished ? "FT" : "LIVE"} statusLabel={finished ? t.matches.status.FT : t.matches.status.LIVE} />
       <div className="simulation-toolbar">
         <div>
           <strong>{t.match.liveExperienceTitle}</strong>
-          <span>{simulationStarted ? t.match.liveExperienceRunning : t.match.liveExperienceCopy}</span>
+          <span>{simulating ? t.common.loading : simulationStarted ? (clock.playing ? t.match.playingState : t.match.pauseState) : t.match.liveExperienceCopy}</span>
         </div>
         <div className="live-toolbar-actions">
           <div className="live-mode-switch" aria-label={t.match.viewMode} role="group">
             {['casual', 'analyst'].map((mode) => <button aria-pressed={preferences.mode === mode} className={preferences.mode === mode ? 'active' : ''} key={mode} onClick={() => changeMode(mode)} type="button">{t.modes[mode].name}</button>)}
           </div>
           {!simulationStarted ? (
-            <Button disabled={simulating} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {t.match.startLive}</Button>
+            <Button disabled={simulating} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {simulating ? t.common.loading : t.match.startLive}</Button>
           ) : (
             <>
               <Button onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {clock.playing ? t.match.pauseLive : t.match.resumeLive}</Button>
@@ -202,13 +207,8 @@ function LiveMatch({ match }) {
           )}
         </div>
       </div>
-      <nav className="match-tabs" role="tablist">
-        {tabs.map((item) => (
-          <button aria-selected={activeTab === item} className={activeTab === item ? 'active' : ''} key={item} onClick={() => setTab(item)} role="tab" type="button">
-            {t.match.tabs[item]}
-          </button>
-        ))}
-      </nav>
+      {simulating && <LoadingScreen message={t.common.loading} compact />}
+      <Tabs items={tabs.map((key) => [key, t.match.tabs[key]])} value={activeTab} onChange={setTab} label={t.match.viewTabs} id="match-view" />
 
       <ErrorNotice message={actionError || live.error} onRetry={() => { setActionError(null); live.resync() }} retryLabel={t.common.retry} />
 
@@ -223,7 +223,7 @@ function LiveMatch({ match }) {
         </div>
       )}
 
-      <div className="match-layout">
+      <div className="match-layout" id="match-view-panel" role="tabpanel" aria-labelledby={`match-view-${activeTab}`}>
         <div className="pitch-column">
           {activeTab === 'comments' ? (
             <LiveCommentsPanel events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />
@@ -237,15 +237,11 @@ function LiveMatch({ match }) {
             <TacticalPanel events={pastEvents} metadata={metadata} playing={clock.playing} timeMs={clock.time} />
           ) : (
             <div className="pitch-wrap">
-              <div className="pitch-meta">
-                <span>
-                  <Icon name="spark" size={16} /> {activeTab === 'tactical' ? t.match.tacticalCopy : t.match.selected}
-                </span>
-                <strong>{current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
-                <span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>
+              <div className="pitch-meta"><span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>{current && <strong>{formatMatchClock(current, t.match.period)} · {current.headline}</strong>}</div>
+              <div className="pitch-stage">
+                <Pitch {...pitchProps} events={pastEvents} trail={6} />
+                <div className="overlay-zone" aria-live="polite" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>
               </div>
-              <Pitch {...pitchProps} events={pastEvents} trail={6} />
-              <div className="overlay-zone" aria-live="assertive" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>
               {popover?.player && (
                 <button className="player-popover" onClick={() => setPopover(null)} type="button">
                   <strong>
@@ -258,17 +254,16 @@ function LiveMatch({ match }) {
                   <Icon name="close" size={15} />
                 </button>
               )}
-              <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
             </div>
           )}
 
-          {activeTab === 'overview' && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}
-
-          <div className="playback">
+      <section className="replay-controls" aria-label={t.match.timeline}>
+        <div className="timeline-heading"><strong>{t.match.timelineTitle}</strong><span>{timelineMoments.length ? `${timelineMoments.length} · ${t.match.tabs.events}` : t.match.timelineEmpty}</span></div>
+        <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>
               {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
             </Button>
-            <Timeline durationMs={liveDurationMs} label={t.match.timeline} moments={moments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
+            <Timeline durationMs={liveDurationMs} label={t.match.timeline} moments={timelineMoments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
             <div className="playback-tools">
               <span className="playback-time">{formatClock(clock.time)} / {formatClock(liveDurationMs)}</span>
               <label className="speed-select">
@@ -282,6 +277,12 @@ function LiveMatch({ match }) {
               </Button>
             </div>
           </div>
+      </section>
+          {activeTab === 'overview' && <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />}
+
+          {activeTab === 'overview' && <details className="vision-details" open={visionOpen} onToggle={(event) => setVisionOpen(event.currentTarget.open)}><summary>{t.match.visionDetails}</summary><p>{t.match.visionDescription}</p>{visionOpen && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}</details>}
+
+
           <div className="event-chips">
             {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
               <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">

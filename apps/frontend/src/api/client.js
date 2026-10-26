@@ -31,6 +31,7 @@ async function request(path, options = {}) {
   let response
   try {
     response = await fetch(path, {
+      signal: AbortSignal.timeout(20_000),
       ...options,
       headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
     })

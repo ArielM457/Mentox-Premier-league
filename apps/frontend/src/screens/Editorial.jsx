@@ -1,10 +1,11 @@
+import { NarrativeCopy } from '../components/ui/NarrativeCopy.jsx'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
 // Revisión editorial (RF-38) y reportes de error (RF-39).
@@ -19,12 +20,15 @@ export function Editorial() {
   const [note, setNote] = useState('')
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [inject, setInject] = useState(false)
   const selected = matchId || catalog?.matches[0]?.id || ''
   const selectedMatch = catalog?.matches.find((m) => m.id === selected)
 
   const refresh = useCallback(async () => {
     if (!selected) return
+    setLoading(true)
     try {
       const [q, r] = await Promise.all([api.editorial(selected), api.reports(selected)])
       setQueue(q)
@@ -32,7 +36,7 @@ export function Editorial() {
       setError(null)
     } catch (err) {
       setError(err.message)
-    }
+    } finally { setLoading(false) }
   }, [selected])
 
   useEffect(() => {
@@ -40,13 +44,15 @@ export function Editorial() {
   }, [refresh])
 
   async function decide(draftId, decision) {
+    setBusy(true)
     try {
       await api.review(selected, draftId, decision, reviewer, note)
       setNote('')
-      refresh()
+      await refresh()
+      setNotice(copy.decisionSaved)
     } catch (err) {
       setError(err.message)
-    }
+    } finally { setBusy(false) }
   }
 
   async function reloadMatch() {
@@ -74,6 +80,7 @@ export function Editorial() {
         <ErrorNotice message={(catalogError && t.common.apiDown) || error} onRetry={catalogError ? reload : refresh} retryLabel={t.common.retry} />
 
         <div className="profile-card">
+          <div className="editorial-intro"><span className="empty-icon"><Icon name="shield" size={24} /></span><div><h2>{copy.workspace}</h2><p>{copy.workspaceCopy}</p></div></div>
           <div className="editorial-fields">
             <label>
               <span>{copy.match}</span>
@@ -87,7 +94,7 @@ export function Editorial() {
             </label>
             <label>
               <span>{copy.reviewer}</span>
-              <input maxLength={80} onChange={(event) => setReviewer(event.target.value)} value={reviewer} />
+              <input maxLength={80} onChange={(event) => setReviewer(event.target.value)} placeholder={copy.reviewerPlaceholder} value={reviewer} />
             </label>
             <label>
               <span>{copy.note}</span>
@@ -96,8 +103,11 @@ export function Editorial() {
           </div>
 
           <div className="preference-block">
-            <h3>{copy.queue}</h3>
-            {queue.length === 0 ? (
+            <div className="editorial-section-title"><h3>{copy.queue}</h3><span className="count-badge">{queue.length}</span></div>
+            {!reviewer.trim() && <p className="muted-copy">{copy.reviewerHint}</p>}
+            {loading && <LoadingScreen compact />}
+            {notice && <p role="status" className="success-copy">{notice}</p>}
+            {!loading && queue.length === 0 ? (
               <p className="muted-copy">{copy.empty}</p>
             ) : (
               <ul className="review-list">
@@ -106,18 +116,18 @@ export function Editorial() {
                     <div>
                       <span className={`editorial-status status-${record.status}`}>{t.recap.status[record.status]}</span>
                       <strong>{record.draft.headline}</strong>
-                      <p>{record.draft.explanation}</p>
+                      <NarrativeCopy text={record.draft.explanation} />
                       <small>
-                        {record.draft.applied_preferences.join(' · ')}
+                        {record.draft.applied_preferences.map((item) => { const [key, value] = item.split(':'); return key === 'language' ? (value === 'es' ? 'Español' : 'English') : key === 'mode' ? t.modes[value]?.name : key === 'level' ? t.levels[value]?.name : catalog?.players.find((player) => player.player_id === value)?.name || catalog?.clubs.find((club) => club.team_id === value)?.name }).filter(Boolean).join(' · ')}
                         {record.reviewer && ` — ${record.reviewer}${record.note ? `: ${record.note}` : ''}`}
                       </small>
                     </div>
                     {record.status === 'pending' && (
                       <div className="review-actions">
-                        <Button disabled={!reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'approve')}>
+                        <Button disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'approve')}>
                           <Icon name="check" size={17} /> {copy.approve}
                         </Button>
-                        <Button variant="ghost" className="danger" disabled={!reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'reject')}>
+                        <Button variant="secondary" className="review-reject" disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'reject')}>
                           <Icon name="close" size={17} /> {copy.reject}
                         </Button>
                       </div>

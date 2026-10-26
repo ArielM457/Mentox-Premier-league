@@ -3,6 +3,11 @@ import { usePreferences } from '../../app/preferences.js'
 import { navigate, paths } from '../../app/router.js'
 import { Brand } from '../ui/Brand.jsx'
 import { Icon } from '../ui/Icon.jsx'
+import { useCatalog } from '../../hooks/useCatalog.js'
+import { LoadingScreen } from '../ui/Feedback.jsx'
+import { ThemeToggle } from '../ui/ThemeToggle.jsx'
+import { SessionDialog } from '../ui/SessionDialog.jsx'
+import { readDemoSession } from '../../lib/session.js'
 
 const SIDEBAR_KEY = 'itg:sidebar'
 
@@ -24,7 +29,10 @@ function readCollapsed() {
 // Marco común de las pantallas internas: barra lateral en escritorio y barra inferior en móvil.
 export function AppShell({ active, children }) {
   const { preferences, t } = usePreferences()
+  const { data: catalog, error: catalogError } = useCatalog()
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  const [user, setUser] = useState(readDemoSession)
+  const [sessionOpen, setSessionOpen] = useState(false)
 
   function toggle() {
     const next = !collapsed
@@ -38,6 +46,7 @@ export function AppShell({ active, children }) {
 
   return (
     <main className={`app-shell ${preferences.theme === 'light' ? 'light-shell' : 'dark-shell'}`}>
+      <a href="#page-content" className="skip-link" onClick={(event) => { event.preventDefault(); document.getElementById('page-content')?.focus() }}>{t.common.skipContent}</a>
       <aside className={`app-sidebar ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-top">
           <button className="brand-link" type="button" onClick={() => navigate(paths.landing())} aria-label="Inside the Game">
@@ -61,11 +70,11 @@ export function AppShell({ active, children }) {
             </button>
           ))}
         </nav>
-        <button className="sidebar-profile" onClick={() => navigate(paths.profile())} type="button">
-          <span>IN</span>
+        <button className="sidebar-profile" onClick={() => setSessionOpen(true)} type="button">
+          <span>{user ? user.slice(0, 2).toUpperCase() : 'IN'}</span>
           <div>
-            <strong>{t.nav.guest}</strong>
-            <small>{t.nav.preferences}</small>
+            <strong>{user || t.nav.guest}</strong>
+            <small>{user ? t.session.account : t.session.title}</small>
           </div>
           <Icon name="arrow" size={15} />
         </button>
@@ -84,7 +93,12 @@ export function AppShell({ active, children }) {
           </button>
         ))}
       </nav>
-      {children}
+      <div className="shell-toolbar">
+        <ThemeToggle />
+        <button className="account-button" onClick={() => setSessionOpen(true)} type="button"><Icon name="user" size={18} />{user || t.nav.guest}</button>
+      </div>
+      <div id="page-content" tabIndex={-1}>{!catalog && !catalogError ? <LoadingScreen /> : children}</div>
+      {sessionOpen && <SessionDialog user={user} onSession={setUser} onClose={() => setSessionOpen(false)} />}
     </main>
   )
 }
