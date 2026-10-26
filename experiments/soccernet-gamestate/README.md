@@ -1,9 +1,9 @@
 # SoccerNet Game State Reconstruction en GPU
 
 Este experimento ejecuta el baseline oficial de `SoccerNet/sn-gamestate` sobre
-una secuencia pública de validación de SoccerNet GSR. Permite comprobar en GPU
-la detección, reidentificación, tracking, calibración, dorsal, equipo y minimapa
-antes de crear un adaptador para el vídeo autorizado de Mentox.
+una secuencia pública de validación o un MP4 sintético/autorizado. TrackLab
+1.3.24 incluye `ExternalVideo`; el lanzador selecciona ese dataset cuando se
+define `MENTOX_GAMESTATE_VIDEO_PATH` y exporta el estado a JSONL auditable.
 
 ## Fuente fijada
 
@@ -65,20 +65,42 @@ MENTOX_GAMESTATE_FRAME_LIMIT=750 \
 bash experiments/soccernet-gamestate/run-gpu.sh
 ```
 
+MP4 propio, sintético o autorizado:
+
+```bash
+MENTOX_GAMESTATE_VIDEO_PATH="/ruta/partido.mp4" \
+MENTOX_GAMESTATE_FRAME_LIMIT=250 \
+bash experiments/soccernet-gamestate/run-gpu.sh
+```
+
 Los resultados quedan en:
 
 ```text
 experiments/soccernet-gamestate/output/sn-gamestate.pklz
+experiments/soccernet-gamestate/output/gamestate-observations.jsonl
 experiments/soccernet-gamestate/output/run/
+```
+
+Normalice el JSONL para el backend Python 3.12:
+
+```bash
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 \
+  python apps/backend/scripts/adapt_soccernet_gamestate.py \
+  --input experiments/soccernet-gamestate/output/gamestate-observations.jsonl \
+  --observations-output experiments/soccernet-gamestate/output/vision-observations.jsonl \
+  --tracking-output experiments/soccernet-gamestate/output/tracking-frames.jsonl \
+  --match-id messi-001 \
+  --fps 15
 ```
 
 ## Límite actual
 
-El baseline oficial trabaja sobre un dataset TrackLab y no expone una interfaz
-estable documentada para pasar cualquier MP4. Este smoke no procesa todavía el
-vídeo autorizado de Mentox. Primero debe demostrar que la instalación oficial,
-los pesos y todos los módulos funcionan en la GPU. Después se implementará un
-adaptador de dataset para el MP4 y un exportador JSON hacia `VisionObservation`.
+El soporte MP4 y el exportador están implementados, pero todavía requieren una
+ejecución completa con GPU, pesos y un vídeo del proyecto. El modo MP4 evita
+crear anotaciones SoccerNet ficticias; utiliza el adaptador `ExternalVideo`
+incluido en TrackLab 1.3.24. La calidad con el render sintético de MESSI sigue
+pendiente de medición.
 
 No se presenta un dorsal como identidad nominal. Aunque el modelo proponga
 equipo y dorsal, `player_id` seguirá vacío hasta asociarlo con evidencia externa.

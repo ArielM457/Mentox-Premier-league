@@ -2,20 +2,22 @@
 set -euo pipefail
 
 cat >&2 <<'EOF'
-SoccerNet GameState NO está listo para desplegar como API de Mentox.
+SoccerNet GameState NO está listo todavía para desplegar como API de The Prime Moment.
 
 Motivos verificables:
-- el baseline oficial recibe un dataset SoccerNet GSR/TrackLab, no un MP4 arbitrario;
+- TrackLab 1.3.24 acepta MP4 mediante ExternalVideo y el adaptador está implementado;
 - requiere descargar pesos y datos sujetos a las condiciones de SoccerNet;
-- aún falta convertir su salida a VisionObservation y probar el adaptador con vídeo autorizado;
-- DV-US-27 sigue pendiente de una ejecución completa.
+- la conversión a VisionObservation está verificada localmente, no con una salida real;
+- DV-US-27 y DV-US-33 siguen pendientes de una inferencia GPU completa.
 
 Primero ejecute y documente el smoke local:
-  bash experiments/soccernet-gamestate/run.sh
+  MENTOX_GAMESTATE_VIDEO_PATH=/ruta/video-permitido.mp4 \
+    bash experiments/soccernet-gamestate/run.sh
 
 No se crea ningún recurso Azure para evitar costo y una falsa sensación de integración.
 Consulte:
   experiments/soccernet-gamestate/README.md
   docs/persona-1-datos-y-vision/evidencias/DV-US-27.md
+  docs/persona-1-datos-y-vision/evidencias/DV-US-33.md
 EOF
 exit 2

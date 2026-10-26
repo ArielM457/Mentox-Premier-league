@@ -1,0 +1,21 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH=/opt/venv/bin:$PATH
+
+WORKDIR /workspace
+
+RUN python -m pip install --no-cache-dir "uv>=0.8,<1"
+
+COPY pyproject.toml uv.lock /workspace/
+RUN uv sync --project /workspace --frozen --no-dev --no-install-project
+
+COPY src /workspace/src
+COPY scripts/run_important_event_worker.py /workspace/scripts/run_important_event_worker.py
+RUN uv sync --project /workspace --frozen --no-dev
+
+USER 65532:65532
+
+CMD ["python", "/workspace/scripts/run_important_event_worker.py", "--max-messages", "10", "--wait-seconds", "5"]

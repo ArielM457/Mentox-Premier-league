@@ -17,6 +17,23 @@ La autenticación local mediante claves compartidas está deshabilitada. Las apl
 
 La cola durable está desactivada por defecto para no generar un recurso con costo sin revisión. Para desplegarla, establezca `deployDurableImportantQueue = true`, ejecute `what-if` y confirme la cuota de `Microsoft.ServiceBus` en la región elegida.
 
+Cuando Storage y los modelos ya existen, use `messaging-topology.bicep`. Esta
+plantilla administra solamente Event Hubs, sus grupos de consumidores y Service
+Bus. No reconcilia Blob Storage, Container Apps, identidades ni trabajos GPU.
+
+```bash
+az deployment group what-if \
+  --resource-group "rg-mentox-dev" \
+  --template-file infra/azure/messaging-topology.bicep \
+  --parameters infra/azure/messaging-topology.dev.bicepparam
+
+az deployment group create \
+  --name "mentox-messaging-topology" \
+  --resource-group "rg-mentox-dev" \
+  --template-file infra/azure/messaging-topology.bicep \
+  --parameters infra/azure/messaging-topology.dev.bicepparam
+```
+
 ## Requisitos
 
 - Azure CLI.

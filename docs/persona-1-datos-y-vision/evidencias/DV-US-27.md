@@ -3,7 +3,7 @@
 ## Identificación
 
 - **Historia:** DV-US-27 · Evaluar SoccerNet Game State Reconstruction en GPU.
-- **Estado:** implementada y ajustada para 6 GB; ejecución pendiente con descarga automática oficial.
+- **Estado:** contenedor y adaptador MP4 implementados; ejecución GPU completa pendiente.
 - **Prioridad:** P2.
 - **Última actualización:** 22 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
@@ -104,9 +104,9 @@ git diff --check
 1. Construir la imagen en el equipo GPU.
 2. Registrar GPU, VRAM, CUDA, descargas, duración y errores.
 3. Revisar el vídeo/minimapa y el estado de tracking.
-4. Crear un exportador del estado a JSON trazable.
-5. Implementar y verificar el adaptador del vídeo autorizado.
-6. Publicar esas salidas como `VisionObservation`, nunca como `MatchEvent` directo.
+4. Ejecutar el exportador del estado a JSON trazable implementado en DV-US-33.
+5. Verificar el adaptador MP4 de DV-US-33 con una inferencia completa.
+6. Publicar una muestra como `VisionObservation`, nunca como `MatchEvent` directo.
 
 ## Aclaración sobre datos
 
@@ -117,10 +117,11 @@ el dataset GameState y los pesos del baseline al ejecutar `tracklab -cn
 soccernet`. No hace falta incluirlos en el ZIP. Se necesita conexión, espacio en
 disco y, si el proveedor solicita acceso, una cuenta autorizada del operador.
 
-La estructura final esperada es
-`experiments/soccernet-gamestate/data/SoccerNetGS/{train,valid,test,challenge}`;
-el smoke consume `valid`. Por tanto, DV-US-27 continúa pendiente y debe repetirse
-con el lanzador corregido.
+El smoke oficial continúa usando
+`experiments/soccernet-gamestate/data/SoccerNetGS/{train,valid,test,challenge}`.
+Para vídeos propios, TrackLab 1.3.24 incluye `ExternalVideo`; DV-US-33 lo activa
+mediante `dataset=video` y evita fabricar anotaciones SoccerNet. DV-US-27 sigue
+pendiente hasta ejecutar el pipeline completo en GPU.
 
 La verificación local del 22 de octubre de 2026 confirmó sintaxis Bash válida,
 compilación del adaptador T-DEED, `git diff --check` limpio y **161 pruebas del

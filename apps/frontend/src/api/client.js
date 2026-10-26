@@ -32,7 +32,7 @@ async function request(path, options = {}) {
   try {
     response = await fetch(path, {
       ...options,
-      headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
+      headers: options.headers ?? (options.body ? { 'Content-Type': 'application/json' } : undefined),
     })
   } catch {
     throw new ApiError('No hay conexión con la API', 0)
@@ -100,11 +100,17 @@ export const api = {
       body: JSON.stringify({ action, video_time_ms: t == null ? null : Math.floor(t) }),
     }),
   visionStatus: () => request('/api/v1/integration/status'),
+  visionLiveStatus: () => request('/api/v1/integration/live/status'),
+  prepareVisionModels: () => request('/api/v1/integration/live/models/prepare', { method: 'POST' }),
   visionTimeline: (start, end, limit = 40) =>
     request(`/api/v1/integration/timeline?start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&spatial_limit=${limit}`),
-  visionPlayback: (action, t) =>
+  visionPlayback: (action, t, matchId) =>
     request(`/api/v1/integration/live/playback/${action}`, {
       method: 'POST',
-      body: action === 'restart' ? undefined : JSON.stringify({ video_time_ms: Math.floor(t) }),
+      body: JSON.stringify({ video_time_ms: Math.floor(t ?? 0), match_id: matchId }),
     }),
+  captureVisionFrame: (matchId, t, image) => request(
+    `/api/v1/integration/live/capture/frame?match_id=${encodeURIComponent(matchId)}&video_time_ms=${Math.floor(t)}`,
+    { method: 'POST', body: image, headers: { 'Content-Type': image.type || 'image/jpeg' } },
+  ),
 }

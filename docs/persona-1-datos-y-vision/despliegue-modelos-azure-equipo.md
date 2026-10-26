@@ -8,9 +8,11 @@ Esta guía permite que un integrante del equipo despliegue los modelos que ya ti
 |---|---|---|---|
 | Roboflow Suite | Imagen JPEG, PNG o WebP | Jugadores, árbitro, balón y puntos del campo | Preparado para desplegar |
 | SoccerNet TeamSpotting | Clip MP4 de hasta 90 segundos | Candidatos de acciones con tiempo, equipo y confianza | Preparado para desplegar |
-| SoccerNet GameState | Dataset SoccerNet GSR/TrackLab | Estado, tracking, equipo, dorsal y calibración | Bloqueado hasta crear y verificar el adaptador para MP4 |
+| SoccerNet GameState | MP4 mediante TrackLab `ExternalVideo` | Estado, tracking, equipo, dorsal y calibración | Adaptador implementado; inferencia GPU pendiente |
 
-GameState no se crea en Azure todavía. Su script de preflight explica el bloqueo y evita generar costos por un contenedor que no acepta la entrada de la aplicación.
+GameState no se crea en Azure todavía. Su adaptador MP4 está implementado en
+DV-US-33, pero falta ejecutar el pipeline completo y comprobar calidad, memoria
+y duración antes de autorizar costos en Azure.
 
 ## Requisitos del equipo
 
@@ -61,6 +63,39 @@ bash infra/azure/deploy-soccernet-teamspotting.sh
 
 Los scripts son idempotentes: actualizan la aplicación si ya existe. La etiqueta se calcula a partir del contenido del paquete, por lo que un ZIP modificado genera una etiqueta nueva aunque no tenga un commit nuevo.
 
+## Procedimiento de Ariel para TeamSpotting
+
+Ariel debe usar el script operativo específico. Este despliega en escala cero, fuerza una sola revisión activa y separa claramente el encendido del apagado:
+
+```bash
+cd /ruta/al/proyecto
+
+export MENTOX_MODEL_API_KEY="$(openssl rand -hex 32)"
+export MENTOX_ACCEPT_MODEL_LICENSES=1
+export MENTOX_IMAGE_BUILD_MODE=local
+
+bash infra/azure/teamspotting-ariel.sh deploy
+bash infra/azure/teamspotting-ariel.sh start
+```
+
+`start` deja una réplica T4 encendida y espera a que `/health/ready` responda correctamente. Solo después de ver `TeamSpotting está listo` debe comenzar la prueba. Así el tiempo de carga de CUDA y de los pesos no se mezcla con la latencia del partido.
+
+Para consultar el estado y apagar el servicio al terminar:
+
+```bash
+bash infra/azure/teamspotting-ariel.sh status
+bash infra/azure/teamspotting-ariel.sh stop
+```
+
+El apagado configura `min-replicas=0`; Azure puede tardar unos minutos en retirar la réplica. No se debe confundir el endpoint con una credencial. Ariel debe entregar por canal privado únicamente:
+
+- endpoint HTTPS impreso por el script;
+- valor de `MENTOX_MODEL_API_KEY` usado en su despliegue;
+- nombre de la aplicación y grupo de recursos;
+- salida de `/health/ready` y estado final en escala cero.
+
+No debe entregar contraseña de Azure, sesión de Azure CLI, secreto del cliente ni claves de Storage.
+
 ## Probar y entregar evidencia
 
 Cada script imprime su FQDN. Espere a que la réplica termine el arranque en frío y pruebe:
@@ -100,11 +135,24 @@ az containerapp update --resource-group "rg-mentox-dev" \
 
 Una réplica T4 encendida factura mientras está asignada. ACR Basic conserva un costo pequeño aunque las aplicaciones estén en cero.
 
+## Arranque coordinado con el backend
+
+Para el análisis de fotogramas en la pantalla Partido, el backend usa estas variables:
+
+```bash
+export ROBOFLOW_SUITE_ENDPOINT="https://<fqdn-roboflow>"
+export ROBOFLOW_SUITE_API_KEY="<clave-privada-del-servicio>"
+```
+
+Antes de reproducir un MP4, el frontend llama `POST /api/v1/integration/live/models/prepare`. El backend consulta `/health/ready` del servicio. El video solo empieza si el modelo responde `ready`; si sigue en arranque en frío, la interfaz mantiene el video pausado y muestra el error. `MENTOX_MODEL_API_KEY` permanece como compatibilidad temporal, pero se recomienda la variable específica `ROBOFLOW_SUITE_API_KEY` cuando los servicios pertenecen a cuentas distintas.
+
 ## GameState
 
 ```bash
 bash infra/azure/preflight-soccernet-gamestate.sh
 ```
 
-El código de salida `2` es deliberado. El siguiente trabajo es ejecutar DV-US-27, adaptar MP4 a TrackLab, convertir el resultado a `VisionObservation` y verificarlo antes de autorizar un despliegue.
+El código de salida `2` es deliberado. El siguiente trabajo es ejecutar DV-US-27
+y DV-US-33 en GPU sobre un MP4 permitido, revisar sus salidas y solo entonces
+autorizar un despliegue.
 

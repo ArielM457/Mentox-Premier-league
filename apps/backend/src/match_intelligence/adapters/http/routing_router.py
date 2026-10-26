@@ -15,6 +15,12 @@ router = APIRouter(prefix="/api/v1/agent-routing", tags=["Enrutamiento de agente
 routing_pipeline = RoutedEventPipeline(build_routing_transport())
 
 
+async def close_routing_transport() -> None:
+    close = getattr(routing_pipeline.transport, "close", None)
+    if close is not None:
+        await close()
+
+
 @router.post("/evaluate", response_model=RoutingOutcome)
 async def evaluate_routing(request: RoutingEvaluationRequest) -> RoutingOutcome:
     """Filter one event window and dispatch only relevant agent work."""

@@ -6,6 +6,8 @@ import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 import { useLiveChannel } from '../hooks/useLiveChannel.js'
 import { useMatchClock } from '../hooks/useMatchClock.js'
 import { useTrackingFrames } from '../hooks/useTrackingFrames.js'
+import { useVisionCapture } from '../hooks/useVisionCapture.js'
+import { useVisionObservationChannel } from '../hooks/useVisionObservationChannel.js'
 import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
@@ -15,12 +17,12 @@ import { LiveTrackingPitch } from '../components/match/LiveTrackingPitch.jsx'
 import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
-import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
+import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel, VisionVideoOverlay } from '../components/match/LiveExperiencePanels.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
-const TABS = ['match', 'summary', 'stats', 'tactical', 'vision']
+const TABS = ['match', 'summary', 'stats', 'tactical']
 const SPEEDS = [1, 2, 4, 8]
 const notify = (promise) => promise.catch(() => {})
 
@@ -63,6 +65,7 @@ function LiveMatch({ match }) {
   const [tab, setTab] = useState('match')
   const [popover, setPopover] = useState(null)
   const [actionError, setActionError] = useState(null)
+  const [preparingVision, setPreparingVision] = useState(false)
   const [simulating, setSimulating] = useState(false)
   const [simulationStarted, setSimulationStarted] = useState(false)
   const [assistantOpen, setAssistantOpen] = useState(() => window.localStorage.getItem('itg:match-agent-open') !== 'false')
@@ -70,7 +73,8 @@ function LiveMatch({ match }) {
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedMomentId, setSelectedMomentId] = useState(null)
   const activeTab = TABS.includes(tab) ? tab : 'match'
-  const matchAgentOpen = activeTab === 'match' && assistantOpen
+  const hasVideoSource = match.video?.kind === 'file' && Boolean(match.video.url)
+  const matchAgentOpen = activeTab === 'match' && assistantOpen && !hasVideoSource
 
   useEffect(() => {
     recordExperience(matchId)
@@ -100,6 +104,13 @@ function LiveMatch({ match }) {
     seekVersion,
     timeMs: clock.time,
   })
+  const visionChannel = useVisionObservationChannel(matchId, seekVersion)
+  const visionCapture = useVisionCapture({
+    matchId,
+    playing: clock.playing,
+    timeRef: clock.timeRef,
+    videoRef,
+  })
 
   const crossed = live.events.filter((event) => event.video_time_ms <= clock.time).length
   const pastEvents = useMemo(() => live.events.slice(0, crossed), [live.events, crossed])
@@ -116,25 +127,38 @@ function LiveMatch({ match }) {
     clock.seek(next)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'seek', next))
-    notify(api.visionPlayback('seek', next))
+    notify(api.visionPlayback('seek', next, matchId))
   }, [clock, liveDurationMs, matchId])
 
-  const play = () => {
+  const play = async () => {
+    if (preparingVision) return
+    setActionError(null)
+    if (hasVideoSource) {
+      setPreparingVision(true)
+      try {
+        await api.prepareVisionModels()
+      } catch (err) {
+        setActionError(err.message)
+        setPreparingVision(false)
+        return
+      }
+      setPreparingVision(false)
+    }
     clock.play()
     notify(api.playback(matchId, 'play', clock.timeRef.current))
-    notify(api.visionPlayback('play', clock.timeRef.current))
+    notify(api.visionPlayback('play', clock.timeRef.current, matchId))
   }
   const pause = () => {
     clock.pause()
     notify(api.playback(matchId, 'pause', clock.timeRef.current))
-    notify(api.visionPlayback('pause', clock.timeRef.current))
+    notify(api.visionPlayback('pause', clock.timeRef.current, matchId))
   }
-  const replay = () => {
+  const replay = async () => {
     clock.seek(0)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'restart'))
-    notify(api.visionPlayback('restart', 0))
-    clock.play()
+    notify(api.visionPlayback('restart', 0, matchId))
+    await play()
   }
 
   const overlay = visibleOverlay(live.overlays, clock.time)
@@ -217,7 +241,7 @@ function LiveMatch({ match }) {
             <Button disabled={simulating} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {t.match.startLive}</Button>
           ) : (
             <>
-              <Button onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {clock.playing ? t.match.pauseLive : t.match.resumeLive}</Button>
+              <Button disabled={preparingVision} onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {preparingVision ? 'Preparando IA…' : (clock.playing ? t.match.pauseLive : t.match.resumeLive)}</Button>
               <Button onClick={replay} variant="ghost"><Icon name="replay" size={17} /> {t.match.restartLive}</Button>
             </>
           )}
@@ -255,17 +279,15 @@ function LiveMatch({ match }) {
             </div>
           ) : activeTab === 'tactical' ? (
             <TacticalPanel compact={false} events={pastEvents} matchId={matchId} metadata={metadata} />
-          ) : activeTab === 'vision' ? (
-            <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />
           ) : (
             <>
               <div className="pitch-wrap">
                 <div className="match-view-controls">
-                  <label className="live-comments-switch">
+                  {!hasVideoSource && <label className="live-comments-switch">
                     <span>{t.match.liveCommentsToggle}</span>
                     <input checked={preferences.liveComments} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
                     <span aria-hidden="true" className="switch-track"><i /></span>
-                  </label>
+                  </label>}
                   <Button
                     aria-label={fullscreen ? t.match.exitFullscreen : t.match.enterFullscreen}
                     className="match-fullscreen-toggle"
@@ -278,10 +300,23 @@ function LiveMatch({ match }) {
                 </div>
                 <div className="pitch-meta">
                   <span><Icon name="spark" size={16} /> {t.match.selected}</span>
-                  <strong>{current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
+                  <strong>{hasVideoSource ? t.match.visionVideoAnalysis : current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
                   <span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>
                 </div>
-                <LiveTrackingPitch
+                {hasVideoSource ? (
+                  <div className="match-video-stage">
+                    <video
+                      className="match-source-video"
+                      crossOrigin="anonymous"
+                      onEnded={pause}
+                      playsInline
+                      preload="metadata"
+                      ref={videoRef}
+                      src={match.video.url}
+                    />
+                    <VisionVideoOverlay matchId={matchId} observations={visionChannel.observations} timeMs={clock.time} />
+                  </div>
+                ) : <LiveTrackingPitch
                   events={pastEvents}
                   eventTypeLabels={t.moment.eventTypes}
                   frames={tracking.frames}
@@ -298,8 +333,8 @@ function LiveMatch({ match }) {
                   sourceLabel={tracking.source === 'video_model' ? t.match.trackingVideo : t.match.trackingSynthetic}
                   speed={clock.speed}
                   timeMs={clock.time}
-                />
-                <div className="overlay-zone" aria-live="assertive" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>
+                />}
+                {!hasVideoSource && <div className="overlay-zone" aria-live="assertive" aria-atomic="true"><OverlayCard onOpen={openMoment} overlay={overlay} playing={clock.playing} time={clock.time} /></div>}
                 {popover?.player && (
                   <button className="player-popover" onClick={() => setPopover(null)} type="button">
                     <strong>
@@ -312,13 +347,14 @@ function LiveMatch({ match }) {
                     <Icon name="close" size={15} />
                   </button>
                 )}
-                <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
+                {!hasVideoSource && <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />}
+                <VisionPanel capture={visionCapture} liveChannel={visionChannel} matchId={matchId} seekVersion={seekVersion} timeMs={clock.time} />
               </div>
-              {preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
+              {!hasVideoSource && preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
             </>
           )}
           <div className="playback">
-            <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>
+            <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
               {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
             </Button>
             <Timeline durationMs={liveDurationMs} label={t.match.timeline} moments={moments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
@@ -335,7 +371,7 @@ function LiveMatch({ match }) {
               </Button>
             </div>
           </div>
-          {activeTab === 'match' && (
+          {activeTab === 'match' && !hasVideoSource && (
             <div className="event-chips">
               {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
                 <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
@@ -345,7 +381,7 @@ function LiveMatch({ match }) {
             </div>
           )}
         </div>
-        {activeTab === 'match' && (
+        {activeTab === 'match' && !hasVideoSource && (
           <button
             aria-controls="match-agent-panel"
             aria-expanded={assistantOpen}

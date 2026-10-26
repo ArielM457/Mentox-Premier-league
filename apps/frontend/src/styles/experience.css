@@ -150,10 +150,24 @@ select, textarea { font: inherit; }
 }
 .vision-panel { display: grid; gap: 16px; }
 .vision-panel > header { align-items: center; display: flex; justify-content: space-between; }
+.vision-panel-inline { margin-top: 12px; padding: 16px; color: #ece9f5; background: linear-gradient(145deg, #211c3b, #17142a); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; }
+.vision-panel-inline h2 { margin: 3px 0 0; font-size: 16px; }
+.vision-statuses { display: flex; justify-content: flex-end; gap: 7px; flex-wrap: wrap; }
+.vision-summary { display: grid; grid-template-columns: minmax(180px, .65fr) minmax(360px, 1.35fr); gap: 14px; align-items: center; }
+.vision-summary > p { margin: 0; color: #aaa5bd; font-size: 10px; line-height: 1.5; }
 .vision-counters { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.vision-counters span { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 12px; display: grid; padding: 12px; }
-.vision-counters strong { font-size: 1.5rem; }
-.vision-feed { display: grid; gap: 8px; max-height: 390px; overflow: auto; }
-.vision-feed article { align-items: center; border-bottom: 1px solid var(--border); display: grid; gap: 12px; grid-template-columns: 72px 1fr; padding: 10px 0; }
+.vision-counters span { background: #24203d; border: 1px solid rgba(255,255,255,.07); border-radius: 10px; display: grid; padding: 10px; color: #aaa5bd; font-size: 9px; text-transform: uppercase; }
+.vision-counters strong { color: var(--lime); font-size: 18px; }
+.vision-feed { display: grid; gap: 7px; max-height: 230px; overflow: auto; }
+.vision-feed article { align-items: center; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; display: grid; gap: 12px; grid-template-columns: 72px 1fr; padding: 10px 12px; }
+.vision-feed article.vision-event-live { border-left: 3px solid var(--lime); }
+.vision-feed time { color: var(--lime); font-size: 10px; font-weight: 900; }
 .vision-feed article div { display: grid; gap: 4px; }
-@media (max-width: 720px) { .vision-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.vision-feed small, .vision-empty { color: #aaa5bd; }
+.vision-error { margin: 0; color: #f3c27c; font-size: 10px; }
+@media (max-width: 900px) { .vision-summary { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .vision-panel > header { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .vision-statuses { justify-content: flex-start; }
+  .vision-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

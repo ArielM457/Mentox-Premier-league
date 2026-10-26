@@ -410,56 +410,138 @@ export function AnnouncerPanel({ current, metadata, snapshot, timeMs }) {
   )
 }
 
-export function VisionPanel({ timeMs, seekVersion }) {
+function visionLabel(t, label) {
+  return t.match.visionObjectLabels[label] ?? label ?? t.match.visionObject
+}
+
+function observationsForFrame(observations, matchId, timeMs) {
+  const candidates = observations.filter((item) => (
+    item.kind === 'spatial_detection'
+    && item.payload?.match_id === matchId
+    && Array.isArray(item.payload?.bounding_box)
+    && Math.abs(item.timestamp_ms - timeMs) <= 2500
+  ))
+  const latestTimestamp = Math.max(-1, ...candidates.map((item) => item.timestamp_ms))
+  return candidates.filter((item) => item.timestamp_ms === latestTimestamp)
+}
+
+function groupLiveObservations(observations) {
+  const groups = new Map()
+  for (const item of observations) {
+    const group = groups.get(item.timestamp_ms) ?? []
+    group.push(item)
+    groups.set(item.timestamp_ms, group)
+  }
+  return [...groups.entries()]
+    .sort(([left], [right]) => right - left)
+    .slice(0, 6)
+    .map(([timestamp, items]) => ({ timestamp, items }))
+}
+
+function detectionSummary(t, observations) {
+  const counts = new Map()
+  for (const item of observations) {
+    const label = item.payload?.label ?? 'other'
+    counts.set(label, (counts.get(label) ?? 0) + 1)
+  }
+  return [...counts.entries()].map(([label, count]) => {
+    const copy = t.match.visionObjectCountLabels[label] ?? t.match.visionObjectCountLabels.other
+    return `${count} ${count === 1 ? copy.one : copy.many}`
+  }).join(' · ')
+}
+
+export function VisionVideoOverlay({ observations, matchId, timeMs }) {
+  const { t } = usePreferences()
+  const detections = observationsForFrame(observations, matchId, timeMs)
+  return (
+    <div className="vision-box-layer" aria-label="Detecciones de visión sobre el vídeo">
+      {detections.map((item) => {
+        const [x1, y1, x2, y2] = item.payload.bounding_box
+        const label = visionLabel(t, item.payload.label)
+        return (
+          <span
+            className={`vision-box vision-box-${item.payload.label ?? 'other'}`}
+            key={item.observation_id}
+            style={{ '--box-x': `${x1 * 100}%`, '--box-y': `${y1 * 100}%`, '--box-width': `${(x2 - x1) * 100}%`, '--box-height': `${(y2 - y1) * 100}%` }}
+          >
+            <small>{label} · {(item.payload.confidence * 100).toFixed(0)}%</small>
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
+export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId }) {
   const { t } = usePreferences()
   const [status, setStatus] = useState(null)
-  const [timeline, setTimeline] = useState(null)
   const [error, setError] = useState(null)
   const second = Math.floor(timeMs / 1000)
 
   useEffect(() => {
     let active = true
-    Promise.all([
+    Promise.allSettled([
+      api.visionLiveStatus(),
       api.visionStatus(),
-      api.visionTimeline(Math.max(0, second * 1000 - 1000), second * 1000 + 1000),
-    ]).then(([nextStatus, nextTimeline]) => {
+    ]).then(([liveResult, integrationResult]) => {
       if (!active) return
-      setStatus(nextStatus)
-      setTimeline(nextTimeline)
-      setError(null)
-    }).catch((reason) => active && setError(reason.message))
+      const liveReady = liveResult.status === 'fulfilled'
+      const integrationReady = integrationResult.status === 'fulfilled'
+      setStatus(integrationReady ? integrationResult.value : {
+        ready: liveReady,
+        fusion: { match_events_published: 0 },
+      })
+      setError(liveReady || integrationReady ? null : t.match.visionUnavailable)
+    })
     return () => { active = false }
-  }, [second, seekVersion])
+  }, [second, seekVersion, t.match.visionUnavailable])
 
-  if (error) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionUnavailable}: {error}</p></section>
-  }
-  if (!status || !timeline) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.common.loading}</p></section>
-  }
-  const observations = [
-    ...timeline.temporal_actions.map((item) => ({ ...item, category: t.match.visionAction })),
-    ...timeline.spatial_observations.map((item) => ({ ...item, category: t.match.visionDetection })),
-  ].sort((a, b) => a.timestamp_ms - b.timestamp_ms).slice(0, 40)
+  if (error) return (
+    <section className="vision-panel vision-panel-inline" aria-live="polite">
+      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-error">{t.match.visionUnavailable}</span></header>
+      <p className="vision-empty">{error}</p>
+    </section>
+  )
+  if (!status) return (
+    <section className="vision-panel vision-panel-inline" aria-busy="true">
+      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill">{t.common.loading}</span></header>
+    </section>
+  )
+  const liveObservations = (liveChannel?.observations ?? [])
+    .filter((item) => item.payload?.match_id === matchId && Math.abs(item.timestamp_ms - timeMs) <= 5000)
+  const liveFrames = groupLiveObservations(liveObservations)
+  const captureLive = capture?.status === 'live'
+  const sessionObservations = (liveChannel?.observations ?? []).filter((item) => item.payload?.match_id === matchId)
+  const spatialCount = sessionObservations.filter((item) => item.kind === 'spatial_detection').length
+  const actionCount = sessionObservations.filter((item) => item.kind === 'temporal_action').length
 
   return (
-    <section className="vision-panel">
-      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-live">{status.ready ? t.match.visionReady : t.match.visionUnavailable}</span></header>
-      <p className="panel-note">{t.match.visionNotice}</p>
-      <div className="vision-counters">
-        <span><strong>{timeline.spatial_total}</strong>{t.match.visionDetections}</span>
-        <span><strong>{timeline.temporal_actions.length}</strong>{t.match.visionActions}</span>
-        <span><strong>{timeline.fusion_candidates.length}</strong>{t.match.visionCandidates}</span>
-        <span><strong>{status.fusion.match_events_published}</strong>MatchEvent</span>
+    <section className="vision-panel vision-panel-inline" aria-live="polite">
+      <header>
+        <div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div>
+        <div className="vision-statuses">
+          <span className={`channel-pill ${captureLive ? 'channel-live' : ''}`}>{captureLive ? t.match.visionCapturing : t.match.visionWaiting}</span>
+          <span className={`channel-pill ${liveChannel?.status === 'live' ? 'channel-live' : ''}`}>{liveChannel?.status === 'live' ? t.match.visionConnected : t.match.visionDisconnected}</span>
+        </div>
+      </header>
+      <div className="vision-summary">
+        <p>{t.match.visionNotice}</p>
+        <div className="vision-counters">
+          <span><strong>{capture?.processed ?? 0}</strong>{t.match.visionFrames}</span>
+          <span><strong>{spatialCount}</strong>{t.match.visionDetections}</span>
+          <span><strong>{actionCount}</strong>{t.match.visionActions}</span>
+          <span><strong>{status.fusion.match_events_published}</strong>MatchEvent</span>
+        </div>
       </div>
       <div className="vision-feed">
-        {observations.length ? observations.map((item) => (
-          <article key={item.prediction_id}>
-            <time>{(item.timestamp_ms / 1000).toFixed(2)} s</time>
-            <div><strong>{item.category} · {item.label}</strong><small>{t.match.visionConfidence}: {(item.confidence * 100).toFixed(1)}% · track_id: {item.track_id ?? '—'}</small></div>
+        {liveFrames.length ? liveFrames.map((frame) => (
+          <article className="vision-event-live" key={frame.timestamp}>
+            <time>{(frame.timestamp / 1000).toFixed(2)} s</time>
+            <div><strong>{t.match.visionLive} · {detectionSummary(t, frame.items)}</strong><small>{t.match.visionFrameEvidence(frame.items.length)}</small></div>
           </article>
-        )) : <p>{t.match.visionEmpty}</p>}
+        )) : <p className="vision-empty">{t.match.visionPlayPrompt}</p>}
       </div>
+      {capture?.error && <p className="vision-error">{capture.error}</p>}
     </section>
   )
 }
