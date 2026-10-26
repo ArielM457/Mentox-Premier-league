@@ -6,7 +6,7 @@ import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 import { useLiveChannel } from '../hooks/useLiveChannel.js'
 import { useMatchClock } from '../hooks/useMatchClock.js'
 import { useTrackingFrames } from '../hooks/useTrackingFrames.js'
-import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
+import { formatClock, formatMatchClock, kindLabel, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Assistant } from '../components/match/Assistant.jsx'
@@ -339,7 +339,7 @@ function LiveMatch({ match }) {
             <div className="event-chips">
               {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
                 <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
-                  {formatMatchClock(m, t.match.period)} · {t.kinds[m.kind] ?? m.kind}
+                  {formatMatchClock(m, t.match.period)} · {kindLabel(t.kinds, m.kind)}
                 </button>
               ))}
             </div>

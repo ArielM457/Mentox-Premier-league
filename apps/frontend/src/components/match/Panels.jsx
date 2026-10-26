@@ -1,6 +1,5 @@
 import { usePreferences } from '../../app/preferences.js'
 import { formatMatchClock } from '../../lib/overlays.js'
-import { Icon } from '../ui/Icon.jsx'
 
 const METRICS = ['goals', 'shots', 'passes_attempted', 'pass_accuracy', 'recoveries', 'pressures']
 
@@ -18,7 +17,7 @@ export function StatsPanel({ snapshot, metadata, timeMs = 0 }) {
   const possession = [home, away].find((team) => team.team_id === snapshot?.possession_team_id)
   return (
     <div className="stats-panel">
-      <div className="stats-heading"><h2>{t.match.statsTitle}</h2><span><i /> {t.match.statsUpdated(formatMatchClock({ clock_ms: timeMs, period: snapshot?.period ?? 1 }, t.match.period))}</span></div>
+      <div className="stats-heading"><h2>{t.match.statsTitle}</h2><span><i /> {t.match.statsUpdated(formatMatchClock(snapshot ?? { clock_ms: timeMs, period: 1 }, t.match.period))}</span></div>
       <div className="stat-teams">
         <strong>{home.name}</strong>
         <strong>{away.name}</strong>
@@ -28,7 +27,7 @@ export function StatsPanel({ snapshot, metadata, timeMs = 0 }) {
         const b = metricValue(snapshot, key, away.team_id)
         const percent = key === 'pass_accuracy'
         const share = percent ? a ?? 0 : a == null && b == null ? 50 : ((a ?? 0) / Math.max(1, (a ?? 0) + (b ?? 0))) * 100
-        const show = (v) => (v == null ? t.match.noData : percent ? `${v}%` : v)
+        const show = (v) => (v == null ? t.match.noData : `${t.common.number(v)}${percent ? '%' : ''}`)
         return (
           <div className="stat-row" key={key}>
             <b>{show(a)}</b>
@@ -44,40 +43,6 @@ export function StatsPanel({ snapshot, metadata, timeMs = 0 }) {
         )
       })}
       <p className="stat-footnote">{t.match.possession}: {possession?.name ?? t.match.noData}</p>
-    </div>
-  )
-}
-
-// Momentos ya mostrados, del más reciente al más antiguo.
-export function MomentFeed({ items, onOpen, detailed = false }) {
-  const { t } = usePreferences()
-  if (!items.length) {
-    return (
-      <div className="event-feed">
-        <p className="feed-empty">{t.match.noMoments}</p>
-      </div>
-    )
-  }
-  return (
-    <div className="event-feed">
-      {items.map((m) => (
-        <button key={m.message_id} onClick={() => onOpen(m)} type="button">
-          <span>{formatMatchClock(m, t.match.period)}</span>
-          <div>
-            <strong>
-              {t.kinds[m.kind] ?? m.kind} · {m.headline}
-            </strong>
-            {detailed && m.explanation && <small>{m.explanation}</small>}
-            <span className="feed-badges">
-              <i>{m.priority}</i>
-              {m.suppressed && <i className="muted">{m.language === 'es' ? 'en cola' : 'queued'}</i>}
-              {m.replaces_message_id && <i className="muted">↺</i>}
-              {m.corrected && <i className="warn">✓</i>}
-            </span>
-          </div>
-          <Icon name="arrow" />
-        </button>
-      ))}
     </div>
   )
 }

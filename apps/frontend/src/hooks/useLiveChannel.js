@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/client.js'
+import { usePreferences } from '../app/preferences.js'
 import { mergeOverlay, overlayMap } from '../lib/overlays.js'
+
+// Se traduce al mostrarlo, así sigue el idioma aunque cambie después del corte.
+const CHANNEL_LOST = Symbol('channel-lost')
 
 // Une el historial (al cargar o adelantar) con el canal en directo (SSE).
 // Al pausar se cierra el canal; al reanudar o adelantar se abre desde la nueva posición.
@@ -77,12 +81,13 @@ export function useLiveChannel({ matchId, prefs, playing, speed, timeRef, seekVe
     source.onerror = () => {
       if (source.readyState === EventSource.CLOSED) return
       status('error')
-      setError('Se perdió el canal en directo. Pausa y vuelve a reproducir para reconectar.')
+      setError(CHANNEL_LOST)
       source.close()
     }
     return () => source.close()
   }, [matchId, prefs, prefsKey, playing, speed, streamKey, timeRef])
 
+  const { t } = usePreferences()
   const status = !playing ? 'idle' : channel.key === streamKey ? channel.status : 'connecting'
-  return { overlays, events, status, error, latency, resync }
+  return { overlays, events, status, error: error === CHANNEL_LOST ? t.common.liveChannelLost : error, latency, resync }
 }

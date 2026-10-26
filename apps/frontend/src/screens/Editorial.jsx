@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
-import { usePreferences } from '../app/preferences.js'
+import { describePreferences, usePreferences } from '../app/preferences.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -108,7 +108,7 @@ export function Editorial() {
                       <strong>{record.draft.headline}</strong>
                       <p>{record.draft.explanation}</p>
                       <small>
-                        {record.draft.applied_preferences.join(' · ')}
+                        {describePreferences(record.draft.applied_preferences, t, selectedMatch?.metadata)}
                         {record.reviewer && ` — ${record.reviewer}${record.note ? `: ${record.note}` : ''}`}
                       </small>
                     </div>

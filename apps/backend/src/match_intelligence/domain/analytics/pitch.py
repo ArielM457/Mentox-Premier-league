@@ -108,9 +108,5 @@ class PitchFrame:
         return abs(degrees(angle))
 
 
-def in_final_third(x: float) -> bool:
-    return x >= FINAL_THIRD_X
-
-
 def in_opponent_half(x: float) -> bool:
     return x >= HALFWAY_X

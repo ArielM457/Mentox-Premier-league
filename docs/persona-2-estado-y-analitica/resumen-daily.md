@@ -9,7 +9,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Lee los partidos y el seguimiento desde una base en Supabase.
   - La pestaña Resumen explica cada momento con cifras medidas.
   - La pestaña «Visión IA» también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1.
-  - Pasan 413 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
+  - Pasan 416 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
 - **Desde el último daily:**
   - Base de datos con partidos ficticios en Supabase.
   - Script que despliega todo en Azure.
@@ -18,6 +18,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Dos reglas nuevas: situaciones del partido y lecturas «¿qué habría pasado si…?».
   - Pestaña Resumen con datos.
   - Guía para que cualquiera del equipo cree el entorno.
+  - Revisión general del frontend y el backend, con siete correcciones.
 - **Demo en Azure:**
   - Interfaz: <https://ca-mentoxp2-web.politegrass-7d829700.eastus2.azurecontainerapps.io>
   - API: <https://ca-mentoxp2-api.politegrass-7d829700.eastus2.azurecontainerapps.io/docs>
@@ -127,6 +128,25 @@ Decía «Visión no disponible» por tres motivos:
 3. **Imagen.** En Azure no estaban los archivos. Ahora la imagen de la API se construye desde la raíz del repositorio y trae los tres resultados (8,5 MB) con sus variables. El `.dockerignore` de la raíz solo deja pasar lo que usan las imágenes.
 
 En Azure se actualizaron la API, la interfaz, el procesador y el trabajo `replay` a la imagen `78cf10c`. Solo cambió la imagen; la cadena de Supabase siguió como secreto. La API responde `ready`, con 16 324 detecciones de Roboflow, 127 acciones de SoccerNet y 12 candidatos de fusión, y sigue leyendo los 3 partidos de Supabase. La imagen no incluye el vídeo, que la pestaña no necesita.
+
+### Revisión general del frontend y el backend
+
+Se recorrieron las 42 rutas de la API con los dos motores y con identificadores reales: todas responden lo esperado, sin errores 500. También se recorrieron todas las pantallas en español y en inglés. Se corrigió:
+
+- **Tipos de momento sin nombre.** Siete tipos de la analítica de Persona 2 aparecían con su nombre interno (por ejemplo, `fast_progression`). Ahora tienen nombre en los dos idiomas, y una prueba nueva avisa si falta alguno.
+- **Botones dentro de botones.** La lista de momentos dibujaba a cada jugador como botón dentro de la tarjeta, que también es un botón. Ahora la cancha pequeña es solo una imagen.
+- **Reloj de las estadísticas.** Mostraba el tiempo del vídeo en lugar del reloj del partido.
+- **Números.** Las estadísticas y la visión usaban punto decimal en español («87.5%»). Ahora usan coma («87,5%»).
+- **Visión IA.** Pedía el estado cada segundo y, pasado el segundo 30, mostraba ceros sin explicar. Ahora pide el estado una vez y avisa que los resultados cubren solo los primeros 30 s del vídeo analizado.
+- **Textos internos.** «language:es · mode:casual» ahora se lee «Español · Aficionado», y dos mensajes de error ya siguen el idioma elegido.
+- **Código sin uso.** Se quitaron 2 componentes de la interfaz, 3 funciones y 7 importaciones del backend.
+
+Quedan para decidir en equipo:
+
+- **Panel de retraso.** Persona 4 lo documenta, pero un cambio posterior lo quitó de la pantalla; la interfaz sigue midiendo el retraso sin mostrarlo.
+- **Simulación oculta.** «Iniciar partido en vivo» también llama a `POST /simulation` y descarta el resultado. Los textos para mostrar colas, rutas y recortes destacados siguen sin uso, igual que las rutas de recortes.
+- **Estado de los partidos por identificador.** La API marca «Final», «Próximo» o «En vivo» según el identificador. Así, el partido de analítica, el más completo, solo abre la previa.
+- **Vocabulario de revisión.** La revisión editorial usa `approve`/`reject` y la de recortes `approved`/`rejected`.
 
 ### Guía para el equipo
 

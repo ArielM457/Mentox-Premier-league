@@ -1,4 +1,5 @@
 import { usePreferences } from '../../app/preferences.js'
+import { kindLabel } from '../../lib/overlays.js'
 import { Icon } from '../ui/Icon.jsx'
 
 // Mensaje sincronizado que aparece sobre el campo (OverlayMessage v1). Solo uno a la vez (RNF-05).
@@ -13,7 +14,7 @@ export function OverlayCard({ overlay, time, playing, onOpen }) {
       key={overlay.message_id}
     >
       <span className="overlay-kind">
-        <Icon name="spark" size={14} /> {t.kinds[overlay.kind] ?? overlay.kind}
+        <Icon name="spark" size={14} /> {kindLabel(t.kinds, overlay.kind)}
         {overlay.corrected && <em> · ✓</em>}
       </span>
       <p className="overlay-headline">{overlay.headline}</p>

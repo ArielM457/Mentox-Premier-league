@@ -35,7 +35,8 @@ function positionFor(player, index, teamPlayers, homeTeamId, events, timeMs) {
 // Dibuja las últimas acciones ocurridas con sus posiciones reales.
 // ``snapshot`` (opcional) fija las posiciones reales de un instante: { players: Map(player_id → {x, y}), ball }.
 // ``markedPlayerIds`` resalta jugadores además de los de los eventos.
-export function Pitch({ events, homeTeamId, players, trail = 6, playing = false, highlightIds, onSelectPlayer, label, selectedPlayerId = null, timeMs = 0, snapshot = null, markedPlayerIds = [] }) {
+// Para elegir jugadores en vivo está LiveTrackingPitch.
+export function Pitch({ events, homeTeamId, players, trail = 6, playing = false, highlightIds, label, timeMs = 0, snapshot = null, markedPlayerIds = [] }) {
   const shown = events.slice(-trail)
   const last = shown[shown.length - 1]
   const ballAt = snapshot?.ball ?? (last?.start ? (() => {
@@ -73,21 +74,17 @@ export function Pitch({ events, homeTeamId, players, trail = 6, playing = false,
         const position = fixed
           ? { x: fixed.x, y: fixed.y, event: shown.findLast((event) => event.player_id === player.player_id) ?? null }
           : positionFor(player, index, byTeam.get(player.team_id) ?? [], homeTeamId, shown, timeMs)
-        const focused = selectedPlayerId === player.player_id
         const involved = (position.event && isHighlighted(position.event)) || markedPlayerIds.includes(player.player_id)
+        // Marcas, no botones: la cancha es una imagen y a veces va dentro de una tarjeta que se puede pulsar.
         return (
-          <button
-            aria-label={player.name}
-            aria-pressed={focused}
-            className={`player-dot ${home ? 'home' : 'away'} ${involved ? 'involved' : ''} ${focused ? 'focused' : ''} ${selectedPlayerId && !focused ? 'dimmed' : ''}`}
+          <span
+            className={`player-dot ${home ? 'home' : 'away'} ${involved ? 'involved' : ''}`}
             key={player.player_id}
-            onClick={() => onSelectPlayer?.(player, position.event)}
             style={{ '--x': `${toPct(position.x)}%`, '--y': `${toPct(position.y)}%`, '--delay': `${(index % 5) * 0.08}s` }}
-            type="button"
+            title={player.name}
           >
             <span>{player.shirt_number ?? ''}</span>
-            {focused && <small>{player.name}</small>}
-          </button>
+          </span>
         )
       })}
       {ballAt && (

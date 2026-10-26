@@ -11,7 +11,6 @@ Una jugada es una serie de acciones de un mismo equipo con el balón:
    como contexto: no la cortan, pero quedan como evidencia.
 """
 
-from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
 from enum import StrEnum
 
@@ -240,11 +239,3 @@ class SequenceBuilder:
             completed_pass_count=sum(1 for event in passes if is_completed_pass(event)),
             points=tuple(sequence.points),
         )
-
-
-def build_sequences(frame: PitchFrame, events: Sequence[MatchEvent]) -> list[PlaySequence]:
-    builder = SequenceBuilder(frame)
-    for event in events:
-        builder.add(event)
-    builder.finish()
-    return list(builder.closed)

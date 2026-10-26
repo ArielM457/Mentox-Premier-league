@@ -47,3 +47,8 @@ export const momentIdOf = (overlay) => overlay.candidate_id ?? overlay.message_i
 export function formatMatchClock(item, periodLabel) {
   return `${periodLabel(item.period)} · ${formatClock(item.clock_ms)}`
 }
+
+// Nombre legible del tipo de momento. Un tipo nuevo sin traducción no muestra guiones bajos.
+export function kindLabel(kinds, kind) {
+  return kinds[kind] ?? kind.replaceAll('_', ' ')
+}

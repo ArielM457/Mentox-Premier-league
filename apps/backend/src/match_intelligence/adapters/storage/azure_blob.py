@@ -6,9 +6,7 @@ from azure.storage.blob.aio import BlobServiceClient
 
 from match_intelligence.application.artifacts import (
     Artifact,
-    ArtifactKind,
     ArtifactLocation,
-    ArtifactProvenance,
     RetrievedArtifact,
 )
 

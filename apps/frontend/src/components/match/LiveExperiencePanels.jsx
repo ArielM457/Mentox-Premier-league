@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
-import { formatMatchClock } from '../../lib/overlays.js'
+import { formatClock, formatMatchClock, kindLabel } from '../../lib/overlays.js'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { TeamBadge } from '../ui/TeamBadge.jsx'
@@ -490,7 +490,7 @@ export function InsightsPanel({ moments, events, metadata, onOpen }) {
         return (
           <button key={moment.message_id} onClick={() => onOpen(moment)} type="button">
             <div className="insight-mini-pitch"><Pitch events={sources} highlightIds={moment.source_event_ids} homeTeamId={metadata.home_team.team_id} label={moment.headline} players={metadata.players} trail={Math.max(1, sources.length)} /></div>
-            <div><span>{formatMatchClock(moment, t.match.period)} · {t.kinds[moment.kind] ?? moment.kind}</span><strong>{moment.headline}</strong><p>{moment.explanation}</p><small>{t.match.author}: {playerName(metadata, author?.player_id)} · {t.match.viewAnalysis}</small></div>
+            <div><span>{formatMatchClock(moment, t.match.period)} · {kindLabel(t.kinds, moment.kind)}</span><strong>{moment.headline}</strong><p>{moment.explanation}</p><small>{t.match.author}: {playerName(metadata, author?.player_id)} · {t.match.viewAnalysis}</small></div>
             <Icon name="arrow" />
           </button>
         )
@@ -523,50 +523,38 @@ export function LiveCommentsPanel({ moments, events, metadata, timeMs, compact =
   )
 }
 
-export function AnnouncerPanel({ current, metadata, snapshot, timeMs }) {
-  const { t } = usePreferences()
-  const factIndex = Math.floor(timeMs / 10_000) % 3
-  const facts = [
-    t.match.contextFacts.players(metadata.players.length),
-    t.match.contextFacts.pitch,
-    snapshot?.possession_team_id ? t.match.contextFacts.possession(teamName(metadata, snapshot.possession_team_id)) : t.match.contextFacts.level,
-  ]
-  return (
-    <aside className="announcer-panel">
-      <header><span className="announcer-avatar"><Icon name="spark" /></span><div><strong>{t.match.announcer}</strong><small>{t.match.announcerLive}</small></div></header>
-      <div className="announcer-message">
-        <span>{current ? formatMatchClock(current, t.match.period) : t.match.deadTime}</span>
-        <h3>{current?.headline ?? t.match.contextFact}</h3>
-        <p>{current?.explanation ?? facts[factIndex]}</p>
-      </div>
-      {!current && <small className="context-badge">{t.match.deadTimeContext}</small>}
-    </aside>
-  )
-}
-
 export function VisionPanel({ timeMs, seekVersion }) {
   const { t } = usePreferences()
   const [status, setStatus] = useState(null)
   const [timeline, setTimeline] = useState(null)
   const [error, setError] = useState(null)
   const second = Math.floor(timeMs / 1000)
+  // Los resultados vienen de un vídeo corto; fuera de su duración no hay nada que pedir.
+  const covered = status != null && second * 1000 <= status.duration_ms
 
+  // El estado no cambia con el reloj: se pide al abrir la pestaña y al reintentar.
   useEffect(() => {
     let active = true
-    Promise.all([
-      api.visionStatus(),
-      api.visionTimeline(Math.max(0, second * 1000 - 1000), second * 1000 + 1000),
-    ]).then(([nextStatus, nextTimeline]) => {
-      if (!active) return
-      setStatus(nextStatus)
-      setTimeline(nextTimeline)
-      setError(null)
-    }).catch((reason) => active && setError(reason.message))
+    api.visionStatus()
+      .then((next) => { if (active) { setStatus(next); setError(null) } })
+      .catch((reason) => active && setError(reason.message))
     return () => { active = false }
-  }, [second, seekVersion])
+  }, [seekVersion])
+
+  useEffect(() => {
+    if (!covered) return undefined
+    let active = true
+    api.visionTimeline(Math.max(0, second * 1000 - 1000), second * 1000 + 1000)
+      .then((next) => { if (active) { setTimeline(next); setError(null) } })
+      .catch((reason) => active && setError(reason.message))
+    return () => { active = false }
+  }, [covered, second, seekVersion])
 
   if (error) {
     return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionUnavailable}: {error}</p></section>
+  }
+  if (status && !covered) {
+    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionOutOfRange(formatClock(status.duration_ms), formatClock(timeMs))}</p></section>
   }
   if (!status || !timeline) {
     return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.common.loading}</p></section>
@@ -589,8 +577,8 @@ export function VisionPanel({ timeMs, seekVersion }) {
       <div className="vision-feed">
         {observations.length ? observations.map((item) => (
           <article key={item.prediction_id}>
-            <time>{(item.timestamp_ms / 1000).toFixed(2)} s</time>
-            <div><strong>{item.category} · {item.label}</strong><small>{t.match.visionConfidence}: {(item.confidence * 100).toFixed(1)}% · track_id: {item.track_id ?? '—'}</small></div>
+            <time>{t.common.number(item.timestamp_ms / 1000)} s</time>
+            <div><strong>{item.category} · {item.label}</strong><small>{t.match.visionConfidence}: {t.common.number(item.confidence * 100)}% · track_id: {item.track_id ?? '—'}</small></div>
           </article>
         )) : <p>{t.match.visionEmpty}</p>}
       </div>

@@ -10,7 +10,6 @@ from .contracts import (
     ErrorReport,
     EvidenceFact,
     InsightCandidate,
-    MatchSnapshot,
     NarrativeDraft,
     NarrativeOutcome,
     NarrativeRequest,

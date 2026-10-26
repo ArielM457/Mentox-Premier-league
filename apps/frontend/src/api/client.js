@@ -1,4 +1,5 @@
 // Cliente de la API de partido. Cada función lanza ApiError con el detalle del backend.
+import { strings } from '../i18n/strings.js'
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -35,7 +36,8 @@ async function request(path, options = {}) {
       headers: options.body ? { 'Content-Type': 'application/json' } : undefined,
     })
   } catch {
-    throw new ApiError('No hay conexión con la API', 0)
+    // PreferencesProvider mantiene el idioma elegido en <html lang>.
+    throw new ApiError((strings[document.documentElement.lang] ?? strings.es).common.apiDown, 0)
   }
   const data = await response.json().catch(() => null)
   if (!response.ok) {

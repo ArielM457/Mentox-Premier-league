@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
-import { usePreferences } from '../app/preferences.js'
+import { describePreferences, usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
-import { formatClock, formatMatchClock, momentIdOf } from '../lib/overlays.js'
+import { formatClock, formatMatchClock, kindLabel, momentIdOf } from '../lib/overlays.js'
 import { Pitch } from '../components/match/Pitch.jsx'
 import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -91,13 +91,13 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
     <div className="detail-grid">
       <section className="detail-main">
         <span className="moment-pill">
-          <Icon name="spark" size={16} /> {t.moment.pill(formatMatchClock(overlay, t.match.period))} · {t.kinds[overlay.kind] ?? overlay.kind}
+          <Icon name="spark" size={16} /> {t.moment.pill(formatMatchClock(overlay, t.match.period))} · {kindLabel(t.kinds, overlay.kind)}
         </span>
         <h1>{overlay.headline}</h1>
         <p>{conciseExplanation}</p>
         <div className="moment-context">
           <span><small>{t.moment.author}</small><strong>{author}</strong></span>
-          <span><small>{t.moment.situation}</small><strong>{t.kinds[overlay.kind] ?? overlay.kind}</strong></span>
+          <span><small>{t.moment.situation}</small><strong>{kindLabel(t.kinds, overlay.kind)}</strong></span>
           <span><small>{t.moment.team}</small><strong>{team}</strong></span>
           <span><small>{t.moment.minute}</small><strong>{formatMatchClock(overlay, t.match.period)}</strong></span>
         </div>
@@ -148,7 +148,7 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
             </div>
             {sources.draft.applied_preferences.length > 0 && (
               <p className="applied-preferences">
-                {t.moment.applied}: {sources.draft.applied_preferences.join(' · ')}
+                {t.moment.applied}: {describePreferences(sources.draft.applied_preferences, t, metadata)}
               </p>
             )}
           </div>

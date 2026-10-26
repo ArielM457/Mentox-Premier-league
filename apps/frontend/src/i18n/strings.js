@@ -24,6 +24,8 @@ const es = {
     saved: 'Preferencias guardadas',
     none: 'Ninguno',
     apiDown: 'No hay conexión con la API. Inicia el backend en el puerto configurado para el frontend.',
+    liveChannelLost: 'Se perdió el canal en directo. Pausa y vuelve a reproducir para reconectar.',
+    number: numEs,
     syntheticData: 'Datos sintéticos de demostración',
     shirt: 'Dorsal',
   },
@@ -42,6 +44,10 @@ const es = {
     progressive_pass: 'Pase vertical', pressure: 'Presión', player_quiet: 'Sin novedades',
     foul: 'Falta', yellow_card: 'Tarjeta amarilla', red_card: 'Tarjeta roja',
     injury_stoppage: 'Paro por lesión',
+    // Momentos que solo propone la analítica de Persona 2.
+    fast_progression: 'Avance rápido', recovery_to_shot: 'Recuperación y remate',
+    sustained_pressure: 'Presión sostenida', high_recovery: 'Recuperación alta',
+    control_shift: 'Cambio de control', chaos_phase: 'Ida y vuelta', player_milestone: 'Hito de jugador',
   },
   nav: { discover: 'Descubrir', matches: 'Partidos', profile: 'Mi experiencia', editorial: 'Revisión', guest: 'Invitado', preferences: 'Mis preferencias' },
   landing: {
@@ -132,7 +138,7 @@ const es = {
     headings: { LIVE: 'En vivo', UPCOMING: 'Próximos encuentros', FT: 'Últimos resúmenes' },
     onlyPlayer: 'Solo partidos de',
     relatedTo: (player) => `Partidos relacionados con ${player}`,
-    results: (n) => `${n} resultados`,
+    results: (n) => `${n} ${n === 1 ? 'resultado' : 'resultados'}`,
     emptyTitle: 'No hay partidos con estos filtros',
     emptyCopy: 'Prueba otra categoría o desactiva el seguimiento del jugador.',
     emptyUpcoming: 'La demo no tiene partidos programados: todos sus partidos ya se pueden reproducir.',
@@ -333,8 +339,6 @@ const es = {
     aiExplanations: 'Explicaciones generadas', importantMoments: 'Situaciones importantes', noImportantMoments: 'Todavía no ocurrió una situación de gol o alta prioridad.',
     author: 'Autor', viewAnalysis: 'Abrir explicación',
     matchPreview: 'Vista del partido', liveCommentsTitle: 'Comentarios en vivo', liveCommentsCopy: 'Los mensajes avanzan con el reloj del partido.', waitingCommentary: 'Los comentarios aparecerán cuando ocurra el primer momento.',
-    announcer: 'Locutor del partido', announcerLive: 'Salida automática', deadTime: 'Tiempo muerto', contextFact: 'Dato contextual', deadTimeContext: 'Contenido contextual durante la pausa',
-    contextFacts: { players: (n) => `${n} jugadores están registrados en esta demostración.`, pitch: 'El mapa usa coordenadas de 0 a 100 para representar el campo.', possession: (team) => `${team} figura con la posesión en el último estado disponible.`, level: 'El marcador sigue igualado en el último estado disponible.' },
     technicalDiagnostics: 'Ver diagnóstico técnico del canal', agentRunDiagnostics: 'Ver resultado técnico de colas y agentes',
     statsUpdated: (time) => `Actualizado en ${time}`,
     commentsKicker: 'Perfil profesional analista',
@@ -351,6 +355,7 @@ const es = {
     visionKicker: 'Modelos experimentales', visionTitle: 'Observaciones de visión sincronizadas',
     visionNotice: 'Roboflow aporta detecciones espaciales y SoccerNet acciones temporales. Los candidatos de fusión siguen siendo evidencia experimental y no se publican como hechos.',
     visionReady: 'Artefactos listos', visionUnavailable: 'Visión no disponible', visionEmpty: 'No hay observaciones en esta ventana de dos segundos.',
+    visionOutOfRange: (covered, now) => `Los resultados de visión cubren los primeros ${covered} del vídeo analizado; este instante (${now}) queda fuera.`,
     visionDetection: 'Detección', visionAction: 'Acción', visionDetections: 'detecciones', visionActions: 'acciones', visionCandidates: 'candidatos', visionConfidence: 'confianza',
   },
   assistant: {
@@ -449,6 +454,8 @@ const en = {
     lightTheme: 'Light mode', darkTheme: 'Dark mode',
     save: 'Save preferences', saved: 'Preferences saved', none: 'None',
     apiDown: 'The API is not reachable. Start the backend on the port configured for the frontend.',
+    liveChannelLost: 'The live channel was lost. Pause and play again to reconnect.',
+    number: numEn,
     syntheticData: 'Synthetic demo data', shirt: 'Shirt',
   },
   modes: {
@@ -466,6 +473,10 @@ const en = {
     progressive_pass: 'Forward pass', pressure: 'Press', player_quiet: 'No news',
     foul: 'Foul', yellow_card: 'Yellow card', red_card: 'Red card',
     injury_stoppage: 'Injury stoppage',
+    // Moments proposed only by the Persona 2 analytics.
+    fast_progression: 'Quick break', recovery_to_shot: 'Win back and shoot',
+    sustained_pressure: 'Sustained press', high_recovery: 'High recovery',
+    control_shift: 'Control shift', chaos_phase: 'End-to-end', player_milestone: 'Player milestone',
   },
   nav: { discover: 'Discover', matches: 'Matches', profile: 'My experience', editorial: 'Review', guest: 'Guest', preferences: 'My preferences' },
   landing: {
@@ -556,7 +567,7 @@ const en = {
     headings: { LIVE: 'Live', UPCOMING: 'Upcoming matches', FT: 'Latest recaps' },
     onlyPlayer: 'Only matches of',
     relatedTo: (player) => `Matches involving ${player}`,
-    results: (n) => `${n} results`,
+    results: (n) => `${n} ${n === 1 ? 'result' : 'results'}`,
     emptyTitle: 'No matches with these filters',
     emptyCopy: 'Try another category or turn off player tracking.',
     emptyUpcoming: 'The demo has no scheduled matches: every match can already be replayed.',
@@ -652,7 +663,7 @@ const en = {
     selectedMoment: 'Selected moment', noMomentSelected: 'Select a moment', openFullAnalysis: 'View full analysis',
     counterfactualKicker: 'Play lab', counterfactualTitle: 'What if…?',
     counterfactualCopy: 'Pick an alternative: analytics compares it with the real instant using the recorded positions.',
-    counterfactualOptions: { earlier_pass: 'The pass was released earlier', keeper_steps: 'The goalkeeper stepped forward', supporting_run: 'A supporting player changed his run', early_shot: 'The shot was taken earlier' },
+    counterfactualOptions: { earlier_pass: 'The pass was released earlier', keeper_steps: 'The goalkeeper stepped forward', supporting_run: 'A supporting player changed their run', early_shot: 'The shot was taken earlier' },
     estimatedResult: 'Estimated outcome',
     counterfactualResult: (change, player, events) => `${change}: the alternative changes the space around ${player}. The estimate uses ${events} recorded events; it compares the decision without claiming an outcome.`,
     counterfactualDisclaimer: 'Reading based on simulated positions: it shows the method and compares space; it does not predict how the play ended or replace the counterfactual agent.',
@@ -707,7 +718,7 @@ const en = {
             ? `One second earlier, ${name(passer.player_id)} had almost the same space: ${numEn(passer.alternative)} m vs ${numEn(passer.actual)} m when passing.`
             : gap > 0
               ? `One second earlier, ${name(passer.player_id)} had ${numEn(passer.alternative)} m to the nearest opponent; when passing, ${numEn(passer.actual)} m.`
-              : `One second earlier, ${name(passer.player_id)} had less space (${numEn(passer.alternative)} m vs ${numEn(passer.actual)} m): waiting gave him room.`
+              : `One second earlier, ${name(passer.player_id)} had less space (${numEn(passer.alternative)} m vs ${numEn(passer.actual)} m): waiting gave more room.`
           return receiver.key
             ? `${first} The receiver, ${name(receiver.player_id)}, had ${numEn(receiver.alternative)} m free one second earlier and ${numEn(receiver.actual)} m when receiving.`
             : first
@@ -722,14 +733,14 @@ const en = {
           const space = pick(items, 'support_space_m')
           const distance = pick(items, 'support_distance_m')
           if (space.alternative_player_id === space.player_id) {
-            return `The nearest support, ${name(space.player_id)}, was already the freest: ${numEn(space.actual)} m from his marker.`
+            return `The nearest support, ${name(space.player_id)}, was already the freest: ${numEn(space.actual)} m from their marker.`
           }
-          return `The nearest support, ${name(space.player_id)}, had ${numEn(space.actual)} m to his marker. ${name(space.alternative_player_id)}, ${numEn(distance.alternative)} m from the ball, had ${numEn(space.alternative)} m: support towards that area offered more space.`
+          return `The nearest support, ${name(space.player_id)}, had ${numEn(space.actual)} m to their marker. ${name(space.alternative_player_id)}, ${numEn(distance.alternative)} m from the ball, had ${numEn(space.alternative)} m: support towards that area offered more space.`
         },
         keeper_steps: (items, name) => {
           const ball = pick(items, 'keeper_ball_distance_m')
           const line = pick(items, 'keeper_goal_line_m')
-          return `Stepping 3 m further out, ${name(ball.player_id)} would be ${numEn(ball.alternative)} m from the ball (was ${numEn(ball.actual)} m) and ${numEn(line.alternative)} m from his goal line (was ${numEn(line.actual)} m).`
+          return `Stepping 3 m further out, ${name(ball.player_id)} would be ${numEn(ball.alternative)} m from the ball (was ${numEn(ball.actual)} m) and ${numEn(line.alternative)} m from the goal line (was ${numEn(line.actual)} m).`
         },
       },
     },
@@ -757,8 +768,6 @@ const en = {
     aiExplanations: 'Generated explanations', importantMoments: 'Important situations', noImportantMoments: 'No goal situation or high-priority moment has happened yet.',
     author: 'Author', viewAnalysis: 'Open explanation',
     matchPreview: 'Match preview', liveCommentsTitle: 'Live commentary', liveCommentsCopy: 'Messages advance with the match clock.', waitingCommentary: 'Commentary will appear after the first moment.',
-    announcer: 'Match announcer', announcerLive: 'Automatic output', deadTime: 'Dead time', contextFact: 'Context fact', deadTimeContext: 'Contextual content during the pause',
-    contextFacts: { players: (n) => `${n} players are registered in this demo.`, pitch: 'The map uses coordinates from 0 to 100 to represent the pitch.', possession: (team) => `${team} has possession in the latest available state.`, level: 'The score remains level in the latest available state.' },
     technicalDiagnostics: 'View channel diagnostics', agentRunDiagnostics: 'View technical queue and agent result',
     statsUpdated: (time) => `Updated at ${time}`,
     commentsKicker: 'Professional analyst profile',
@@ -854,6 +863,7 @@ const en = {
     visionKicker: 'Experimental models', visionTitle: 'Synchronized vision observations',
     visionNotice: 'Roboflow provides spatial detections and SoccerNet temporal actions. Fusion candidates remain experimental evidence and are not published as facts.',
     visionReady: 'Artifacts ready', visionUnavailable: 'Vision unavailable', visionEmpty: 'No observations in this two-second window.',
+    visionOutOfRange: (covered, now) => `The vision results cover the first ${covered} of the analysed video; this instant (${now}) is outside it.`,
     visionDetection: 'Detection', visionAction: 'Action', visionDetections: 'detections', visionActions: 'actions', visionCandidates: 'candidates', visionConfidence: 'confidence',
     reports: 'Reports received',
     noReports: 'No reports.',
