@@ -1,6 +1,6 @@
 # Resumen para el daily · Persona 2 (estado y analítica)
 
-Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
+Actualizado el 26 de octubre de 2026. Rama `persona-2/estado-analitica`, subida a GitHub.
 
 ## En un minuto
 
@@ -8,28 +8,35 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - La API de The Prime Moment usa el motor real de Persona 2, no la analítica provisional.
   - Lee los partidos y el seguimiento desde una base en Supabase.
   - La pestaña Resumen explica cada momento con cifras medidas.
-  - La visión IA también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1. Ahora es una tarjeta dentro de la pestaña Partido.
-  - Pasan 429 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
+  - La tarjeta «Visión IA», dentro de la pestaña Partido, une nuestro trabajo con el de Persona 1. En Azure muestra los resultados guardados de sus modelos y aclara que son de otro vídeo. Con su vídeo y su GPU, muestra la captura en vivo.
+  - Pasan 438 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
 - **Desde el último daily:**
   - Base de datos con partidos ficticios en Supabase.
   - Script que despliega todo en Azure.
   - La API usa la analítica real.
-  - Unión con `main`, con `develop` y con `integration/modelos-frontend-20261025` (Persona 1).
+  - Unión con `main`, con `develop` y dos veces con `integration/modelos-frontend-20261025` (Persona 1). La segunda trajo la captura de visión en vivo y los modelos en GPU.
   - Dos reglas nuevas: situaciones del partido y lecturas «¿qué habría pasado si…?».
   - Pestaña Resumen con datos.
   - Guía para que cualquiera del equipo cree el entorno.
   - Revisión general del frontend y el backend, con siete correcciones.
+  - Centro del partido pulido: asistente con controles claros, campos y barras con el tema, y modo claro completo.
+  - Revisión de seguridad con tres correcciones: límite de tamaño en la captura, vídeo por partes y contraseñas ocultas en los registros.
 - **Demo en Azure:**
   - Interfaz: <https://ca-mentoxp2-web.politegrass-7d829700.eastus2.azurecontainerapps.io>
   - API: <https://ca-mentoxp2-api.politegrass-7d829700.eastus2.azurecontainerapps.io/docs>
+  - Versión desplegada: API `bdc42b4` e interfaz `79c1b79`.
   - El tablero local sigue en [`demo/tablero.html`](demo/tablero.html).
 - **Flujo continuo probado en Azure:** 178 eventos por Event Hubs, todos aplicados a tiempo, con 51 ms de transporte medio y 27 ms de procesamiento. El registro quedó en Blob y en Supabase.
 - **Siguiente:**
   - Acordar los contratos con Persona 3.
-  - Subir la rama y abrir el PR cuando el equipo lo decida.
+  - Unir la rama `uidesign` de Eliana cuando la actualice desde `develop` o desde la nuestra.
+  - Decidir en equipo los cuatro puntos abiertos de la revisión general.
+  - Abrir el PR cuando el equipo lo decida.
 - **Bloqueos y avisos:**
   - Los contratos de Persona 3 todavía rechazan las salidas del motor.
   - La tabla de eventos de Supabase que llegó con `main` mezcla eventos de partidos distintos.
+  - Persona 1 debe revisar los cambios hechos en sus archivos al unir (ver «Detalle de los avisos para Persona 1»).
+  - `uidesign` parte de `main` y choca con 8 archivos de la interfaz; unirla hoy rehace parte de su diseño sin ella.
 
 ## Novedades desde el último daily
 
@@ -90,7 +97,7 @@ Lo que adapté:
 | Cancha en vivo | `develop` la construyó sobre el formato viejo de seguimiento. Ahora usa nuestro modelo y entrega el mismo JSON (`TrackingFrame v1`), sin cambios en la interfaz. La simulación de posiciones volvió a `src/` porque la API la usa al ejecutarse |
 | Faltas, tarjetas y lesiones | Regla nueva `situation@1`. Ahora el motor real también las propone como momentos: la roja siempre, amarillas y lesión en todos los modos, faltas solo para el analista |
 | Campos nuevos de los eventos | Migración nueva en Supabase para guardar receptor, situación y duración de la detención |
-| Pestañas de la interfaz | Se conserva la estructura nueva de `develop`, y la visión de Persona 1 tiene su propia pestaña, «Visión IA» (ver la unión con su rama más abajo) |
+| Pestañas de la interfaz | Se conserva la estructura nueva de `develop`. La visión de Persona 1 tuvo primero su propia pestaña, «Visión IA», y después pasó a una tarjeta dentro de Partido (ver más abajo) |
 | Imagen de Docker | Conserva la estructura del repositorio para que la previa táctica encuentre sus datos en Azure |
 
 ### Pestaña Resumen con analítica
@@ -222,6 +229,7 @@ Con el partido de prueba de 178 eventos, el perfil casual recibe 14 momentos, el
 |---|---|---|
 | Persona 1 (datos) | Contrato `MatchEvent 1.0` (con los campos nuevos), validación, deduplicación y eventos tardíos | Probado en local |
 | Persona 1 (vídeo y visión) | `MatchStateRebuilder` y las observaciones `VisualTrackObservation` con identidad resuelta | Probado con observaciones simuladas |
+| Persona 1 (visión en vivo) | La tarjeta «Visión IA» muestra su captura en vivo cuando hay vídeo, y sus resultados guardados cuando no | Unido; la captura en vivo no se probó con su vídeo y su GPU |
 | Persona 1 (Azure) | Event Hubs y Storage de su plantilla, reutilizados sin cambios | Desplegado |
 | Persona 4 (API e interfaz) | `AnalyticsPort` con el motor real, cancha en vivo, análisis de momentos en Resumen | Integrado y desplegado en Azure |
 | Persona 3 (agentes) | Tiene los contratos y ejemplos de Persona 2 | Bloqueado: sus contratos rechazan las salidas del motor |
@@ -288,14 +296,19 @@ Con el partido de prueba de 178 eventos, el perfil casual recibe 14 momentos, el
 | Persona | Qué recibe | Qué necesito de ella |
 |---|---|---|
 | **Persona 4 (API e interfaz)** | El motor real detrás de su `AnalyticsPort`, la cancha en vivo con nuestro modelo, el análisis de momentos y el despliegue en Azure | Revisar los cambios en sus archivos (registro de partidos, narración provisional, Resumen y pestañas) y decidir si `persona2` pasa a ser el motor predeterminado |
-| **Persona 1 (datos y visión)** | La analítica de seguimiento que consume sus observaciones y la cadena de Azure que reutiliza su plantilla | Avisar cuando cambien los resultados de sus modelos (la imagen copia los de `docs/mentox-modelos-20261023T045413Z`) y corregir la tabla `match_events` de su Supabase. Coordinar los cambios de contrato, indicar en las observaciones qué pista es el balón o un portero y conseguir un vídeo permitido |
-| **Persona 5 (UX/UI)** | Los bloques nuevos del Resumen: motivos, datos medidos y la tabla de alternativas | Revisar su diseño en claro y oscuro y en móvil |
+| **Persona 1 (datos y visión)** | La analítica de seguimiento que consume sus observaciones y la cadena de Azure que reutiliza su plantilla | Revisar los cambios hechos en sus archivos al unir. Avisar cuando cambien los resultados de sus modelos (la imagen copia los de `docs/mentox-modelos-20261023T045413Z`) y corregir la tabla `match_events` de su Supabase. Coordinar los cambios de contrato, indicar en las observaciones qué pista es el balón o un portero y conseguir un vídeo permitido |
+| **Persona 5 (UX/UI)** | Los bloques nuevos del Resumen, la tarjeta «Visión IA», el interruptor del asistente y el estilo común de los select | Actualizar `uidesign` desde `develop` o desde nuestra rama antes de unirla, y revisar con su paleta estas piezas nuevas, en claro, oscuro y móvil |
 
 Detalle de los avisos para Persona 1:
 
 - **Archivos de experimentos:** su panel de visión los busca en `experiments/…/output-real`, que solo existe en su equipo. Ya funciona apuntando las variables `MENTOX_*_ARTIFACT` a las copias de `docs/mentox-modelos-20261023T045413Z/resultados`, con lo que pasan 8 de las 10 pruebas que fallaban. Las 2 restantes tienen esa ruta fija en la prueba. La imagen de Azure copia esas mismas tres copias; si publica resultados nuevos en otra carpeta, hay que cambiarla en `apps/backend/Dockerfile` y en el `.dockerignore` de la raíz.
-- **Panel de visión:** decía «Visión no disponible» aunque la API respondía `ready`, porque leía un campo que la API no envía. Ya está corregido.
+- **Panel de visión:** decía «Visión no disponible» aunque la API respondía `ready`, porque leía un campo que la API no envía. Ya está corregido. Ahora su panel y nuestra tarjeta son una sola, `VisionCard`.
 - **Tabla `match_events`:** usa `event_id` como clave única, así que dos partidos con `evt-001` se pisan.
+- **Cambios en sus archivos al unir:**
+  - `integration_router.py` y `live_vision_capture.py`: la captura comprueba la pausa y el tipo antes de leer el fotograma y corta al pasar 8 MiB (413). El vídeo de Blob se envía por partes de 4 MiB.
+  - `soccernet_gamestate.py` usa `TrackedKind.REFEREE`, que volvió a existir junto a `UNASSIGNED`.
+  - `deploy-messi-generator.sh` da el permiso de escritura solo sobre su contenedor. Si ya ejecutó el script, debe quitar el permiso anterior sobre toda la cuenta de Storage.
+  - Sus 3 rutas nuevas están en la colección de Postman.
 
 ## Cómo se integra con Azure
 
@@ -314,7 +327,8 @@ Trabajo replay ──► Event Hubs · match-events ──► procesador continu
 **Listo y verificado en Azure:**
 - Infraestructura completa con identidad administrada, sin claves.
 - La API con el motor real, que lee Supabase.
-- La interfaz, el análisis de momentos y la previa táctica.
+- La interfaz, el análisis de momentos, la previa táctica y la tarjeta «Visión IA» en español y en inglés.
+- Las rutas de captura de Persona 1 con límites: sin su configuración explican qué falta, y un fotograma grande en pausa se rechaza sin leerlo.
 
 **Flujo continuo verificado el 25 de octubre:** el trabajo `replay` publicó en `match-events` los 178 eventos del partido de analítica a 8× (como `synthetic-analytics-001-live-20261026003858`). El procesador los aplicó todos a tiempo, con un transporte medio de 51 ms (p95 71 ms) y un procesamiento medio de 27 ms (p95 35 ms). Propuso momentos en 19 eventos y, 30 s después del último, guardó el registro `run-c57436ad-…` con 7 archivos en Blob y en Supabase.
 
