@@ -170,6 +170,11 @@ Persona 1 subió un commit grande: modelos en GPU de Azure, captura de visión e
   - Faltaban 3 rutas nuevas en la colección de Postman.
 - **Comprobación:** pasan 429 pruebas; fallan las mismas 10 de Persona 1 de siempre. Todas las rutas responden con los dos motores, y la tarjeta funciona en español y en inglés sin errores.
 - **En Azure:** la API, la interfaz, el procesador y el trabajo `replay` usan la imagen `79c1b79` (con esta unión y el permiso acotado del generador MESSI). La visión responde `ready`, la API sigue leyendo los 3 partidos de Supabase y las revisiones nuevas están sanas. Sin la configuración de Persona 1, la captura en vivo queda apagada: `models/prepare` explica qué variables faltan.
+- **Revisión de seguridad.** Después del push se corrigieron tres puntos:
+  - La captura de fotogramas leía el cuerpo completo antes de comprobar la pausa y el límite de 8 MiB. Ahora lo comprueba antes y corta al pasar el límite.
+  - El vídeo de Blob se cargaba entero en memoria. Ahora se envía por partes de 4 MiB.
+  - El aviso de Supabase podía escribir la contraseña de una cadena mal formada en los registros. Ahora la oculta.
+  - Las dos primeras están en archivos de Persona 1. La API de Azure usa la imagen `bdc42b4`: un fotograma de 9 MiB en pausa se rechaza en medio segundo con 409.
 
 ### Guía para el equipo
 
