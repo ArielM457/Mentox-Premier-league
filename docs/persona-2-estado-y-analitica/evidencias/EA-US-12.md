@@ -5,7 +5,7 @@
 - **Historia:** EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase.
 - **Estado:** verificada en local y en Azure, incluido el flujo continuo con Event Hubs.
 - **Prioridad:** P1.
-- **Última verificación:** 18 de octubre de 2026.
+- **Última verificación:** 25 de octubre de 2026.
 - **Responsable:** Persona 2 · Estado y analítica.
 - **Requisitos relacionados:** RNF-01 a RNF-03, la decisión 10 (Event Hubs y Blob Storage) y el requisito del equipo de desplegar en Azure.
 
@@ -32,6 +32,7 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 | Plantilla aceptada por Azure | `what-if` (20 recursos para crear y 3 asignaciones de roles que no se pueden calcular antes) y `az deployment group validate` de las dos fases | Cumplido |
 | Flujo continuo en Azure | Flujo continuo verificado el 25 de octubre de 2026: el trabajo `replay` publicó en `match-events` los 178 eventos del partido de analítica a 8× (como `synthetic-analytics-001-live-20261026003858`). El procesador los aplicó todos a tiempo, con un transporte medio de 51 ms (p95 71 ms) y un procesamiento medio de 27 ms (p95 35 ms). Propuso momentos en 19 eventos y, 30 s después del último, guardó el registro `run-c57436ad-…` con 7 archivos en Blob y en Supabase. | Cumplido |
 | Despliegue en Azure | Tres intentos. Primero, Azure creó el entorno en modo Express y rechazó el trabajo `replay`. Después suspendió el cómputo del entorno recreado con el mismo nombre (`ManagedClusterSuspended`). Por último, la API no alcanzaba Supabase porque la cadena era la directa, solo IPv6. Con la plantilla en modo `WorkloadProfiles`, el entorno `…-wp`, la cadena del Session pooler y la API resistente a la base, el 25 de octubre de 2026, en Azure for Students (`eastus2`), el entorno `cae-mentoxp2-demo-wp` sigue activo, la API lee los 3 partidos y su seguimiento desde Supabase, y la interfaz, el análisis de momentos y la previa responden (imagen `0635142`). | Cumplido |
+| La pestaña «Visión IA» funciona en Azure | Imagen `78cf10c`, construida desde la raíz con los tres resultados de Persona 1. En local, el contenedor respondió `ready` sin variables extra, y la línea temporal de 0 a 5 s trajo 2743 detecciones, 22 acciones y 2 candidatos. En Azure (revisión `ca-mentoxp2-api--0000002`, sana), `/api/v1/integration/status` responde `ready` con 16 324 predicciones de Roboflow, 127 de SoccerNet y 12 candidatos de fusión. La misma línea temporal llega a través de la interfaz, cuyo paquete incluye la pestaña y la corrección del panel, y la API sigue leyendo los 3 partidos de Supabase | Cumplido por HTTP; falta revisar la pestaña a la vista, porque el navegador de prueba no respondió |
 
 ## Decisiones técnicas
 
@@ -41,6 +42,8 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 - **Adaptador en lugar de cambiar contratos.** `PresentationAnalytics` entrega a la API de Persona 4 el subconjunto que conoce. Las razones, señales y componentes siguen en `match-insights`.
 - **El escenario vuelve a `src`.** Desde la unión con `main`, la API de Persona 4 lo carga al arrancar, y el código de producción no puede importar desde `tests`.
 - **Dos fases en Bicep.** Las Container Apps necesitan que las imágenes ya existan en el registro.
+- **Resultados de visión dentro de la imagen.** Azure no tiene la carpeta `experiments/` de Persona 1, y las copias de sus resultados ya están en el repositorio. Para no duplicarlas, la imagen de la API se construye desde la raíz y las copia con sus tres variables. El `.dockerignore` de la raíz deja pasar solo lo que copian las imágenes (unos 10 MB); también reduce el contexto de `compose.integration.yml`, que antes enviaba el repositorio entero, y su imagen se sigue construyendo. No se incluye el vídeo.
+- **Solo cambiar la imagen.** En Azure se usó `az containerapp update --image` en lugar de repetir la plantilla. Así, la cadena de Supabase siguió como secreto sin volver a pedirla. La próxima ejecución del script construye igual.
 - **Secreto fuera de la línea de comandos.** La cadena de Supabase pasa a Azure en un archivo temporal de una carpeta privada y queda como secreto de Container Apps. Una revisión de seguridad automática señaló que en Linux `/tmp` deja el archivo legible por otros usuarios; se corrigió con permisos 700 y 600 antes de escribirlo.
 
 ## Reproducción
@@ -60,7 +63,13 @@ docker build -f apps/backend/Dockerfile -t mentox-local/match-intelligence-api:t
 docker build -t mentox-local/match-intelligence-web:test apps/frontend
 ```
 
-La imagen de la API se construye desde la raíz desde el 25 de octubre de 2026 (ver «Resultados de visión en la imagen»).
+La imagen de la API se construye desde la raíz desde el 25 de octubre de 2026. Para comprobar la visión dentro de ella:
+
+```bash
+docker run --rm -p 127.0.0.1:8099:8000 -e ANALYTICS_ENGINE=persona2 mentox-local/match-intelligence-api:test
+curl http://127.0.0.1:8099/api/v1/integration/status
+docker build -f apps/backend/Dockerfile.integration -t mentox-local/integration:check .
+```
 
 ## Resultado
 
@@ -70,6 +79,8 @@ Con PostgreSQL 18 local: 344 passed, 1 skipped
 Carga de datos: 2 partidos, 188 eventos, 49 222 observaciones, 2 análisis (9 archivos cada uno)
 Imágenes: match-intelligence-api 512 MB, match-intelligence-web 77 MB
 Estado con seguimiento del partido completo: 115 a 145 ms
+Contexto desde la raíz (25 de octubre): 9,8 MB; visión en el contenedor: ready
+Pruebas el 25 de octubre: 413 passed, 10 failed, 8 skipped (las 10 son de Persona 1 y buscan experiments/)
 ```
 
 El salto omitido sin base es la prueba de Postman de Persona 4, que ya se omitía antes.
@@ -91,6 +102,7 @@ El salto omitido sin base es la prueba de Postman de Persona 4, que ya se omití
 - Las comprobaciones del script con dobles no prueban los permisos reales de la suscripción, como el registro de proveedores o la política de regiones.
 - Event Hubs Standard cobra aunque no se use: hay que borrar el grupo después de la demo.
 - La API mantiene una sola réplica porque guarda estado en memoria.
+- La imagen copia los resultados de `docs/mentox-modelos-20261023T045413Z`. Si Persona 1 publica otros, hay que cambiar esa carpeta en `apps/backend/Dockerfile` y en el `.dockerignore` de la raíz; si falta un archivo, la construcción falla en lugar de publicar una imagen sin visión.
 
 ## Dependencias
 

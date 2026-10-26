@@ -8,6 +8,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - La API de The Prime Moment usa el motor real de Persona 2, no la analítica provisional.
   - Lee los partidos y el seguimiento desde una base en Supabase.
   - La pestaña Resumen explica cada momento con cifras medidas.
+  - La pestaña «Visión IA» también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1.
   - Pasan 413 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
 - **Desde el último daily:**
   - Base de datos con partidos ficticios en Supabase.
@@ -23,12 +24,10 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - El tablero local sigue en [`demo/tablero.html`](demo/tablero.html).
 - **Flujo continuo probado en Azure:** 178 eventos por Event Hubs, todos aplicados a tiempo, con 51 ms de transporte medio y 27 ms de procesamiento. El registro quedó en Blob y en Supabase.
 - **Siguiente:**
-  - Volver a desplegar en Azure para que la demo muestre la pestaña «Visión IA».
   - Acordar los contratos con Persona 3.
   - Subir la rama y abrir el PR cuando el equipo lo decida.
 - **Bloqueos y avisos:**
   - Los contratos de Persona 3 todavía rechazan las salidas del motor.
-  - La pestaña «Visión IA» ya funciona en local con los resultados de Persona 1 que están en el repositorio. Faltaban dos cosas: un `.gitattributes`, porque Windows cambiaba la huella de esos archivos, y apuntar tres variables a esa carpeta. En Azure todavía no aparece, porque la imagen no incluye esos archivos.
   - La tabla de eventos de Supabase que llegó con `main` mezcla eventos de partidos distintos.
 
 ## Novedades desde el último daily
@@ -117,7 +116,17 @@ Esta rama de Persona 1 une `develop` con su visión. También prepara el desplie
 - **Resumen:** conserva el `matchId` con el que carga el análisis del momento.
 - **Comprobación:** las pruebas dan el mismo resultado (413 pasan; las 10 que fallan son las de `main`). La interfaz compila y en local muestra las cinco pestañas sin errores.
 
-Ahora nuestra rama contiene `main`, `develop` y esta integración; las demás ramas no tienen nada que falte en la nuestra. La demo en Azure mostrará la pestaña nueva cuando se vuelva a desplegar.
+Ahora nuestra rama contiene `main`, `develop` y esta integración; las demás ramas no tienen nada que falte en la nuestra.
+
+### Pestaña «Visión IA» en local y en Azure
+
+Decía «Visión no disponible» por tres motivos:
+
+1. **Ruta de los archivos.** La API busca los resultados de los modelos en `experiments/…/output-real`, que solo existe en el equipo de Persona 1. Las copias están en `docs/mentox-modelos-20261023T045413Z/resultados`. En local basta con apuntar tres variables a esa carpeta.
+2. **Finales de línea.** En Windows, Git cambiaba esos archivos y su huella SHA-256 dejaba de coincidir. Un `.gitattributes` lo evita.
+3. **Imagen.** En Azure no estaban los archivos. Ahora la imagen de la API se construye desde la raíz del repositorio y trae los tres resultados (8,5 MB) con sus variables. El `.dockerignore` de la raíz solo deja pasar lo que usan las imágenes.
+
+En Azure se actualizaron la API, la interfaz, el procesador y el trabajo `replay` a la imagen `78cf10c`. Solo cambió la imagen; la cadena de Supabase siguió como secreto. La API responde `ready`, con 16 324 detecciones de Roboflow, 127 acciones de SoccerNet y 12 candidatos de fusión, y sigue leyendo los 3 partidos de Supabase. La imagen no incluye el vídeo, que la pestaña no necesita.
 
 ### Guía para el equipo
 
@@ -231,12 +240,12 @@ Con el partido de prueba de 178 eventos, el perfil casual recibe 14 momentos, el
 | Persona | Qué recibe | Qué necesito de ella |
 |---|---|---|
 | **Persona 4 (API e interfaz)** | El motor real detrás de su `AnalyticsPort`, la cancha en vivo con nuestro modelo, el análisis de momentos y el despliegue en Azure | Revisar los cambios en sus archivos (registro de partidos, narración provisional, Resumen y pestañas) y decidir si `persona2` pasa a ser el motor predeterminado |
-| **Persona 1 (datos y visión)** | La analítica de seguimiento que consume sus observaciones y la cadena de Azure que reutiliza su plantilla | Publicar los archivos de experimentos que pide su panel de visión (hoy da 503) y corregir la tabla `match_events` de su Supabase. Coordinar los cambios de contrato, indicar en las observaciones qué pista es el balón o un portero y conseguir un vídeo permitido |
+| **Persona 1 (datos y visión)** | La analítica de seguimiento que consume sus observaciones y la cadena de Azure que reutiliza su plantilla | Avisar cuando cambien los resultados de sus modelos (la imagen copia los de `docs/mentox-modelos-20261023T045413Z`) y corregir la tabla `match_events` de su Supabase. Coordinar los cambios de contrato, indicar en las observaciones qué pista es el balón o un portero y conseguir un vídeo permitido |
 | **Persona 5 (UX/UI)** | Los bloques nuevos del Resumen: motivos, datos medidos y la tabla de alternativas | Revisar su diseño en claro y oscuro y en móvil |
 
 Detalle de los avisos para Persona 1:
 
-- **Archivos de experimentos:** su panel de visión los busca en `experiments/…/output-real`, que solo existe en su equipo. Ya funciona apuntando las variables `MENTOX_*_ARTIFACT` a las copias de `docs/mentox-modelos-20261023T045413Z/resultados`, con lo que pasan 8 de las 10 pruebas que fallaban. Las 2 restantes tienen esa ruta fija en la prueba.
+- **Archivos de experimentos:** su panel de visión los busca en `experiments/…/output-real`, que solo existe en su equipo. Ya funciona apuntando las variables `MENTOX_*_ARTIFACT` a las copias de `docs/mentox-modelos-20261023T045413Z/resultados`, con lo que pasan 8 de las 10 pruebas que fallaban. Las 2 restantes tienen esa ruta fija en la prueba. La imagen de Azure copia esas mismas tres copias; si publica resultados nuevos en otra carpeta, hay que cambiarla en `apps/backend/Dockerfile` y en el `.dockerignore` de la raíz.
 - **Panel de visión:** decía «Visión no disponible» aunque la API respondía `ready`, porque leía un campo que la API no envía. Ya está corregido.
 - **Tabla `match_events`:** usa `event_id` como clave única, así que dos partidos con `evt-001` se pisan.
 
