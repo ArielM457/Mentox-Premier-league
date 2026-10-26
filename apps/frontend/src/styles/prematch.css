@@ -77,7 +77,7 @@
 .tactic-selector header span, .tactic-selector > label { display: block; color: var(--violet); font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .07em; }
 .tactic-selector h3 { margin: 3px 0 0; }
 .tactic-selector > label { margin-bottom: 7px; }
-.tactic-selector select { width: 100%; min-height: 46px; padding: 0 34px 0 12px; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 11px; font-weight: 800; }
+.tactic-selector select { width: 100%; min-height: 46px; border-radius: 11px; font-weight: 800; }
 .tactic-selector p { min-height: 52px; margin: 11px 0 14px; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .simulation-stage { padding: 12px; color: white; background: var(--navy); border-radius: 22px; }
 .simulation-status { min-height: 78px; padding: 14px 6px 3px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; }
@@ -140,7 +140,6 @@
 :root[data-theme='dark'] .formation-options button { color: #f5f3fb; background: #211d38; border-color: var(--line); }
 :root[data-theme='dark'] .formation-options button.selected { background: var(--violet); }
 :root[data-theme='dark'] .discover-fixtures-section .match-card { background: #211d38; }
-:root[data-theme='dark'] .tactic-selector select,
 :root[data-theme='dark'] .recent-results article,
 :root[data-theme='dark'] .availability-list article,
 :root[data-theme='dark'] .key-player-list article { color: #f5f3fb; background: #211d38; border-color: var(--line); }

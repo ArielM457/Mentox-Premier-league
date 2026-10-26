@@ -15,12 +15,12 @@ import { LiveTrackingPitch } from '../components/match/LiveTrackingPitch.jsx'
 import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
-import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionPanel } from '../components/match/LiveExperiencePanels.jsx'
+import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionCard } from '../components/match/LiveExperiencePanels.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
-const TABS = ['match', 'summary', 'stats', 'tactical', 'vision']
+const TABS = ['match', 'summary', 'stats', 'tactical']
 const SPEEDS = [1, 2, 4, 8]
 const notify = (promise) => promise.catch(() => {})
 
@@ -56,6 +56,7 @@ function LiveMatch({ match }) {
   const metadata = match.metadata
   const videoRef = useRef(null)
   const matchViewRef = useRef(null)
+  const assistantSwitchRef = useRef(null)
   const liveDurationMs = match.durationMs
   const clock = useMatchClock(liveDurationMs, videoRef)
   const [seekVersion, setSeekVersion] = useState(0)
@@ -172,6 +173,12 @@ function LiveMatch({ match }) {
     if (openTab) setTab('summary')
   }
 
+  // Al cerrar desde el panel, el foco pasa al interruptor que lo vuelve a abrir.
+  function closeAssistant() {
+    setAssistantOpen(false)
+    assistantSwitchRef.current?.focus()
+  }
+
   function changeMode(mode) {
     update({ mode })
   }
@@ -255,15 +262,18 @@ function LiveMatch({ match }) {
             </div>
           ) : activeTab === 'tactical' ? (
             <TacticalPanel compact={false} events={pastEvents} matchId={matchId} metadata={metadata} />
-          ) : activeTab === 'vision' ? (
-            <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />
           ) : (
             <>
               <div className="pitch-wrap">
                 <div className="match-view-controls">
-                  <label className="live-comments-switch">
+                  <label className="view-switch">
                     <span>{t.match.liveCommentsToggle}</span>
                     <input checked={preferences.liveComments} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
+                    <span aria-hidden="true" className="switch-track"><i /></span>
+                  </label>
+                  <label className="view-switch">
+                    <span><Icon name="spark" size={15} /> {t.match.assistantToggle}</span>
+                    <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} ref={assistantSwitchRef} type="checkbox" />
                     <span aria-hidden="true" className="switch-track"><i /></span>
                   </label>
                   <Button
@@ -336,31 +346,21 @@ function LiveMatch({ match }) {
             </div>
           </div>
           {activeTab === 'match' && (
-            <div className="event-chips">
-              {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
-                <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
-                  {formatMatchClock(m, t.match.period)} · {kindLabel(t.kinds, m.kind)}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="event-chips">
+                {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
+                  <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
+                    {formatMatchClock(m, t.match.period)} · {kindLabel(t.kinds, m.kind)}
+                  </button>
+                ))}
+              </div>
+              <VisionCard seekVersion={seekVersion} timeMs={clock.time} />
+            </>
           )}
         </div>
-        {activeTab === 'match' && (
-          <button
-            aria-controls="match-agent-panel"
-            aria-expanded={assistantOpen}
-            aria-label={assistantOpen ? t.match.hideAgent : t.match.showAgent}
-            className="agent-rail-toggle"
-            onClick={() => setAssistantOpen((currentValue) => !currentValue)}
-            title={assistantOpen ? t.match.hideAgent : t.match.showAgent}
-            type="button"
-          >
-            <Icon name={assistantOpen ? 'arrow' : 'back'} size={18} />
-          </button>
-        )}
         {matchAgentOpen && (
           <div className="match-agent-rail" id="match-agent-panel">
-            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onClose={closeAssistant} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
           </div>
         )}
       </div>

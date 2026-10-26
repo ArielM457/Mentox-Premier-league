@@ -13,18 +13,65 @@
   --line: #dfdce8;
   --red: #f15a67;
   --shadow: 0 20px 70px rgba(35, 25, 76, 0.13);
+  /* Campos con lista y barras de desplazamiento; el tema oscuro los redefine. */
+  --field-bg: #ffffff;
+  --field-text: var(--navy);
+  --field-border: var(--line);
+  --field-picker: #ffffff;
+  --field-hover: #f1ebff;
+  --field-accent: #6337df;
+  --field-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236337df' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --scroll-thumb: #c9c3dd;
   color: var(--navy);
   font-family: "DM Sans", sans-serif;
   font-synthesis: none;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scrollbar-color: var(--scroll-thumb) transparent; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--off-white); }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { border: 0; cursor: pointer; }
 button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+
+/* Barras de desplazamiento finas con los colores del tema (Safari usa las reglas -webkit-). */
+* { scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); background-clip: padding-box; border: 3px solid transparent; border-radius: 999px; }
+
+/* Un solo estilo para todos los select. Donde existe `appearance: base-select`, la lista
+   desplegable también usa los colores del tema; en el resto queda la lista del sistema. */
+select {
+  min-height: 40px;
+  padding: 0 38px 0 12px;
+  appearance: none;
+  color: var(--field-text);
+  background: var(--field-bg) var(--field-chevron) no-repeat right 12px center / 14px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+select:hover { border-color: var(--violet); }
+select:focus-visible { outline: 3px solid var(--lime); outline-offset: 2px; }
+select:disabled { opacity: .55; cursor: not-allowed; }
+option { color: var(--field-text); background: var(--field-picker); }
+@supports (appearance: base-select) {
+  select, ::picker(select) { appearance: base-select; }
+  select { padding-right: 11px; display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; background-image: none; }
+  select::picker-icon { content: ''; width: 14px; height: 14px; background: var(--field-accent); mask: var(--chevron-mask) center / contain no-repeat; transition: rotate 200ms cubic-bezier(.2, .8, .2, 1); }
+  select:open { border-color: var(--violet); }
+  select:open::picker-icon { rotate: 180deg; }
+  ::picker(select) { margin-block: 6px; padding: 5px; color: var(--field-text); background: var(--field-picker); border: 1px solid var(--field-border); border-radius: 12px; box-shadow: 0 16px 36px rgba(9, 7, 26, .3); }
+  option { min-height: 34px; padding: 0 10px; display: flex; align-items: center; gap: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+  option:hover, option:focus-visible { background: var(--field-hover); outline: 0; }
+  option:checked { color: var(--field-accent); }
+  option::checkmark { color: var(--field-accent); }
+}
 h1, h2, h3, p { margin-top: 0; }
 h1, h2, h3, .brand, .card-score, .score-center b { font-family: "Space Grotesk", sans-serif; }
 .icon { display: block; flex: 0 0 auto; }

@@ -9,7 +9,6 @@
   .sidebar-profile > div, .sidebar-profile > .icon { display: none; }
   .match-layout { grid-template-columns: minmax(0, 1fr); }
   .match-agent-rail { width: min(320px, calc(100% - 42px)); position: absolute; z-index: 12; inset: 0 0 0 auto; filter: drop-shadow(-18px 8px 28px rgba(0,0,0,.35)); }
-  .match-layout.agent-open .agent-rail-toggle { right: min(320px, calc(100% - 42px)); }
   .assistant { min-height: 0; }
   .hero { grid-template-columns: .9fr 1.1fr; }
   .hero-art { min-height: 560px; }
@@ -141,8 +140,8 @@
   .score-center { min-width: 90px; }
   .score-center b { font-size: 26px; }
   .pitch-wrap { padding: 8px; }
-  .match-view-controls { align-items: stretch; }
-  .live-comments-switch { flex: 1; justify-content: space-between; }
+  .match-view-controls { align-items: stretch; flex-wrap: wrap; }
+  .view-switch { flex: 1; justify-content: space-between; }
   .pitch-column:fullscreen { padding: 8px; }
   .pitch-column:fullscreen .pitch { min-height: 0; max-height: none; }
   .simulation-toolbar { align-items: stretch; flex-direction: column; }

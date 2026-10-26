@@ -20,6 +20,9 @@ const PATHS = {
   broadcast: (<><circle cx="12" cy="12" r="2.2" /><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7" /><path d="M5.5 5.5a9.2 9.2 0 0 0 0 13M18.5 5.5a9.2 9.2 0 0 1 0 13" /></>),
   fullscreen: <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />,
   fullscreenExit: <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5" />,
+  eye: (<><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></>),
+  // Panel lateral que se cierra hacia su borde: el gesto del botón, no una flecha suelta.
+  panelClose: (<><rect x="3" y="4" width="18" height="16" rx="3" /><path d="M15 4v16" /><path d="m8.5 9.5 2.5 2.5-2.5 2.5" /></>),
 }
 
 export function Icon({ name, size = 20 }) {

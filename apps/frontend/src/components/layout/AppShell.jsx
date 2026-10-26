@@ -43,7 +43,7 @@ export function AppShell({ active, children }) {
           <button className="brand-link" type="button" onClick={() => navigate(paths.landing())} aria-label={t.brand}>
             <Brand />
           </button>
-          <button aria-label={collapsed ? 'Expandir menú' : 'Contraer menú'} className="collapse-sidebar" onClick={toggle} type="button">
+          <button aria-label={collapsed ? t.nav.expandMenu : t.nav.collapseMenu} className="collapse-sidebar" onClick={toggle} type="button">
             <Icon name={collapsed ? 'arrow' : 'back'} size={18} />
           </button>
         </div>

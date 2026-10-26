@@ -8,7 +8,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - La API de The Prime Moment usa el motor real de Persona 2, no la analítica provisional.
   - Lee los partidos y el seguimiento desde una base en Supabase.
   - La pestaña Resumen explica cada momento con cifras medidas.
-  - La pestaña «Visión IA» también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1.
+  - La visión IA también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1. Ahora es una tarjeta dentro de la pestaña Partido.
   - Pasan 416 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
 - **Desde el último daily:**
   - Base de datos con partidos ficticios en Supabase.
@@ -147,6 +147,13 @@ Quedan para decidir en equipo:
 - **Simulación oculta.** «Iniciar partido en vivo» también llama a `POST /simulation` y descarta el resultado. Los textos para mostrar colas, rutas y recortes destacados siguen sin uso, igual que las rutas de recortes.
 - **Estado de los partidos por identificador.** La API marca «Final», «Próximo» o «En vivo» según el identificador. Así, el partido de analítica, el más completo, solo abre la previa.
 - **Vocabulario de revisión.** La revisión editorial usa `approve`/`reject` y la de recortes `approved`/`rejected`.
+
+### Centro del partido: visión, asistente y campos
+
+- **Visión IA dentro de Partido.** Deja de ser una pestaña y pasa a una tarjeta bajo el campo, con la forma de los comentarios en vivo. Muestra la ventana de vídeo, cuántas detecciones, acciones y candidatos hay, y las últimas acciones de SoccerNet traducidas. Fuera de los 30 s analizados, da los totales del vídeo. Se mantiene porque es la única muestra de los modelos de Persona 1 en la demo, siempre marcada como experimental.
+- **Asistente.** La flecha suelta entre el campo y el panel se reemplazó por dos controles con sentido: un interruptor «Asistente» junto a «Comentarios en vivo» y un botón para cerrar el panel en su cabecera. Al cerrarlo, el foco pasa al interruptor.
+- **Campos y barras.** Todos los select comparten un estilo con los colores del tema; en Chrome y Edge, también la lista desplegable. Las barras de desplazamiento son finas y siguen el tema.
+- **Modo claro.** Los comentarios en vivo, los interruptores y el select de velocidad seguían oscuros sobre fondo blanco. Ahora siguen el tema.
 
 ### Guía para el equipo
 

@@ -183,7 +183,7 @@ npm run dev --workspace frontend
 
 La interfaz queda en `http://localhost:5173` y reenvía `/api` a la API.
 
-Para que la pestaña «Visión IA» muestre los resultados de los modelos de Persona 1, defina antes de iniciar la API las rutas a las copias que están en el repositorio:
+Para que la tarjeta «Visión IA» de la pestaña Partido muestre los resultados de los modelos de Persona 1, defina antes de iniciar la API las rutas a las copias que están en el repositorio:
 
 ```powershell
 $r = 'docs/mentox-modelos-20261023T045413Z/resultados'

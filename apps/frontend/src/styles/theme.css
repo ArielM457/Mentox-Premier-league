@@ -30,6 +30,14 @@
   --line: #413b58;
   --violet-light: #c2a9ff;
   --shadow: 0 20px 70px rgba(0, 0, 0, .28);
+  --field-bg: #24203d;
+  --field-text: #f5f3fb;
+  --field-border: #494261;
+  --field-picker: #1f1b36;
+  --field-hover: #302849;
+  --field-accent: var(--lime);
+  --field-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d8ff65' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --scroll-thumb: #4a4268;
   color: #f5f3fb;
 }
 :root[data-theme='dark'] body { color: #f5f3fb; background: var(--off-white); }
@@ -127,9 +135,7 @@
 :root[data-theme='dark'] .search-box input::placeholder { color: #b7b1cc; }
 :root[data-theme='dark'] .recap-content > .match-score { color: #f5f3fb; background: #211d38; border-color: var(--line); }
 :root[data-theme='dark'] .mobile-nav { background: rgba(23,20,40,.96); border-color: var(--line); }
-:root[data-theme='dark'] .review-list li,
-:root[data-theme='dark'] .editorial-fields select,
-:root[data-theme='dark'] .editorial-fields input { color: #f5f3fb; }
+:root[data-theme='dark'] .review-list li { color: #f5f3fb; }
 :root[data-theme='dark'] .review-list .btn.danger { color: #ffb4bd; }
 :root[data-theme='dark'] .review-list p { color: #cbc6dc; }
 :root[data-theme='dark'] .experience-panel {
@@ -170,14 +176,33 @@
 :root[data-theme='light'] .tactical-panel,
 :root[data-theme='light'] .insight-list,
 :root[data-theme='light'] .commentary-stage,
-:root[data-theme='light'] .announcer-panel,
+:root[data-theme='light'] .commentary-inline,
+:root[data-theme='light'] .vision-card,
 :root[data-theme='light'] .moment-selector { color: var(--navy); background: #fff; border-color: var(--line); }
+:root[data-theme='light'] .commentary-flow header,
+:root[data-theme='light'] .commentary-flow article,
+:root[data-theme='light'] .vision-card > header,
+:root[data-theme='light'] .vision-rows li { border-color: var(--line); }
+:root[data-theme='light'] .commentary-flow time,
+:root[data-theme='light'] .vision-rows time,
+:root[data-theme='light'] .vision-window > span:first-child { color: #6337df; }
+:root[data-theme='light'] .commentary-flow header small,
+:root[data-theme='light'] .vision-card > header small,
+:root[data-theme='light'] .vision-window,
+:root[data-theme='light'] .vision-note,
+:root[data-theme='light'] .vision-rows small,
+:root[data-theme='light'] .vision-footnote { color: #504c64; }
+:root[data-theme='light'] .vision-window b,
+:root[data-theme='light'] .vision-confidence { color: var(--navy); }
+:root[data-theme='light'] .view-switch { color: var(--navy); background: var(--off-white); border-color: var(--line); }
+:root[data-theme='light'] .view-switch .icon { color: #6337df; }
+:root[data-theme='light'] .switch-track { background: #cfcadf; }
+:root[data-theme='light'] .assistant-close { color: var(--muted); background: var(--off-white); }
 :root[data-theme='light'] .moment-workspace header p,
 :root[data-theme='light'] .panel-note,
 :root[data-theme='light'] .commentary-flow article p { color: #504c64; }
 :root[data-theme='light'] .counterfactual-panel,
-:root[data-theme='light'] .insight-list > button,
-:root[data-theme='light'] .announcer-message { color: var(--navy); background: #f1ebff; }
+:root[data-theme='light'] .insight-list > button { color: var(--navy); background: #f1ebff; }
 :root[data-theme='light'] .counterfactual-options button { color: var(--navy); background: #fff; border-color: var(--line); }
 :root[data-theme='light'] .moment-why,
 :root[data-theme='light'] .moment-facts { color: var(--navy); background: #f1ebff; }
@@ -195,7 +220,6 @@
 :root[data-theme='light'] .what-if-table td { border-top-color: var(--line); }
 :root[data-theme='light'] .counterfactual-options button.muted { color: #6f6a86; }
 :root[data-theme='light'] .counterfactual-result.unavailable { background: #fff; border-color: var(--line); }
-:root[data-theme='light'] .tactical-panel select { color: var(--navy); background: #fff; border-color: var(--line); }
 :root[data-theme='light'] .match-tabs button,
 :root[data-theme='light'] .pitch-meta > span,
 :root[data-theme='light'] .stat-row > div span,

@@ -523,16 +523,20 @@ export function LiveCommentsPanel({ moments, events, metadata, timeMs, compact =
   )
 }
 
-export function VisionPanel({ timeMs, seekVersion }) {
+// Resultados de los modelos de visión de Persona 1, como tarjeta compañera del campo.
+// Vienen de un vídeo corto y distinto del partido sintético: son evidencia experimental, no eventos.
+export function VisionCard({ timeMs, seekVersion }) {
   const { t } = usePreferences()
   const [status, setStatus] = useState(null)
   const [timeline, setTimeline] = useState(null)
   const [error, setError] = useState(null)
   const second = Math.floor(timeMs / 1000)
-  // Los resultados vienen de un vídeo corto; fuera de su duración no hay nada que pedir.
+  const from = Math.max(0, second * 1000 - 1000)
+  const to = second * 1000 + 1000
+  // Fuera de la duración del vídeo analizado no hay nada que pedir.
   const covered = status != null && second * 1000 <= status.duration_ms
 
-  // El estado no cambia con el reloj: se pide al abrir la pestaña y al reintentar.
+  // El estado no cambia con el reloj: se pide al abrir la tarjeta y al reintentar.
   useEffect(() => {
     let active = true
     api.visionStatus()
@@ -541,47 +545,67 @@ export function VisionPanel({ timeMs, seekVersion }) {
     return () => { active = false }
   }, [seekVersion])
 
+  // La tarjeta solo muestra el total de detecciones: basta una de muestra.
   useEffect(() => {
     if (!covered) return undefined
     let active = true
-    api.visionTimeline(Math.max(0, second * 1000 - 1000), second * 1000 + 1000)
+    api.visionTimeline(from, to, 1)
       .then((next) => { if (active) { setTimeline(next); setError(null) } })
       .catch((reason) => active && setError(reason.message))
     return () => { active = false }
-  }, [covered, second, seekVersion])
+  }, [covered, from, to, seekVersion])
 
+  const n = t.common.number
+  let body
   if (error) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionUnavailable}: {error}</p></section>
+    body = <p className="vision-note">{t.match.visionUnavailable}<small>{error}</small></p>
+  } else if (status && !covered) {
+    body = (
+      <p className="vision-note">
+        {t.match.visionOutOfRange(formatClock(status.duration_ms))}{' '}
+        {t.match.visionTotals(n(status.roboflow.predictions), n(status.soccernet.predictions), n(status.fusion.candidates))}
+      </p>
+    )
+  } else if (!status || !timeline) {
+    body = <p className="vision-note">{t.common.loading}</p>
+  } else {
+    const actions = timeline.temporal_actions.slice().sort((a, b) => b.timestamp_ms - a.timestamp_ms).slice(0, 3)
+    const count = (value, noun) => <span><b>{n(value)}</b> {noun(value)}</span>
+    body = (
+      <>
+        <p className="vision-window">
+          <span>{t.match.visionWindow(`${formatClock(from)}–${formatClock(to)}`)}</span>
+          {count(timeline.spatial_total, t.match.visionDetections)}
+          {count(timeline.temporal_actions.length, t.match.visionActions)}
+          {count(timeline.fusion_candidates.length, t.match.visionCandidates)}
+        </p>
+        {actions.length ? (
+          <ul className="vision-rows">
+            {actions.map((action) => (
+              <li key={action.prediction_id}>
+                <time>{n(action.timestamp_ms / 1000)} s</time>
+                <div>
+                  <strong>{t.match.visionActionLabels[action.label] ?? action.label}</strong>
+                  {action.team && <small>{t.match.visionSides[action.team] ?? action.team}</small>}
+                </div>
+                <span className="vision-confidence">{n(action.confidence * 100)}% <small>{t.match.visionConfidence}</small></span>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="vision-note">{t.match.visionEmpty}</p>}
+      </>
+    )
   }
-  if (status && !covered) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.match.visionOutOfRange(formatClock(status.duration_ms), formatClock(timeMs))}</p></section>
-  }
-  if (!status || !timeline) {
-    return <section className="vision-panel empty-comments"><h2>{t.match.visionTitle}</h2><p>{t.common.loading}</p></section>
-  }
-  const observations = [
-    ...timeline.temporal_actions.map((item) => ({ ...item, category: t.match.visionAction })),
-    ...timeline.spatial_observations.map((item) => ({ ...item, category: t.match.visionDetection })),
-  ].sort((a, b) => a.timestamp_ms - b.timestamp_ms).slice(0, 40)
 
   return (
-    <section className="vision-panel">
-      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-live">{status.ready || status.status === 'ready' ? t.match.visionReady : t.match.visionUnavailable}</span></header>
-      <p className="panel-note">{t.match.visionNotice}</p>
-      <div className="vision-counters">
-        <span><strong>{timeline.spatial_total}</strong>{t.match.visionDetections}</span>
-        <span><strong>{timeline.temporal_actions.length}</strong>{t.match.visionActions}</span>
-        <span><strong>{timeline.fusion_candidates.length}</strong>{t.match.visionCandidates}</span>
-        <span><strong>{status.fusion.match_events_published}</strong>MatchEvent</span>
-      </div>
-      <div className="vision-feed">
-        {observations.length ? observations.map((item) => (
-          <article key={item.prediction_id}>
-            <time>{t.common.number(item.timestamp_ms / 1000)} s</time>
-            <div><strong>{item.category} · {item.label}</strong><small>{t.match.visionConfidence}: {t.common.number(item.confidence * 100)}% · track_id: {item.track_id ?? '—'}</small></div>
-          </article>
-        )) : <p>{t.match.visionEmpty}</p>}
-      </div>
+    <section aria-labelledby="vision-card-title" className="vision-card">
+      <header>
+        <span className="vision-glyph"><Icon name="eye" size={17} /></span>
+        <div><strong id="vision-card-title">{t.match.visionTitle}</strong><small>{t.match.visionCopy}</small></div>
+        <span className="channel-pill">{t.match.visionBadge}</span>
+      </header>
+      {body}
+      <p className="vision-footnote">{t.match.visionNotice}</p>
     </section>
   )
 }
