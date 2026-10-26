@@ -4,7 +4,7 @@ La guía para que cualquier integrante cree el entorno está en [despliegue en A
 
 Esta guía deja la analítica funcionando en la nube con datos guardados, en lugar de calcularla con adaptadores provisionales en memoria. Un solo script despliega todos los servicios de la analítica en Azure, y otro carga datos ficticios en Supabase.
 
-- **Estado:** datos cargados en Supabase y despliegue en curso en Azure for Students (`eastus2`).
+- **Estado:** desplegado y verificado el 25 de octubre de 2026, en Azure for Students (`eastus2`), el entorno `cae-mentoxp2-demo-wp` sigue activo, la API lee los 3 partidos y su seguimiento desde Supabase, y la interfaz, el análisis de momentos y la previa responden. Falta probar en Azure el flujo continuo (procesador y trabajo `replay`).
   - La vista previa y la fase 1 salieron bien, y las imágenes están en el registro.
   - La primera fase 2 falló porque Azure creó el entorno en modo Express, que no admite trabajos.
   - La plantilla ya pide el modo `WorkloadProfiles`, y las dos fases validan contra la suscripción.

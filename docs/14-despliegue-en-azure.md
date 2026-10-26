@@ -7,7 +7,7 @@ Esta guía permite que cualquier integrante del equipo cree todo el entorno de l
 
 Todo lo hace un solo script. El detalle técnico de cada recurso está en [despliegue en Azure y Supabase](persona-2-estado-y-analitica/despliegue-azure-supabase.md).
 
-- **Estado:** el 19 de octubre de 2026, con Azure for Students en `eastus2`, se crearon la infraestructura, las imágenes y las aplicaciones, y la API respondió con los partidos de Supabase. Azure suspendió después el entorno de Container Apps (ver la sección 8). La versión de esta guía, con el entorno `…-wp`, falta desplegarla de nuevo.
+- **Estado:** desplegado y verificado el 25 de octubre de 2026, en Azure for Students (`eastus2`), el entorno `cae-mentoxp2-demo-wp` sigue activo, la API lee los 3 partidos y su seguimiento desde Supabase, y la interfaz, el análisis de momentos y la previa responden. Antes se resolvieron los problemas de la sección 8 (entorno Express, suspensión y cadena solo IPv6).
 - **Responsable:** Persona 2 (estado y analítica).
 
 ## **Antes de empezar: ¿un despliegue para todos o uno por persona?**

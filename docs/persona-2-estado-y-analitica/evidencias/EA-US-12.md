@@ -3,7 +3,7 @@
 ## Identificación
 
 - **Historia:** EA-US-12 · Desplegar la analítica en Azure con datos ficticios en Supabase.
-- **Estado:** verificada en local y con datos reales en Supabase. En Azure, la vista previa, la fase 1 y la publicación de imágenes salieron bien. La fase 2 se repite con el entorno en modo `WorkloadProfiles`.
+- **Estado:** verificada en local y en Azure. Falta probar en Azure el flujo continuo (procesador encendido y trabajo `replay`).
 - **Prioridad:** P1.
 - **Última verificación:** 18 de octubre de 2026.
 - **Responsable:** Persona 2 · Estado y analítica.
@@ -30,7 +30,7 @@ La API usa el motor real de Persona 2 en vez de la analítica provisional y lee 
 | El script sigue los pasos en orden y no expone la cadena de Supabase | Ejecución con dobles de `az`, `docker` e `Invoke-RestMethod`; la carga real corrió contra PostgreSQL local | Cumplido con dobles |
 | Carga de datos en Supabase | `supabase_seed.py --schema` contra el proyecto real: 2 partidos, 49 222 observaciones y 2 análisis; la consulta de `attention_decisions` devuelve los momentos | Cumplido |
 | Plantilla aceptada por Azure | `what-if` (20 recursos para crear y 3 asignaciones de roles que no se pueden calcular antes) y `az deployment group validate` de las dos fases | Cumplido |
-| Despliegue en Azure | Fase 1 e imágenes publicadas. La fase 2 falló con `ExpressEnvironmentResourceNotSupported` en el trabajo `replay`: Azure había creado el entorno en modo Express. La segunda vez, con modo `WorkloadProfiles`, todo se desplegó y la API respondió con los partidos de Supabase. Un minuto después Azure suspendió el cómputo del entorno (`ManagedClusterSuspended`, «unknown reasons»). Se repite con un entorno de nombre nuevo. | En curso |
+| Despliegue en Azure | Tres intentos. Primero, Azure creó el entorno en modo Express y rechazó el trabajo `replay`. Después suspendió el cómputo del entorno recreado con el mismo nombre (`ManagedClusterSuspended`). Por último, la API no alcanzaba Supabase porque la cadena era la directa, solo IPv6. Con la plantilla en modo `WorkloadProfiles`, el entorno `…-wp`, la cadena del Session pooler y la API resistente a la base, el 25 de octubre de 2026, en Azure for Students (`eastus2`), el entorno `cae-mentoxp2-demo-wp` sigue activo, la API lee los 3 partidos y su seguimiento desde Supabase, y la interfaz, el análisis de momentos y la previa responden (imagen `0635142`). | Cumplido |
 
 ## Decisiones técnicas
 

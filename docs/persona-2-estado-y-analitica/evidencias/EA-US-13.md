@@ -3,7 +3,7 @@
 ## Identificación
 
 - **Historia:** EA-US-13 · Explicar un momento con datos en el resumen.
-- **Estado:** verificada localmente con la API, la interfaz en el navegador y las imágenes de Docker; en Azure, pendiente del próximo despliegue.
+- **Estado:** verificada localmente y en Azure: el análisis de un momento responde a través de la interfaz desplegada (imagen `0635142`).
 - **Prioridad:** P1.
 - **Última verificación:** 25 de octubre de 2026.
 - **Responsable:** Persona 2 · Estado y analítica (con cambios acotados en la pestaña Resumen de Persona 4).
