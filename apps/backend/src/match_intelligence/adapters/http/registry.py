@@ -1,3 +1,4 @@
+import logging
 import os
 from collections.abc import Callable
 
@@ -7,6 +8,8 @@ from match_intelligence.adapters.sources.synthetic import SyntheticMatch, genera
 from match_intelligence.application.match_session import MatchSession, NotFoundError
 from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
 from match_intelligence.application.ports import AnalyticsPort, NarrativePort
+
+logger = logging.getLogger(__name__)
 
 DEMO_MATCH_ID = "synthetic-acceptance-001"
 ANALYTICS_MATCH_ID = "synthetic-analytics-001"
@@ -116,14 +119,23 @@ def _stored_matches(load_tracking: bool) -> tuple[list[SyntheticMatch], dict]:
     store = SupabaseMatchStore.from_env()
     if store is None:
         raise RuntimeError(f"MATCH_SOURCE=supabase requiere la variable {DATABASE_URL_VARIABLE}")
-    matches = store.load_matches()
-    tracks = {}
-    if load_tracking:
-        for match in matches:
-            tracking = store.load_tracking(match.metadata.match_id)
-            if tracking is not None:
-                conversion = tracks_from_observations(match.metadata, match.events, tracking)
-                tracks[match.metadata.match_id] = conversion.tracks
+    try:
+        matches = store.load_matches()
+        tracks = {}
+        if load_tracking:
+            for match in matches:
+                tracking = store.load_tracking(match.metadata.match_id)
+                if tracking is not None:
+                    conversion = tracks_from_observations(match.metadata, match.events, tracking)
+                    tracks[match.metadata.match_id] = conversion.tracks
+    except Exception as error:  # noqa: BLE001 - la base no debe dejar la API sin partidos
+        # Sin conexión (por ejemplo, una cadena directa solo IPv6 desde Azure), la API
+        # arranca con los partidos sintéticos y lo deja escrito en los registros.
+        logger.warning(
+            "No se pudo leer Supabase (%s: %s). Se cargan los partidos sintéticos.",
+            type(error).__name__, str(error).splitlines()[0] if str(error) else "",
+        )
+        return [], {}
     return matches, tracks
 
 

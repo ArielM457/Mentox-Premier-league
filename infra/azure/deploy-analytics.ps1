@@ -242,10 +242,24 @@ if ($databaseUrl) {
     if ($databaseUrl -notmatch '^postgres(ql)?://') {
         throw 'La cadena de Supabase debe empezar por postgresql://'
     }
-    if ($databaseUrl -match '@db\.[a-z0-9]+\.supabase\.co') {
-        Write-Warning 'Es la conexión directa (solo IPv6). Container Apps necesita la del Session pooler (pooler.supabase.com).'
+    # Container Apps sale a Internet solo por IPv4. La conexión directa de Supabase
+    # (db.<ref>.supabase.co) solo tiene IPv6: la API no podría leer la base.
+    $hostMatches = [regex]::Matches($databaseUrl, '@([^@:/?]+)(?::\d+)?(?:/|$)')
+    if ($hostMatches.Count -eq 0) { throw 'No se pudo leer el servidor de la cadena de Supabase.' }
+    $databaseHost = $hostMatches[$hostMatches.Count - 1].Groups[1].Value
+    $ipv4Count = 1
+    try {
+        $ipv4Count = @([System.Net.Dns]::GetHostAddresses($databaseHost) |
+            Where-Object { $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork }).Count
     }
-    Write-Host 'Supabase: configurado (la cadena no se muestra).'
+    catch {
+        Write-Warning "No se pudo resolver $databaseHost desde este equipo; no se comprueba si tiene IPv4."
+    }
+    if ($databaseHost -match '^db\.[a-z0-9]+\.supabase\.co$' -or $ipv4Count -eq 0) {
+        throw ("La cadena usa $databaseHost, que solo tiene IPv6, y Azure Container Apps sale por IPv4. " +
+            'Copie la del Session pooler en Supabase: Connect > Direct > Session pooler (servidor ...pooler.supabase.com, usuario postgres.<ref>).')
+    }
+    Write-Host "Supabase: configurado con $databaseHost (la cadena no se muestra)."
 }
 else {
     Write-Host 'Supabase: no configurado. La API usará los partidos sintéticos y no se crea el trabajo replay.'

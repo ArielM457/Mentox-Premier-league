@@ -201,6 +201,7 @@ La interfaz queda en `http://localhost:5173` y reenvía `/api` a la API. Sin `MA
 | `ExpressEnvironmentResourceNotSupported` | Azure creó el entorno en modo Express | Ya resuelto: la plantilla pide `WorkloadProfiles`. Vuelva a ejecutar el script |
 | `GatewayTimeout` al borrar | Azure tardó en responder | El script espera y comprueba; vuelva a ejecutarlo si se detuvo |
 | `ManagedClusterSuspended` | Azure suspendió el cómputo del entorno (nos ocurrió con un entorno recién recreado con el mismo nombre) | Ejecute con `-RecreateEnvironment`. Si se repite, deje la API y la interfaz en un entorno Express y corra el procesador desde un equipo |
+| La API no responde y sus registros dicen `connection is bad: connection to server at "2600:…" … Cannot assign requested address` | Se usó la conexión directa de Supabase (`db.<ref>.supabase.co`), que solo tiene IPv6; Container Apps sale por IPv4 | Use la del **Session pooler** (`…pooler.supabase.com`, usuario `postgres.<ref>`) y vuelva a desplegar. El script ahora la rechaza antes de desplegar, y la API arranca con los partidos sintéticos si no alcanza la base |
 | `MaxNumberOfRegionalEnvironmentsInSubExceeded` | Solo se permite un entorno por región | Borre el anterior (el script lo ofrece) o use otra región |
 | `503` en `/api/v1/integration/*` | Faltan archivos de experimentos de visión de Persona 1 (`experiments/…/output`) | Es esperado hasta que Persona 1 los publique; el resto de la API funciona |
 | Docker no responde | Docker Desktop cerrado | Ábralo y espere a que diga que está en marcha |

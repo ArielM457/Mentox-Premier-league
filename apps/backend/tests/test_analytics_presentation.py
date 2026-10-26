@@ -150,3 +150,24 @@ def test_supabase_source_requires_its_connection(monkeypatch: pytest.MonkeyPatch
     monkeypatch.delenv("SUPABASE_DB_URL", raising=False)
     with pytest.raises(RuntimeError, match="SUPABASE_DB_URL"):
         registry_module._default_registry()
+
+
+def test_unreachable_supabase_falls_back_to_synthetic_matches(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Una cadena que Azure no alcanza no debe dejar la API sin partidos."""
+    from match_intelligence.adapters.storage import supabase_store
+
+    class Unreachable:
+        def load_matches(self):
+            raise OSError('connection to server at "2600:1f18::1", port 5432 failed')
+
+    monkeypatch.setenv("MATCH_SOURCE", "supabase")
+    monkeypatch.setenv("ANALYTICS_ENGINE", "persona2")
+    monkeypatch.setattr(supabase_store.SupabaseMatchStore, "from_env", classmethod(lambda cls: Unreachable()))
+    with caplog.at_level("WARNING"):
+        registry = _default_registry()
+    assert sorted(s.match_id for s in registry.all()) == sorted(
+        [DEMO_MATCH_ID, ANALYTICS_MATCH_ID, "synthetic-live-001"]
+    )
+    assert "No se pudo leer Supabase" in caplog.text and "OSError" in caplog.text
