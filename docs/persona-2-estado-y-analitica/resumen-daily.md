@@ -166,9 +166,10 @@ Persona 1 subió un commit grande: modelos en GPU de Azure, captura de visión e
 - **Conflictos:** 4 archivos de la interfaz. Su panel de visión y nuestra tarjeta iban en la misma dirección, así que quedaron unidos. Con vídeo, la tarjeta muestra la captura en vivo (fotogramas, detecciones y resúmenes como «22 jugadores · 2 árbitros · 1 balón»). Sin vídeo, muestra los resultados guardados y dice que son de otro vídeo, no de este partido.
 - **Arreglos que hizo falta hacer:**
   - Su adaptador de GameState usaba `TrackedKind.REFEREE`, que ya no existía en nuestra rama. Se añadió como valor nuevo, sin quitar `UNASSIGNED`.
-  - En inglés, los textos de visión estaban dentro de `editorial`, no de `match`. Con la tarjeta, la pantalla del partido se rompía en inglés; **la versión `5fd326b` de Azure tiene ese error**. Ahora `npm run lint` también comprueba que español e inglés tengan las mismas claves.
+  - En inglés, los textos de visión estaban dentro de `editorial`, no de `match`. Con la tarjeta, la pantalla del partido se rompía en inglés; la versión `5fd326b` de Azure tenía ese error, ya corregido. Ahora `npm run lint` también comprueba que español e inglés tengan las mismas claves.
   - Faltaban 3 rutas nuevas en la colección de Postman.
 - **Comprobación:** pasan 429 pruebas; fallan las mismas 10 de Persona 1 de siempre. Todas las rutas responden con los dos motores, y la tarjeta funciona en español y en inglés sin errores.
+- **En Azure:** la API, la interfaz, el procesador y el trabajo `replay` usan la imagen `79c1b79` (con esta unión y el permiso acotado del generador MESSI). La visión responde `ready`, la API sigue leyendo los 3 partidos de Supabase y las revisiones nuevas están sanas. Sin la configuración de Persona 1, la captura en vivo queda apagada: `models/prepare` explica qué variables faltan.
 
 ### Guía para el equipo
 
