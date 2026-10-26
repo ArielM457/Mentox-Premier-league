@@ -4,14 +4,38 @@
     {
       "name": "backend",
       "runtimeExecutable": ".venv/Scripts/python.exe",
-      "runtimeArgs": ["-m", "uvicorn", "match_intelligence.main:app", "--host", "127.0.0.1", "--port", "8000"],
-      "env": { "ANALYTICS_ENGINE": "persona2" },
+      "runtimeArgs": [
+        "-m",
+        "uvicorn",
+        "match_intelligence.main:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
+      ],
+      "env": {
+        "ANALYTICS_ENGINE": "persona2",
+        "MENTOX_ROBOFLOW_ARTIFACT": "docs/mentox-modelos-20261023T045413Z/resultados/roboflow-sports-predictions.json",
+        "MENTOX_SOCCERNET_ARTIFACT": "docs/mentox-modelos-20261023T045413Z/resultados/soccernet-predictions.json",
+        "MENTOX_FUSION_ARTIFACT": "docs/mentox-modelos-20261023T045413Z/resultados/dv-us-21-report-recalculado.json"
+      },
       "port": 8000
     },
     {
       "name": "frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--workspace", "frontend", "--", "--host", "127.0.0.1", "--port", "5173", "--strictPort"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--workspace",
+        "frontend",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5173",
+        "--strictPort"
+      ],
       "port": 5173
     }
   ]
