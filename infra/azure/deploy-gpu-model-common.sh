@@ -9,6 +9,10 @@ die() {
   exit 1
 }
 
+normalize_location() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]_-'
+}
+
 for required_variable in MENTOX_DEPLOY_SLUG MENTOX_DEPLOY_CONTEXT MENTOX_DEPLOY_APP_NAME MENTOX_DEPLOY_IDENTITY_NAME; do
   [[ -n "${!required_variable:-}" ]] || die "Falta la variable interna ${required_variable}. Use un wrapper deploy-*.sh."
 done
@@ -72,7 +76,7 @@ if ! az acr show --resource-group "${resource_group}" --name "${acr_name}" >/dev
     --location "${location}" --sku Basic --admin-enabled false --output none
 fi
 acr_location="$(az acr show --resource-group "${resource_group}" --name "${acr_name}" --query location --output tsv)"
-[[ "${acr_location,,}" == "${location,,}" ]] || die \
+[[ "$(normalize_location "${acr_location}")" == "$(normalize_location "${location}")" ]] || die \
   "El ACR ${acr_name} está en ${acr_location}, no en ${location}. Use la región existente o otro MENTOX_ACR_NAME."
 
 login_server="$(az acr show --resource-group "${resource_group}" --name "${acr_name}" --query loginServer --output tsv)"
@@ -123,7 +127,7 @@ if ! az containerapp env show --resource-group "${resource_group}" --name "${env
     --location "${location}" --environment-mode WorkloadProfiles --logs-destination none --output none
 else
   env_location="$(az containerapp env show --resource-group "${resource_group}" --name "${environment_name}" --query location --output tsv)"
-  [[ "${env_location,,}" == "${location,,}" ]] || die \
+  [[ "$(normalize_location "${env_location}")" == "$(normalize_location "${location}")" ]] || die \
     "El entorno ${environment_name} está en ${env_location}, no en ${location}."
 fi
 
@@ -154,6 +158,10 @@ else
     --secrets model-api-key="${MENTOX_MODEL_API_KEY}" \
     --env-vars MENTOX_MODEL_API_KEY=secretref:model-api-key --output none
 fi
+
+# Una sola revisión evita que dos versiones compitan por la GPU T4 disponible.
+az containerapp revision set-mode --resource-group "${resource_group}" \
+  --name "${MENTOX_DEPLOY_APP_NAME}" --mode single --output none
 
 fqdn="$(az containerapp show --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" \
   --query properties.configuration.ingress.fqdn --output tsv)"

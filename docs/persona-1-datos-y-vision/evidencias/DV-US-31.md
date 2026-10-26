@@ -2,10 +2,14 @@
 
 ## Estado
 
-**Implementada, pendiente de verificación en Azure.**  
+**Verificada en Azure.**
 **Última revisión:** 25 de octubre de 2026.
 
-Se prepararon imágenes y scripts reproducibles para la suite espacial de Roboflow Sports y SoccerNet TeamSpotting. No se afirma que estos dos servicios estén desplegados hasta ejecutar los comandos contra Azure y conservar sus respuestas. GameState se bloquea de manera explícita porque todavía no acepta un MP4 de Mentox.
+Se desplegaron la suite espacial de Roboflow Sports y SoccerNet TeamSpotting en
+Azure Container Apps con una Tesla T4. Ambos servicios procesaron el mismo
+vídeo autorizado de 30 segundos: la suite recibió un fotograma del segundo 5 y
+TeamSpotting recibió el clip completo. GameState continúa separado y no se
+presenta como desplegado.
 
 ## Alcance y exclusiones
 
@@ -24,7 +28,7 @@ No incluye:
 - conexión de estas URL con el backend oficial;
 - inferencia sobre transmisiones completas o datos Premier League;
 - autenticación de producción con Microsoft Entra;
-- verificación remota de las imágenes nuevas.
+- ejecución simultánea de dos aplicaciones GPU con la cuota actual.
 
 ## Archivos
 
@@ -71,7 +75,7 @@ No incluye:
 |---|---|---|
 | Reutilizar correcciones reales | Script común con región, modo local, venv, timeout y WorkloadProfiles | Verificado por inspección y sintaxis |
 | No duplicar infraestructura costosa | ACR, entorno y perfil compartidos; APIs separadas | Verificado por parámetros |
-| Preservar integridad de pesos | Identificadores y SHA-256 fijados en Dockerfiles | Pendiente de construcción remota |
+| Preservar integridad de pesos | Identificadores y SHA-256 fijados en Dockerfiles | Verificado durante construcción y arranque remoto |
 | Limitar costo | Mínimo 0, máximo 1, sin Log Analytics | Verificado por valores predeterminados |
 | Proteger inferencia | Clave fuera de Git, límite de archivo y bloqueo por réplica | Verificado por código |
 | No fingir GameState | Preflight termina antes de Azure y explica dependencias | Verificado localmente |
@@ -90,24 +94,76 @@ python3.12 -m py_compile deploy/azure-soccernet-teamspotting/app.py
 git diff --check
 ```
 
-## Comando de verificación en Azure pendiente
+## Verificación real en Azure
+
+Recursos observados:
+
+| Aplicación | Imagen | Perfil | Estado |
+|---|---|---|---|
+| `ca-mentox-roboflow-dev` | `mentox/roboflow-suite:bb033679830f` | `NC8as-T4` | `Succeeded` |
+| `ca-mentox-teamspotting-dev` | `mentox/soccernet-teamspotting:08817e0fac34` | `NC8as-T4` | `Succeeded` |
+
+Entrada autorizada:
+
+- `experiments/authorized-video/input/2e57b9_0.mp4`;
+- H.264, 1920×1080, 25 FPS, 750 cuadros y 30 segundos;
+- el fotograma espacial se extrajo en el segundo 5;
+- no se copió el MP4 ni se guardó ninguna credencial en la evidencia.
+
+Resultado de la suite Roboflow en Tesla T4:
+
+| Modelo solicitado | Ejecución observada | Resultado |
+|---|---|---|
+| `player` | Sí | 26 detecciones: 22 jugadores, 3 árbitros y 1 balón |
+| `ball` | Sí | 0 detecciones en ese fotograma |
+| `pitch` | Sí | 1 detección de campo |
+
+La respuesta incluyó los tres nombres dentro de `results`, por lo que una
+salida vacía del modelo `ball` no se interpreta como modelo omitido. La
+inferencia conjunta tardó `304.851 ms`. El SHA-256 del JSON completo temporal
+fue `94426aaad6808b9de7f6f7d3e7bc93605ec0bb04432f2e3a55f8191977f41208`.
+
+Resultado de SoccerNet TeamSpotting en Tesla T4:
+
+- 375 cuadros muestreados a 12,5 FPS;
+- `3858.928 ms` de inferencia del modelo;
+- 127 candidatos temporales: 48 `drive`, 7 `header`, 16 `high pass`, 7
+  `out`, 46 `pass` y 3 `throw in`;
+- SHA-256 del JSON completo temporal:
+  `f6cea990b7c6ecb01999373e8f0fb91a9d642429ef4263c442c7e33772c9ad2b`.
+
+Comandos usados, con el secreto recuperado en una variable efímera y nunca
+impreso:
 
 ```bash
-export MENTOX_MODEL_API_KEY="$(openssl rand -hex 32)"
-export MENTOX_ACCEPT_MODEL_LICENSES=1
-export MENTOX_IMAGE_BUILD_MODE=local
-export MENTOX_MIN_REPLICAS=0
-bash infra/azure/deploy-remaining-vision-models.sh
+ffmpeg -hide_banner -loglevel error -y -ss 00:00:05 \
+  -i experiments/authorized-video/input/2e57b9_0.mp4 \
+  -frames:v 1 /tmp/mentox-full-flow/frame.jpg
+
+curl --fail-with-body \
+  --header "X-API-Key: ${MENTOX_MODEL_API_KEY}" \
+  --form "image=@/tmp/mentox-full-flow/frame.jpg;type=image/jpeg" \
+  "https://<roboflow-fqdn>/v1/predict?models=all"
+
+curl --fail-with-body \
+  --header "X-API-Key: ${MENTOX_MODEL_API_KEY}" \
+  --form "video=@experiments/authorized-video/input/2e57b9_0.mp4;type=video/mp4" \
+  "https://<teamspotting-fqdn>/v1/predict"
 ```
 
-Se debe adjuntar la salida sin secretos y probar `/health/ready` e inferencia antes de cambiar el estado a verificada en Azure.
+Durante el cambio de una aplicación a otra Azure respondió temporalmente con
+HTTP `507`. Los reintentos finalizaron correctamente cuando se liberó la T4.
+Esto demuestra ejecución secuencial, no simultánea.
 
 ## Riesgos y dependencias
 
 - Los pesos no declaran todos una licencia separada; ACR debe permanecer privado hasta resolverlo.
-- Una sola T4 puede cargar la suite Roboflow, pero las APIs no comparten una réplica entre sí.
+- La cuota observada solo permite una carga T4 a la vez. Roboflow y
+  TeamSpotting funcionan por separado, pero no simultáneamente en esta
+  suscripción. Para paralelizarlos se necesita más cuota u otras suscripciones.
 - Arrancar desde cero añade latencia de descarga de imagen y carga del modelo.
-- TeamSpotting consume el clip completo y no sustituye todavía un worker por segmentos en vivo.
+- TeamSpotting consume el clip completo y no forma parte todavía del bucle de
+  fotogramas en vivo del frontend. Requiere un worker de ventanas MP4.
 - La disponibilidad del perfil no garantiza cuota en otra suscripción.
 - GameState depende de DV-US-27 y de un adaptador todavía inexistente.
 

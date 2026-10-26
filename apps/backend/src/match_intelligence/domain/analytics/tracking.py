@@ -58,6 +58,9 @@ LIMIT_IDENTITY = "La pista no está asociada a un jugador confirmado; se informa
 class TrackedKind(StrEnum):
     PLAYER = "player"
     GOALKEEPER = "goalkeeper"
+    # La fuente sabe que es un árbitro (por ejemplo, SoccerNet GameState).
+    REFEREE = "referee"
+    # Pista sin equipo de una fuente que no indica la clase (VisualTrackObservation).
     UNASSIGNED = "unassigned"
     BALL = "ball"
 

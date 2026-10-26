@@ -2,7 +2,7 @@
 
 ## Estado y resultado
 
-**Estado:** verificada localmente el 23 de octubre de 2026.
+**Estado:** verificada en integración el 25 de octubre de 2026.
 
 El filtro determinista quedó conectado a tres canales con garantías distintas:
 
@@ -25,7 +25,9 @@ El botón **Iniciar partido en vivo** ejecuta `/api/v1/matches/{id}/simulation`.
 - Un fallo de métricas se registra en `telemetry_failures` y no borra el ingreso.
 - Un fallo de la cola importante produce error; el backend no confirma una entrega inexistente.
 - `ROUTING_TRANSPORT=memory` permite probar sin Azure. `azure` activa los dos Event Hubs y Service Bus con `DefaultAzureCredential`.
-- Service Bus está desactivado por defecto en Bicep para evitar costo accidental. Requiere `deployDurableImportantQueue=true`, `what-if` y autorización explícita.
+- La topología compartida conserva Service Bus desactivado por defecto para
+  evitar costo accidental. El entorno autorizado usa una plantilla aislada que
+  no modifica Storage, Container Apps ni trabajos GPU.
 
 ## Archivos
 
@@ -36,10 +38,13 @@ El botón **Iniciar partido en vivo** ejecuta `/api/v1/matches/{id}/simulation`.
 - `apps/backend/src/match_intelligence/adapters/http/match_router.py`
 - `apps/backend/tests/test_routing_transport.py`
 - `infra/azure/main.bicep`
+- `infra/azure/messaging-topology.bicep`
+- `infra/azure/messaging-topology.dev.bicepparam`
 - `infra/azure/dev.bicepparam.example`
 - `infra/azure/README.md`
 - `apps/backend/pyproject.toml`
 - `apps/backend/uv.lock`
+- `apps/backend/scripts/routing_transport_smoke.py`
 
 ## Criterios y evidencia
 
@@ -52,6 +57,9 @@ El botón **Iniciar partido en vivo** ejecuta `/api/v1/matches/{id}/simulation`.
 | No ocultar fallo durable | Excepción propagada para reintento | `test_important_failure_is_propagated_for_retry` |
 | Integrar la experiencia | La simulación HTTP usa el pipeline compartido | Pruebas de experiencia y API |
 | Infraestructura reproducible | Event Hub y Service Bus condicional en Bicep | Compilación Bicep correcta |
+| Canales reales | Plantilla aislada de mensajería | Despliegue `Succeeded` en Azure |
+| Recorrido real | Publicación de pase y gol sintéticos | 2 ingresos, 1 métrica y 1 importante; cero fallos |
+| Retención durable | Cola activa con DLQ y diez entregas máximas | Smoke consumió sus mensajes; cola terminó con 0 activos y 0 muertos |
 
 ## Comandos y resultados
 
@@ -80,17 +88,52 @@ Resultado: compilación correcta. El linter terminó sin errores y conservó tre
 
 Resultado: plantilla compilada correctamente.
 
+```bash
+az deployment group create \
+  --name mentox-messaging-topology \
+  --resource-group rg-mentox-dev \
+  --template-file infra/azure/messaging-topology.bicep \
+  --parameters infra/azure/messaging-topology.dev.bicepparam
+```
+
+Resultado del 25 de octubre de 2026: **Succeeded**. Se crearon en `centralus`:
+
+- `eh-damon-dev-hxwjzbiyupwqc` con `match-events`, `match-metrics` y
+  `vision-observations`, todos activos y con dos particiones;
+- `sb-damon-dev-hxwjzbiyupwqc` con `important-events`, activa,
+  `maxDeliveryCount=10` y envío a DLQ al vencer;
+- grupos `backend` y `diagnostics` para ingreso y visión, y `diagnostics` para
+  métricas.
+
+```bash
+export EVENT_HUB_FULLY_QUALIFIED_NAMESPACE="eh-damon-dev-hxwjzbiyupwqc.servicebus.windows.net"
+export EVENT_HUB_NAME="match-events"
+export METRICS_EVENT_HUB_NAME="match-metrics"
+export SERVICE_BUS_FULLY_QUALIFIED_NAMESPACE="sb-damon-dev-hxwjzbiyupwqc.servicebus.windows.net"
+export IMPORTANT_EVENTS_QUEUE_NAME="important-events"
+
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 \
+  python apps/backend/scripts/routing_transport_smoke.py
+```
+
+Resultado real: ruta `metrics_only` para el pase, `danger_immediate` para el
+gol, dos ingresos, una métrica, una entrega importante y cero fallos de
+telemetría. La segunda ejecución consumió y confirmó los dos mensajes smoke
+acumulados. Azure terminó con cero mensajes activos y cero en la cola muerta.
+
 ## Versiones y documentación consultada
 
 - Python 3.12 mediante `uv`.
 - `azure-servicebus` 7.15.0 bloqueado en `uv.lock`.
 - Azure SDK for Python: cliente asíncrono de Service Bus, `DefaultAzureCredential`, sender de cola y `ServiceBusMessage`.
+- Context7 confirmó el cierre explícito de clientes y credenciales asíncronos;
+  el lifespan de la API ahora también cierra el transporte de enrutamiento.
 - Vite 8.3.3 durante la compilación del frontend.
 
 ## Limitaciones y pendientes
 
-- No se desplegaron `match-metrics` ni Service Bus en Azure durante esta verificación.
-- Falta ejecutar `az deployment group validate`, `what-if` y `create` con la suscripción elegida.
-- Falta asignar `Azure Event Hubs Data Sender` y `Azure Service Bus Data Sender` a la identidad de ejecución.
+- El usuario local quedó autorizado para la prueba. La identidad del backend
+  que se despliegue deberá recibir permisos de envío sin compartir claves.
 - La cola Basic no usa detección nativa de duplicados; la idempotencia se conserva mediante `decision_id` y debe comprobarla el consumidor.
 - Las salidas actuales de visión siguen siendo observaciones experimentales y no entran a importantes hasta que una política las confirme como `MatchEvent`.

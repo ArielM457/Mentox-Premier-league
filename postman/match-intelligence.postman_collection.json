@@ -326,6 +326,69 @@
           ]
         },
         {
+          "name": "POST Preparar modelos de visión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/live/models/prepare",
+            "description": "Despierta la suite de Roboflow en la GPU antes de Play (DV-US-34). Sin ROBOFLOW_SUITE_ENDPOINT y su clave responde 503; configurada, 200 con el modelo listo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 503', () => pm.response.to.have.status(503));",
+                  "pm.test('Explica la configuración que falta', () => pm.expect(pm.response.json().detail).to.include('ROBOFLOW_SUITE_ENDPOINT'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Vídeo del partido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/live/video",
+            "description": "Sirve el MP4 privado de Blob Storage con rangos. Sin AZURE_BLOB_SERVICE_ENDPOINT y VISION_VIDEO_BLOB_NAME responde 404; configurado, 200 o 206 con el vídeo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Indica que no hay vídeo', () => pm.expect(pm.response.json().detail).to.include('Blob Storage'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Capturar fotograma",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=1000",
+            "description": "Recibe el fotograma visible como JPEG mientras el vídeo está en Play y lo envía a Roboflow. En pausa responde 409; reproduciendo y con la GPU configurada, 202."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Rechaza capturas en pausa', () => pm.expect(pm.response.json().detail).to.include('pausada'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "POST Reiniciar reproducción de visión",
           "request": {
             "method": "POST",

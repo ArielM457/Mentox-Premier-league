@@ -6,6 +6,7 @@ Las rutas solo traducen HTTP; la lógica vive en ``MatchSession``.
 import asyncio
 import json
 import time
+import os
 from collections.abc import AsyncIterator
 from typing import Annotated
 
@@ -97,11 +98,18 @@ Preferences = Annotated[ViewerPreferences, Depends(preferences)]
 
 
 def _detail(session: MatchSession) -> MatchDetailResponse:
+    has_blob_video = bool(
+        os.getenv("AZURE_BLOB_SERVICE_ENDPOINT")
+        and os.getenv("VISION_VIDEO_BLOB_NAME")
+    )
     return MatchDetailResponse(
         metadata=session.metadata,
         duration_ms=session.duration_ms,
         event_count=len(session.events),
-        video=VideoSource(),
+        video=VideoSource(
+            kind="file" if has_blob_video else "synthetic_timeline",
+            url="/api/v1/integration/live/video" if has_blob_video else None,
+        ),
     )
 
 

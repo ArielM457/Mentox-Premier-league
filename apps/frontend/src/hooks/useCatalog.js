@@ -23,6 +23,7 @@ async function fetchCatalog() {
         eventCount: detail.event_count,
         finalScore: final.score,
         events: events.events,
+        video: detail.video,
       }
     }),
   )

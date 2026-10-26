@@ -523,9 +523,98 @@ export function LiveCommentsPanel({ moments, events, metadata, timeMs, compact =
   )
 }
 
-// Resultados de los modelos de visión de Persona 1, como tarjeta compañera del campo.
-// Vienen de un vídeo corto y distinto del partido sintético: son evidencia experimental, no eventos.
-export function VisionCard({ timeMs, seekVersion }) {
+function visionLabel(t, label) {
+  return t.match.visionObjectLabels[label] ?? label ?? t.match.visionObject
+}
+
+// Detecciones del fotograma capturado más cercano al instante visible (hasta 2,5 s de distancia).
+function observationsForFrame(observations, matchId, timeMs) {
+  const candidates = observations.filter((item) => (
+    item.kind === 'spatial_detection'
+    && item.payload?.match_id === matchId
+    && Array.isArray(item.payload?.bounding_box)
+    && Math.abs(item.timestamp_ms - timeMs) <= 2500
+  ))
+  const latestTimestamp = Math.max(-1, ...candidates.map((item) => item.timestamp_ms))
+  return candidates.filter((item) => item.timestamp_ms === latestTimestamp)
+}
+
+function groupLiveObservations(observations) {
+  const groups = new Map()
+  for (const item of observations) {
+    const group = groups.get(item.timestamp_ms) ?? []
+    group.push(item)
+    groups.set(item.timestamp_ms, group)
+  }
+  return [...groups.entries()]
+    .sort(([left], [right]) => right - left)
+    .map(([timestamp, items]) => ({ timestamp, items }))
+}
+
+// «22 jugadores · 2 árbitros · 1 balón» en lugar de enumerar cada caja.
+function detectionSummary(t, observations) {
+  const counts = new Map()
+  for (const item of observations) {
+    const label = item.payload?.label ?? 'other'
+    counts.set(label, (counts.get(label) ?? 0) + 1)
+  }
+  return [...counts.entries()].map(([label, count]) => {
+    const copy = t.match.visionObjectCountLabels[label] ?? t.match.visionObjectCountLabels.other
+    return `${count} ${count === 1 ? copy.one : copy.many}`
+  }).join(' · ')
+}
+
+export function VisionVideoOverlay({ observations, matchId, timeMs }) {
+  const { t } = usePreferences()
+  const detections = observationsForFrame(observations, matchId, timeMs)
+  return (
+    <div aria-label={t.match.visionOverlayLabel} className="vision-box-layer" role="group">
+      {detections.map((item) => {
+        const [x1, y1, x2, y2] = item.payload.bounding_box
+        return (
+          <span
+            className={`vision-box vision-box-${item.payload.label ?? 'other'}`}
+            key={item.observation_id}
+            style={{ '--box-x': `${x1 * 100}%`, '--box-y': `${y1 * 100}%`, '--box-width': `${(x2 - x1) * 100}%`, '--box-height': `${(y2 - y1) * 100}%` }}
+          >
+            <small>{visionLabel(t, item.payload.label)} · {t.common.number(Math.round(item.payload.confidence * 100))}%</small>
+          </span>
+        )
+      })}
+    </div>
+  )
+}
+
+const visionCount = (t, value, noun) => <span><b>{t.common.number(value)}</b> {noun(value)}</span>
+
+// Captura en vivo (DV-US-34): solo lo recibido en esta sesión, nunca predicciones guardadas.
+function LiveVisionResults({ capture, observations, timeMs }) {
+  const { t } = usePreferences()
+  const frames = groupLiveObservations(observations.filter((item) => Math.abs(item.timestamp_ms - timeMs) <= 5000)).slice(0, 4)
+  return (
+    <>
+      <p className="vision-window">
+        {visionCount(t, capture?.processed ?? 0, t.match.visionFrames)}
+        {visionCount(t, observations.filter((item) => item.kind === 'spatial_detection').length, t.match.visionDetections)}
+        {visionCount(t, observations.filter((item) => item.kind === 'temporal_action').length, t.match.visionActions)}
+      </p>
+      {frames.length ? (
+        <ul className="vision-rows">
+          {frames.map((frame) => (
+            <li key={frame.timestamp}>
+              <time>{t.common.number(frame.timestamp / 1000)} s</time>
+              <div><strong>{detectionSummary(t, frame.items)}</strong><small>{t.match.visionFrameEvidence(frame.items.length)}</small></div>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="vision-note">{t.match.visionPlayPrompt}</p>}
+      {capture?.error && <p className="vision-note vision-error">{capture.error}</p>}
+    </>
+  )
+}
+
+// Resultados que los modelos dejaron guardados de otro vídeo autorizado de 30 s.
+function SavedVisionResults({ timeMs, seekVersion }) {
   const { t } = usePreferences()
   const [status, setStatus] = useState(null)
   const [timeline, setTimeline] = useState(null)
@@ -556,55 +645,64 @@ export function VisionCard({ timeMs, seekVersion }) {
   }, [covered, from, to, seekVersion])
 
   const n = t.common.number
-  let body
-  if (error) {
-    body = <p className="vision-note">{t.match.visionUnavailable}<small>{error}</small></p>
-  } else if (status && !covered) {
-    body = (
+  if (error) return <p className="vision-note">{t.match.visionUnavailable}<small>{error}</small></p>
+  if (status && !covered) {
+    return (
       <p className="vision-note">
         {t.match.visionOutOfRange(formatClock(status.duration_ms))}{' '}
         {t.match.visionTotals(n(status.roboflow.predictions), n(status.soccernet.predictions), n(status.fusion.candidates))}
       </p>
     )
-  } else if (!status || !timeline) {
-    body = <p className="vision-note">{t.common.loading}</p>
-  } else {
-    const actions = timeline.temporal_actions.slice().sort((a, b) => b.timestamp_ms - a.timestamp_ms).slice(0, 3)
-    const count = (value, noun) => <span><b>{n(value)}</b> {noun(value)}</span>
-    body = (
-      <>
-        <p className="vision-window">
-          <span>{t.match.visionWindow(`${formatClock(from)}–${formatClock(to)}`)}</span>
-          {count(timeline.spatial_total, t.match.visionDetections)}
-          {count(timeline.temporal_actions.length, t.match.visionActions)}
-          {count(timeline.fusion_candidates.length, t.match.visionCandidates)}
-        </p>
-        {actions.length ? (
-          <ul className="vision-rows">
-            {actions.map((action) => (
-              <li key={action.prediction_id}>
-                <time>{n(action.timestamp_ms / 1000)} s</time>
-                <div>
-                  <strong>{t.match.visionActionLabels[action.label] ?? action.label}</strong>
-                  {action.team && <small>{t.match.visionSides[action.team] ?? action.team}</small>}
-                </div>
-                <span className="vision-confidence">{n(action.confidence * 100)}% <small>{t.match.visionConfidence}</small></span>
-              </li>
-            ))}
-          </ul>
-        ) : <p className="vision-note">{t.match.visionEmpty}</p>}
-      </>
-    )
   }
+  if (!status || !timeline) return <p className="vision-note">{t.common.loading}</p>
+  const actions = timeline.temporal_actions.slice().sort((a, b) => b.timestamp_ms - a.timestamp_ms).slice(0, 3)
+  return (
+    <>
+      <p className="vision-window">
+        <span className="vision-range">{t.match.visionWindow(`${formatClock(from)}–${formatClock(to)}`)}</span>
+        {visionCount(t, timeline.spatial_total, t.match.visionDetections)}
+        {visionCount(t, timeline.temporal_actions.length, t.match.visionActions)}
+        {visionCount(t, timeline.fusion_candidates.length, t.match.visionCandidates)}
+      </p>
+      {actions.length ? (
+        <ul className="vision-rows">
+          {actions.map((action) => (
+            <li key={action.prediction_id}>
+              <time>{n(action.timestamp_ms / 1000)} s</time>
+              <div>
+                <strong>{t.match.visionActionLabels[action.label] ?? action.label}</strong>
+                {action.team && <small>{t.match.visionSides[action.team] ?? action.team}</small>}
+              </div>
+              <span className="vision-confidence">{n(action.confidence * 100)}% <small>{t.match.visionConfidence}</small></span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="vision-note">{t.match.visionEmpty}</p>}
+    </>
+  )
+}
 
+// Tarjeta «Visión IA» del Partido. Con vídeo, o si llegan observaciones de esta sesión, muestra la
+// captura en vivo de Persona 1; si no, los resultados guardados de otro vídeo, dichos como tales.
+export function VisionCard({ timeMs, seekVersion, matchId, videoMode, capture, liveChannel }) {
+  const { t } = usePreferences()
+  const observations = (liveChannel?.observations ?? []).filter((item) => item.payload?.match_id === matchId)
+  const live = videoMode || observations.length > 0
   return (
     <section aria-labelledby="vision-card-title" className="vision-card">
       <header>
         <span className="vision-glyph"><Icon name="eye" size={17} /></span>
-        <div><strong id="vision-card-title">{t.match.visionTitle}</strong><small>{t.match.visionCopy}</small></div>
-        <span className="channel-pill">{t.match.visionBadge}</span>
+        <div><strong id="vision-card-title">{t.match.visionTitle}</strong><small>{live ? t.match.visionLiveCopy : t.match.visionSavedCopy}</small></div>
+        {live ? (
+          <span className="vision-statuses">
+            <span className={`channel-pill ${capture?.status === 'live' ? 'channel-live' : ''}`}>{capture?.status === 'live' ? t.match.visionCapturing : t.match.visionWaiting}</span>
+            <span className={`channel-pill ${liveChannel?.status === 'live' ? 'channel-live' : ''}`}>{liveChannel?.status === 'live' ? t.match.visionConnected : t.match.visionDisconnected}</span>
+          </span>
+        ) : <span className="channel-pill">{t.match.visionBadge}</span>}
       </header>
-      {body}
+      {live
+        ? <LiveVisionResults capture={capture} observations={observations} timeMs={timeMs} />
+        : <SavedVisionResults seekVersion={seekVersion} timeMs={timeMs} />}
       <p className="vision-footnote">{t.match.visionNotice}</p>
     </section>
   )

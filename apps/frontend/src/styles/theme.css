@@ -185,7 +185,8 @@
 :root[data-theme='light'] .vision-rows li { border-color: var(--line); }
 :root[data-theme='light'] .commentary-flow time,
 :root[data-theme='light'] .vision-rows time,
-:root[data-theme='light'] .vision-window > span:first-child { color: #6337df; }
+:root[data-theme='light'] .vision-range { color: #6337df; }
+:root[data-theme='light'] .vision-error { color: #8a5300; }
 :root[data-theme='light'] .commentary-flow header small,
 :root[data-theme='light'] .vision-card > header small,
 :root[data-theme='light'] .vision-window,

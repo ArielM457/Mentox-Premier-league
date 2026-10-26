@@ -204,7 +204,9 @@ docker build -f apps/backend/Dockerfile -t mentox-local/api .
 docker run --rm -p 8000:8000 -e ANALYTICS_ENGINE=persona2 mentox-local/api
 ```
 
-`http://localhost:8000/api/v1/integration/status` debe responder `"status": "ready"`. La imagen no incluye el video, así que `video_available` sale en `false`; la pestaña no lo necesita.
+`http://localhost:8000/api/v1/integration/status` debe responder `"status": "ready"`. La imagen no incluye el video, así que `video_available` sale en `false`; la tarjeta no lo necesita.
+
+Así, la tarjeta muestra los resultados guardados y lo dice: vienen de un vídeo autorizado, no del partido. La captura en vivo de Persona 1 (DV-US-34) cambia la cancha por un vídeo y envía un fotograma por segundo a Roboflow en una GPU. Solo se activa si la API tiene `AZURE_BLOB_SERVICE_ENDPOINT`, `VISION_VIDEO_BLOB_NAME`, `ROBOFLOW_SUITE_ENDPOINT` y `ROBOFLOW_SUITE_API_KEY`. Nuestro despliegue no las define. Para crear esos servicios, siga la guía de Persona 1 en `docs/persona-1-datos-y-vision/despliegue-modelos-azure-equipo.md`.
 
 ## **7. Secretos**
 

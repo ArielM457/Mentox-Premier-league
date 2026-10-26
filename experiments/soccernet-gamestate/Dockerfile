@@ -39,6 +39,7 @@ RUN git clone https://github.com/SoccerNet/sn-gamestate.git /opt/sn-gamestate \
     && python -m mim install "mmcv==2.0.1"
 
 COPY run_official_baseline.sh /usr/local/bin/run-official-baseline
+COPY export_tracker_state.py /opt/mentox/export_tracker_state.py
 RUN chmod 0555 /usr/local/bin/run-official-baseline
 
 ENV XDG_CACHE_HOME=/models/cache

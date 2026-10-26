@@ -29,14 +29,17 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 | DV-US-21 · Calibrar identidad y fusión | Verificada experimentalmente; un candidato sin identidad y ningún evento publicado | [DV-US-21](DV-US-21.md) |
 | DV-US-22 · Ejecutar el ensayo de aceptación integrado | Verificada en integración; recorrido local, Azure, vídeo, modelos, fusión y fallo controlado comprobados | [DV-US-22](DV-US-22.md) |
 | DV-US-28 · Integrar visión con la aplicación oficial | Implementada en rama de integración; frontend y pruebas aisladas verificados | [DV-US-28](DV-US-28.md) |
-| DV-US-29 · Separar telemetría y eventos importantes | Verificada localmente; despliegue de los recursos nuevos pendiente | [DV-US-29](DV-US-29.md) |
+| DV-US-29 · Separar telemetría y eventos importantes | Verificada en Azure con tres canales y publicación real | [DV-US-29](DV-US-29.md) |
 | DV-US-30 · Desplegar el primer detector en una GPU de Azure | Verificada en Azure con Tesla T4 y escala posterior a cero | [DV-US-30](DV-US-30.md) |
-| DV-US-31 · Preparar el despliegue de los modelos restantes | Implementada localmente; construcción e inferencia en Azure pendientes | [DV-US-31](DV-US-31.md) |
+| DV-US-31 · Preparar el despliegue de los modelos restantes | Suite Roboflow y TeamSpotting verificados en Azure; ejecución simultánea limitada por cuota | [DV-US-31](DV-US-31.md) |
 | DV-US-23 · Integrar el pipeline en el backend oficial | Backend y API HTTP verificados en un recorrido consolidado; Compose y frontend fuera de esta prueba | [DV-US-23](DV-US-23.md) |
 | DV-US-24 · Transportar observaciones durante la transmisión | Verificada localmente; canal Azure desplegado y prueba de datos pendiente con identidad autorizada | [DV-US-24](DV-US-24.md) |
 | DV-US-25 · Controlar observaciones con la reproducción | Verificada localmente; recorrido visual con Compose pendiente | [DV-US-25](DV-US-25.md) |
 | DV-US-26 · Ampliar la percepción espacial de fútbol | Ejecución completa en GPU de 6 GB verificada; calidad pendiente de anotación manual | [DV-US-26](DV-US-26.md) |
 | DV-US-27 · Evaluar SoccerNet Game State Reconstruction | Ajustada para 6 GB; descarga automática, construcción y smoke pendientes | [DV-US-27](DV-US-27.md) |
+| DV-US-33 · Adaptar un MP4 a SoccerNet GameState | Contratos verificados localmente; inferencia GPU pendiente | [DV-US-33](DV-US-33.md) |
+| DV-US-34 · Ejecutar inferencia mientras se reproduce el vídeo | Captura verificada localmente y topología Azure verificada; recorrido visual pendiente | [DV-US-34](DV-US-34.md) |
+| DV-US-35 · Consumir eventos importantes con un worker | Worker y recorrido Service Bus verificados; ejecución real de agentes pendiente | [DV-US-35](DV-US-35.md) |
 
 La revisión consolidada de la ejecución GPU se encuentra en
 [revisión de modelos GPU del 23 de octubre de 2026](revision-modelos-gpu-2026-10-23.md).

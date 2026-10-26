@@ -29,7 +29,7 @@ La analítica usa los mismos objetos que Persona 1 ya definió en `application/v
 - Los porteros, por `goalkeeper_player_ids`.
 - Una pista sin equipo que no es el balón (por ejemplo, el árbitro) queda como `unassigned` y no entra en las cifras de jugadores.
 
-Si Persona 1 añade la clase a su observación, el adaptador la usará y estas convenciones desaparecen.
+Si Persona 1 añade la clase a su observación, el adaptador la usará y estas convenciones desaparecen. Su adaptador de SoccerNet GameState ya la trae: produce cuadros con `referee` (valor `TrackedKind.REFEREE`), que tampoco entran en las cifras de jugadores.
 
 ## Reglas de limpieza
 

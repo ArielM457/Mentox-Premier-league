@@ -4,6 +4,7 @@ set -euo pipefail
 gpu_index="${MENTOX_CUDA_DEVICE:-0}"
 frame_limit="${MENTOX_GAMESTATE_FRAME_LIMIT:-250}"
 low_vram_profile="${MENTOX_GAMESTATE_LOW_VRAM:-0}"
+video_path="${MENTOX_GAMESTATE_VIDEO_PATH:-}"
 
 mkdir -p /tmp/mentox-home /data /models /output \
   "${XDG_CACHE_HOME}" "${HF_HOME}" "${TORCH_HOME}" "${MPLCONFIGDIR}"
@@ -48,16 +49,42 @@ if [[ "${low_vram_profile}" == "1" ]]; then
   )
 fi
 
-exec tracklab -cn soccernet \
+dataset_arguments=()
+if [[ -n "${video_path}" ]]; then
+  [[ -f "${video_path}" ]] || {
+    echo "El vídeo solicitado no existe dentro del contenedor: ${video_path}" >&2
+    exit 1
+  }
+  dataset_arguments=(
+    "dataset=video"
+    "dataset.video_path=${video_path}"
+    "dataset.eval_set=val"
+    "dataset.nvid=1"
+    "dataset.nframes=${frame_limit}"
+    "eval=trackeval"
+  )
+  echo "Modo MP4 externo: ${video_path}"
+else
+  dataset_arguments=(
+    "dataset.nvid=1"
+    "dataset.nframes=${frame_limit}"
+  )
+  echo "Modo dataset oficial SoccerNet GSR."
+fi
+
+tracklab -cn soccernet \
   "home_dir=/tmp/mentox-home" \
   "data_dir=/data" \
   "model_dir=/models" \
-  "dataset.nvid=1" \
-  "dataset.nframes=${frame_limit}" \
-  "test_tracking=false" \
+  "test_tracking=true" \
   "eval_tracking=false" \
   "use_wandb=false" \
   "state.save_file=/output/sn-gamestate.pklz" \
   "visualization.cfg.save_videos=true" \
   "hydra.run.dir=/output/run" \
+  "${dataset_arguments[@]}" \
   "${machine_arguments[@]}"
+
+python /opt/mentox/export_tracker_state.py \
+  --state /output/sn-gamestate.pklz \
+  --output /output/gamestate-observations.jsonl

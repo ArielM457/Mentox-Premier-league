@@ -9,7 +9,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Lee los partidos y el seguimiento desde una base en Supabase.
   - La pestaña Resumen explica cada momento con cifras medidas.
   - La visión IA también funciona en Azure: la imagen de la API ya trae los resultados de los modelos de Persona 1. Ahora es una tarjeta dentro de la pestaña Partido.
-  - Pasan 416 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
+  - Pasan 429 pruebas. Las 10 que fallan ya fallaban en `main` y son de Persona 1 (ver más abajo).
 - **Desde el último daily:**
   - Base de datos con partidos ficticios en Supabase.
   - Script que despliega todo en Azure.
@@ -156,6 +156,19 @@ Quedan para decidir en equipo:
 - **Modo claro.** Los comentarios en vivo, los interruptores y el select de velocidad seguían oscuros sobre fondo blanco. Ahora siguen el tema.
 
 Ya está en Azure, junto con la revisión general: la API, la interfaz, el procesador y el trabajo `replay` usan la imagen `5fd326b`. Solo cambió la imagen. La visión responde `ready`, la API sigue leyendo los 3 partidos de Supabase y las revisiones nuevas están sanas.
+
+### Segunda unión con `integration/modelos-frontend-20261025` (26 de octubre)
+
+Persona 1 subió un commit grande: modelos en GPU de Azure, captura de visión en vivo, un worker de eventos importantes y el generador MESSI.
+
+- **Modelos en Azure.** Según su evidencia (DV-US-31), la suite de Roboflow y TeamSpotting quedaron desplegadas en una GPU T4 de su suscripción, no de la nuestra.
+- **Captura en vivo (DV-US-34).** Con un vídeo de Blob Storage, el navegador envía un fotograma por segundo y Roboflow devuelve las detecciones por Event Hubs. Solo se activa con su configuración; nuestro despliegue sigue con la cancha sintética.
+- **Conflictos:** 4 archivos de la interfaz. Su panel de visión y nuestra tarjeta iban en la misma dirección, así que quedaron unidos. Con vídeo, la tarjeta muestra la captura en vivo (fotogramas, detecciones y resúmenes como «22 jugadores · 2 árbitros · 1 balón»). Sin vídeo, muestra los resultados guardados y dice que son de otro vídeo, no de este partido.
+- **Arreglos que hizo falta hacer:**
+  - Su adaptador de GameState usaba `TrackedKind.REFEREE`, que ya no existía en nuestra rama. Se añadió como valor nuevo, sin quitar `UNASSIGNED`.
+  - En inglés, los textos de visión estaban dentro de `editorial`, no de `match`. Con la tarjeta, la pantalla del partido se rompía en inglés; **la versión `5fd326b` de Azure tiene ese error**. Ahora `npm run lint` también comprueba que español e inglés tengan las mismas claves.
+  - Faltaban 3 rutas nuevas en la colección de Postman.
+- **Comprobación:** pasan 429 pruebas; fallan las mismas 10 de Persona 1 de siempre. Todas las rutas responden con los dos motores, y la tarjeta funciona en español y en inglés sin errores.
 
 ### Guía para el equipo
 

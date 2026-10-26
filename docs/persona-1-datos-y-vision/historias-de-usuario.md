@@ -739,7 +739,10 @@ endpoints reales y prepara evidencia. La guía se encuentra en la
 
 **Prioridad:** P1.
 
-**Estado:** implementada, pendiente de verificación en Azure. La suite Roboflow y TeamSpotting tienen paquetes y scripts; GameState permanece bloqueado hasta que acepte el vídeo de Mentox.
+**Estado:** verificada en Azure para la suite Roboflow y TeamSpotting. Los
+cuatro modelos procesaron la misma fuente autorizada de forma secuencial sobre
+Tesla T4. GameState permanece pendiente y la cuota actual no permite ejecutar
+dos aplicaciones GPU simultáneamente.
 
 **Evidencia:** [informe técnico de DV-US-31](evidencias/DV-US-31.md).
 
@@ -754,3 +757,101 @@ endpoints reales y prepara evidencia. La guía se encuentra en la
 - La guía indica despliegue, prueba, evidencia y apagado para el equipo.
 
 **Dependencias:** DV-US-20, DV-US-26, DV-US-27, DV-US-30 y cuota T4.
+
+### DV-US-32 · Generar un catálogo de partidos sintéticos con MESSI
+
+**Como** responsable de datos sintéticos,
+**quiero** ejecutar MESSI como un trabajo GPU finito y almacenar sus repeticiones,
+**para** disponer de varios partidos reproducibles sin generar vídeo durante la reproducción.
+
+**Prioridad:** P1.
+
+**Estado:** implementada y desplegada; la primera ejecución GPU detectó un fallo
+nativo durante el rollout y la corrección queda pendiente de una prueba corta en Azure.
+
+**Evidencia:** [informe técnico de DV-US-32](evidencias/DV-US-32.md).
+
+**Criterios de aceptación:**
+
+- El lote predeterminado genera 30 partidos sintéticos con semillas distintas y reproducibles.
+- Cada partido produce MP4, eventos, tracking, metadatos y un manifiesto con hashes.
+- El generador usa un Azure Container Apps Job sobre T4 y termina al completar el lote.
+- La identidad administrada descarga la imagen privada y escribe en Blob Storage mediante RBAC.
+- Los partidos completos se representan como vídeos tácticos comprimidos de tres minutos.
+- Una ejecución repetida omite partidos cuyo manifiesto ya figura como completo.
+- El contenedor de Storage es privado y la futura reproducción usará acceso temporal de lectura.
+- La documentación distingue los datos estructurados de MESSI de una transmisión real.
+
+**Dependencias:** DV-US-06, DV-US-09, cuota T4 y MESSI fijado a una revisión verificable.
+
+### DV-US-33 · Adaptar un MP4 a SoccerNet GameState
+
+**Como** responsable de visión,
+**quiero** procesar un MP4 sintético o autorizado mediante el baseline GameState y normalizar su estado,
+**para** entregar seguimiento, equipo, dorsal y posición al backend sin inventar identidades.
+
+**Prioridad:** P2.
+
+**Estado:** implementada y verificada localmente para adaptación y contratos; pendiente de inferencia GPU completa.
+
+**Evidencia:** [informe técnico de DV-US-33](evidencias/DV-US-33.md).
+
+**Criterios de aceptación:**
+
+- El lanzador acepta un MP4 mediante el `ExternalVideo` incluido en TrackLab 1.3.24.
+- El estado `.pklz` se exporta dentro del contenedor a JSONL sin obligar al backend Python 3.12 a cargar pickle.
+- El adaptador produce `VisionObservation` y `TrackingFrame v1` con tiempos reproducibles desde cuadro y FPS.
+- Equipo, dorsal y pista conservan su condición de estimaciones; `player_id` permanece vacío.
+- Una fila sin calibración sigue disponible como observación, pero no produce una posición de seguimiento falsa.
+- La historia no se marca como verificada en integración hasta completar una inferencia GPU sobre un MP4 permitido.
+
+**Dependencias:** DV-US-12, DV-US-17, DV-US-27, GPU compatible y pesos oficiales de GameState.
+
+### DV-US-34 · Ejecutar inferencia mientras se reproduce el vídeo
+
+**Como** operador de The Prime Moment,
+**quiero** que los modelos capturen el vídeo únicamente mientras está en reproducción,
+**para** observar resultados nuevos sin procesar el partido cuando está pausado.
+
+**Prioridad:** P0.
+
+**Estado:** captura verificada localmente y topología Azure verificada; recorrido
+visual con endpoint GPU, Blob Storage y WebSocket pendiente.
+
+**Evidencia:** [informe técnico de DV-US-34](evidencias/DV-US-34.md).
+
+**Criterios de aceptación:**
+
+- El navegador obtiene el MP4 privado mediante el backend y conserva la cancha sintética como fallback.
+- Play habilita la captura y Pause la detiene en frontend y backend.
+- Se envía como máximo un fotograma por segundo y nunca se expone la clave del modelo al navegador.
+- Una inferencia que termina después de Pause se descarta antes de publicar observaciones.
+- Los tres modelos de la suite Roboflow se ejecutan sobre el mismo fotograma.
+- Las detecciones se normalizan y publican en `vision-observations`.
+- El consumidor entrega las observaciones al panel oficial mediante WebSocket.
+- Los eventos deportivos fusionados conservan su separación posterior entre métricas e importantes.
+
+**Dependencias:** DV-US-24, DV-US-29, DV-US-30, DV-US-31, vídeo MESSI completo y RBAC de Azure.
+
+### DV-US-35 · Consumir eventos importantes con un worker
+
+**Como** operador de The Prime Moment,
+**quiero** que un worker retire de forma segura las decisiones importantes,
+**para** reintentar fallos sin perder jugadas relevantes ni procesarlas dos veces.
+
+**Prioridad:** P0.
+
+**Estado:** transporte y despacho verificados en Azure; ejecutores de agentes pendientes.
+
+**Evidencia:** [informe técnico de DV-US-35](evidencias/DV-US-35.md).
+
+**Criterios de aceptación:**
+
+- Valida `RoutingOutcome` antes de ejecutar trabajo.
+- Completa éxitos y duplicados idempotentes.
+- Abandona errores recuperables para permitir reintentos.
+- Envía contratos inválidos a la cola muerta.
+- Renueva el bloqueo durante tareas largas.
+- Usa identidad de Azure sin cadenas de conexión.
+
+**Dependencias:** DV-US-29, Service Bus y un ejecutor por cada tarea de agente.

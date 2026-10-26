@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -5,9 +7,18 @@ from .adapters.http.analytics_router import router as analytics_router
 from .adapters.http.match_router import router as match_router
 from .adapters.http.narrative_router import router as narrative_router
 from .adapters.http.router import router
-from .adapters.http.integration_router import router as integration_router
-from .adapters.http.routing_router import router as routing_router
+from .adapters.http.integration_router import integration_lifespan, router as integration_router
+from .adapters.http.routing_router import close_routing_transport, router as routing_router
 from .application.match_session import SessionError
+
+@asynccontextmanager
+async def application_lifespan(application: FastAPI):
+    async with integration_lifespan(application):
+        try:
+            yield
+        finally:
+            await close_routing_transport()
+
 
 app = FastAPI(
     title="Match Intelligence API",
@@ -17,6 +28,7 @@ app = FastAPI(
         "resúmenes y revisión editorial."
     ),
     version="0.2.0",
+    lifespan=application_lifespan,
 )
 app.include_router(router)
 app.include_router(narrative_router)

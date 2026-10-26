@@ -6,6 +6,7 @@ data_directory="${MENTOX_GAMESTATE_DATA_DIRECTORY:-${experiment_directory}/data}
 models_directory="${MENTOX_GAMESTATE_MODELS_DIRECTORY:-${experiment_directory}/models}"
 output_directory="${MENTOX_GAMESTATE_OUTPUT_DIRECTORY:-${experiment_directory}/output}"
 gpu_index="${MENTOX_CUDA_DEVICE:-0}"
+video_path="${MENTOX_GAMESTATE_VIDEO_PATH:-}"
 
 if ! command -v nvidia-smi >/dev/null 2>&1; then
   echo "No se encontró nvidia-smi. sn-gamestate requiere una GPU NVIDIA." >&2
@@ -37,6 +38,20 @@ else
 fi
 mkdir -p "${data_directory}" "${models_directory}" "${output_directory}"
 
+video_arguments=()
+if [[ -n "${video_path}" ]]; then
+  [[ -f "${video_path}" ]] || {
+    echo "No existe el MP4: ${video_path}" >&2
+    exit 1
+  }
+  video_directory="$(cd "$(dirname "${video_path}")" && pwd)"
+  video_filename="$(basename "${video_path}")"
+  video_arguments=(
+    --env "MENTOX_GAMESTATE_VIDEO_PATH=/input/${video_filename}"
+    --volume "${video_directory}:/input:ro"
+  )
+fi
+
 sudo docker build \
   --build-arg GAMESTATE_COMMIT=1c958345067218297d221e45e1a6405f975f83e0 \
   --tag mentox/soccernet-gamestate:1c95834-cuda117 \
@@ -48,10 +63,12 @@ sudo docker run --rm \
   --env MENTOX_CUDA_DEVICE="${gpu_index}" \
   --env MENTOX_GAMESTATE_FRAME_LIMIT="${frame_limit}" \
   --env MENTOX_GAMESTATE_LOW_VRAM="${low_vram_profile}" \
+  "${video_arguments[@]}" \
   --volume "${data_directory}:/data" \
   --volume "${models_directory}:/models" \
   --volume "${output_directory}:/output" \
   mentox/soccernet-gamestate:1c95834-cuda117
 
 echo "Estado de tracking: ${output_directory}/sn-gamestate.pklz"
+echo "Observaciones: ${output_directory}/gamestate-observations.jsonl"
 echo "Resultados y vídeo: ${output_directory}/run"
