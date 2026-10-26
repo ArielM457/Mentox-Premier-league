@@ -28,7 +28,7 @@ Actualizado el 25 de octubre de 2026. Rama `persona-2/estado-analitica`.
   - Subir la rama y abrir el PR cuando el equipo lo decida.
 - **Bloqueos y avisos:**
   - Los contratos de Persona 3 todavía rechazan las salidas del motor.
-  - La visión de Persona 1 necesita archivos de experimentos que no están en el repositorio.
+  - La pestaña «Visión IA» ya funciona en local con los resultados de Persona 1 que están en el repositorio. Faltaban dos cosas: un `.gitattributes`, porque Windows cambiaba la huella de esos archivos, y apuntar tres variables a esa carpeta. En Azure todavía no aparece, porque la imagen no incluye esos archivos.
   - La tabla de eventos de Supabase que llegó con `main` mezcla eventos de partidos distintos.
 
 ## Novedades desde el último daily
@@ -236,7 +236,8 @@ Con el partido de prueba de 178 eventos, el perfil casual recibe 14 momentos, el
 
 Detalle de los avisos para Persona 1:
 
-- **Archivos de experimentos:** su panel de visión pide `experiments/…/output`, que no está en el repositorio. Por eso las rutas `/api/v1/integration/*` responden 503 y fallan 10 pruebas.
+- **Archivos de experimentos:** su panel de visión los busca en `experiments/…/output-real`, que solo existe en su equipo. Ya funciona apuntando las variables `MENTOX_*_ARTIFACT` a las copias de `docs/mentox-modelos-20261023T045413Z/resultados`, con lo que pasan 8 de las 10 pruebas que fallaban. Las 2 restantes tienen esa ruta fija en la prueba.
+- **Panel de visión:** decía «Visión no disponible» aunque la API respondía `ready`, porque leía un campo que la API no envía. Ya está corregido.
 - **Tabla `match_events`:** usa `event_id` como clave única, así que dos partidos con `evt-001` se pisan.
 
 ## Cómo se integra con Azure

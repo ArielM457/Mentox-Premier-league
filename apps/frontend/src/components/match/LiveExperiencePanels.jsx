@@ -578,7 +578,7 @@ export function VisionPanel({ timeMs, seekVersion }) {
 
   return (
     <section className="vision-panel">
-      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-live">{status.ready ? t.match.visionReady : t.match.visionUnavailable}</span></header>
+      <header><div><span className="section-kicker">{t.match.visionKicker}</span><h2>{t.match.visionTitle}</h2></div><span className="channel-pill channel-live">{status.ready || status.status === 'ready' ? t.match.visionReady : t.match.visionUnavailable}</span></header>
       <p className="panel-note">{t.match.visionNotice}</p>
       <div className="vision-counters">
         <span><strong>{timeline.spatial_total}</strong>{t.match.visionDetections}</span>
