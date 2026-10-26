@@ -705,3 +705,52 @@ endpoints reales y prepara evidencia. La guía se encuentra en la
 - El botón de simulación del centro del partido recorre esta misma canalización.
 
 **Dependencias:** RF-40, RF-41, RF-51, DV-US-28 y autorización de Azure para la verificación remota.
+
+### DV-US-30 · Desplegar el primer detector en una GPU de Azure
+
+**Como** responsable de visión,
+**quiero** desplegar inicialmente un solo detector espacial en Azure Container Apps GPU,
+**para** medir costo, memoria y latencia reales antes de incorporar los demás modelos.
+
+**Prioridad:** P1.
+
+**Estado:** implementada, pendiente de verificación en Azure. El servicio, la imagen y el script son comprobables localmente; falta cuota T4, construcción en ACR y prueba contra el endpoint real.
+
+**Evidencia:** [informe técnico de DV-US-30](evidencias/DV-US-30.md).
+
+**Criterios de aceptación:**
+
+- La primera imagen incluye únicamente `football-player-detection.pt` y verifica su SHA-256.
+- El modelo se carga una sola vez, realiza calentamiento CUDA y atiende solicitudes posteriores sin recargar los pesos.
+- La API acepta JPEG, PNG o WebP, limita el tamaño y devuelve cajas normalizadas, clase, confianza y latencia.
+- La predicción requiere una clave externa al repositorio; las sondas de salud no revelan secretos.
+- ACR conserva la imagen de forma privada y Container Apps usa identidad administrada para descargarla.
+- El perfil T4 usa mínimo cero, máximo uno y permite mínimo uno durante el partido.
+- El script comprueba suscripción, región, perfil GPU y aceptación de las condiciones de los pesos antes de crear recursos.
+- La documentación diferencia implementación local de verificación real en Azure.
+
+**Dependencias:** DV-US-26, cuota para `Consumption-GPU-NC8as-T4` y revisión de licencias de los pesos.
+
+### DV-US-31 · Preparar el despliegue de los modelos restantes
+
+**Como** integrante del equipo,
+**quiero** desplegar los modelos de visión restantes mediante comandos repetibles,
+**para** probar cada API sin repetir los errores encontrados con el primer detector.
+
+**Prioridad:** P1.
+
+**Estado:** implementada, pendiente de verificación en Azure. La suite Roboflow y TeamSpotting tienen paquetes y scripts; GameState permanece bloqueado hasta que acepte el vídeo de Mentox.
+
+**Evidencia:** [informe técnico de DV-US-31](evidencias/DV-US-31.md).
+
+**Criterios de aceptación:**
+
+- Los recursos comunes reutilizan ACR, entorno y perfil T4 sin mezclar identidades de las APIs.
+- La suite Roboflow verifica los tres pesos y permite seleccionar jugador, balón y campo.
+- TeamSpotting acepta un clip MP4 acotado y devuelve candidatos temporales sin inventar identidad.
+- Los scripts conservan escala 0–1, secretos externos, ACR privado y construcción local reanudable.
+- Una huella del contenido evita desplegar una imagen anterior al trabajar desde un ZIP.
+- GameState no crea recursos hasta completar su adaptador y verificación.
+- La guía indica despliegue, prueba, evidencia y apagado para el equipo.
+
+**Dependencias:** DV-US-20, DV-US-26, DV-US-27, DV-US-30 y cuota T4.

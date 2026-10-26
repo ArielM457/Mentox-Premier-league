@@ -20,7 +20,7 @@ import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
-const TABS = ['match', 'summary', 'stats', 'tactical']
+const TABS = ['match', 'summary', 'stats', 'tactical', 'vision']
 const SPEEDS = [1, 2, 4, 8]
 const notify = (promise) => promise.catch(() => {})
 
@@ -255,6 +255,8 @@ function LiveMatch({ match }) {
             </div>
           ) : activeTab === 'tactical' ? (
             <TacticalPanel compact={false} events={pastEvents} matchId={matchId} metadata={metadata} />
+          ) : activeTab === 'vision' ? (
+            <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />
           ) : (
             <>
               <div className="pitch-wrap">
@@ -315,9 +317,6 @@ function LiveMatch({ match }) {
               {preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
             </>
           )}
-
-          {activeTab === 'match' && <VisionPanel seekVersion={seekVersion} timeMs={clock.time} />}
-
           <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" onClick={clock.playing ? pause : play}>
               {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}

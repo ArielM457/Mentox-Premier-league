@@ -30,6 +30,8 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 | DV-US-22 · Ejecutar el ensayo de aceptación integrado | Verificada en integración; recorrido local, Azure, vídeo, modelos, fusión y fallo controlado comprobados | [DV-US-22](DV-US-22.md) |
 | DV-US-28 · Integrar visión con la aplicación oficial | Implementada en rama de integración; frontend y pruebas aisladas verificados | [DV-US-28](DV-US-28.md) |
 | DV-US-29 · Separar telemetría y eventos importantes | Verificada localmente; despliegue de los recursos nuevos pendiente | [DV-US-29](DV-US-29.md) |
+| DV-US-30 · Desplegar el primer detector en una GPU de Azure | Verificada en Azure con Tesla T4 y escala posterior a cero | [DV-US-30](DV-US-30.md) |
+| DV-US-31 · Preparar el despliegue de los modelos restantes | Implementada localmente; construcción e inferencia en Azure pendientes | [DV-US-31](DV-US-31.md) |
 | DV-US-23 · Integrar el pipeline en el backend oficial | Backend y API HTTP verificados en un recorrido consolidado; Compose y frontend fuera de esta prueba | [DV-US-23](DV-US-23.md) |
 | DV-US-24 · Transportar observaciones durante la transmisión | Verificada localmente; canal Azure desplegado y prueba de datos pendiente con identidad autorizada | [DV-US-24](DV-US-24.md) |
 | DV-US-25 · Controlar observaciones con la reproducción | Verificada localmente; recorrido visual con Compose pendiente | [DV-US-25](DV-US-25.md) |
