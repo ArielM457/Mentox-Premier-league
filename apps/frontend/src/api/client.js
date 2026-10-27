@@ -33,6 +33,7 @@ async function request(path, options = {}) {
   let response
   try {
     response = await fetch(path, {
+      signal: AbortSignal.timeout(20_000),
       ...options,
       headers: options.headers ?? (options.body ? { 'Content-Type': 'application/json' } : undefined),
     })
@@ -108,7 +109,8 @@ export const api = {
       body: JSON.stringify({ action, video_time_ms: t == null ? null : Math.floor(t) }),
     }),
   visionStatus: () => request('/api/v1/integration/status'),
-  prepareVisionModels: () => request('/api/v1/integration/live/models/prepare', { method: 'POST' }),
+  // Despertar la GPU (escala desde cero) tarda más que el límite general de 20 s.
+  prepareVisionModels: () => request('/api/v1/integration/live/models/prepare', { method: 'POST', signal: AbortSignal.timeout(180_000) }),
   visionTimeline: (start, end, limit = 40) =>
     request(`/api/v1/integration/timeline?start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&spatial_limit=${limit}`),
   visionPlayback: (action, t, matchId) =>

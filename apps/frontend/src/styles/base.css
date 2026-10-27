@@ -13,13 +13,14 @@
   --line: #dfdce8;
   --red: #f15a67;
   --shadow: 0 20px 70px rgba(35, 25, 76, 0.13);
-  /* Campos con lista y barras de desplazamiento; el tema oscuro los redefine. */
-  --field-bg: #ffffff;
-  --field-text: var(--navy);
+  /* Campos con lista: usan las superficies del sistema de diseño (ux.css), que cambian con el tema.
+     El tema oscuro solo redefine el chevron y la barra de desplazamiento. */
+  --field-bg: var(--surface-raised, #ffffff);
+  --field-text: var(--text, var(--navy));
   --field-border: var(--line);
-  --field-picker: #ffffff;
-  --field-hover: #f1ebff;
-  --field-accent: #6337df;
+  --field-picker: var(--surface-raised, #ffffff);
+  --field-hover: var(--surface-soft, #f1ebff);
+  --field-accent: var(--accent-ink, #6337df);
   --field-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236337df' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --scroll-thumb: #c9c3dd;

@@ -11,6 +11,8 @@ const numEn = numberIn('en')
 const SAME_SPACE_M = 0.5
 
 const es = {
+  session: { demo: 'Acceso de demostración', title: 'Iniciar sesión', account: 'Tu sesión de demo', description: 'Prueba la experiencia con tu nombre. No se crea una cuenta real ni necesitas una contraseña.', name: 'Tu nombre', enter: 'Entrar a la demo', logout: 'Cerrar sesión de demo' },
+
   brand: 'The Prime Moment',
   common: {
     back: 'Atrás',
@@ -23,9 +25,11 @@ const es = {
     save: 'Guardar preferencias',
     saved: 'Preferencias guardadas',
     none: 'Ninguno',
-    apiDown: 'No hay conexión con la API. Inicia el backend en el puerto configurado para el frontend.',
+    apiDown: 'No pudimos cargar la información. Comprueba tu conexión y vuelve a intentarlo.',
     liveChannelLost: 'Se perdió el canal en directo. Pausa y vuelve a reproducir para reconectar.',
     number: numEs,
+    skipContent: 'Ir al contenido',
+    loadingCopy: 'Estamos preparando tu experiencia deportiva.',
     syntheticData: 'Datos sintéticos de demostración',
     shirt: 'Dorsal',
   },
@@ -49,8 +53,9 @@ const es = {
     sustained_pressure: 'Presión sostenida', high_recovery: 'Recuperación alta',
     control_shift: 'Cambio de control', chaos_phase: 'Ida y vuelta', player_milestone: 'Hito de jugador',
   },
-  nav: { discover: 'Descubrir', matches: 'Partidos', profile: 'Mi experiencia', editorial: 'Revisión', guest: 'Invitado', preferences: 'Mis preferencias', collapseMenu: 'Contraer menú', expandMenu: 'Expandir menú' },
+  nav: { discover: 'Home', matches: 'Partidos', profile: 'Mi experiencia', editorial: 'Revisión', guest: 'Invitado', preferences: 'Mis preferencias', collapseMenu: 'Contraer menú', expandMenu: 'Expandir menú' },
   landing: {
+    sampleLabel: 'EJEMPLO',
     start: 'Empezar',
     eyebrow: 'El fútbol, explicado para ti',
     titleA: 'Ve el', titleB: 'partido.',
@@ -99,6 +104,8 @@ const es = {
   },
   discover: {
     kicker: 'Tu jornada',
+    welcome: 'Bienvenido', subtitle: 'Tu experiencia deportiva',
+    editFavorites: 'Editar favoritos', chooseClubTitle: 'Tu club, en primer lugar', chooseClubCopy: 'Elige tu club favorito para ver aquí solo sus partidos.', chooseClubAction: 'Elegir mi club', choosePlayerTitle: 'Un espacio para tu jugador', choosePlayerCopy: 'Elige a tu jugador favorito para seguir sus acciones y sus partidos.', choosePlayerAction: 'Elegir mi jugador',
     greeting: () => {
       const hour = new Date().getHours()
       return hour < 12 ? 'Buenos días.' : hour < 20 ? 'Buenas tardes.' : 'Buenas noches.'
@@ -134,8 +141,8 @@ const es = {
     title: 'Todos los partidos.',
     intro: 'Busca, filtra y abre cualquier encuentro de la demo.',
     search: 'Buscar partidos o equipos…',
-    filters: { LIVE: 'En vivo', UPCOMING: 'Próximos', FT: 'Resúmenes' },
-    headings: { LIVE: 'En vivo', UPCOMING: 'Próximos encuentros', FT: 'Últimos resúmenes' },
+    filters: { LIVE: 'Simulaciones', UPCOMING: 'Próximos', FT: 'Resúmenes' },
+    headings: { LIVE: 'Simulaciones', UPCOMING: 'Próximos encuentros', FT: 'Últimos resúmenes' },
     onlyPlayer: 'Solo partidos de',
     relatedTo: (player) => `Partidos relacionados con ${player}`,
     results: (n) => `${n} ${n === 1 ? 'resultado' : 'resultados'}`,
@@ -151,11 +158,11 @@ const es = {
     recap: 'Ver resumen',
     replay: 'Simulación',
     final: 'Final',
-    status: { LIVE: 'EN VIVO', FT: 'FINAL', UPCOMING: 'PRÓXIMO' },
-    scenario: { 'synthetic-acceptance-001': 'Partido corto de aceptación', 'synthetic-analytics-001': 'Partido de dos tiempos', 'synthetic-live-001': 'Partido en vivo táctico' },
+    status: { LIVE: 'SIMULACIÓN', FT: 'FINAL', UPCOMING: 'PRÓXIMO' },
+    scenario: { 'synthetic-acceptance-001': 'Partido corto', 'synthetic-analytics-001': 'Partido de dos tiempos', 'synthetic-live-001': 'Partido táctico' },
   },
   preview: {
-    back: 'Volver a Descubrir',
+    back: 'Volver a Home',
     home: 'Equipo local', away: 'Equipo visitante',
     kicker: 'Próximo partido', title: 'La previa táctica',
     duelAlt: (home, away) => `Jugadores de ${home} y ${away} frente a frente`,
@@ -179,6 +186,7 @@ const es = {
     noInformationResults: 'No encontramos datos que coincidan con tu búsqueda.',
   },
   match: {
+    replayLabel: 'Reproducción de demostración', viewTabs: 'Vistas del partido', timelineTitle: 'Momentos destacados', timelineEmpty: 'Los momentos se marcarán a medida que avances.', pauseState: 'En pausa', playingState: 'Reproduciendo', visionDetails: 'Acerca del análisis de vídeo', visionDescription: 'Esta sección reúne observaciones obtenidas de un vídeo cuando hay datos disponibles. La simulación funciona de forma independiente.', visionMissing: 'No hay un análisis de vídeo disponible para este partido. Puedes continuar con la simulación y sus estadísticas.', visionOpen: 'Ver observaciones de vídeo',
     kicker: 'Demo sintética',
     title: 'Centro del partido',
     live: 'Simulación con datos en vivo',
@@ -206,10 +214,10 @@ const es = {
     simulationCopy: 'Envía seis casos sintéticos por ingreso, colas y agentes.',
     startSimulation: 'Iniciar simulación',
     simulating: 'Procesando…',
-    liveExperienceTitle: 'Partido en vivo con datos sintéticos',
+    liveExperienceTitle: 'Simulación del partido',
     liveExperienceCopy: 'Inicia el reloj, los movimientos, los momentos y las estadísticas del partido.',
-    liveExperienceRunning: 'El partido sigue activo aunque cambies de pestaña.',
-    startLive: 'Iniciar partido en vivo', pauseLive: 'Pausar', resumeLive: 'Continuar', restartLive: 'Reiniciar',
+    liveExperienceRunning: 'Explora las vistas sin perder el punto de reproducción.',
+    startLive: 'Iniciar simulación', pauseLive: 'Pausar', resumeLive: 'Continuar', restartLive: 'Reiniciar',
     hideAgent: 'Ocultar asistente', assistantToggle: 'Asistente',
     liveCommentsToggle: 'Comentarios en vivo', enterFullscreen: 'Ver partido en pantalla completa', exitFullscreen: 'Salir de pantalla completa',
     fullscreenUnavailable: 'No se pudo abrir la vista del partido en pantalla completa.',
@@ -396,7 +404,7 @@ const es = {
     back: 'Volver al centro del partido',
     pill: (time) => `Momento clave · ${time}`,
     tabs: { explanation: 'Explicación', stats: 'Cifras', players: 'Jugadores' },
-    why: '¿Por qué es importante?',
+    why: 'Lectura de la jugada',
     takeaway: 'Respaldo',
     takeawayCopy: (n) => `Esta explicación se apoya en ${n} ${n === 1 ? 'evento' : 'eventos'} del partido.`,
     numbers: 'La jugada en números',
@@ -428,13 +436,14 @@ const es = {
     select: 'Elige un momento para ver el análisis completo',
   },
   profile: {
+    saveHint: 'Guarda tus cambios antes de salir de esta pantalla.',
     kicker: 'Mi experiencia',
     title: 'Haz tuyo cada partido.',
     intro: 'Cambia lo que sigues y cómo se explica el juego.',
     guest: 'Invitado',
     since: 'Preferencias guardadas en este navegador',
     language: 'Idioma', club: 'Club favorito', player: 'Jugador favorito', mode: 'Modo de experiencia', level: 'Nivel de explicación',
-    back: 'Volver a Descubrir',
+    back: 'Volver a Home',
     playerNeeded: 'El modo centrado en jugador necesita un jugador favorito.',
     liveComments: 'Comentarios en vivo para analista',
     liveCommentsCopy: 'Muestra la narración, los momentos y el contexto mientras avanza el partido.',
@@ -444,6 +453,7 @@ const es = {
     openPlayerContent: 'Abrir seguimiento en el partido',
   },
   editorial: {
+    workspace: 'Espacio de revisión', workspaceCopy: 'Revisa las fuentes y decide si el resumen está listo para publicarse.', reviewerPlaceholder: 'Escribe tu nombre', reviewerHint: 'Introduce tu nombre para habilitar Aprobar y Rechazar.', decisionSaved: 'Decisión guardada.',
     kicker: 'Control editorial',
     title: 'Revisión antes de publicar.',
     intro: 'Aprueba o rechaza los resúmenes finales y revisa los reportes de error.',
@@ -497,12 +507,15 @@ const es = {
 }
 
 const en = {
+  session: { demo: 'Demo access', title: 'Sign in', account: 'Your demo session', description: 'Try the experience with your name. No real account is created and no password is needed.', name: 'Your name', enter: 'Enter demo', logout: 'Sign out of demo' },
+
   brand: 'The Prime Moment',
   common: {
+    skipContent: 'Skip to content', loadingCopy: 'We are preparing your sporting experience.',
     back: 'Back', continue: 'Continue', retry: 'Retry', loading: 'Loading…', close: 'Close',
     lightTheme: 'Light mode', darkTheme: 'Dark mode',
     save: 'Save preferences', saved: 'Preferences saved', none: 'None',
-    apiDown: 'The API is not reachable. Start the backend on the port configured for the frontend.',
+    apiDown: 'We could not load the information. Check your connection and try again.',
     liveChannelLost: 'The live channel was lost. Pause and play again to reconnect.',
     number: numEn,
     syntheticData: 'Synthetic demo data', shirt: 'Shirt',
@@ -527,8 +540,9 @@ const en = {
     sustained_pressure: 'Sustained press', high_recovery: 'High recovery',
     control_shift: 'Control shift', chaos_phase: 'End-to-end', player_milestone: 'Player milestone',
   },
-  nav: { discover: 'Discover', matches: 'Matches', profile: 'My experience', editorial: 'Review', guest: 'Guest', preferences: 'My preferences', collapseMenu: 'Collapse menu', expandMenu: 'Expand menu' },
+  nav: { discover: 'Home', matches: 'Matches', profile: 'My experience', editorial: 'Review', guest: 'Guest', preferences: 'My preferences', collapseMenu: 'Collapse menu', expandMenu: 'Expand menu' },
   landing: {
+    sampleLabel: 'EXAMPLE',
     start: 'Start',
     eyebrow: 'Football, explained for you',
     titleA: 'Watch the', titleB: 'match.',
@@ -576,6 +590,7 @@ const en = {
     crest: (club) => `${club} crest`,
   },
   discover: {
+    welcome: 'Welcome', subtitle: 'Your sporting experience', editFavorites: 'Edit favourites', chooseClubTitle: 'Your club comes first', chooseClubCopy: 'Choose your favourite club to see only its matches here.', chooseClubAction: 'Choose my club', choosePlayerTitle: 'A place for your player', choosePlayerCopy: 'Choose your favourite player to follow their actions and matches.', choosePlayerAction: 'Choose my player',
     kicker: 'Your matchday',
     greeting: () => {
       const hour = new Date().getHours()
@@ -612,8 +627,8 @@ const en = {
     title: 'All matches.',
     intro: 'Search, filter and open any match in the demo.',
     search: 'Search matches or teams…',
-    filters: { LIVE: 'Live', UPCOMING: 'Upcoming', FT: 'Recaps' },
-    headings: { LIVE: 'Live', UPCOMING: 'Upcoming matches', FT: 'Latest recaps' },
+    filters: { LIVE: 'Simulations', UPCOMING: 'Upcoming', FT: 'Recaps' },
+    headings: { LIVE: 'Simulations', UPCOMING: 'Upcoming matches', FT: 'Latest recaps' },
     onlyPlayer: 'Only matches of',
     relatedTo: (player) => `Matches involving ${player}`,
     results: (n) => `${n} ${n === 1 ? 'result' : 'results'}`,
@@ -629,11 +644,11 @@ const en = {
     recap: 'View recap',
     replay: 'Simulation',
     final: 'Full time',
-    status: { LIVE: 'LIVE', FT: 'FT', UPCOMING: 'UPCOMING' },
-    scenario: { 'synthetic-acceptance-001': 'Short acceptance match', 'synthetic-analytics-001': 'Two-half match', 'synthetic-live-001': 'Live tactical match' },
+    status: { LIVE: 'SIMULATION', FT: 'FT', UPCOMING: 'UPCOMING' },
+    scenario: { 'synthetic-acceptance-001': 'Short match', 'synthetic-analytics-001': 'Two-half match', 'synthetic-live-001': 'Tactical match' },
   },
   preview: {
-    back: 'Back to Discover',
+    back: 'Back to Home',
     home: 'Home team', away: 'Away team',
     kicker: 'Next match', title: 'Tactical preview',
     duelAlt: (home, away) => `${home} and ${away} players facing each other`,
@@ -657,6 +672,7 @@ const en = {
     noInformationResults: 'No information matches your search.',
   },
   match: {
+    replayLabel: 'Demo replay', viewTabs: 'Match views', timelineTitle: 'Key moments', timelineEmpty: 'Moments will be marked as you advance.', pauseState: 'Paused', playingState: 'Playing', visionDetails: 'About video analysis', visionDescription: 'This section brings together observations from video when data is available. The simulation works independently.', visionMissing: 'No video analysis is available for this match. You can continue with the simulation and its statistics.', visionOpen: 'View video observations',
     kicker: 'Synthetic demo',
     title: 'Match Center',
     live: 'Live data simulation',
@@ -684,10 +700,10 @@ const en = {
     simulationCopy: 'Sends six synthetic cases through ingress, queues and agents.',
     startSimulation: 'Start simulation',
     simulating: 'Processing…',
-    liveExperienceTitle: 'Live match with synthetic data',
+    liveExperienceTitle: 'Match simulation',
     liveExperienceCopy: 'Start the match clock, movement, moments and live statistics.',
     liveExperienceRunning: 'The match stays active while you switch tabs.',
-    startLive: 'Start live match', pauseLive: 'Pause', resumeLive: 'Resume', restartLive: 'Restart',
+    startLive: 'Start simulation', pauseLive: 'Pause', resumeLive: 'Resume', restartLive: 'Restart',
     hideAgent: 'Hide assistant', assistantToggle: 'Assistant',
     liveCommentsToggle: 'Live commentary', enterFullscreen: 'View match in fullscreen', exitFullscreen: 'Exit fullscreen',
     fullscreenUnavailable: 'The match view could not enter fullscreen.',
@@ -874,7 +890,7 @@ const en = {
     back: 'Back to Match Center',
     pill: (time) => `Key moment · ${time}`,
     tabs: { explanation: 'Explanation', stats: 'Numbers', players: 'Players' },
-    why: 'Why is this important?',
+    why: 'Reading the play',
     takeaway: 'Evidence',
     takeawayCopy: (n) => `This explanation is backed by ${n} match ${n === 1 ? 'event' : 'events'}.`,
     numbers: 'The move by numbers',
@@ -906,13 +922,14 @@ const en = {
     select: 'Select a moment for the full analysis',
   },
   profile: {
+    saveHint: 'Save your changes before leaving this screen.',
     kicker: 'My experience',
     title: 'Make every match yours.',
     intro: 'Update what you follow and how the game is explained.',
     guest: 'Guest',
     since: 'Preferences saved in this browser',
     language: 'Language', club: 'Favourite club', player: 'Favourite player', mode: 'Experience mode', level: 'Explanation level',
-    back: 'Return to Discover',
+    back: 'Return to Home',
     playerNeeded: 'Player focus needs a favourite player.',
     liveComments: 'Live commentary for analysts',
     liveCommentsCopy: 'Shows commentary, moments and context while the match advances.',
@@ -922,6 +939,7 @@ const en = {
     openPlayerContent: 'Open player tracking in the match',
   },
   editorial: {
+    workspace: 'Review workspace', workspaceCopy: 'Review the sources and decide if the recap is ready to publish.', reviewerPlaceholder: 'Enter your name', reviewerHint: 'Enter your name to enable Approve and Reject.', decisionSaved: 'Decision saved.',
     kicker: 'Editorial control',
     title: 'Review before publishing.',
     intro: 'Approve or reject final summaries and check error reports.',

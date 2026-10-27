@@ -27,11 +27,10 @@
 .view-switch > span:first-child { margin: 0; display: inline-flex; align-items: center; gap: 6px; color: inherit; font-size: inherit; }
 .view-switch .icon { color: var(--lime); }
 .view-switch input { width: 1px; height: 1px; position: absolute; opacity: 0; pointer-events: none; }
-.switch-track { width: 34px; height: 19px; padding: 2px; display: block; background: #4b465f; border-radius: 999px; transition: background 180ms ease; }
-.switch-track i { width: 15px; height: 15px; display: block; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,.35); transition: transform 180ms ease; }
-.view-switch input:checked + .switch-track { background: var(--lime); }
-.view-switch input:checked + .switch-track i { transform: translateX(15px); }
-.view-switch:focus-within { outline: 2px solid var(--lime); outline-offset: 2px; }
+/* El interruptor es el de ux.css (Eliana); aquí solo su estado con una casilla. */
+.view-switch input:checked + .switch-track { background: var(--action); }
+.view-switch input:checked + .switch-track > span { transform: translateX(20px); }
+.view-switch:focus-within { outline: 3px solid var(--violet); outline-offset: 4px; }
 .match-fullscreen-toggle { width: 40px; min-height: 38px; padding: 0; }
 .pitch-column:fullscreen { padding: 22px; overflow: auto; color: #ece9f5; background: var(--navy-2); }
 .pitch-column:fullscreen .pitch-wrap { width: min(1500px, 100%); margin: 0 auto; }

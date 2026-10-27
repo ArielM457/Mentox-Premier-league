@@ -30,12 +30,6 @@
   --line: #413b58;
   --violet-light: #c2a9ff;
   --shadow: 0 20px 70px rgba(0, 0, 0, .28);
-  --field-bg: #24203d;
-  --field-text: #f5f3fb;
-  --field-border: #494261;
-  --field-picker: #1f1b36;
-  --field-hover: #302849;
-  --field-accent: var(--lime);
   --field-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d8ff65' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --scroll-thumb: #4a4268;
   color: #f5f3fb;
@@ -176,29 +170,20 @@
 :root[data-theme='light'] .tactical-panel,
 :root[data-theme='light'] .insight-list,
 :root[data-theme='light'] .commentary-stage,
-:root[data-theme='light'] .commentary-inline,
-:root[data-theme='light'] .vision-card,
 :root[data-theme='light'] .moment-selector { color: var(--navy); background: #fff; border-color: var(--line); }
-:root[data-theme='light'] .commentary-flow header,
-:root[data-theme='light'] .commentary-flow article,
-:root[data-theme='light'] .vision-card > header,
-:root[data-theme='light'] .vision-rows li { border-color: var(--line); }
-:root[data-theme='light'] .commentary-flow time,
-:root[data-theme='light'] .vision-rows time,
-:root[data-theme='light'] .vision-range { color: #6337df; }
+/* Piezas posteriores al diseño de Eliana: usan sus tokens (ux.css) en los dos temas. */
+:root[data-theme] :is(.vision-card, .commentary-inline) { color: var(--text); background: var(--surface); border: 1px solid var(--line); }
+:root[data-theme] :is(.commentary-flow header, .commentary-flow article, .vision-card > header, .vision-rows li) { border-color: var(--line); }
+:root[data-theme] :is(.commentary-flow time, .vision-rows time, .vision-range, .view-switch .icon) { color: var(--accent-ink); }
+:root[data-theme] :is(.commentary-flow header small, .vision-card > header small, .vision-window, .vision-note, .vision-rows small, .vision-footnote) { color: var(--muted); }
+:root[data-theme] :is(.vision-window b, .vision-confidence) { color: var(--text); }
+:root[data-theme] .vision-glyph { color: var(--on-accent); background: var(--lime); }
+:root[data-theme] .view-switch { color: var(--text); background: var(--surface-raised); border-color: var(--line); }
+:root[data-theme] .assistant-close { color: var(--muted); background: var(--surface-soft); }
+:root[data-theme] .assistant-close:hover { color: var(--on-accent); background: var(--lime); }
 :root[data-theme='light'] .vision-error { color: #8a5300; }
-:root[data-theme='light'] .commentary-flow header small,
-:root[data-theme='light'] .vision-card > header small,
-:root[data-theme='light'] .vision-window,
-:root[data-theme='light'] .vision-note,
-:root[data-theme='light'] .vision-rows small,
-:root[data-theme='light'] .vision-footnote { color: #504c64; }
-:root[data-theme='light'] .vision-window b,
-:root[data-theme='light'] .vision-confidence { color: var(--navy); }
-:root[data-theme='light'] .view-switch { color: var(--navy); background: var(--off-white); border-color: var(--line); }
-:root[data-theme='light'] .view-switch .icon { color: #6337df; }
-:root[data-theme='light'] .switch-track { background: #cfcadf; }
-:root[data-theme='light'] .assistant-close { color: var(--muted); background: var(--off-white); }
+/* Dentro del bloque plegable de visión, la tarjeta no repite fondo ni borde. */
+:root[data-theme] .vision-details .vision-card { margin-top: 12px; padding: 0; background: transparent; border: 0; }
 :root[data-theme='light'] .moment-workspace header p,
 :root[data-theme='light'] .panel-note,
 :root[data-theme='light'] .commentary-flow article p { color: #504c64; }

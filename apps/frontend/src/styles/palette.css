@@ -1,0 +1,46 @@
+/* Escalas del design system compartido por la diseñadora. */
+:root {
+  --ds-white: #ffffff;
+  --ds-lime-05: #fbfff0;
+  --ds-lime-1: #f7ffe0;
+  --ds-lime-15: #f3ffd1;
+  --ds-lime-2: #efffc1;
+  --ds-lime-3: #e8ffa3;
+  --ds-lime-4: #e0ff84;
+  --ds-lime-5: #d8ff65;
+  --ds-lime-6: #b6d851;
+  --ds-lime-7: #94b13d;
+  --ds-lime-8: #718a28;
+  --ds-lime-85: #60771e;
+  --ds-lime-9: #4f6314;
+  --ds-lime-95: #3e500a;
+  --ds-lime-10: #2d3c00;
+  --ds-violet-05: #f3eefe;
+  --ds-violet-1: #e6ddfd;
+  --ds-violet-15: #dacdfc;
+  --ds-violet-2: #cdbcfb;
+  --ds-violet-3: #b49af9;
+  --ds-violet-4: #9b79f7;
+  --ds-violet-5: #8257f5;
+  --ds-violet-6: #6a46cb;
+  --ds-violet-7: #5235a1;
+  --ds-violet-8: #3b2476;
+  --ds-violet-85: #2f1c61;
+  --ds-violet-9: #23134c;
+  --ds-violet-95: #170b37;
+  --ds-violet-10: #0b0222;
+  --ds-purple-05: #efebfa;
+  --ds-purple-1: #dfd7f5;
+  --ds-purple-15: #d0c3f0;
+  --ds-purple-2: #c0afeb;
+  --ds-purple-3: #a088e2;
+  --ds-purple-4: #8160d8;
+  --ds-purple-5: #6138ce;
+  --ds-purple-6: #4e2da5;
+  --ds-purple-7: #3a227c;
+  --ds-purple-8: #271652;
+  --ds-purple-85: #1d113e;
+  --ds-purple-9: #130b29;
+  --ds-purple-95: #0a0615;
+  --ds-black: #000000;
+}

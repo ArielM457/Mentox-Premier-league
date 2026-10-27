@@ -18,7 +18,7 @@ export function OverlayCard({ overlay, time, playing, onOpen }) {
         {overlay.corrected && <em> · ✓</em>}
       </span>
       <p className="overlay-headline">{overlay.headline}</p>
-      {overlay.explanation && <p className="overlay-text">{overlay.explanation}</p>}
+      {overlay.explanation && <p className="overlay-text">{overlay.explanation.split(/\s(?:Datos|Data):/)[0]}</p>}
       <button className="overlay-link" onClick={() => onOpen(overlay)} type="button">
         {t.match.whyMatters} <Icon name="arrow" size={14} />
       </button>

@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { useState } from 'react'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
@@ -35,6 +36,7 @@ export function Onboarding() {
       <section className="onboarding-modal compact-modal">
         <div className="compact-modal-top">
           <Brand />
+          <ThemeToggle />
           <button className="skip-setup" onClick={() => { update({ onboarded: true }); navigate(paths.discover()) }} type="button">
             {copy.skip}
           </button>
@@ -68,7 +70,7 @@ export function Onboarding() {
               <StepIntro number="01" title={copy.languageTitle} text={copy.languageCopy} />
               <div className="onboarding-language language-cards">
                 {LANGUAGES.map(([value, code, name, description]) => (
-                  <button className={draft.language === value ? 'selected' : ''} key={value} onClick={() => { set({ language: value }); update({ language: value }) }} type="button">
+                  <button aria-pressed={draft.language === value} className={draft.language === value ? 'selected' : ''} key={value} onClick={() => { set({ language: value }); update({ language: value }) }} type="button">
                     <b>{code}</b>
                     <span>
                       <strong>{name}</strong>
@@ -89,7 +91,7 @@ export function Onboarding() {
                   const brand = teamBranding(team)
                   const selected = draft.favoriteTeamId === team.team_id
                   return (
-                    <button className={selected ? 'selected' : ''} key={team.team_id} onClick={() => set({ favoriteTeamId: team.team_id, favoritePlayerId: '' })} type="button">
+                    <button aria-pressed={selected} className={selected ? 'selected' : ''} key={team.team_id} onClick={() => set({ favoriteTeamId: team.team_id, favoritePlayerId: '' })} type="button">
                       {brand.logo ? <img alt={copy.crest(team.name)} src={brand.logo} /> : <b>{brand.short}</b>}
                       <strong>{team.name}</strong>
                       {selected && (
@@ -110,7 +112,7 @@ export function Onboarding() {
               {club ? (
                 <div className="player-card-grid">
                   {players.map((player) => (
-                    <button className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => set({ favoritePlayerId: player.player_id })} type="button">
+                    <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => set({ favoritePlayerId: player.player_id })} type="button">
                       <img alt="" src={playerPhoto(player.player_id)} />
                       <span>
                         <strong>{player.name}</strong>
@@ -139,7 +141,7 @@ export function Onboarding() {
                 {['casual', 'analyst', 'player'].map((mode) => {
                   const disabled = mode === 'player' && !draft.favoritePlayerId
                   return (
-                    <button className={draft.mode === mode ? 'selected' : ''} disabled={disabled} key={mode} onClick={() => set({ mode })} title={disabled ? t.profile.playerNeeded : undefined} type="button">
+                    <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} disabled={disabled} key={mode} onClick={() => set({ mode })} title={disabled ? t.profile.playerNeeded : undefined} type="button">
                       <div>
                         <img alt="" src={MODE_ART[mode].image} />
                       </div>

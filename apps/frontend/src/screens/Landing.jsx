@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { useState } from 'react'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
@@ -21,7 +22,7 @@ export function Landing() {
       <header className="landing-header">
         <Brand />
         <div className="landing-actions">
-          <LanguageSwitch variant="landing" />
+          <ThemeToggle /><LanguageSwitch variant="landing" />
           <Button onClick={start}>
             {copy.start} <Icon name="arrow" size={17} />
           </Button>
@@ -44,7 +45,7 @@ export function Landing() {
         <div className="hero-art">
           <img alt="" className="hero-main-illustration" src="/images/stadium.webp" />
           <span className="hero-live-chip">
-            <i /> LIVE · 0:32
+            <i /> {copy.sampleLabel} · 0:32
           </span>
           <p className="hero-image-caption">{copy.caption}</p>
         </div>
@@ -63,7 +64,7 @@ export function Landing() {
           </div>
           <div className="discover-points">
             {copy.points.map(([title, description], index) => (
-              <button className={selectedPoint === index ? 'active' : ''} key={title} onClick={() => setSelectedPoint(index)} type="button">
+              <button className={selectedPoint === index ? 'active' : ''} key={title} onClick={() => { setSelectedPoint(index); start() }} type="button">
                 <span className="point-number">0{index + 1}</span>
                 <span className="point-icon">
                   <Icon name={POINT_ICONS[index]} />

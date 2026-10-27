@@ -1,6 +1,4 @@
 import { useRoute } from './app/router.js'
-import { usePreferences } from './app/preferences.js'
-import { Icon } from './components/ui/Icon.jsx'
 import { AllMatches } from './screens/AllMatches.jsx'
 import { Discover } from './screens/Discover.jsx'
 import { Editorial } from './screens/Editorial.jsx'
@@ -14,7 +12,6 @@ import { Recap } from './screens/Recap.jsx'
 
 export default function App() {
   const { name, params } = useRoute()
-  const { preferences, update, t } = usePreferences()
   let screen
   switch (name) {
     case 'onboarding':
@@ -48,21 +45,5 @@ export default function App() {
       screen = <Landing />
   }
 
-  const dark = preferences.theme !== 'light'
-  return (
-    <>
-      {screen}
-      <button
-        aria-label={dark ? t.common.lightTheme : t.common.darkTheme}
-        aria-pressed={dark}
-        className="theme-toggle"
-        onClick={() => update({ theme: dark ? 'light' : 'dark' })}
-        title={dark ? t.common.lightTheme : t.common.darkTheme}
-        type="button"
-      >
-        <Icon name={dark ? 'sun' : 'moon'} size={20} />
-        <span>{dark ? t.common.lightTheme : t.common.darkTheme}</span>
-      </button>
-    </>
-  )
+  return screen
 }

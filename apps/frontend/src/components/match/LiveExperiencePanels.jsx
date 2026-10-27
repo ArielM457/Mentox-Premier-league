@@ -27,7 +27,7 @@ function teamName(metadata, teamId) {
 
 export function MomentSelector({ moments, selected, onSelect }) {
   const { t } = usePreferences()
-  if (!moments.length) return <p className="moment-selector empty">{t.match.noMoments}</p>
+  if (!moments.length) return null
   const index = Math.max(0, moments.findIndex((moment) => moment.message_id === selected?.message_id))
   const move = (amount) => onSelect(moments[(index + amount + moments.length) % moments.length])
   return (

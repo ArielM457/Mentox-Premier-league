@@ -12,3 +12,6 @@
 @import './animations.css';
 @import './responsive.css';
 @import './theme.css';
+@import './palette.css';
+@import './ux.css';
+@import './editorial.css';

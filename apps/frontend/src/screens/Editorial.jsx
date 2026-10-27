@@ -1,3 +1,4 @@
+import { NarrativeCopy } from '../components/ui/NarrativeCopy.jsx'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { describePreferences, usePreferences } from '../app/preferences.js'
@@ -5,7 +6,7 @@ import { CommunityPanel } from '../components/community/CommunityPanel.jsx'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
 // Revisión editorial (RF-38), reportes de error (RF-39) y revisión de la comunidad.
@@ -20,6 +21,8 @@ export function Editorial() {
   const [note, setNote] = useState('')
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [inject, setInject] = useState(false)
   const [tab, setTab] = useState('review')
   const [tallies, setTallies] = useState({})
@@ -30,6 +33,7 @@ export function Editorial() {
 
   const refresh = useCallback(async () => {
     if (!selected) return
+    setLoading(true)
     try {
       const [q, r, votes] = await Promise.all([
         api.editorial(selected),
@@ -42,7 +46,7 @@ export function Editorial() {
       setError(null)
     } catch (err) {
       setError(err.message)
-    }
+    } finally { setLoading(false) }
   }, [selected])
 
   useEffect(() => {
@@ -50,13 +54,15 @@ export function Editorial() {
   }, [refresh])
 
   async function decide(draftId, decision) {
+    setBusy(true)
     try {
       await api.review(selected, draftId, decision, reviewer, note)
       setNote('')
-      refresh()
+      await refresh()
+      setNotice(copy.decisionSaved)
     } catch (err) {
       setError(err.message)
-    }
+    } finally { setBusy(false) }
   }
 
   async function generateSummary() {
@@ -102,6 +108,7 @@ export function Editorial() {
         </nav>
 
         <div className="profile-card">
+          {tab === 'review' && <div className="editorial-intro"><span className="empty-icon"><Icon name="shield" size={24} /></span><div><h2>{copy.workspace}</h2><p>{copy.workspaceCopy}</p></div></div>}
           <div className="editorial-fields">
             <label>
               <span>{copy.match}</span>
@@ -117,7 +124,7 @@ export function Editorial() {
               <>
               <label>
                 <span>{copy.reviewer}</span>
-                <input maxLength={80} onChange={(event) => setReviewer(event.target.value)} value={reviewer} />
+                <input maxLength={80} onChange={(event) => setReviewer(event.target.value)} placeholder={copy.reviewerPlaceholder} value={reviewer} />
               </label>
               <label>
                 <span>{copy.note}</span>
@@ -143,13 +150,15 @@ export function Editorial() {
             <>
             <div className="preference-block">
               <div className="queue-heading">
-                <h3>{copy.queue}</h3>
+                <div className="editorial-section-title"><h3>{copy.queue}</h3><span className="count-badge">{queue.length}</span></div>
                 <Button variant="ghost" disabled={!selectedMatch} onClick={generateSummary}>
                   <Icon name="spark" size={17} /> {copy.generate}
                 </Button>
               </div>
               <p className="muted-copy">{copy.whereFrom}</p>
-              {queue.length === 0 ? (
+              {!reviewer.trim() && <p className="muted-copy">{copy.reviewerHint}</p>}
+              {loading && <LoadingScreen compact />}
+              {!loading && queue.length === 0 ? (
                 <p className="muted-copy">{copy.empty}</p>
               ) : (
                 <ul className="review-list">
@@ -158,7 +167,7 @@ export function Editorial() {
                       <div>
                         <span className={`editorial-status status-${record.status}`}>{t.recap.status[record.status]}</span>
                         <strong>{record.draft.headline}</strong>
-                        <p>{record.draft.explanation}</p>
+                        <NarrativeCopy text={record.draft.explanation} />
                         <span className="community-signal">
                           <Icon name="user" size={14} />
                           {copy.communitySignal(tallies[record.draft.draft_id]?.approve_pct, tallies[record.draft.draft_id]?.total ?? 0)}
@@ -170,10 +179,10 @@ export function Editorial() {
                       </div>
                       {record.status === 'pending' && (
                         <div className="review-actions">
-                          <Button disabled={!reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'approve')}>
+                          <Button disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'approve')}>
                             <Icon name="check" size={17} /> {copy.approve}
                           </Button>
-                          <Button variant="ghost" className="danger" disabled={!reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'reject')}>
+                          <Button variant="secondary" className="review-reject" disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'reject')}>
                             <Icon name="close" size={17} /> {copy.reject}
                           </Button>
                         </div>

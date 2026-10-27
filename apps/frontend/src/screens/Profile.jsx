@@ -3,7 +3,6 @@ import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { MODE_ART, playerPhoto, teamBranding } from '../data/branding.js'
 import { useCatalog } from '../hooks/useCatalog.js'
-import { loadExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
@@ -16,9 +15,11 @@ export function Profile() {
   const { t, preferences, update } = usePreferences()
   const { data: catalog, error, reload } = useCatalog()
   const copy = t.profile
-  const [draft, setDraft] = useState(preferences)
+  const [draft, setDraft] = useState(() => {
+    const { language, mode, level, favoriteTeamId, favoritePlayerId, liveComments } = preferences
+    return { language, mode, level, favoriteTeamId, favoritePlayerId, liveComments }
+  })
   const [saved, setSaved] = useState(false)
-  const [experience] = useState(loadExperience)
   const set = (changes) => {
     setSaved(false)
     setDraft((current) => ({ ...current, ...changes }))
@@ -26,15 +27,6 @@ export function Profile() {
   const players = catalog?.players.filter((p) => !draft.favoriteTeamId || p.team_id === draft.favoriteTeamId) ?? []
   const playerName = catalog?.players.find((p) => p.player_id === draft.favoritePlayerId)?.name ?? t.common.none
   const invalidMode = draft.mode === 'player' && !draft.favoritePlayerId
-  const matchHistory = experience.viewedMatches
-    .map((entry) => ({ ...entry, match: catalog?.matches.find((match) => match.id === entry.matchId) }))
-    .filter((entry) => entry.match)
-  const recapHistory = experience.viewedRecaps
-    .map((entry) => ({ ...entry, match: catalog?.matches.find((match) => match.id === entry.matchId) }))
-    .filter((entry) => entry.match)
-  const playerMatches = draft.favoritePlayerId
-    ? catalog?.matches.filter((match) => match.metadata.players.some((player) => player.player_id === draft.favoritePlayerId)) ?? []
-    : []
 
   function save() {
     if (invalidMode) return
@@ -53,27 +45,11 @@ export function Profile() {
           </div>
         </header>
         <ErrorNotice message={error && t.common.apiDown} onRetry={reload} retryLabel={t.common.retry} />
-        <section className="experience-grid">
-          <ExperienceList copy={copy.history} empty={copy.emptyHistory} entries={matchHistory} onOpen={(id) => navigate(paths.match(id))} />
-          <ExperienceList copy={copy.summaries} empty={copy.emptySummaries} entries={recapHistory} onOpen={(id) => navigate(paths.recap(id))} />
-          <article className="experience-panel">
-            <h2>{copy.playerContent}</h2>
-            {!draft.favoritePlayerId && <p>{copy.choosePlayer}</p>}
-            {draft.favoritePlayerId && playerMatches.length === 0 && <p>{copy.emptyPlayerContent}</p>}
-            {playerMatches.map((match) => (
-              <button key={match.id} onClick={() => navigate(paths.match(match.id))} type="button">
-                <strong>{match.metadata.home_team.name} · {match.metadata.away_team.name}</strong>
-                <small>{copy.openPlayerContent}</small>
-                <Icon name="arrow" size={15} />
-              </button>
-            ))}
-          </article>
-        </section>
         <div className="profile-card">
           <div className="profile-intro">
-            <span>IN</span>
+            <span><Icon name="user" /></span>
             <div>
-              <h2>{copy.guest}</h2>
+              <h2>{t.nav.preferences}</h2>
               <p>{copy.since}</p>
             </div>
           </div>
@@ -131,7 +107,7 @@ export function Profile() {
 
           <div className="preference-block">
             <h3>{copy.player}</h3>
-            <div className="player-options">
+            <div className="player-options"><button aria-pressed={!draft.favoritePlayerId} className={!draft.favoritePlayerId ? 'selected' : ''} onClick={() => set({ favoritePlayerId: '', mode: draft.mode === 'player' ? 'casual' : draft.mode })} type="button"><Icon name="user" /><strong>{t.common.none}</strong></button>
               {players.map((player) => (
                 <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => set({ favoritePlayerId: player.player_id })} type="button">
                   <img alt="" src={playerPhoto(player.player_id)} />
@@ -163,14 +139,15 @@ export function Profile() {
             {invalidMode && <p className="form-warning" role="alert">{copy.playerNeeded}</p>}
             {draft.mode === 'analyst' && (
               <button
-                aria-pressed={draft.liveComments}
+                aria-checked={draft.liveComments}
+                role="switch"
                 className={`analyst-comments-toggle ${draft.liveComments ? 'selected' : ''}`}
                 onClick={() => set({ liveComments: !draft.liveComments })}
                 type="button"
               >
                 <Icon name="match" />
                 <span><strong>{copy.liveComments}</strong><small>{copy.liveCommentsCopy}</small></span>
-                <Icon name={draft.liveComments ? 'check' : 'close'} size={16} />
+                <span className="switch-track" aria-hidden="true"><span /></span>
               </button>
             )}
           </div>
@@ -190,7 +167,7 @@ export function Profile() {
             </div>
           </div>
 
-          <div className="save-row">
+          <div className="save-row"><span className="save-note" role="status">{saved ? t.common.saved : t.profile.saveHint}</span>
             <Button disabled={invalidMode} onClick={save}>
               {saved ? (<><Icon name="check" /> {t.common.saved}</>) : t.common.save}
             </Button>
@@ -201,21 +178,5 @@ export function Profile() {
         </div>
       </section>
     </AppShell>
-  )
-}
-
-function ExperienceList({ copy, empty, entries, onOpen }) {
-  return (
-    <article className="experience-panel">
-      <h2>{copy}</h2>
-      {entries.length === 0 && <p>{empty}</p>}
-      {entries.slice(0, 4).map(({ match, viewedAt }) => (
-        <button key={match.id} onClick={() => onOpen(match.id)} type="button">
-          <strong>{match.metadata.home_team.name} · {match.metadata.away_team.name}</strong>
-          <small>{new Date(viewedAt).toLocaleDateString()}</small>
-          <Icon name="arrow" size={15} />
-        </button>
-      ))}
-    </article>
   )
 }

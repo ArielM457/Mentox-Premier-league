@@ -4,6 +4,11 @@ import { api } from '../api/client.js'
 // Catálogo de la demo: partidos cargados en la API, sus equipos y jugadores.
 // Se pide una vez y se comparte entre pantallas; reload() lo vuelve a pedir.
 let cache = null
+let pending = null
+function sharedCatalog() {
+  if (!pending) pending = fetchCatalog().then((data) => { cache = data; return data }).finally(() => { pending = null })
+  return pending
+}
 
 async function fetchCatalog() {
   const list = await api.listMatches()
@@ -53,7 +58,7 @@ export function useCatalog() {
 
   const reload = useCallback(async () => {
     try {
-      cache = await fetchCatalog()
+      cache = await sharedCatalog()
       setState({ data: cache, error: null })
     } catch (error) {
       setState((current) => ({ data: current.data, error: error.message }))

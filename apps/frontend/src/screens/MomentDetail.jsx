@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { describePreferences, usePreferences } from '../app/preferences.js'
@@ -7,14 +8,15 @@ import { formatClock, formatMatchClock, kindLabel, momentIdOf } from '../lib/ove
 import { Pitch } from '../components/match/Pitch.jsx'
 import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
+import { Tabs } from '../components/ui/Tabs.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
 const STEP_MS = 900
 
 export function MomentDetail({ matchId, momentId }) {
   const { t, apiPreferences } = usePreferences()
-  const { data: catalog } = useCatalog()
+  const { data: catalog, error: catalogError, reload } = useCatalog()
   const match = catalog?.matches.find((m) => m.id === matchId)
   const [overlay, setOverlay] = useState(null)
   const [sources, setSources] = useState(null)
@@ -53,10 +55,11 @@ export function MomentDetail({ matchId, momentId }) {
         <Button variant="ghost" onClick={back}>
           <Icon name="back" /> {t.moment.back}
         </Button>
-        <Brand light />
+        <Brand /><ThemeToggle />
         <span className="share-label">{t.common.syntheticData}</span>
       </header>
-      <ErrorNotice message={error} onRetry={error === t.moment.notFound ? back : load} retryLabel={error === t.moment.notFound ? t.moment.back : t.common.retry} />
+      <ErrorNotice message={catalogError ? t.common.apiDown : catalog && !match ? t.moment.notFound : error} onRetry={catalogError ? reload : error === t.moment.notFound || (catalog && !match) ? back : load} retryLabel={error === t.moment.notFound ? t.moment.back : t.common.retry} />
+      {!catalogError && !error && (!catalog || (match && (!overlay || !sources))) && <LoadingScreen />}
       {overlay && sources && match && (
         <MomentContent key={overlay.draft_id} lastReport={lastReport} match={match} overlay={overlay} sources={sources} tab={tab} setTab={setTab} onReported={(report) => { setLastReport(report); if (report.outcome === 'withdrawn') load() }} />
       )}
@@ -84,7 +87,7 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
   const team = authorEvent?.team_id === metadata.home_team.team_id ? metadata.home_team.name : authorEvent?.team_id === metadata.away_team.team_id ? metadata.away_team.name : '—'
   const span = events.length > 1 ? (events[events.length - 1].clock_ms - events[0].clock_ms) / 1000 : 0
   const passes = events.filter((e) => e.type === 'pass').length
-  const explanation = sources.draft.explanation || overlay.explanation || overlay.headline
+  const explanation = (sources.draft.explanation || overlay.explanation || overlay.headline).split(/\s(?:Datos|Data):/)[0]
   const conciseExplanation = explanation.length > 260 ? `${explanation.slice(0, 257)}…` : explanation
 
   return (
@@ -94,7 +97,6 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
           <Icon name="spark" size={16} /> {t.moment.pill(formatMatchClock(overlay, t.match.period))} · {kindLabel(t.kinds, overlay.kind)}
         </span>
         <h1>{overlay.headline}</h1>
-        <p>{conciseExplanation}</p>
         <div className="moment-context">
           <span><small>{t.moment.author}</small><strong>{author}</strong></span>
           <span><small>{t.moment.situation}</small><strong>{kindLabel(t.kinds, overlay.kind)}</strong></span>
@@ -127,13 +129,8 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
       </section>
 
       <aside className="detail-insight">
-        <nav role="tablist">
-          {Object.entries(t.moment.tabs).map(([key, label]) => (
-            <button aria-selected={tab === key} className={tab === key ? 'active' : ''} key={key} onClick={() => setTab(key)} role="tab" type="button">
-              {label}
-            </button>
-          ))}
-        </nav>
+        <Tabs items={Object.entries(t.moment.tabs)} value={tab} onChange={setTab} label={t.match.viewTabs} id="moment-view" />
+        <div role="tabpanel" id="moment-view-panel" aria-labelledby={`moment-view-${tab}`}>
 
         {tab === 'explanation' && (
           <div className="tab-copy">
@@ -204,6 +201,7 @@ function MomentContent({ match, overlay, sources, tab, setTab, lastReport, onRep
           </div>
         )}
 
+        </div>
         <ReportForm lastReport={lastReport} matchId={match.id} overlay={overlay} onReported={onReported} />
       </aside>
     </div>

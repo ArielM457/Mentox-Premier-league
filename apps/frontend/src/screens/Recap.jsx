@@ -1,3 +1,4 @@
+import { NarrativeCopy } from '../components/ui/NarrativeCopy.jsx'
 import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
@@ -57,7 +58,8 @@ export function Recap({ matchId }) {
           )}
         </header>
         <ErrorNotice message={(catalogError && t.common.apiDown) || error} onRetry={reload} retryLabel={t.common.retry} />
-        {!match && !catalogError && <LoadingCards />}
+        {(!catalog || (match && !summary && !error)) && !catalogError && <LoadingCards />}
+        {catalog && !match && <ErrorNotice message={t.moment.notFound} />}
         {match && (
           <MatchScore metadata={match.metadata} minute={t.matches.final} score={match.finalScore} status="FT" statusLabel={t.matches.status.FT} />
         )}
@@ -73,7 +75,7 @@ export function Recap({ matchId }) {
                 <Icon name="spark" size={16} /> {t.recap.summaryKicker}
               </span>
               <h2>{summary.draft.headline}</h2>
-              <p>{summary.draft.explanation}</p>
+              <NarrativeCopy text={summary.draft.explanation} />
               <div className="recap-meta">
                 <span className={`editorial-status status-${summary.status}`}>{t.recap.status[summary.status]}</span>
                 <span className="personal-note">{t.recap.personal(t.modes[preferences.mode].name)}</span>
