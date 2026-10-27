@@ -1,5 +1,10 @@
 from contextlib import asynccontextmanager
 
+from .env_file import load_env_file
+
+# Antes de importar las rutas: algunas leen variables de entorno al importarse.
+load_env_file()
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 

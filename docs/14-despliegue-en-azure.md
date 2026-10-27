@@ -175,6 +175,8 @@ $env:ANALYTICS_ENGINE = 'persona2'; $env:MATCH_SOURCE = 'supabase'
 .\.venv\Scripts\python.exe -m uvicorn match_intelligence.main:app --port 8000
 ```
 
+En lugar de escribir las variables en cada terminal, puede copiar `apps/backend/.env.example` como `apps/backend/.env` y completarlo. La API lo lee al iniciar y escribe en la consola qué variables tomó (solo los nombres). Lo que ya esté definido en la terminal tiene prioridad. Git ignora ese archivo, y la imagen de Docker no lo incluye. Las pruebas tampoco lo leen.
+
 En otra terminal, inicie la interfaz:
 
 ```powershell
