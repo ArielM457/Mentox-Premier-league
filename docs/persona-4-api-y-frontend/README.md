@@ -71,6 +71,33 @@ Decisiones de la implementación:
 - **Navegación con la URL.** Cada pantalla tiene su dirección y el botón Atrás del navegador funciona.
 - **Pantalla nueva de revisión editorial.** El diseño no la tenía y el reto la pide (RF-38, RF-39).
 
+## **Revisión comunitaria de los resúmenes**
+
+La pantalla **Revisión** tiene dos pestañas:
+
+- **Revisar resumen:** lo que ya existía (aprobar o rechazar como editor, reportes y herramientas de demo). Ahora tiene un botón para **generar el resumen del partido** desde ahí y muestra junto a cada resumen el voto de la comunidad («Comunidad: 80 % a favor · 5 votos»).
+- **Comunidad:** cualquier persona vota si aprobaría el resumen que hizo la IA, deja **sugerencias** y conversa en un **chat en vivo**. Todo se actualiza al instante en todas las pantallas abiertas.
+
+El voto de la comunidad **orienta** al editor, pero no aprueba ni publica el resumen: la publicación sigue exigiendo la revisión editorial (RF-38).
+
+**Tiempo real.** Cada resumen es un tema de un bus de mensajes. La API publica en ese tema cada voto y cada mensaje, y los navegadores suscritos los reciben por Server-Sent Events, con un latido cada 15 s para mantener viva la conexión. El bus por defecto usa una cola en memoria (`asyncio.Queue`) por suscriptor, suficiente porque la API corre en una sola réplica (`maxReplicas: 1` en `infra/azure`). La interfaz `MessageBus` (`application/community.py`) permite reemplazarlo por MQTT o Azure Service Bus si se escalan réplicas.
+
+**Moderación** (`application/moderation.py`). Antes de publicar se rechazan groserías e insultos en español e inglés, enlaces y spam (`422` con el motivo). El texto se normaliza para resistir trucos (`put4`, `p.u.t.a`, `puuuta`, tildes) y se comparan palabras completas para no bloquear palabras sanas como «computadora». Los nombres también se moderan. Límite: un mensaje cada 2 segundos por persona (`429` con `Retry-After`).
+
+**Identidad.** No hay inicio de sesión: cada navegador recibe un identificador aleatorio (un voto por persona, que puede cambiarse) y la persona escribe el nombre con el que la verán.
+
+| Ruta | Para qué sirve |
+|---|---|
+| `GET /matches/{id}/community` | Votos por resumen de la cola editorial. |
+| `GET /matches/{id}/community/{draft_id}?client_id=` | Votos, mi voto, sugerencias y chat. |
+| `POST /matches/{id}/community/{draft_id}/votes` | Votar `approve` o `reject`. |
+| `POST /matches/{id}/community/{draft_id}/messages` | Enviar `suggestion` o `chat`; pasa por la moderación. |
+| `GET /matches/{id}/community/{draft_id}/stream` | Canal SSE con `ready`, `vote` y `message`. |
+
+Pruebas: `tests/test_moderation.py`, `tests/test_community.py` y el grupo «Comunidad» de Postman.
+
+Limitaciones: votos y mensajes se guardan en memoria y se pierden al reiniciar el backend; el identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo es orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
+
 ## **Decisiones de Persona 4**
 
 **1. El vídeo manda.** El tiempo del reproductor decide qué se ve. Cada mensaje lleva `video_time_ms` tomado de sus eventos de origen (`video_time_basis = source_event_timestamp`); no se presenta como detección automática.

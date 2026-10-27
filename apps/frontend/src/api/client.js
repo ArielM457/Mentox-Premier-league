@@ -2,9 +2,10 @@
 import { strings } from '../i18n/strings.js'
 
 export class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, data = null) {
     super(message)
     this.status = status
+    this.data = data
   }
 }
 
@@ -42,7 +43,7 @@ async function request(path, options = {}) {
   const data = await response.json().catch(() => null)
   if (!response.ok) {
     const detail = typeof data?.detail === 'string' ? data.detail : JSON.stringify(data?.detail ?? response.statusText)
-    throw new ApiError(detail, response.status)
+    throw new ApiError(detail, response.status, data)
   }
   return data
 }
@@ -119,4 +120,12 @@ export const api = {
     `/api/v1/integration/live/capture/frame?match_id=${encodeURIComponent(matchId)}&video_time_ms=${Math.floor(t)}`,
     { method: 'POST', body: image, headers: { 'Content-Type': image.type || 'image/jpeg' } },
   ),
+  communityTallies: (id) => request(`${base(id)}/community`),
+  communityRoom: (id, draftId, clientId) =>
+    request(`${base(id)}/community/${encodeURIComponent(draftId)}?client_id=${encodeURIComponent(clientId)}`),
+  communityVote: (id, draftId, body) =>
+    request(`${base(id)}/community/${encodeURIComponent(draftId)}/votes`, { method: 'POST', body: JSON.stringify(body) }),
+  communityPost: (id, draftId, body) =>
+    request(`${base(id)}/community/${encodeURIComponent(draftId)}/messages`, { method: 'POST', body: JSON.stringify(body) }),
+  communityStreamUrl: (id, draftId) => `${base(id)}/community/${encodeURIComponent(draftId)}/stream`,
 }

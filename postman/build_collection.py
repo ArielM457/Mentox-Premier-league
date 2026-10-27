@@ -234,6 +234,55 @@ def match_experience_items() -> list[dict]:
     ]
 
 
+def community_items() -> list[dict]:
+    """Revisión comunitaria del resumen creado en «Experiencia del partido» (ejecutar después)."""
+    base = "/api/v1/matches/synthetic-acceptance-001/community"
+    summary = "summary-synthetic-acceptance-001-es-casual"
+    body = "const body = pm.response.json();"
+    person = {"client_id": "postman-cliente-01", "author": "Postman"}
+    return [
+        get(
+            "GET Votos por resumen",
+            base,
+            [status(200), body, "pm.test('Lista los resúmenes', () => pm.expect(body.map(r => r.draft_id)).to.include('" + summary + "'));"],
+            "Conteo de votos de la comunidad para cada resumen de la cola editorial.",
+        ),
+        request(
+            "POST Votar aprobar",
+            base + f"/{summary}/votes",
+            {**person, "vote": "approve"},
+            [status(200), body, "pm.test('Cuenta el voto', () => pm.expect(body.approve).to.be.at.least(1));"],
+            "Un voto por persona; volver a votar lo cambia.",
+        ),
+        request(
+            "POST Sugerencia",
+            base + f"/{summary}/messages",
+            {**person, "kind": "suggestion", "text": "Agregaría el minuto exacto del gol."},
+            [status(201), body, "pm.test('Guardada como sugerencia', () => pm.expect(body.kind).to.equal('suggestion'));"],
+            "Las sugerencias pasan por el filtro de contenido.",
+        ),
+        request(
+            "POST Comentario ofensivo",
+            base + f"/{summary}/messages",
+            {**person, "kind": "chat", "text": "qué resumen de mierda"},
+            [status(422), body, "pm.test('Filtrado', () => pm.expect(body.rejection).to.equal('profanity'));"],
+            "El filtro rechaza groserías, enlaces y spam antes de publicar.",
+        ),
+        get(
+            "GET Sala del resumen",
+            base + f"/{summary}?client_id=postman-cliente-01",
+            [status(200), body, "pm.test('Recuerda mi voto', () => pm.expect(body.my_vote).to.equal('approve'));", "pm.test('Incluye la sugerencia', () => pm.expect(body.suggestions.length).to.be.above(0));"],
+            "Votos, sugerencias y chat de un resumen.",
+        ),
+        get(
+            "GET Canal de un resumen inexistente",
+            base + "/no-existe/stream",
+            [status(404), body, "pm.test('Explica el error', () => pm.expect(body.detail).to.include('no-existe'));"],
+            "Con un resumen existente responde text/event-stream con vote y message en tiempo real.",
+        ),
+    ]
+
+
 def main() -> None:
     collection = json.loads(COLLECTION.read_text(encoding="utf-8"))
     events_group = next(group for group in collection["item"] if group["name"] == "Eventos")
@@ -451,13 +500,14 @@ def main() -> None:
     collection["item"] = [
         group
         for group in collection["item"]
-        if group["name"] not in {"Narrativa", "Enrutamiento de agentes", "Experiencia del partido"}
+        if group["name"] not in {"Narrativa", "Enrutamiento de agentes", "Experiencia del partido", "Comunidad"}
     ]
     collection["item"].append(
         {"name": "Enrutamiento de agentes", "item": routing_items}
     )
     collection["item"].append({"name": "Narrativa", "item": items})
     collection["item"].append({"name": "Experiencia del partido", "item": match_experience_items()})
+    collection["item"].append({"name": "Comunidad", "item": community_items()})
     collection["info"]["description"] = (
         "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. "
         "El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa "
