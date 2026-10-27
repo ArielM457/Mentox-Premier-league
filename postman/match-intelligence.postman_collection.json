@@ -1597,6 +1597,186 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Comunidad",
+      "item": [
+        {
+          "name": "GET Votos por resumen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community",
+            "description": "Conteo de votos de la comunidad para cada resumen de la cola editorial."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Lista los resúmenes', () => pm.expect(body.map(r => r.draft_id)).to.include('summary-synthetic-acceptance-001-es-casual'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Votar aprobar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community/summary-synthetic-acceptance-001-es-casual/votes",
+            "description": "Un voto por persona; volver a votar lo cambia.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"postman-cliente-01\",\n  \"author\": \"Postman\",\n  \"vote\": \"approve\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Cuenta el voto', () => pm.expect(body.approve).to.be.at.least(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Sugerencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community/summary-synthetic-acceptance-001-es-casual/messages",
+            "description": "Las sugerencias pasan por el filtro de contenido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"postman-cliente-01\",\n  \"author\": \"Postman\",\n  \"kind\": \"suggestion\",\n  \"text\": \"Agregaría el minuto exacto del gol.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Guardada como sugerencia', () => pm.expect(body.kind).to.equal('suggestion'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Comentario ofensivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community/summary-synthetic-acceptance-001-es-casual/messages",
+            "description": "El filtro rechaza groserías, enlaces y spam antes de publicar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"client_id\": \"postman-cliente-01\",\n  \"author\": \"Postman\",\n  \"kind\": \"chat\",\n  \"text\": \"qué resumen de mierda\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 422', () => pm.response.to.have.status(422));",
+                  "const body = pm.response.json();",
+                  "pm.test('Filtrado', () => pm.expect(body.rejection).to.equal('profanity'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Sala del resumen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community/summary-synthetic-acceptance-001-es-casual?client_id=postman-cliente-01",
+            "description": "Votos, sugerencias y chat de un resumen."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Recuerda mi voto', () => pm.expect(body.my_vote).to.equal('approve'));",
+                  "pm.test('Incluye la sugerencia', () => pm.expect(body.suggestions.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Canal de un resumen inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/community/no-existe/stream",
+            "description": "Con un resumen existente responde text/event-stream con vote y message en tiempo real."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 404', () => pm.response.to.have.status(404));",
+                  "const body = pm.response.json();",
+                  "pm.test('Explica el error', () => pm.expect(body.detail).to.include('no-existe'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

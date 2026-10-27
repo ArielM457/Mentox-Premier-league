@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .adapters.http.analytics_router import router as analytics_router
+from .adapters.http.community_router import router as community_router
 from .adapters.http.match_router import router as match_router
 from .adapters.http.narrative_router import router as narrative_router
 from .adapters.http.router import router
@@ -34,6 +35,7 @@ app.include_router(router)
 app.include_router(narrative_router)
 app.include_router(routing_router)
 app.include_router(match_router)
+app.include_router(community_router)
 app.include_router(analytics_router)
 app.include_router(integration_router)
 
