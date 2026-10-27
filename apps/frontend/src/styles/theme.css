@@ -178,8 +178,6 @@
 :root[data-theme] :is(.vision-window b, .vision-confidence) { color: var(--text); }
 :root[data-theme] .vision-glyph { color: var(--on-accent); background: var(--lime); }
 :root[data-theme] .view-switch { color: var(--text); background: var(--surface-raised); border-color: var(--line); }
-:root[data-theme] .assistant-close { color: var(--muted); background: var(--surface-soft); }
-:root[data-theme] .assistant-close:hover { color: var(--on-accent); background: var(--lime); }
 :root[data-theme='light'] .vision-error { color: #8a5300; }
 /* Dentro del bloque plegable de visión, la tarjeta no repite fondo ni borde. */
 :root[data-theme] .vision-details .vision-card { margin-top: 12px; padding: 0; background: transparent; border: 0; }

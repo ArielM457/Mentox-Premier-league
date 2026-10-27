@@ -58,7 +58,6 @@ function LiveMatch({ match }) {
   const metadata = match.metadata
   const videoRef = useRef(null)
   const matchViewRef = useRef(null)
-  const assistantSwitchRef = useRef(null)
   const liveDurationMs = match.durationMs
   const clock = useMatchClock(liveDurationMs, videoRef, matchId)
   const [seekVersion, setSeekVersion] = useState(0)
@@ -203,12 +202,6 @@ function LiveMatch({ match }) {
     if (openTab) setTab('summary')
   }
 
-  // Al cerrar desde el panel, el foco pasa al interruptor que lo vuelve a abrir.
-  function closeAssistant() {
-    setAssistantOpen(false)
-    assistantSwitchRef.current?.focus()
-  }
-
   function changeMode(mode) {
     update({ mode })
   }
@@ -300,7 +293,7 @@ function LiveMatch({ match }) {
                       </label>
                       <label className="view-switch">
                         <span><Icon name="spark" size={15} /> {t.match.assistantToggle}</span>
-                        <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} ref={assistantSwitchRef} type="checkbox" />
+                        <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} type="checkbox" />
                         <span aria-hidden="true" className="switch-track"><span /></span>
                       </label>
                     </>
@@ -407,7 +400,7 @@ function LiveMatch({ match }) {
         </div>
         {matchAgentOpen && (
           <div className="match-agent-rail" id="match-agent-panel">
-            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onClose={closeAssistant} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
           </div>
         )}
       </div>

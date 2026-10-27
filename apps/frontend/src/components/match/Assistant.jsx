@@ -5,8 +5,7 @@ import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
 // Preguntas sobre el partido respondidas con los eventos ya ocurridos (RF-34).
-// ``onClose`` (opcional) añade en la cabecera el botón que oculta el panel.
-export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onExplore, canExplore, onClose }) {
+export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onExplore, canExplore }) {
   const { t, apiPreferences, preferences } = usePreferences()
   const [question, setQuestion] = useState('')
   const [asked, setAsked] = useState(null)
@@ -37,14 +36,7 @@ export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onEx
         <span id="assistant-title">
           <Icon name="spark" /> {t.assistant.title}
         </span>
-        <span className="assistant-title-tools">
-          <span className="ai-mode">{t.modes[preferences.mode].name}</span>
-          {onClose && (
-            <button aria-controls="match-agent-panel" aria-label={t.match.hideAgent} className="assistant-close" onClick={onClose} title={t.match.hideAgent} type="button">
-              <Icon name="panelClose" size={18} />
-            </button>
-          )}
-        </span>
+        <span className="ai-mode">{t.modes[preferences.mode].name}</span>
       </div>
       {asked && <div className="assistant-question">{asked}</div>}
       <div className="assistant-answer" aria-live="polite">

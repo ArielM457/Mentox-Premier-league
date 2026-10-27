@@ -107,11 +107,6 @@
 .assistant-title > span:first-child { display: flex; align-items: center; gap: 7px; }
 .assistant-title .icon { color: var(--lime); }
 .ai-mode { padding: 4px 7px; color: var(--lime); background: rgba(216,255,101,.1); border-radius: 6px; font-size: 8px; }
-.assistant-title-tools { display: inline-flex; align-items: center; gap: 8px; }
-/* Mismo gesto que el botón que contrae el menú lateral. */
-.assistant-close { width: 34px; height: 34px; padding: 0; display: grid; place-items: center; color: #b9b4ca; background: #24203d; border-radius: 10px; transition: color 160ms ease, background-color 160ms ease; }
-.assistant-close .icon { color: inherit; }
-.assistant-close:hover { color: var(--navy); background: var(--lime); }
 .assistant-question { margin: 18px 0 12px 40px; padding: 12px 14px; color: white; background: var(--violet); border-radius: 14px 14px 3px 14px; font-size: 12px; font-weight: 600; }
 .assistant-answer { padding: 14px; display: flex; gap: 10px; background: #24203d; border-radius: 14px; }
 .assistant-answer p { margin: 0; color: #d7d3e1; font-size: 12px; line-height: 1.55; }
