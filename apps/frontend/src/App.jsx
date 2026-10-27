@@ -1,7 +1,7 @@
 import { useRoute } from './app/router.js'
 import { AllMatches } from './screens/AllMatches.jsx'
 import { Discover } from './screens/Discover.jsx'
-import { Editorial } from './screens/Editorial.jsx'
+import { Editorial, EditorialDetail } from './screens/Editorial.jsx'
 import { Landing } from './screens/Landing.jsx'
 import { MatchCenter } from './screens/MatchCenter.jsx'
 import { MomentDetail } from './screens/MomentDetail.jsx'
@@ -40,6 +40,9 @@ export default function App() {
       break
     case 'editorial':
       screen = <Editorial />
+      break
+    case 'editorialDetail':
+      screen = <EditorialDetail key={params.join('/')} matchId={params[0]} draftId={params[1]} />
       break
     default:
       screen = <Landing />

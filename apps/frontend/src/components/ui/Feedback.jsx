@@ -1,10 +1,15 @@
-import { Button } from './Button.jsx'
+import { Button, Spinner } from './Button.jsx'
 import { Icon } from './Icon.jsx'
 import { usePreferences } from '../../app/preferences.js'
 
 export function LoadingScreen({ message, compact = false }) {
   const { t } = usePreferences()
-  return <div className={`loading-screen ${compact ? 'compact-loading' : ''}`} role="status" aria-live="polite"><span className="loading-spinner" aria-hidden="true" /><strong>{message || t.common.loading}</strong><p>{t.common.loadingCopy}</p></div>
+  return <div aria-busy="true" className={`loading-screen ${compact ? 'compact-loading' : ''}`} role="status" aria-live="polite"><Spinner /><strong>{message || t.common.loading}</strong><p>{t.common.loadingCopy}</p></div>
+}
+
+export function InlineLoading({ message }) {
+  const { t } = usePreferences()
+  return <span aria-busy="true" className="inline-loading" role="status"><Spinner size="small" /> {message || t.common.loading}</span>
 }
 
 export function ErrorNotice({ message, onRetry, retryLabel }) {

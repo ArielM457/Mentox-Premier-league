@@ -6,7 +6,7 @@ import { MODE_ART, playerPhoto, teamBranding } from '../data/branding.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 
 const LANGUAGES = [['es', 'ES', 'Español', 'Experiencia en español'], ['en', 'EN', 'English', 'Experience in English']]
@@ -65,6 +65,8 @@ export function Onboarding() {
 
           <ErrorNotice message={error && t.common.apiDown} onRetry={reload} retryLabel={t.common.retry} />
 
+          {!catalog && !error && (step === 1 || step === 2) && <LoadingScreen compact />}
+
           {step === 0 && (
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="01" title={copy.languageTitle} text={copy.languageCopy} />
@@ -83,7 +85,7 @@ export function Onboarding() {
             </div>
           )}
 
-          {step === 1 && (
+          {step === 1 && catalog && (
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="02" title={copy.clubTitle} text={copy.clubCopy} />
               <div className="club-logo-grid">
@@ -106,7 +108,7 @@ export function Onboarding() {
             </div>
           )}
 
-          {step === 2 && (
+          {step === 2 && catalog && (
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="03" title={club ? copy.playersOf(club.name) : copy.chooseClubFirst} text={copy.playerCopy} />
               {club ? (

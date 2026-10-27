@@ -13,6 +13,7 @@ const ROUTES = [
   ['recap', /^\/recap\/([^/]+)$/],
   ['profile', /^\/profile$/],
   ['editorial', /^\/editorial$/],
+  ['editorialDetail', /^\/editorial\/([^/]+)\/([^/]+)$/],
 ]
 
 export function parseRoute(hash) {
@@ -39,6 +40,7 @@ export const paths = {
   recap: (matchId) => `/recap/${encodeURIComponent(matchId)}`,
   profile: () => '/profile',
   editorial: () => '/editorial',
+  editorialDetail: (matchId, draftId) => `/editorial/${encodeURIComponent(matchId)}/${encodeURIComponent(draftId)}`,
 }
 
 // Un partido "FT" abre su resumen; uno en vivo abre el centro del partido.

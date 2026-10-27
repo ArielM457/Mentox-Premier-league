@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
-import { Button } from '../ui/Button.jsx'
+import { Button, Spinner } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
 // Preguntas sobre el partido respondidas con los eventos ya ocurridos (RF-34).
@@ -47,7 +47,7 @@ export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onEx
           {error ? (
             <p className="assistant-error">{error}</p>
           ) : busy ? (
-            <p>{t.assistant.asking}</p>
+            <p className="inline-loading"><Spinner size="small" /> {t.assistant.asking}</p>
           ) : answer ? (
             <>
               <p><strong>{answer.headline}</strong></p>
@@ -76,8 +76,8 @@ export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onEx
           placeholder={t.assistant.placeholder}
           value={question}
         />
-        <button aria-label={t.assistant.ask} disabled={busy || !question.trim()} type="submit">
-          <Icon name="arrow" size={17} />
+        <button aria-busy={busy || undefined} aria-label={t.assistant.ask} disabled={busy || !question.trim()} type="submit">
+          {busy ? <Spinner size="small" /> : <Icon name="arrow" size={17} />}
         </button>
       </form>
       <div className="suggestions">

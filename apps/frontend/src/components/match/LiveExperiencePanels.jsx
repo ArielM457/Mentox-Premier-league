@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
 import { formatClock, formatMatchClock, kindLabel } from '../../lib/overlays.js'
-import { Button } from '../ui/Button.jsx'
+import { Button, Spinner } from '../ui/Button.jsx'
+import { InlineLoading } from '../ui/Feedback.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { TeamBadge } from '../ui/TeamBadge.jsx'
 import { Pitch } from './Pitch.jsx'
@@ -158,7 +159,7 @@ export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
           <Pitch events={sources} highlightIds={moment.source_event_ids} homeTeamId={metadata.home_team.team_id} label={moment.headline} markedPlayerIds={marked} players={metadata.players} snapshot={snapshot} trail={Math.max(1, sources.length)} />
           {snapshot && <small className="pitch-caption">{simulated ? t.match.analysis.positionsSimulated : t.match.analysis.positionsVideo}</small>}
           <div className="moment-evidence">
-            {loading && <p className="moment-evidence-status">{t.match.analysis.loading}</p>}
+            {loading && <InlineLoading message={t.match.analysis.loading} />}
             {error && <p className="moment-evidence-status">{t.match.analysis.error}</p>}
             {analysis && !analysis.found_in_engine && <p className="moment-evidence-status">{t.match.analysis.notInEngine}</p>}
             {analysis?.found_in_engine && (
@@ -210,7 +211,7 @@ export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
               )
             })}
           </div>
-          {loading ? <p className="moment-evidence-status">{t.match.analysis.loading}</p> : <WhatIfResult metadata={metadata} reading={reading} t={t} />}
+          {loading ? <InlineLoading message={t.match.analysis.loading} /> : <WhatIfResult metadata={metadata} reading={reading} t={t} />}
           <small className="simulation-disclaimer">{simulated ? t.match.counterfactualDisclaimer : t.match.counterfactualDisclaimerVideo}</small>
         </aside>
       </div>
@@ -431,6 +432,7 @@ export function TacticalPanel({ compact = false, events, matchId, metadata }) {
         </div>
       </header>
       {error && <p className="panel-note">{error}</p>}
+      {!preview && !error && <InlineLoading message={t.common.processing} />}
       {preview && homeFormation && awayFormation && (
         <>
           <div className="initial-lineup-bar">
@@ -654,7 +656,7 @@ function SavedVisionResults({ timeMs, seekVersion }) {
       </p>
     )
   }
-  if (!status || !timeline) return <p className="vision-note">{t.common.loading}</p>
+  if (!status || !timeline) return <InlineLoading message={t.common.processing} />
   const actions = timeline.temporal_actions.slice().sort((a, b) => b.timestamp_ms - a.timestamp_ms).slice(0, 3)
   return (
     <>
@@ -695,7 +697,10 @@ export function VisionCard({ timeMs, seekVersion, matchId, videoMode, capture, l
         <div><strong id="vision-card-title">{t.match.visionTitle}</strong><small>{live ? t.match.visionLiveCopy : t.match.visionSavedCopy}</small></div>
         {live ? (
           <span className="vision-statuses">
-            <span className={`channel-pill ${capture?.status === 'live' ? 'channel-live' : ''}`}>{capture?.status === 'live' ? t.match.visionCapturing : t.match.visionWaiting}</span>
+            <span aria-busy={capture?.status === 'processing' || undefined} className={`channel-pill ${capture?.status === 'live' ? 'channel-live' : ''}`}>
+              {capture?.status === 'processing' && <Spinner size="small" />}
+              {capture?.status === 'processing' ? t.common.processing : capture?.status === 'live' ? t.match.visionCapturing : t.match.visionWaiting}
+            </span>
             <span className={`channel-pill ${liveChannel?.status === 'live' ? 'channel-live' : ''}`}>{liveChannel?.status === 'live' ? t.match.visionConnected : t.match.visionDisconnected}</span>
           </span>
         ) : <span className="channel-pill">{t.match.visionBadge}</span>}

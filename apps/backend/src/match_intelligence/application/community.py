@@ -9,8 +9,8 @@ ni publica el resumen por sí solo (RF-38).
 """
 
 import asyncio
-import itertools
 import time
+import uuid
 from collections import deque
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, field
@@ -97,6 +97,33 @@ class RoomSnapshot:
     chat: list[Message]
 
 
+@dataclass(frozen=True)
+class PersistedRoom:
+    votes: dict[str, tuple[Vote, str]] = field(default_factory=dict)
+    messages: list[Message] = field(default_factory=list)
+
+
+class CommunityPersistence(Protocol):
+    """Persistencia secundaria de la participación de la comunidad."""
+
+    def load_room(self, topic: str) -> PersistedRoom: ...
+
+    def save_vote(self, topic: str, client_id: str, author: str, vote: Vote) -> None: ...
+
+    def save_message(self, topic: str, client_id: str, message: Message) -> None: ...
+
+
+class NullCommunityPersistence:
+    def load_room(self, topic: str) -> PersistedRoom:
+        return PersistedRoom()
+
+    def save_vote(self, topic: str, client_id: str, author: str, vote: Vote) -> None:
+        return None
+
+    def save_message(self, topic: str, client_id: str, message: Message) -> None:
+        return None
+
+
 class MessageBus(Protocol):
     """Publicación y suscripción por tema. Se puede reemplazar por MQTT o Azure Service Bus."""
 
@@ -152,6 +179,7 @@ class CommunityService:
         self,
         bus: MessageBus,
         *,
+        persistence: CommunityPersistence | None = None,
         clock: Callable[[], float] = time.monotonic,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
         rate_limit_s: float = RATE_LIMIT_S,
@@ -160,12 +188,18 @@ class CommunityService:
         self._clock = clock
         self._now = now
         self._rate_limit_s = rate_limit_s
+        self._persistence = persistence or NullCommunityPersistence()
         self._rooms: dict[str, _Room] = {}
         self._last_post: dict[str, float] = {}
-        self._ids = itertools.count(1)
 
     def _room(self, topic: str) -> _Room:
-        return self._rooms.setdefault(topic, _Room())
+        if topic not in self._rooms:
+            saved = self._persistence.load_room(topic)
+            self._rooms[topic] = _Room(
+                votes=dict(saved.votes),
+                messages=deque(saved.messages, maxlen=MAX_MESSAGES),
+            )
+        return self._rooms[topic]
 
     def snapshot(self, topic: str, client_id: str | None = None) -> RoomSnapshot:
         room = self._room(topic)
@@ -187,6 +221,7 @@ class CommunityService:
         room = self._room(topic)
         previous = room.votes.get(client_id)
         room.votes[client_id] = (vote, author)
+        self._persistence.save_vote(topic, client_id, author, vote)
         tally = room.tally()
         self._bus.publish(
             topic,
@@ -212,13 +247,14 @@ class CommunityService:
             raise RateLimitError(round(wait, 1))
         self._last_post[key] = now
         message = Message(
-            message_id=f"msg-{next(self._ids):05d}",
+            message_id=f"msg-{uuid.uuid4().hex}",
             kind=kind,
             author=author,
             text=result.text,
             created_at=self._now(),
         )
         self._room(topic).messages.append(message)
+        self._persistence.save_message(topic, client_id, message)
         self._bus.publish(topic, {"type": "message", "message": message_dict(message)})
         return message
 

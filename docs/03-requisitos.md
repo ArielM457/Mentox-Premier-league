@@ -154,6 +154,14 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-78 · P0.** El partido en vivo debe coordinar eventos, balón y jugadores mediante situaciones reproducibles. Cada pase debe identificar un receptor distinto, llevar el balón hasta su zona y declarar su propósito cuando sea un cambio de orientación, pase al espacio, apoyo, salida segura o pase atrás. Una recuperación debe cambiar la posesión. Las faltas, tarjetas, lesiones y reanudaciones deben detener o reactivar el movimiento de forma visible y conservar sus eventos de origen. Se verifica con una secuencia que incluya recuperación y contraataque, pase largo, falta con tarjeta, paro por lesión y reanudación.
 
+**RF-79 · P1.** La revisión comunitaria debe mostrar siempre varios partidos en una sola lista de tarjetas, sin separar Revisar resumen y Comunidad. Cada tarjeta debe incluir equipos, marcador, un resumen breve, likes, dislikes y acceso al detalle. La lista debe permitir buscar y filtrar por estado. Se verifica con al menos tres partidos y búsquedas por equipo y texto del resumen.
+
+**RF-80 · P1.** El detalle comunitario de un resumen debe mostrar el equipo destacado, el marcador, el resumen completo, tácticas respaldadas por la información sintética del partido, un agente de preguntas, aprobación mediante like o dislike y comentarios sobre qué mejorar. Se verifica abriendo una tarjeta, votando, preguntando y publicando una sugerencia y un comentario.
+
+**RF-81 · P1.** Los resúmenes, decisiones editoriales, likes, dislikes, sugerencias y comentarios deben poder persistirse en Supabase mediante la clave exclusiva del backend. Cuando Supabase esté deshabilitado o falle, la interfaz debe conservar el flujo en memoria sin detenerse. Se verifica reiniciando el backend con la base activa y con una prueba separada sin base.
+
+**RF-82 · P1.** Los controles de tema y sesión de invitado deben estar dentro del sidebar izquierdo en escritorio. En el centro del partido, la línea de tiempo y sus controles deben quedar dentro del contenedor de Partido, debajo de los comentarios cuando estén visibles. Se verifica alternando el sidebar y los comentarios sin reiniciar el reloj.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.

@@ -122,6 +122,17 @@ class MatchSession:
                 "Todos los eventos necesitan video_time_ms para sincronizar: " + ", ".join(missing)
             )
         self.events = tuple(sorted(self.events, key=_video_time))
+        for saved in self.persistence.load_summaries(self.match_id):
+            decided_at = saved.decided_at
+            if isinstance(decided_at, str):
+                decided_at = datetime.fromisoformat(decided_at.replace("Z", "+00:00"))
+            self._editorial[saved.draft.draft_id] = EditorialRecord(
+                draft=saved.draft,
+                status=saved.status,
+                reviewer=saved.reviewer,
+                note=saved.note,
+                decided_at=decided_at,
+            )
 
     # ----- consultas básicas ----------------------------------------------
     @property
@@ -377,6 +388,7 @@ class MatchSession:
         if record is None:
             record = EditorialRecord(draft=draft)
             self._editorial[draft.draft_id] = record
+            self._save_editorial(record)
         return record
 
     def editorial_queue(self) -> list[EditorialRecord]:
@@ -399,7 +411,18 @@ class MatchSession:
         record.note = note
         record.decided_at = self._clock()
         record.draft = record.draft.model_copy(update={"editorial_status": record.status})
+        self._save_editorial(record)
         return record
+
+    def _save_editorial(self, record: EditorialRecord) -> None:
+        self.persistence.save_summary(
+            match_id=self.match_id,
+            draft=record.draft,
+            status=record.status,
+            reviewer=record.reviewer,
+            note=record.note,
+            decided_at=record.decided_at,
+        )
 
     def published(self, draft_id: str) -> NarrativeDraft:
         """Devuelve el análisis final solo si fue aprobado."""
@@ -436,6 +459,7 @@ class MatchSession:
                 record.status = EditorialStatus.REJECTED
                 record.note = "Retirado por verificación: " + "; ".join(result.issues)
                 record.draft = record.draft.model_copy(update={"editorial_status": record.status})
+                self._save_editorial(record)
         report = ErrorReport(
             report_id=f"report-{len(self._reports) + 1:03d}",
             draft_id=draft_id,

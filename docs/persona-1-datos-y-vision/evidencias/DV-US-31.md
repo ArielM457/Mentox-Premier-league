@@ -3,7 +3,7 @@
 ## Estado
 
 **Verificada en Azure.**
-**Última revisión:** 25 de octubre de 2026.
+**Última revisión:** 26 de octubre de 2026.
 
 Se desplegaron la suite espacial de Roboflow Sports y SoccerNet TeamSpotting en
 Azure Container Apps con una Tesla T4. Ambos servicios procesaron el mismo
@@ -154,6 +154,72 @@ curl --fail-with-body \
 Durante el cambio de una aplicación a otra Azure respondió temporalmente con
 HTTP `507`. Los reintentos finalizaron correctamente cuando se liberó la T4.
 Esto demuestra ejecución secuencial, no simultánea.
+
+## Verificación de TeamSpotting en la suscripción de Ariel
+
+El 26 de octubre de 2026 desplegamos únicamente SoccerNet TeamSpotting en el
+grupo `rg-premier-agents-rhs8l5fb`, en `northcentralus`. No desplegamos
+Roboflow ni GameState. Antes de comenzar, el grupo solo contenía Azure OpenAI
+y el despliegue `football-intelligence`.
+
+Recursos creados porque no existían en esta suscripción:
+
+- ACR privado `mentoxcdcb5a0d` con administrador deshabilitado;
+- identidad `id-mentox-teamspotting-dev` con acceso `AcrPull`;
+- entorno `cae-mentox-vision-dev` con perfil `NC8as-T4`;
+- aplicación `ca-mentox-teamspotting-dev` con una sola revisión activa;
+- secreto `model-api-key`, sin registrar su valor en Git ni en esta evidencia.
+
+La construcción local no fue viable porque el daemon de Docker en WSL quedó
+bloqueado al atender los contenedores locales existentes. Usamos el modo
+`acr`, permitido por el script. El primer build remoto, `cp1`, falló porque el
+constructor clásico de ACR no admite `RUN --mount=type=cache`. Retiramos solo
+los dos cache mounts de `uv`; las versiones instaladas no cambiaron. El build
+`cp2` terminó correctamente.
+
+Imagen publicada:
+
+```text
+mentoxcdcb5a0d.azurecr.io/mentox/soccernet-teamspotting:74c810f1e3c2
+sha256:78aa2b1dbadba88db34ae1a6f5773ba628696d65541883009f4f90f8bac4111f
+```
+
+Comandos operativos ejecutados:
+
+```bash
+bash infra/azure/teamspotting-ariel.sh deploy
+bash infra/azure/teamspotting-ariel.sh start
+bash infra/azure/teamspotting-ariel.sh status
+bash infra/azure/teamspotting-ariel.sh stop
+```
+
+El despliegue usó estas variables de alcance:
+
+```bash
+export MENTOX_AZURE_RESOURCE_GROUP=rg-premier-agents-rhs8l5fb
+export MENTOX_AZURE_LOCATION=northcentralus
+export MENTOX_IMAGE_BUILD_MODE=acr
+export MENTOX_ACCEPT_MODEL_LICENSES=1
+```
+
+Resultados comprobados:
+
+- el endpoint `/health/ready` respondió `status=ready`;
+- el modelo informó `SoccerNet T-DEED TeamSpotting`;
+- el dispositivo informado fue `Tesla T4`;
+- la revisión observada durante `status` estuvo `Healthy` y con una réplica;
+- `stop` dejó `min-replicas=0`, `max-replicas=1` y modo `Single`;
+- el estado final fue `Healthy`, `ScaledToZero` y `0` réplicas.
+
+Durante el apagado Azure intentó activar una revisión nueva antes de retirar la
+anterior. Como la cuota permite una sola T4, desactivamos únicamente la
+revisión anterior para liberar la GPU. La revisión final fue
+`ca-mentox-teamspotting-dev--0000002`.
+
+Esta ejecución comprobó despliegue, arranque, salud y apagado. No enviamos un
+MP4 a `/v1/predict`, por lo que no añade evidencia nueva sobre calidad o tiempo
+de inferencia. La evidencia de inferencia autorizada continúa siendo la prueba
+anterior registrada en este documento.
 
 ## Riesgos y dependencias
 

@@ -20,6 +20,12 @@
 .app-sidebar button:hover, .app-sidebar button.active { color: var(--violet); background: #f1ebff; }
 .dark-shell .app-sidebar button:hover, .dark-shell .app-sidebar button.active { color: white; background: var(--violet); }
 .app-sidebar.collapsed nav button { justify-content: center; font-size: 0; }
+.sidebar-actions { width: 100%; margin-top: auto; display: grid; gap: 9px; }
+.sidebar-actions .theme-toggle,
+.sidebar-actions .account-button { position: static; width: 100%; min-height: 46px; justify-content: flex-start; padding: 0 14px; border-radius: 13px; }
+.app-sidebar.collapsed .sidebar-actions { align-items: center; }
+.app-sidebar.collapsed .sidebar-actions :is(.theme-toggle, .account-button) { width: 46px; padding: 0; justify-content: center; }
+.app-sidebar.collapsed .sidebar-actions :is(.theme-toggle span, .account-button span) { display: none; }
 .sidebar-language { width: 100%; margin-top: auto; padding: 12px; background: var(--off-white); border-radius: 14px; }
 .dark-shell .sidebar-language { background: #201c37; }
 .sidebar-language > small { display: block; margin-bottom: 8px; color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
