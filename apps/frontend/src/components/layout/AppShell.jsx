@@ -70,14 +70,6 @@ export function AppShell({ active, children }) {
             </button>
           ))}
         </nav>
-        <button className="sidebar-profile" onClick={() => setSessionOpen(true)} type="button">
-          <span>{user ? user.slice(0, 2).toUpperCase() : 'IN'}</span>
-          <div>
-            <strong>{user || t.nav.guest}</strong>
-            <small>{user ? t.session.account : t.session.title}</small>
-          </div>
-          <Icon name="arrow" size={15} />
-        </button>
       </aside>
       <nav className="mobile-nav" aria-label={t.nav.discover}>
         {ITEMS.map(([key, icon, path]) => (

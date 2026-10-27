@@ -103,7 +103,6 @@
 :root[data-theme='dark'] .dark-shell { color: #f5f3fb; background: #100e20; }
 :root[data-theme='dark'] .app-sidebar button:hover,
 :root[data-theme='dark'] .app-sidebar button.active { color: #f5f3fb; background: #594190; }
-:root[data-theme='dark'] .sidebar-profile { color: #f5f3fb !important; background: #302849 !important; border-color: var(--line) !important; }
 :root[data-theme='dark'] .match-card,
 :root[data-theme='dark'] .profile-card,
 :root[data-theme='dark'] .recap-list button,

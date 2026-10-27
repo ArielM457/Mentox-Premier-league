@@ -5,8 +5,6 @@
   .app-sidebar .brand { margin-inline: 0; }
   .app-sidebar .brand > span:last-child, .app-sidebar nav button { font-size: 0; }
   .app-sidebar button { justify-content: center; }
-  .sidebar-profile { width: 52px; grid-template-columns: 1fr; }
-  .sidebar-profile > div, .sidebar-profile > .icon { display: none; }
   .match-layout { grid-template-columns: minmax(0, 1fr); }
   .match-agent-rail { width: min(320px, calc(100% - 42px)); position: absolute; z-index: 12; inset: 0 0 0 auto; filter: drop-shadow(-18px 8px 28px rgba(0,0,0,.35)); }
   .assistant { min-height: 0; }

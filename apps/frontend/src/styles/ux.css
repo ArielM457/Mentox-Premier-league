@@ -42,7 +42,6 @@ body { color: var(--text); }
 :root[data-theme] .app-shell { color: var(--text); background: var(--off-white); }
 :root[data-theme] .app-sidebar,
 :root[data-theme] .mobile-nav { color: var(--text); background: var(--navigation); border-color: var(--line); }
-:root[data-theme] .sidebar-profile { color: var(--text) !important; background: var(--surface) !important; border-color: var(--line) !important; }
 :root[data-theme] .onboarding { background: var(--off-white); }
 :root[data-theme] .onboarding-modal,
 :root[data-theme] .onboarding-preference { color: var(--text); background: var(--surface); border-color: var(--line); }
@@ -55,7 +54,7 @@ body { color: var(--text); }
 button, input, select, textarea { font-family: "DM Sans", sans-serif; }
 .card-score, .team-badge, .overlay-headline, .moment-stats strong { font-family: "Space Grotesk", sans-serif; }
 .card-score small { font-family: "DM Sans", sans-serif !important; }
-.sidebar-profile > span, .profile-intro > span { color: #fff; background: var(--action); }
+.profile-intro > span { color: #fff; background: var(--action); }
 button:disabled { cursor: not-allowed; opacity: .6; }
 :is(button, a, input, select, textarea, summary):focus-visible { outline: 3px solid var(--violet); outline-offset: 4px; }
 .app-shell { padding-bottom: 24px; }

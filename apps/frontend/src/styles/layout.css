@@ -29,14 +29,6 @@
 .app-sidebar.collapsed .sidebar-language { padding: 6px; }
 .app-sidebar.collapsed .sidebar-language > small { display: none; }
 .app-sidebar.collapsed .sidebar-language > div { grid-template-columns: 1fr; }
-.sidebar-profile { margin-top: auto; padding: 8px !important; display: grid !important; grid-template-columns: auto 1fr auto; gap: 9px !important; align-items: center; color: var(--navy) !important; background: var(--off-white) !important; border: 1px solid var(--line) !important; border-radius: 14px !important; }
-.sidebar-profile > span { width: 36px; height: 36px; display: grid; place-items: center; color: white; background: var(--violet); border-radius: 50%; font-size: 10px; }
-.sidebar-profile > div { min-width: 0; }
-.sidebar-profile strong, .sidebar-profile small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sidebar-profile strong { font-size: 11px; }.sidebar-profile small { color: var(--muted); font-size: 9px; }
-.app-sidebar.collapsed .sidebar-profile { width: 52px; grid-template-columns: 1fr; }
-.app-sidebar.collapsed .sidebar-profile > div, .app-sidebar.collapsed .sidebar-profile > .icon { display: none; }
-.dark-shell .sidebar-profile { color: white !important; background: #201c37 !important; border-color: #393250 !important; }
 .mobile-nav { display: none; }
 .discover-content, .recap-content, .profile-content { max-width: 1220px; margin: auto; padding: 50px 5vw 90px; }
 .page-header { margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
