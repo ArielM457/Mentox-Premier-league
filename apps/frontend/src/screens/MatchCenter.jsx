@@ -8,11 +8,12 @@ import { useMatchClock } from '../hooks/useMatchClock.js'
 import { useTrackingFrames } from '../hooks/useTrackingFrames.js'
 import { useVisionCapture } from '../hooks/useVisionCapture.js'
 import { useVisionObservationChannel } from '../hooks/useVisionObservationChannel.js'
-import { formatClock, formatMatchClock, kindLabel, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
+import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Assistant } from '../components/match/Assistant.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
+import { MomentCarousel } from '../components/match/MomentCarousel.jsx'
 import { LiveTrackingPitch } from '../components/match/LiveTrackingPitch.jsx'
 import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
@@ -391,15 +392,7 @@ function LiveMatch({ match }) {
           </section>
           {activeTab === 'match' && (
             <>
-              {!hasVideoSource && (
-                <div className="event-chips">
-                  {history.filter((m) => !m.suppressed).slice(0, 8).map((m) => (
-                    <button className={current?.message_id === m.message_id ? 'active' : ''} key={m.message_id} onClick={() => openMoment(m)} type="button">
-                      {formatMatchClock(m, t.match.period)} · {kindLabel(t.kinds, m.kind)}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {!hasVideoSource && <MomentCarousel currentId={current?.message_id} moments={moments.slice(0, 8)} onOpen={openMoment} />}
               {hasVideoSource ? (
                 <VisionCard capture={visionCapture} liveChannel={visionChannel} matchId={matchId} seekVersion={seekVersion} timeMs={clock.time} videoMode />
               ) : (

@@ -86,7 +86,20 @@
 .timeline-event small { display: none; position: absolute; top: 15px; left: 50%; transform: translateX(-50%); color: #d8d4e4; }
 .timeline-event.selected { width: 18px; height: 18px; top: 10px; background: var(--lime); box-shadow: 0 0 0 4px rgba(216,255,101,.14); }
 .timeline-event.selected small { display: block; }
-.event-chips { display: flex; gap: 8px; overflow-x: auto; }
+/* Carrusel infinito de momentos (MomentCarousel): sin barra de desplazamiento. */
+.moment-carousel { overflow: hidden; }
+.moment-carousel-track { width: max-content; display: flex; }
+.moment-carousel-group { display: flex; gap: 8px; padding-inline-end: 8px; }
+.moment-carousel.is-looping { mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+.moment-carousel.is-looping .moment-carousel-track { animation: moment-carousel var(--loop-duration) linear infinite; }
+.moment-carousel:is(:hover, :focus-within) .moment-carousel-track { animation-play-state: paused; }
+@keyframes moment-carousel { to { transform: translateX(calc(-1 * var(--loop-distance))); } }
+@media (prefers-reduced-motion: reduce) {
+  .moment-carousel { overflow-x: auto; }
+  .moment-carousel.is-looping { mask-image: none; }
+  .moment-carousel .moment-carousel-track { animation: none !important; }
+  .moment-carousel-group[aria-hidden='true'] { display: none; }
+}
 .event-chips button { padding: 8px 12px; white-space: nowrap; color: #aaa5bd; background: #1a172f; border-radius: 999px; font-size: 11px; }
 .event-chips button.active { color: var(--navy); background: var(--lime); }
 .assistant { min-width: 0; padding: 18px; align-self: stretch; color: #ebe9f4; background: #1a1731; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; }
