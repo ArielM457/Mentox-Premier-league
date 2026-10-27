@@ -143,6 +143,11 @@ button:disabled { cursor: not-allowed; opacity: .6; }
 .timeline-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: 13px; }
 .timeline-heading > span { color: var(--muted); font-size: 12px; }
 .playback { grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; }
+/* Las marcas de momentos van debajo de la barra: el botón y los controles se alinean con la barra
+   (centro a 27 px del borde: top 24 px + 5 px de alto), no con el centro de la fila. */
+.replay-controls .playback { margin-top: 16px; align-items: start; }
+.replay-controls .play-main { margin-top: calc(26.5px - 24px); }
+.replay-controls .playback-tools { min-height: 53px; }
 .timeline { min-height: 90px; height: 90px; }
 .timeline-track { position: absolute; top: 24px; inset-inline: 0; height: 5px; border-radius: 5px; background: var(--line); }
 .timeline-track > span { display: block; width: var(--progress); height: 100%; background: var(--violet); border-radius: inherit; }
