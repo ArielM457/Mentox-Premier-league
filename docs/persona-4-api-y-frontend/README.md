@@ -80,7 +80,12 @@ La pantalla **Revisión** tiene dos pestañas:
 
 El voto de la comunidad **orienta** al editor, pero no aprueba ni publica el resumen: la publicación sigue exigiendo la revisión editorial (RF-38).
 
-**Tiempo real.** Cada resumen es un tema de un bus de mensajes. La API publica en ese tema cada voto y cada mensaje, y los navegadores suscritos los reciben por Server-Sent Events, con un latido cada 15 s para mantener viva la conexión. El bus por defecto usa una cola en memoria (`asyncio.Queue`) por suscriptor, suficiente porque la API corre en una sola réplica (`maxReplicas: 1` en `infra/azure`). La interfaz `MessageBus` (`application/community.py`) permite reemplazarlo por MQTT o Azure Service Bus si se escalan réplicas.
+**Tiempo real.** Cada resumen es un tema (`community/{partido}/{resumen}`). La API publica en ese tema cada voto y cada mensaje, y los navegadores suscritos los reciben por Server-Sent Events, con un latido cada 15 s para mantener viva la conexión. `COMMUNITY_TRANSPORT` elige el transporte:
+
+- `memory` (local y pruebas): una cola `asyncio.Queue` por suscriptor dentro del proceso.
+- `azure_event_hubs` (Azure): cada evento se envía al Event Hub `community-events` con el tema como clave de partición, para conservar el orden de cada resumen. Cada réplica de la API lee el hub desde el último evento (`@latest`, grupo de consumidores `api`, sin puntos de control) y lo reparte a sus conexiones SSE. Así varias réplicas comparten el mismo chat. Si Azure no responde, la réplica entrega el evento a sus propias conexiones para no cortar la sala. El adaptador está en `adapters/messaging/azure_community.py`; el hub, en `infra/azure/community.bicep`, y la API ya trae las variables en `analytics-platform.bicep`. Usa la identidad administrada, que ya tiene los roles de envío y recepción sobre el namespace.
+
+Se eligió Event Hubs porque ya está desplegado y la API tiene permisos; Service Bus solo existe como opción (`deployDurableImportantQueue`) y en el plan Basic no tiene temas para repartir a varios lectores.
 
 **Moderación** (`application/moderation.py`). Antes de publicar se rechazan groserías e insultos en español e inglés, enlaces y spam (`422` con el motivo). El texto se normaliza para resistir trucos (`put4`, `p.u.t.a`, `puuuta`, tildes) y se comparan palabras completas para no bloquear palabras sanas como «computadora». Los nombres también se moderan. Límite: un mensaje cada 2 segundos por persona (`429` con `Retry-After`).
 
@@ -96,7 +101,7 @@ El voto de la comunidad **orienta** al editor, pero no aprueba ni publica el res
 
 Pruebas: `tests/test_moderation.py`, `tests/test_community.py` y el grupo «Comunidad» de Postman.
 
-Limitaciones: votos y mensajes se guardan en memoria y se pierden al reiniciar el backend; el identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo es orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
+Limitaciones: Event Hubs solo transporta los eventos; los votos y mensajes se guardan en la memoria de la API y se pierden al reiniciarla; el identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo es orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
 
 ## **Decisiones de Persona 4**
 
