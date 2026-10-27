@@ -94,10 +94,11 @@
 .moment-carousel.is-looping .moment-carousel-track { animation: moment-carousel var(--loop-duration) linear infinite; }
 .moment-carousel:is(:hover, :focus-within) .moment-carousel-track { animation-play-state: paused; }
 @keyframes moment-carousel { to { transform: translateX(calc(-1 * var(--loop-distance))); } }
+/* Con movimiento reducido no hay animación ni barra: los momentos pasan a varias filas. */
 @media (prefers-reduced-motion: reduce) {
-  .moment-carousel { overflow-x: auto; }
   .moment-carousel.is-looping { mask-image: none; }
-  .moment-carousel .moment-carousel-track { animation: none !important; }
+  .moment-carousel .moment-carousel-track { width: auto; animation: none !important; }
+  .moment-carousel-group { flex-wrap: wrap; padding-inline-end: 0; }
   .moment-carousel-group[aria-hidden='true'] { display: none; }
 }
 .event-chips button { padding: 8px 12px; white-space: nowrap; color: #aaa5bd; background: #1a172f; border-radius: 999px; font-size: 11px; }
