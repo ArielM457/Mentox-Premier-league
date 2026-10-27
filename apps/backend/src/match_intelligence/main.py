@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from .adapters.http.analytics_router import router as analytics_router
-from .adapters.http.community_router import router as community_router
+from .adapters.http.community_router import close_community_bus, router as community_router, start_community_bus
 from .adapters.http.match_router import router as match_router
 from .adapters.http.narrative_router import router as narrative_router
 from .adapters.http.router import router
@@ -15,9 +15,11 @@ from .application.match_session import SessionError
 @asynccontextmanager
 async def application_lifespan(application: FastAPI):
     async with integration_lifespan(application):
+        await start_community_bus()
         try:
             yield
         finally:
+            await close_community_bus()
             await close_routing_transport()
 
 
