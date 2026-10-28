@@ -236,7 +236,7 @@ function ReportForm({ matchId, overlay, lastReport, onReported }) {
         <Icon name="flag" size={15} /> {t.moment.report}
       </label>
       <textarea id="report-reason" maxLength={500} onChange={(event) => setReason(event.target.value)} placeholder={t.moment.reportReason} required rows={2} value={reason} />
-      <Button variant="secondary" disabled={busy || !reason.trim()} type="submit">
+      <Button busy={busy} busyLabel={t.moment.sendingReport} variant="secondary" disabled={!reason.trim()} type="submit">
         {t.moment.sendReport}
       </Button>
       {error && <p className="report-error" role="alert">{error}</p>}

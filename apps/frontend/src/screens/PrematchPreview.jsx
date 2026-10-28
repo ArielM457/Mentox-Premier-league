@@ -4,7 +4,7 @@ import { navigate, paths } from '../app/router.js'
 import { usePreferences } from '../app/preferences.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
-import { ErrorNotice } from '../components/ui/Feedback.jsx'
+import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
 import { TeamBadge } from '../components/ui/TeamBadge.jsx'
 import { TacticalSimulationPitch } from '../components/match/TacticalSimulationPitch.jsx'
@@ -262,7 +262,7 @@ export function PrematchPreview({ matchId }) {
           <Icon name="back" size={17} /> {copy.back}
         </button>
         <ErrorNotice message={error} onRetry={() => window.location.reload()} retryLabel={t.common.retry} />
-        {!preview && !error && <div className="preview-loading">{t.common.loading}</div>}
+        {!preview && !error && <LoadingScreen message={copy.loading} compact />}
 
         {preview && selectedHome && selectedAway && (
           <>

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { strings } from '../i18n/strings.js'
-import { DEFAULT_PREFERENCES, PreferencesContext, STORAGE_KEY } from './preferences.js'
+import { CONFIGURATION_STORAGE_KEYS, DEFAULT_PREFERENCES, PreferencesContext, STORAGE_KEY } from './preferences.js'
 
 function load() {
   try {
@@ -29,7 +29,15 @@ export function PreferencesProvider({ children }) {
 
   const value = useMemo(() => {
     const update = (changes) => setPreferences((current) => ({ ...current, ...changes }))
-    return { preferences, update, t: strings[preferences.language] }
+    const reset = () => {
+      try {
+        CONFIGURATION_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key))
+      } catch {
+        // El estado de React igualmente se reinicia si el navegador bloquea el almacenamiento.
+      }
+      setPreferences({ ...DEFAULT_PREFERENCES })
+    }
+    return { preferences, reset, update, t: strings[preferences.language] }
   }, [preferences])
 
   // Los cambios visuales no reinician las consultas ni el canal del partido.

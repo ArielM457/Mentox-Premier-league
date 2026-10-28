@@ -13,12 +13,10 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /uvx /bin/
 COPY requirements.txt /tmp/requirements.txt
 ENV VIRTUAL_ENV=/opt/venv PATH="/opt/venv/bin:${PATH}" UV_HTTP_TIMEOUT=300 UV_LINK_MODE=copy
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv venv --python python3.12 "${VIRTUAL_ENV}" \
+RUN uv venv --python python3.12 "${VIRTUAL_ENV}" \
     && uv pip install --python "${VIRTUAL_ENV}/bin/python" --index-url "${TORCH_INDEX_URL}" \
         "torch==2.7.1" "torchvision==0.22.1"
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --python "${VIRTUAL_ENV}/bin/python" --requirements /tmp/requirements.txt
+RUN uv pip install --python "${VIRTUAL_ENV}/bin/python" --requirements /tmp/requirements.txt
 
 RUN git clone https://github.com/SoccerNet/sn-teamspotting.git /opt/sn-teamspotting \
     && git -C /opt/sn-teamspotting checkout "${SOCCERNET_COMMIT}" \

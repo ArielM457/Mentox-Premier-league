@@ -12,7 +12,7 @@ const LANGUAGES = [['en', 'EN', 'English'], ['es', 'ES', 'Español']]
 const LEVEL_ICONS = { simple: 'spark', normal: 'match', advanced: 'chart' }
 
 export function Profile() {
-  const { t, preferences, update } = usePreferences()
+  const { t, preferences, reset, update } = usePreferences()
   const { data: catalog, error, reload } = useCatalog()
   const copy = t.profile
   const [draft, setDraft] = useState(() => {
@@ -20,6 +20,7 @@ export function Profile() {
     return { language, mode, level, favoriteTeamId, favoritePlayerId, liveComments }
   })
   const [saved, setSaved] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
   const set = (changes) => {
     setSaved(false)
     setDraft((current) => ({ ...current, ...changes }))
@@ -32,6 +33,11 @@ export function Profile() {
     if (invalidMode) return
     update({ ...draft, onboarded: true })
     setSaved(true)
+  }
+
+  function resetConfiguration() {
+    reset()
+    navigate(paths.onboarding())
   }
 
   return (
@@ -175,6 +181,31 @@ export function Profile() {
               {copy.back}
             </Button>
           </div>
+
+          <section className="reset-preferences" aria-labelledby="reset-preferences-title">
+            <div>
+              <span className="reset-preferences-icon"><Icon name="trash" /></span>
+              <div>
+                <h3 id="reset-preferences-title">{copy.resetTitle}</h3>
+                <p>{copy.resetCopy}</p>
+              </div>
+            </div>
+            {!confirmReset ? (
+              <Button className="danger" variant="ghost" onClick={() => setConfirmReset(true)}>
+                <Icon name="trash" size={17} /> {copy.resetAction}
+              </Button>
+            ) : (
+              <div className="reset-confirmation" role="alert">
+                <strong>{copy.resetConfirm}</strong>
+                <div>
+                  <Button className="danger" variant="ghost" onClick={resetConfiguration}>
+                    <Icon name="trash" size={17} /> {copy.resetConfirmAction}
+                  </Button>
+                  <Button variant="ghost" onClick={() => setConfirmReset(false)}>{copy.resetCancel}</Button>
+                </div>
+              </div>
+            )}
+          </section>
         </div>
       </section>
     </AppShell>

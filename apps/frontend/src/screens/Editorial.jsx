@@ -1,95 +1,69 @@
-import { NarrativeCopy } from '../components/ui/NarrativeCopy.jsx'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../api/client.js'
-import { describePreferences, usePreferences } from '../app/preferences.js'
+import { usePreferences } from '../app/preferences.js'
+import { navigate, paths } from '../app/router.js'
 import { CommunityPanel } from '../components/community/CommunityPanel.jsx'
-import { useCatalog } from '../hooks/useCatalog.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
+import { Assistant } from '../components/match/Assistant.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
+import { NarrativeCopy } from '../components/ui/NarrativeCopy.jsx'
+import { teamBranding } from '../data/branding.js'
+import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 
-// Revisión editorial (RF-38), reportes de error (RF-39) y revisión de la comunidad.
+const FILTERS = ['all', 'LIVE', 'FT', 'UPCOMING']
+
+function scoreOf(match, teamId) {
+  return Number(match.finalScore?.[teamId] ?? 0)
+}
+
+function winnerId(match) {
+  const home = scoreOf(match, match.metadata.home_team.team_id)
+  const away = scoreOf(match, match.metadata.away_team.team_id)
+  if (home === away) return null
+  return home > away ? match.metadata.home_team.team_id : match.metadata.away_team.team_id
+}
+
 export function Editorial() {
   const { t, apiPreferences } = usePreferences()
   const { data: catalog, error: catalogError, reload } = useCatalog()
-  const copy = t.editorial
-  const [matchId, setMatchId] = useState('')
-  const [queue, setQueue] = useState([])
-  const [reports, setReports] = useState([])
-  const [reviewer, setReviewer] = useState('')
-  const [note, setNote] = useState('')
+  const copy = t.editorial.library
+  const [cards, setCards] = useState([])
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState('all')
   const [error, setError] = useState(null)
-  const [notice, setNotice] = useState(null)
-  const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [inject, setInject] = useState(false)
-  const [tab, setTab] = useState('review')
-  const [tallies, setTallies] = useState({})
-  const [communityDraft, setCommunityDraft] = useState('')
-  const selected = matchId || catalog?.matches[0]?.id || ''
-  const selectedMatch = catalog?.matches.find((m) => m.id === selected)
-  const communityRecord = queue.find((record) => record.draft.draft_id === communityDraft) ?? queue[0] ?? null
-
-  const refresh = useCallback(async () => {
-    if (!selected) return
-    setLoading(true)
-    try {
-      const [q, r, votes] = await Promise.all([
-        api.editorial(selected),
-        api.reports(selected),
-        api.communityTallies(selected).catch(() => []),
-      ])
-      setQueue(q)
-      setReports(r)
-      setTallies(Object.fromEntries(votes.map((item) => [item.draft_id, item.tally])))
-      setError(null)
-    } catch (err) {
-      setError(err.message)
-    } finally { setLoading(false) }
-  }, [selected])
 
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    if (!catalog) return
+    let active = true
+    setLoading(true)
+    setCards([])
+    Promise.all(catalog.matches.map(async (match) => {
+      const record = await api.summary(match.id, apiPreferences)
+      const tallies = await api.communityTallies(match.id).catch(() => [])
+      const tally = tallies.find((item) => item.draft_id === record.draft.draft_id)?.tally ?? { approve: 0, reject: 0, total: 0 }
+      return { match, record, tally }
+    }))
+      .then((items) => { if (active) { setCards(items); setError(null) } })
+      .catch((err) => { if (active) setError(err.message) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [catalog, apiPreferences])
 
-  async function decide(draftId, decision) {
-    setBusy(true)
-    try {
-      await api.review(selected, draftId, decision, reviewer, note)
-      setNote('')
-      await refresh()
-      setNotice(copy.decisionSaved)
-    } catch (err) {
-      setError(err.message)
-    } finally { setBusy(false) }
-  }
-
-  async function generateSummary() {
-    try {
-      await api.summary(selected, apiPreferences)
-      setNotice(copy.generated)
-      refresh()
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-  async function reloadMatch() {
-    try {
-      const scenario = selected === 'synthetic-analytics-001' ? 'analytics' : 'acceptance'
-      await api.loadMatch({ scenario, match_id: selected, inject_error_in: inject ? 'goal' : null })
-      setNotice(copy.reloaded)
-      await reload()
-      refresh()
-    } catch (err) {
-      setError(err.message)
-    }
-  }
+  const visible = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase()
+    return cards.filter(({ match, record }) => {
+      const matchesFilter = filter === 'all' || match.status === filter
+      const haystack = `${match.metadata.home_team.name} ${match.metadata.away_team.name} ${record.draft.headline} ${record.draft.explanation}`.toLocaleLowerCase()
+      return matchesFilter && (!needle || haystack.includes(needle))
+    })
+  }, [cards, filter, query])
 
   return (
     <AppShell active="editorial">
-      <section className="profile-content editorial-content">
+      <section className="profile-content editorial-content community-library">
         <header className="page-header">
           <div>
             <span className="section-kicker">{copy.kicker}</span>
@@ -97,141 +71,160 @@ export function Editorial() {
             <p>{copy.intro}</p>
           </div>
         </header>
-        <ErrorNotice message={(catalogError && t.common.apiDown) || error} onRetry={catalogError ? reload : refresh} retryLabel={t.common.retry} />
+        <ErrorNotice message={(catalogError && t.common.apiDown) || error} onRetry={catalogError ? reload : undefined} retryLabel={t.common.retry} />
 
-        <nav className="editorial-tabs" role="tablist" aria-label={copy.kicker}>
-          {['review', 'community'].map((key) => (
-            <button aria-selected={tab === key} className={tab === key ? 'active' : ''} key={key} onClick={() => { setTab(key); if (key === 'review') refresh() }} role="tab" type="button">
-              <Icon name={key === 'review' ? 'shield' : 'user'} size={17} /> {copy.tabs[key]}
-            </button>
-          ))}
-        </nav>
-
-        <div className="profile-card">
-          {tab === 'review' && <div className="editorial-intro"><span className="empty-icon"><Icon name="shield" size={24} /></span><div><h2>{copy.workspace}</h2><p>{copy.workspaceCopy}</p></div></div>}
-          <div className="editorial-fields">
-            <label>
-              <span>{copy.match}</span>
-              <select onChange={(event) => { setMatchId(event.target.value); setCommunityDraft('') }} value={selected}>
-                {catalog?.matches.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.metadata.home_team.name} – {m.metadata.away_team.name} · {t.matches.scenario[m.id] ?? m.id}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {tab === 'review' ? (
-              <>
-              <label>
-                <span>{copy.reviewer}</span>
-                <input maxLength={80} onChange={(event) => setReviewer(event.target.value)} placeholder={copy.reviewerPlaceholder} value={reviewer} />
-              </label>
-              <label>
-                <span>{copy.note}</span>
-                <input maxLength={500} onChange={(event) => setNote(event.target.value)} value={note} />
-              </label>
-              </>
-            ) : (
-              <label className="wide">
-                <span>{copy.community.pick}</span>
-                <select disabled={!queue.length} onChange={(event) => setCommunityDraft(event.target.value)} value={communityRecord?.draft.draft_id ?? ''}>
-                  {queue.map((record) => (
-                    <option key={record.draft.draft_id} value={record.draft.draft_id}>
-                      {record.draft.headline} · {t.recap.status[record.status]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+        <div className="community-library-tools">
+          <label className="community-search">
+            <Icon name="search" size={18} />
+            <span className="sr-only">{copy.search}</span>
+            <input onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} value={query} />
+          </label>
+          <div className="community-filters" role="group" aria-label={copy.filters}>
+            {FILTERS.map((key) => (
+              <button aria-pressed={filter === key} className={filter === key ? 'active' : ''} key={key} onClick={() => setFilter(key)} type="button">
+                {copy.filter[key]}
+              </button>
+            ))}
           </div>
-          {notice && <p className="success-copy" role="status">{notice}</p>}
-
-          {tab === 'review' ? (
-            <>
-            <div className="preference-block">
-              <div className="queue-heading">
-                <div className="editorial-section-title"><h3>{copy.queue}</h3><span className="count-badge">{queue.length}</span></div>
-                <Button variant="ghost" disabled={!selectedMatch} onClick={generateSummary}>
-                  <Icon name="spark" size={17} /> {copy.generate}
-                </Button>
-              </div>
-              <p className="muted-copy">{copy.whereFrom}</p>
-              {!reviewer.trim() && <p className="muted-copy">{copy.reviewerHint}</p>}
-              {loading && <LoadingScreen compact />}
-              {!loading && queue.length === 0 ? (
-                <p className="muted-copy">{copy.empty}</p>
-              ) : (
-                <ul className="review-list">
-                  {queue.map((record) => (
-                    <li key={record.draft.draft_id}>
-                      <div>
-                        <span className={`editorial-status status-${record.status}`}>{t.recap.status[record.status]}</span>
-                        <strong>{record.draft.headline}</strong>
-                        <NarrativeCopy text={record.draft.explanation} />
-                        <span className="community-signal">
-                          <Icon name="user" size={14} />
-                          {copy.communitySignal(tallies[record.draft.draft_id]?.approve_pct, tallies[record.draft.draft_id]?.total ?? 0)}
-                        </span>
-                        <small>
-                          {describePreferences(record.draft.applied_preferences, t, selectedMatch?.metadata)}
-                          {record.reviewer && ` — ${record.reviewer}${record.note ? `: ${record.note}` : ''}`}
-                        </small>
-                      </div>
-                      {record.status === 'pending' && (
-                        <div className="review-actions">
-                          <Button disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'approve')}>
-                            <Icon name="check" size={17} /> {copy.approve}
-                          </Button>
-                          <Button variant="secondary" className="review-reject" disabled={busy || !reviewer.trim()} onClick={() => decide(record.draft.draft_id, 'reject')}>
-                            <Icon name="close" size={17} /> {copy.reject}
-                          </Button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="preference-block">
-              <h3>{copy.reports}</h3>
-              {reports.length === 0 ? (
-                <p className="muted-copy">{copy.noReports}</p>
-              ) : (
-                <ul className="review-list">
-                  {reports.map((report) => (
-                    <li key={report.report_id}>
-                      <div>
-                        <span className={`editorial-status report-${report.outcome}`}>{copy.outcomes[report.outcome]}</span>
-                        <strong>{report.reason}</strong>
-                        <small><code>{report.draft_id}</code></small>
-                        {report.issues.map((issue) => <p key={issue}>{issue}</p>)}
-                        {report.corrected_draft && <p>✓ {report.corrected_draft.headline}</p>}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <details className="preference-block demo-tools">
-              <summary>{copy.demo}</summary>
-              <p className="muted-copy">{copy.demoCopy}</p>
-              <label className="checkbox">
-                <input checked={inject} onChange={(event) => setInject(event.target.checked)} type="checkbox" />
-                <span>{copy.inject}</span>
-              </label>
-              <Button variant="ghost" disabled={!selectedMatch} onClick={reloadMatch}>
-                <Icon name="replay" size={17} /> {copy.reload}
-              </Button>
-            </details>
-            </>
-          ) : communityRecord ? (
-            <CommunityPanel key={`${selected}/${communityRecord.draft.draft_id}`} matchId={selected} record={communityRecord} />
-          ) : (
-            <p className="muted-copy community-empty">{copy.community.none}</p>
-          )}
         </div>
+
+        {loading && <LoadingScreen />}
+        {!loading && visible.length === 0 && <p className="community-library-empty">{copy.empty}</p>}
+        <div className="community-match-list">
+          {visible.map((item) => <SummaryMatchCard item={item} key={`${item.match.id}/${item.record.draft.draft_id}`} copy={copy} />)}
+        </div>
+      </section>
+    </AppShell>
+  )
+}
+
+function SummaryMatchCard({ item, copy }) {
+  const { match, record, tally } = item
+  const home = match.metadata.home_team
+  const away = match.metadata.away_team
+  const homeBrand = teamBranding(home)
+  const awayBrand = teamBranding(away)
+  const winner = winnerId(match)
+  return (
+    <article className="community-match-card">
+      <div className="community-match-visual" style={{ '--home-color': homeBrand.color, '--away-color': awayBrand.color }}>
+        <div className={`community-team-side home ${winner === home.team_id ? 'winner' : ''}`}>
+          {homeBrand.logo ? <img alt="" src={homeBrand.logo} /> : <strong>{homeBrand.short}</strong>}
+          <span>{home.name}</span>
+        </div>
+        <div className={`community-team-side away ${winner === away.team_id ? 'winner' : ''}`}>
+          {awayBrand.logo ? <img alt="" src={awayBrand.logo} /> : <strong>{awayBrand.short}</strong>}
+          <span>{away.name}</span>
+        </div>
+        <div className="community-match-score" aria-label={`${home.name} ${scoreOf(match, home.team_id)}, ${away.name} ${scoreOf(match, away.team_id)}`}>
+          <b>{scoreOf(match, home.team_id)}</b><i>–</i><b>{scoreOf(match, away.team_id)}</b>
+        </div>
+      </div>
+      <div className="community-match-overview">
+        <div className="community-match-heading">
+          <div>
+            <span className={`editorial-status status-${record.status}`}>{copy.status[record.status]}</span>
+            <h2>{record.draft.headline}</h2>
+          </div>
+          <span className="community-match-state">{copy.filter[match.status]}</span>
+        </div>
+        <div className="community-overview-copy"><NarrativeCopy text={record.draft.explanation} /></div>
+        <div className="community-card-footer">
+          <div className="community-card-votes" aria-label={copy.votesLabel}>
+            <span><Icon name="thumbUp" size={17} /> {tally.approve}</span>
+            <span><Icon name="thumbDown" size={17} /> {tally.reject}</span>
+          </div>
+          <Button onClick={() => navigate(paths.editorialDetail(match.id, record.draft.draft_id))}>
+            {copy.open} <Icon name="arrow" size={17} />
+          </Button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export function EditorialDetail({ matchId, draftId }) {
+  const { t, apiPreferences, preferences } = usePreferences()
+  const { data: catalog, error: catalogError, reload } = useCatalog()
+  const copy = t.editorial.detail
+  const match = catalog?.matches.find((item) => item.id === matchId)
+  const [record, setRecord] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [error, setError] = useState(null)
+  const timeRef = useRef(match?.durationMs ?? 0)
+
+  useEffect(() => {
+    timeRef.current = match?.durationMs ?? 0
+  }, [match?.durationMs])
+
+  useEffect(() => {
+    if (!match) return
+    let active = true
+    Promise.all([api.summary(matchId, apiPreferences), api.preview(matchId).catch(() => null)])
+      .then(([summary, prematch]) => {
+        if (!active) return
+        if (summary.draft.draft_id !== draftId) throw new Error(copy.notFound)
+        setRecord(summary)
+        setPreview(prematch)
+        setError(null)
+      })
+      .catch((err) => { if (active) setError(err.message) })
+    return () => { active = false }
+  }, [match, matchId, draftId, apiPreferences, copy.notFound])
+
+  if (!catalog && !catalogError) return <AppShell active="editorial"><LoadingScreen /></AppShell>
+  if (!match) return <AppShell active="editorial"><ErrorNotice message={catalogError || copy.notFound} onRetry={reload} retryLabel={t.common.retry} /></AppShell>
+
+  const home = match.metadata.home_team
+  const away = match.metadata.away_team
+  const winner = winnerId(match)
+  const featured = winner === away.team_id ? away : home
+  const featuredBrand = teamBranding(featured)
+
+  return (
+    <AppShell active="editorial">
+      <section className="profile-content editorial-content community-review-detail">
+        <button className="community-detail-back" onClick={() => navigate(paths.editorial())} type="button"><Icon name="back" size={18} /> {copy.back}</button>
+        <ErrorNotice message={catalogError || error} onRetry={catalogError ? reload : undefined} retryLabel={t.common.retry} />
+        {!record ? <LoadingScreen /> : (
+          <div className="community-detail-grid">
+            <article className="community-detail-story">
+              <div className="community-detail-team" style={{ '--team-color': featuredBrand.color }}>
+                {featuredBrand.logo && <img alt={featured.name} src={featuredBrand.logo} />}
+                <div><span>{copy.featured}</span><strong>{featured.name}</strong></div>
+                <div className="community-detail-score"><b>{scoreOf(match, home.team_id)}</b><i>–</i><b>{scoreOf(match, away.team_id)}</b></div>
+              </div>
+              <div className="community-detail-summary">
+                <span className={`editorial-status status-${record.status}`}>{t.editorial.library.status[record.status]}</span>
+                <h1>{record.draft.headline}</h1>
+                <NarrativeCopy text={record.draft.explanation} />
+              </div>
+              <section className="community-tactics">
+                <span className="section-kicker">{copy.tacticsKicker}</span>
+                <h2>{copy.tactics}</h2>
+                <div>
+                  {(preview?.simulations ?? []).slice(0, 4).map((simulation) => (
+                    <article key={simulation.simulation_id}>
+                      <strong>{simulation.title}</strong>
+                      <p>{simulation.summary}</p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </article>
+            <aside className="community-detail-side">
+              <Assistant
+                canExplore={false}
+                favoriteClub={teamOf(catalog, preferences.favoriteTeamId)}
+                favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)}
+                matchId={matchId}
+                onExplore={() => {}}
+                timeRef={timeRef}
+              />
+              <CommunityPanel compact matchId={matchId} record={record} showSummary={false} />
+            </aside>
+          </div>
+        )}
       </section>
     </AppShell>
   )

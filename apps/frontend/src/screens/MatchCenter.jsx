@@ -19,7 +19,7 @@ import { OverlayCard } from '../components/match/OverlayCard.jsx'
 import { StatsPanel } from '../components/match/Panels.jsx'
 import { Timeline } from '../components/match/Timeline.jsx'
 import { InsightsPanel, LiveCommentsPanel, MomentSelector, MomentWorkspace, TacticalPanel, VisionCard, VisionVideoOverlay } from '../components/match/LiveExperiencePanels.jsx'
-import { Button } from '../components/ui/Button.jsx'
+import { Button, Spinner } from '../components/ui/Button.jsx'
 import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Tabs } from '../components/ui/Tabs.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
@@ -237,23 +237,23 @@ function LiveMatch({ match }) {
       <div className="simulation-toolbar">
         <div>
           <strong>{t.match.liveExperienceTitle}</strong>
-          <span>{simulating ? t.common.loading : simulationStarted ? (clock.playing ? t.match.playingState : t.match.pauseState) : t.match.liveExperienceCopy}</span>
+          <span>{simulating ? t.common.processing : simulationStarted ? (clock.playing ? t.match.playingState : t.match.pauseState) : t.match.liveExperienceCopy}</span>
         </div>
         <div className="live-toolbar-actions">
           <div className="live-mode-switch" aria-label={t.match.viewMode} role="group">
             {['casual', 'analyst'].map((mode) => <button aria-pressed={preferences.mode === mode} className={preferences.mode === mode ? 'active' : ''} key={mode} onClick={() => changeMode(mode)} type="button">{t.modes[mode].name}</button>)}
           </div>
           {!simulationStarted ? (
-            <Button disabled={simulating} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {simulating ? t.common.loading : t.match.startLive}</Button>
+            <Button busy={simulating} busyLabel={t.common.processing} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {t.match.startLive}</Button>
           ) : (
             <>
-              <Button disabled={preparingVision} onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {preparingVision ? t.match.preparingVision : (clock.playing ? t.match.pauseLive : t.match.resumeLive)}</Button>
+              <Button busy={preparingVision} busyLabel={t.match.preparingVision} onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {clock.playing ? t.match.pauseLive : t.match.resumeLive}</Button>
               <Button onClick={replay} variant="ghost"><Icon name="replay" size={17} /> {t.match.restartLive}</Button>
             </>
           )}
         </div>
       </div>
-      {simulating && <LoadingScreen message={t.common.loading} compact />}
+      {simulating && <LoadingScreen message={t.common.processing} compact />}
       <Tabs items={TABS.map((key) => [key, t.match.tabs[key]])} value={activeTab} onChange={setTab} label={t.match.viewTabs} id="match-view" />
 
       <ErrorNotice message={actionError || live.error || tracking.error} onRetry={() => { setActionError(null); live.resync(); setSeekVersion((value) => value + 1) }} retryLabel={t.common.retry} />
@@ -311,7 +311,9 @@ function LiveMatch({ match }) {
                 <div className="pitch-meta">
                   <span><Icon name="spark" size={16} /> {t.match.selected}</span>
                   <strong>{hasVideoSource ? t.match.visionVideoAnalysis : current ? `${formatMatchClock(current, t.match.period)} · ${current.headline}` : t.match.waiting}</strong>
-                  <span className={`channel-pill channel-${live.status}`}>{t.match.channel[live.status]}</span>
+                  <span aria-busy={live.status === 'connecting' || undefined} className={`channel-pill channel-${live.status}`}>
+                    {live.status === 'connecting' && <Spinner size="small" />} {t.match.channel[live.status]}
+                  </span>
                 </div>
                 {hasVideoSource ? (
                   <div className="match-video-stage">
@@ -360,29 +362,29 @@ function LiveMatch({ match }) {
                 {!hasVideoSource && <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />}
               </div>
               {!hasVideoSource && preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
+              <section className="replay-controls" aria-label={t.match.timeline}>
+                <div className="timeline-heading"><strong>{t.match.timelineTitle}</strong><span>{timelineMoments.length || t.match.timelineEmpty}</span></div>
+                <div className="playback">
+                  <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
+                    {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
+                  </Button>
+                  <Timeline durationMs={liveDurationMs} label={t.match.timeline} moments={timelineMoments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
+                  <div className="playback-tools">
+                    <span className="playback-time">{formatClock(clock.time)} / {formatClock(liveDurationMs)}</span>
+                    <label className="speed-select">
+                      <span className="sr-only">{t.match.speed}</span>
+                      <select onChange={(event) => clock.setSpeed(Number(event.target.value))} value={clock.speed}>
+                        {SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}
+                      </select>
+                    </label>
+                    <Button variant="ghost" onClick={replay}>
+                      <Icon name="replay" /> {t.match.replay}
+                    </Button>
+                  </div>
+                </div>
+              </section>
             </>
           )}
-          <section className="replay-controls" aria-label={t.match.timeline}>
-          <div className="timeline-heading"><strong>{t.match.timelineTitle}</strong><span>{timelineMoments.length || t.match.timelineEmpty}</span></div>
-          <div className="playback">
-            <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
-              {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
-            </Button>
-            <Timeline durationMs={liveDurationMs} label={t.match.timeline} moments={timelineMoments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
-            <div className="playback-tools">
-              <span className="playback-time">{formatClock(clock.time)} / {formatClock(liveDurationMs)}</span>
-              <label className="speed-select">
-                <span className="sr-only">{t.match.speed}</span>
-                <select onChange={(event) => clock.setSpeed(Number(event.target.value))} value={clock.speed}>
-                  {SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}
-                </select>
-              </label>
-              <Button variant="ghost" onClick={replay}>
-                <Icon name="replay" /> {t.match.replay}
-              </Button>
-            </div>
-          </div>
-          </section>
           {activeTab === 'match' && (
             <>
               {!hasVideoSource && <MomentCarousel currentId={current?.message_id} moments={moments.slice(0, 8)} onOpen={openMoment} />}

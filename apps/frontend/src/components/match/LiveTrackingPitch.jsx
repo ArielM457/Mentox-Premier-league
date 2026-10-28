@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
+import { Spinner } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
 const FALLBACK_433 = [
@@ -163,7 +164,7 @@ export function LiveTrackingPitch({
           <path key={event.event_id} d={`M${toPitchPct(event.start.x)} ${toPitchPct(event.start.y)} L${toPitchPct(event.end.x)} ${toPitchPct(event.end.y)}`} />
         ))}
       </svg>
-      <span className="tracking-source">{loading ? '…' : sourceLabel}</span>
+      <span aria-busy={loading || undefined} className="tracking-source">{loading ? <><Spinner size="small" /> {sourceLabel}</> : sourceLabel}</span>
       {activeSituation && (
         <span className={`live-situation situation-${activeSituation.type}`} role="status">
           {situationLabels?.[activeSituation.situation]

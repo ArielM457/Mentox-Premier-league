@@ -21,6 +21,9 @@ const PATHS = {
   fullscreen: <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />,
   fullscreenExit: <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5" />,
   eye: (<><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" /><circle cx="12" cy="12" r="3" /></>),
+  thumbUp: (<><path d="M7 10v10H3V10h4Z" /><path d="M7 18c3 2 8 2 10 1l2-7c.3-1.2-.5-2-1.5-2H14l1-4c.3-1.5-.8-3-2-3l-1 3-5 5v7Z" /></>),
+  thumbDown: (<><path d="M7 14V4H3v10h4Z" /><path d="M7 6c3-2 8-2 10-1l2 7c.3 1.2-.5 2-1.5 2H14l1 4c.3 1.5-.8 3-2 3l-1-3-5-5V6Z" /></>),
+  trash: (<><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14" /><path d="M10 11v6M14 11v6" /></>),
 }
 
 export function Icon({ name, size = 20 }) {

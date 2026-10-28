@@ -5,6 +5,8 @@
   .app-sidebar .brand { margin-inline: 0; }
   .app-sidebar .brand > span:last-child, .app-sidebar nav button { font-size: 0; }
   .app-sidebar button { justify-content: center; }
+  .app-sidebar .sidebar-actions :is(.theme-toggle, .account-button) { width: 46px; padding: 0; justify-content: center; }
+  .app-sidebar .sidebar-actions :is(.theme-toggle span, .account-button span) { display: none; }
   .match-layout { grid-template-columns: minmax(0, 1fr); }
   .match-agent-rail { position: static; }
   .assistant { min-height: 0; }

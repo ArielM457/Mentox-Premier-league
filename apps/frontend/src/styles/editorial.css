@@ -84,7 +84,7 @@
 }
 .editorial-content .review-actions > .btn { width: 100%; }
 .editorial-content .btn-primary { color: var(--ds-white); background: var(--action); border: 1px solid var(--action); }
-.editorial-content .btn-primary:hover:enabled { background: var(--ds-violet-6); border-color: var(--ds-violet-6); }
+.editorial-content .btn-primary:hover:enabled { background: var(--violet-dark); border-color: var(--violet-dark); }
 :root[data-theme] .editorial-content .review-reject {
   color: var(--violet);
   background: var(--surface-raised);

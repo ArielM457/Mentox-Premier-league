@@ -70,6 +70,12 @@ export function AppShell({ active, children }) {
             </button>
           ))}
         </nav>
+        <div className="sidebar-actions">
+          <ThemeToggle />
+          <button className="account-button" onClick={() => setSessionOpen(true)} title={user || t.nav.guest} type="button">
+            <Icon name="user" size={18} /><span>{user || t.nav.guest}</span>
+          </button>
+        </div>
       </aside>
       <nav className="mobile-nav" aria-label={t.nav.discover}>
         {ITEMS.map(([key, icon, path]) => (
@@ -85,10 +91,6 @@ export function AppShell({ active, children }) {
           </button>
         ))}
       </nav>
-      <div className="shell-toolbar">
-        <ThemeToggle />
-        <button className="account-button" onClick={() => setSessionOpen(true)} type="button"><Icon name="user" size={18} />{user || t.nav.guest}</button>
-      </div>
       <div id="page-content" tabIndex={-1}>{!catalog && !catalogError ? <LoadingScreen /> : children}</div>
       {sessionOpen && <SessionDialog user={user} onSession={setUser} onClose={() => setSessionOpen(false)} />}
     </main>

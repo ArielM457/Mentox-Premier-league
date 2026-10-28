@@ -30,6 +30,7 @@ export function useVisionCapture({ matchId, playing, timeRef, videoRef }) {
       try {
         const image = await frameBlob(videoRef.current)
         if (!image || !active) return
+        setState((current) => ({ ...current, status: 'processing', error: null }))
         const result = await api.captureVisionFrame(matchId, timeRef.current, image)
         if (!active) return
         setState((current) => ({

@@ -4,9 +4,9 @@ import logging
 import os
 from collections.abc import Sequence
 
-from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
+from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence, PersistedSummary
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
-from match_intelligence.domain.presentation import NarrativeDraft, OverlayMessage
+from match_intelligence.domain.presentation import EditorialStatus, NarrativeDraft, OverlayMessage
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,13 @@ class SupabaseMatchRepository:
             callback()
         except Exception as exc:  # La persistencia secundaria no detiene el directo.
             logger.warning("Supabase %s falló: %s", operation, type(exc).__name__)
+
+    def _safe_read(self, operation: str, callback, default):
+        try:
+            return callback()
+        except Exception as exc:  # La base no debe impedir abrir la experiencia.
+            logger.warning("Supabase %s falló: %s", operation, type(exc).__name__)
+            return default
 
     def save_match(self, metadata: MatchMetadata, events: Sequence[MatchEvent]) -> None:
         def write() -> None:
@@ -104,3 +111,46 @@ class SupabaseMatchRepository:
             "explanation": answer.explanation,
             "source_event_ids": answer.source_event_ids,
         }).execute())
+
+    def save_summary(
+        self,
+        *,
+        match_id: str,
+        draft: NarrativeDraft,
+        status: EditorialStatus,
+        reviewer: str | None,
+        note: str | None,
+        decided_at,
+    ) -> None:
+        self._safe("save_summary", lambda: self._client.table("match_summaries").upsert({
+            "draft_id": draft.draft_id,
+            "match_id": match_id,
+            "status": status.value,
+            "reviewer": reviewer,
+            "note": note,
+            "decided_at": decided_at.isoformat() if decided_at else None,
+            "headline": draft.headline,
+            "explanation": draft.explanation,
+            "payload": draft.model_dump(mode="json"),
+        }).execute())
+
+    def load_summaries(self, match_id: str) -> list[PersistedSummary]:
+        def read() -> list[PersistedSummary]:
+            response = (
+                self._client.table("match_summaries")
+                .select("*")
+                .eq("match_id", match_id)
+                .execute()
+            )
+            return [
+                PersistedSummary(
+                    draft=NarrativeDraft.model_validate(row["payload"]),
+                    status=EditorialStatus(row["status"]),
+                    reviewer=row.get("reviewer"),
+                    note=row.get("note"),
+                    decided_at=row.get("decided_at"),
+                )
+                for row in (response.data or [])
+            ]
+
+        return self._safe_read("load_summaries", read, [])

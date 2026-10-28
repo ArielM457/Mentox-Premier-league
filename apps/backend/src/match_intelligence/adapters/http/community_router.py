@@ -35,7 +35,12 @@ _service: CommunityService | None = None
 def get_community_service() -> CommunityService:
     global _service
     if _service is None:
-        _service = CommunityService(InMemoryMessageBus())
+        from match_intelligence.adapters.storage.supabase_community import SupabaseCommunityRepository
+
+        _service = CommunityService(
+            InMemoryMessageBus(),
+            persistence=SupabaseCommunityRepository.from_environment(),
+        )
     return _service
 
 

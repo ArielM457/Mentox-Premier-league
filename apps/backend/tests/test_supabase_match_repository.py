@@ -5,23 +5,33 @@ from match_intelligence.adapters.storage.supabase_match import SupabaseMatchRepo
 from match_intelligence.application.match_session import MatchSession
 from match_intelligence.application.persistence import NullMatchPersistence
 from match_intelligence.domain.presentation import ViewerPreferences
+from types import SimpleNamespace
 
 
 class FakeQuery:
     def __init__(self, table: str, writes: list[tuple[str, str, object]]) -> None:
         self.table = table
         self.writes = writes
+        self.operation = "select"
 
     def upsert(self, value):
+        self.operation = "upsert"
         self.writes.append((self.table, "upsert", value))
         return self
 
     def insert(self, value):
+        self.operation = "insert"
         self.writes.append((self.table, "insert", value))
         return self
 
+    def select(self, _fields):
+        return self
+
+    def eq(self, _field, _value):
+        return self
+
     def execute(self):
-        return None
+        return SimpleNamespace(data=[])
 
 
 class FakeClient:
@@ -54,10 +64,12 @@ def test_match_moments_and_questions_are_written_idempotently() -> None:
     first = session.overlays(ViewerPreferences(mode="analyst"))
     session.overlays(ViewerPreferences(mode="analyst"))
     session.ask("¿Qué está pasando en el partido?", 40_000, ViewerPreferences())
+    session.summary(ViewerPreferences())
 
     tables = [table for table, _, _ in client.writes]
     assert tables.count("matches") == 1
     assert tables.count("match_events") == 1
     assert tables.count("moments") == 1
     assert tables.count("assistant_messages") == 1
+    assert tables.count("match_summaries") == 1
     assert first.overlays

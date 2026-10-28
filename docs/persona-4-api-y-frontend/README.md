@@ -45,7 +45,8 @@ Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`
 | Momento | `#/match/{id}/moment/{momento}` | Autor, situación, equipo y tiempo; explicación breve, cifras, jugadores, eventos de origen y reporte de errores. |
 | Resumen | `#/recap/{id}` | Marcador final, resumen pendiente o aprobado y los tres momentos principales. |
 | Mi experiencia | `#/profile` | Preferencias, historial local de partidos y resúmenes, contenido del jugador seguido y comentarios para analistas. |
-| Revisión | `#/editorial` | Aprobar o rechazar resúmenes, ver reportes y recargar un partido con un error controlado. |
+| Comunidad | `#/editorial` | Lista buscable de partidos con resumen, marcador, likes, dislikes y acceso al detalle. |
+| Detalle comunitario | `#/editorial/{partido}/{resumen}` | Equipo destacado, resultado, resumen, tácticas, agente de preguntas, votación, sugerencias y comentarios en vivo. |
 
 Estructura del código:
 
@@ -73,10 +74,9 @@ Decisiones de la implementación:
 
 ## **Revisión comunitaria de los resúmenes**
 
-La pantalla **Revisión** tiene dos pestañas:
+La pantalla ya no separa Revisar resumen y Comunidad. Muestra siempre los partidos como tarjetas grandes con búsqueda y filtros. Cada tarjeta combina los equipos en una composición diagonal, resalta al ganador, presenta el marcador, un resumen breve y los conteos de likes y dislikes.
 
-- **Revisar resumen:** lo que ya existía (aprobar o rechazar como editor, reportes y herramientas de demo). Ahora tiene un botón para **generar el resumen del partido** desde ahí y muestra junto a cada resumen el voto de la comunidad («Comunidad: 80 % a favor · 5 votos»).
-- **Comunidad:** cualquier persona vota si aprobaría el resumen que hizo la IA, deja **sugerencias** y conversa en un **chat en vivo**. Todo se actualiza al instante en todas las pantallas abiertas.
+Al abrir una tarjeta se muestra el resumen completo, las tácticas sintéticas del partido y un agente que responde preguntas con los eventos disponibles. La misma vista permite aprobar con like, marcar que necesita mejoras con dislike, explicar qué debería cambiar y conversar sobre el resumen.
 
 El voto de la comunidad **orienta** al editor, pero no aprueba ni publica el resumen: la publicación sigue exigiendo la revisión editorial (RF-38).
 
@@ -96,7 +96,7 @@ El voto de la comunidad **orienta** al editor, pero no aprueba ni publica el res
 
 Pruebas: `tests/test_moderation.py`, `tests/test_community.py` y el grupo «Comunidad» de Postman.
 
-Limitaciones: votos y mensajes se guardan en memoria y se pierden al reiniciar el backend; el identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo es orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
+Con `SUPABASE_ENABLED=true`, los resúmenes, decisiones, votos y mensajes se guardan mediante la Data API. Con Supabase deshabilitado o temporalmente inaccesible, el flujo continúa en memoria. El identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo sigue siendo orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
 
 ## **Decisiones de Persona 4**
 
@@ -163,7 +163,7 @@ El laboratorio contrafactual actual es una estimación determinista de interfaz 
 
 El campo interpola cada pase y remate en un máximo de 900 ms. La secuencia final del partido corto conecta el pase de N. Alba con el remate y gol de M. Luz. El balón se representa en blanco y ya no usa un movimiento decorativo separado de los eventos.
 
-La persistencia opcional usa Supabase desde el backend. La migración `supabase/migrations/202610190001_match_intelligence.sql` crea `matches`, `match_events`, `moments` y `assistant_messages` con RLS activo. `SUPABASE_ENABLED=false` mantiene la demo en memoria. El `.env` ignorado contiene la URL, la clave y la referencia del proyecto. Para aplicar la migración remota falta autenticar la CLI, corregir la clave que actualmente responde `401` y completar `SUPABASE_DB_PASSWORD`.
+La persistencia opcional usa Supabase desde el backend. La migración `supabase/migrations/202610190001_match_intelligence.sql` crea `matches`, `match_events`, `moments` y `assistant_messages` con RLS activo. `SUPABASE_ENABLED=false` mantiene la demo en memoria. El `.env` ignorado contiene la URL y las claves. Para aplicar la migración remota falta autenticar la CLI, corregir las claves que actualmente responden `401` y completar `SUPABASE_DB_PASSWORD`; el identificador del proyecto se obtiene automáticamente de `SUPABASE_URL`.
 
 La verificación final ejecutó 330 pruebas del backend correctamente, además de `npm run lint:frontend` sin errores y `npm run build:frontend` correctamente. La API local devolvió siete momentos para el partido corto, incluido `Gol de M. Luz`, y el asistente respondió una pregunta abierta con las fuentes `evt-006`, `evt-007`, `evt-009` y `evt-010`. La conexión remota de Supabase respondió `401`; la migración no se aplicó porque la CLI no tiene sesión y la clave actual no autentica contra el proyecto indicado.
 
@@ -171,13 +171,23 @@ La verificación final ejecutó 330 pruebas del backend correctamente, además d
 
 **Prueba en navegador de la primera interfaz** (9 de octubre, Chrome, escritorio y 375 px): reproducción a 2×, mensajes de robo, recuperación y gol en su momento; marcador 0-0 antes del gol y 1-0 después; saltos a 5, 20, 24, 33,5 y 35 s sin mensajes de otro momento; cambio a inglés y analista; pregunta «How many shots did M. Luz take?» con fuente `evt-010`; resumen bloqueado con 409 y publicado tras aprobar; error controlado «A. Vega» reportado, retirado y corregido a «M. Luz». El retraso medido en local fue de unos 9 ms de transporte, menos de 1 ms de cálculo y unos 850 ms de margen antes de mostrar.
 
+**Actualización de comunidad y revisión, 26 de octubre de 2026.** Se reemplazaron las pestañas Revisar resumen y Comunidad por una lista única con los tres partidos sintéticos, búsqueda, filtros, tarjetas diagonales, marcador, resumen breve y conteos de likes y dislikes. El detalle reúne equipo destacado, resumen completo, tácticas, agente, votación, sugerencias y conversación. Los controles de tema y sesión volvieron al sidebar, y la línea de tiempo quedó dentro de Partido debajo de los comentarios.
+
+Mi experiencia incluye al final una acción confirmada para borrar la configuración local. Reinicia idioma, tema, modo, nivel, club, jugador, comentarios en vivo, estado del sidebar y apertura del agente, marca el onboarding como pendiente y vuelve a la selección inicial. Conserva el historial de partidos y resúmenes, la identidad de comunidad, los votos y los comentarios.
+
+Las esperas del frontend muestran un indicador de carga visible y accesible. El patrón cubre la carga inicial, catálogo, previa, resúmenes, comunidad, conexión en vivo, agente, reportes, analítica táctica, seguimiento y procesamiento de visión. Los botones asíncronos se bloquean mientras esperan su respuesta y muestran el progreso dentro del mismo control.
+
+La migración `202610260001_summary_community.sql` añade resúmenes, votos y mensajes. Los adaptadores recuperan y guardan esos datos cuando Supabase está activo y mantienen respaldo en memoria cuando falla. Se superaron 53 pruebas específicas de experiencia, comunidad y persistencia; la suite disponible sin los artefactos reales de visión terminó con 412 pruebas superadas y 7 omitidas. El linter y la compilación del frontend terminaron correctamente con las dos advertencias anteriores. La comprobación HTTP local cargó tres resúmenes y tres salas de comunidad. La revisión visual automatizada no pudo completarse porque Chrome y Edge no generaron la captura en este entorno.
+
+La base remota no se migró: `SUPABASE_ENABLED` sigue en `false`, las claves actuales responden `401` y falta `SUPABASE_DB_PASSWORD`. La migración queda lista para aplicarse con `scripts/setup-supabase.ps1`; `SUPABASE_PROJECT_REF` ya no es obligatorio porque el script lo deriva de la URL.
+
 ## **Limitaciones y pendientes**
 
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
 - **Analítica provisional.** Narrativa ya admite Persona 3, pero algunas operaciones conservan respaldo determinista. Ver la decisión 6.
 - **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.
 - **Partidos de la demo.** Hay tres: el corto finalizado de aceptación, el próximo partido analítico de dos tiempos y otro escenario analítico marcado en vivo para revisar el centro del partido con once jugadores por equipo. Los tres enfrentan a Aurora FC y Río Unido.
-- **Estado en memoria.** Revisiones y reportes se pierden al reiniciar el backend. Para la demo alcanza; para producción haría falta guardarlos.
+- **Persistencia opcional.** Con Supabase activo se recuperan resúmenes, decisiones, votos y mensajes. Los reportes de error todavía se conservan solo en memoria. Sin Supabase, toda la participación comunitaria vuelve al respaldo local en memoria.
 - **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.
 - **Sin vídeo real.** La interfaz nueva usa el campo sintético; el reproductor de la primera versión aceptaba una URL de vídeo y puede recuperarse cuando el equipo elija el vídeo.
 - **Voz.** No implementada; depende de que el equipo la incluya en el alcance.

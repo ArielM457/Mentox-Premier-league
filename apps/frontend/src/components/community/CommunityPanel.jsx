@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { usePreferences } from '../../app/preferences.js'
 import { useCommunityRoom } from '../../hooks/useCommunityRoom.js'
 import { communityClientId, saveCommunityName, savedCommunityName } from '../../lib/communityIdentity.js'
-import { Button } from '../ui/Button.jsx'
-import { ErrorNotice } from '../ui/Feedback.jsx'
+import { Button, Spinner } from '../ui/Button.jsx'
+import { ErrorNotice, InlineLoading } from '../ui/Feedback.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
 // Sala de un resumen: votación, sugerencias y chat, todo en tiempo real.
-export function CommunityPanel({ matchId, record }) {
+export function CommunityPanel({ matchId, record, compact = false, showSummary = true }) {
   const { t } = usePreferences()
   const copy = t.editorial.community
   const [clientId] = useState(communityClientId)
@@ -45,13 +45,15 @@ export function CommunityPanel({ matchId, record }) {
         </span>
       </header>
 
-      <article className="community-summary">
+      {showSummary && <article className="community-summary">
         <span className={`editorial-status status-${record.status}`}>{t.recap.status[record.status]}</span>
         <h3>{record.draft.headline}</h3>
         <p>{record.draft.explanation}</p>
-      </article>
+      </article>}
 
-      <label className={`community-name ${nameMissing ? 'is-invalid' : ''}`}>
+      {!room && !error && <InlineLoading message={copy.loadingRoom} />}
+
+      {room && <label className={`community-name ${nameMissing ? 'is-invalid' : ''}`}>
         <span>{copy.name}</span>
         <input
           maxLength={40}
@@ -60,11 +62,11 @@ export function CommunityPanel({ matchId, record }) {
           value={name}
         />
         {nameMissing && <small role="alert">{copy.nameNeeded}</small>}
-      </label>
+      </label>}
 
       <ErrorNotice message={error} />
 
-      <div className="community-grid">
+      {room && <div className={`community-grid ${compact ? 'community-grid-single' : ''}`}>
         <div className="community-column">
           <VotePanel lastEvent={lastEvent} onVote={async (choice) => { const author = requireName(); if (author) await vote(author, choice) }} room={room} />
           <MessageList
@@ -89,7 +91,7 @@ export function CommunityPanel({ matchId, record }) {
           title={copy.chat}
           variant="chat"
         />
-      </div>
+      </div>}
       <p className="community-rules">
         <Icon name="shield" size={14} /> {copy.rules}
       </p>
@@ -100,21 +102,21 @@ export function CommunityPanel({ matchId, record }) {
 function VotePanel({ room, onVote, lastEvent }) {
   const { t } = usePreferences()
   const copy = t.editorial.community
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   const tally = room?.tally ?? { approve: 0, reject: 0, total: 0, approve_pct: null }
   const approvePct = tally.total ? Math.round((tally.approve / tally.total) * 100) : 0
   const flash = lastEvent ? copy.newVote(lastEvent.author, copy.voted[lastEvent.vote]) : null
 
   async function choose(choice) {
-    setBusy(true)
+    setBusy(choice)
     setError(null)
     try {
       await onVote(choice)
     } catch (err) {
       setError(err.message)
     } finally {
-      setBusy(false)
+      setBusy(null)
     }
   }
 
@@ -124,14 +126,15 @@ function VotePanel({ room, onVote, lastEvent }) {
       <div className="vote-buttons">
         {['approve', 'reject'].map((choice) => (
           <button
+            aria-busy={busy === choice || undefined}
             aria-pressed={room?.my_vote === choice}
             className={`vote-button vote-${choice} ${room?.my_vote === choice ? 'selected' : ''}`}
-            disabled={busy || !room}
+            disabled={Boolean(busy) || !room}
             key={choice}
             onClick={() => choose(choice)}
             type="button"
           >
-            <Icon name={choice === 'approve' ? 'check' : 'close'} size={18} />
+            {busy === choice ? <Spinner size="small" /> : <Icon name={choice === 'approve' ? 'thumbUp' : 'thumbDown'} size={18} />}
             {copy[choice]}
             <b>{choice === 'approve' ? tally.approve : tally.reject}</b>
           </button>
@@ -219,7 +222,7 @@ function MessageList({ title, items, emptyLabel, placeholder, sendLabel, onSend,
           rows={live ? 1 : 2}
           value={text}
         />
-        <Button disabled={busy || !text.trim()} type="submit">
+        <Button busy={busy} busyLabel={copy.sending} disabled={!text.trim()} type="submit">
           {live ? <Icon name="arrow" size={17} /> : sendLabel}
           {live && <span className="sr-only">{sendLabel}</span>}
         </Button>

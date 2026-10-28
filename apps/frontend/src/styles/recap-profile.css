@@ -52,6 +52,18 @@
 .profile-modes strong, .profile-modes small { display: block; }
 .profile-modes small { color: var(--muted); font-size: 10px; }
 .save-row { margin-top: 32px; display: flex; gap: 12px; }
+.reset-preferences { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
+.reset-preferences > div:first-child { display: flex; align-items: flex-start; gap: 13px; }
+.reset-preferences-icon { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; color: #a11e3b; background: #fff0f3; border-radius: 12px; }
+.reset-preferences h3 { margin: 0 0 6px; font-size: 18px; }
+.reset-preferences p { margin: 0 0 18px; max-width: 650px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.reset-preferences > .btn { display: inline-flex; align-items: center; gap: 8px; }
+.reset-confirmation { margin-top: 16px; padding: 16px; color: var(--text); background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; }
+.reset-confirmation strong { display: block; font-size: 14px; line-height: 1.45; }
+.reset-confirmation > div { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+.reset-preferences .btn.danger { color: #a11e3b; border: 1px solid #d98a9c; }
+:root[data-theme='dark'] .reset-preferences-icon { color: #ffbdc9; background: rgba(241,90,103,.14); }
+:root[data-theme='dark'] .reset-preferences .btn.danger { color: #ffbdc9; border-color: #bd6b82; }
 .experience-grid { margin-bottom: 22px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .experience-panel { min-height: 150px; padding: 18px; background: var(--surface, white); border: 1px solid var(--line); border-radius: 18px; }
 .experience-panel h2 { margin: 0 0 12px; font-size: 16px; }

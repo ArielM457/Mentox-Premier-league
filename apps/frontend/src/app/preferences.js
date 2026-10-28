@@ -1,6 +1,11 @@
 import { createContext, useContext } from 'react'
 
 export const STORAGE_KEY = 'itg:preferences'
+export const CONFIGURATION_STORAGE_KEYS = [
+  STORAGE_KEY,
+  'itg:sidebar',
+  'itg:match-agent-open',
+]
 
 export const DEFAULT_PREFERENCES = {
   language: 'es',
