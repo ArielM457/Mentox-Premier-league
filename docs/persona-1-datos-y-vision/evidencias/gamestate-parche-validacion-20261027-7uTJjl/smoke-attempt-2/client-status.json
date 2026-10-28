@@ -1,0 +1,25 @@
+{
+  "configured": true,
+  "runs": 0,
+  "failures": 1,
+  "cached_detections": 0,
+  "analysis_id": null,
+  "device": "Tesla T4",
+  "tracking_frames": 0,
+  "metrics": 0,
+  "resolved_identities": 0,
+  "ambiguous_identities": 0,
+  "match_id": "gamestate-validation",
+  "media_sha256": "576cfc9bd1975b6cd7dec4150dcec6009f59c875b17a26226d8012091cacebdf",
+  "status": "failed",
+  "error": "GameState falló: GameState terminó con código 1",
+  "video": {
+    "fps": 15.0,
+    "frames": 30,
+    "duration_ms": 2000,
+    "width": 1920,
+    "height": 1080
+  },
+  "roster_verified": false,
+  "team_mapping_configured": false
+}

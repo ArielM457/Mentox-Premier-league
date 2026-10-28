@@ -19,7 +19,9 @@ for command_name in az sha256sum; do
 done
 
 az account show --query '{subscription:name,state:state,tenant:tenantId}' --output table
-az extension add --name containerapp --upgrade --yes >/dev/null
+if ! az extension show --name containerapp >/dev/null 2>&1; then
+  az extension add --name containerapp --yes >/dev/null
+fi
 for provider in Microsoft.App Microsoft.ContainerRegistry Microsoft.ManagedIdentity Microsoft.ServiceBus; do
   az provider register --namespace "${provider}" --wait
 done

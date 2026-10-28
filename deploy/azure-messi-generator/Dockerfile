@@ -16,6 +16,7 @@ RUN apt-get update \
 
 COPY --from=ghcr.io/astral-sh/uv:0.9.5 /uv /uvx /bin/
 COPY requirements.txt /tmp/requirements.txt
+COPY patches/clean-hud.patch /tmp/clean-hud.patch
 
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:${PATH}" \
@@ -24,7 +25,9 @@ ENV VIRTUAL_ENV=/opt/venv \
 
 RUN git clone "${MESSI_REPOSITORY}" /opt/messi \
     && git -C /opt/messi checkout --detach "${MESSI_COMMIT}" \
-    && test "$(git -C /opt/messi rev-parse HEAD)" = "${MESSI_COMMIT}"
+    && test "$(git -C /opt/messi rev-parse HEAD)" = "${MESSI_COMMIT}" \
+    && git -C /opt/messi apply --check /tmp/clean-hud.patch \
+    && git -C /opt/messi apply /tmp/clean-hud.patch
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --python python3.12 "${VIRTUAL_ENV}" \

@@ -1,0 +1,15 @@
+{
+  "retrieved_at_utc": "2026-10-27T21:43:26Z",
+  "analysis_id": "bed13a88ebaf4110a00e74fce99d881f",
+  "revision": "ca-mentox-gamestate-dev--0000014",
+  "gpu": "Tesla T4",
+  "samples": [
+    {"utilization_percent": 95, "memory_used_mib": 3857},
+    {"utilization_percent": 95, "memory_used_mib": 3857},
+    {"utilization_percent": 95, "memory_used_mib": 3857},
+    {"utilization_percent": 100, "memory_used_mib": 3857},
+    {"utilization_percent": 100, "memory_used_mib": 3857}
+  ],
+  "method": "Cinco consultas nvidia-smi separadas por un segundo desde la consola del contenedor.",
+  "scope": "Muestra breve durante el análisis, no un perfil completo ni una prueba de precisión."
+}

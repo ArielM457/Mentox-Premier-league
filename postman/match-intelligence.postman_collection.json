@@ -1240,6 +1240,31 @@
       "name": "Integración de visión",
       "item": [
         {
+          "name": "GET Observaciones del vídeo por ventana",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=1000"},
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
+        },
+        {
+          "name": "GET Analítica causal del vídeo",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/integration/live/analytics?match_id=synthetic-live-001&until_video_ms=1000"},
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
+        },
+        {
+          "name": "POST Preparar modelos sin proveedores configurados",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/api/v1/integration/live/models/prepare?match_id=demo"},
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 200', () => pm.response.to.have.status(200));"]}}]
+        },
+        {
+          "name": "GET Vídeo Blob no configurado",
+          "request": {"method": "GET", "header": [], "url": "{{baseUrl}}/api/v1/integration/live/video"},
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 404', () => pm.response.to.have.status(404));"]}}]
+        },
+        {
+          "name": "POST Captura rechazada mientras está en pausa",
+          "request": {"method": "POST", "header": [], "url": "{{baseUrl}}/api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=0"},
+          "event": [{"listen": "test", "script": {"type": "text/javascript", "exec": ["pm.test('HTTP 409', () => pm.response.to.have.status(409));"]}}]
+        },
+        {
           "name": "GET Estado del enrutamiento",
           "request": {
             "method": "GET",

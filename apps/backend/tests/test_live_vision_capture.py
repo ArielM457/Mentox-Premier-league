@@ -124,3 +124,41 @@ def test_interval_skips_duplicate_second_without_model_call() -> None:
         assert result == {"accepted": False, "reason": "capture_interval"}
 
     asyncio.run(scenario())
+
+
+def test_seeking_back_allows_capture_at_the_new_position() -> None:
+    async def scenario():
+        service, _ = capture()
+        service.play("m")
+        await service.capture(match_id="m", video_time_ms=8000, image=b"jpeg", content_type="image/jpeg")
+        service.seek("m")
+        result = await service.capture(match_id="m", video_time_ms=1000, image=b"jpeg", content_type="image/jpeg")
+        assert result["accepted"] is True
+
+    asyncio.run(scenario())
+
+
+def test_pause_and_quick_resume_discard_old_inflight_frame() -> None:
+    async def scenario():
+        service, publisher = capture()
+        started, finish = asyncio.Event(), asyncio.Event()
+
+        class SlowPredictor(Predictor):
+            async def predict(self, image, content_type):
+                started.set()
+                await finish.wait()
+                return await super().predict(image, content_type)
+
+        service.predictor = SlowPredictor()
+        service.play("m")
+        task = asyncio.create_task(service.capture(
+            match_id="m", video_time_ms=8000, image=b"jpeg", content_type="image/jpeg",
+        ))
+        await started.wait()
+        service.pause("m")
+        service.play("m")
+        finish.set()
+        assert (await task)["accepted"] is False
+        assert publisher.items == []
+
+    asyncio.run(scenario())

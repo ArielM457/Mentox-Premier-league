@@ -1,11 +1,24 @@
 # Evidencia técnica de DV-US-34
 
+## Actualización del 27 de octubre de 2026
+
+El flujo actual usa Roboflow, TeamSpotting y los datos del mismo vídeo MESSI;
+GameState queda retirado. El paquete se verifica por SHA-256 y sustituye el
+guion de Ariel solo para el partido enlazado al MP4. La reproducción publica
+eventos del simulador con procedencia explícita y separación de colas.
+La [evidencia híbrida](messi-hibrido-20261027.md) registra las pruebas locales,
+la conversión del archivo real y sus límites. La
+[prueba real posterior en Azure](messi-azure-20261027/README.md) verifica
+el vídeo completo en Chrome con ambas GPU, colas y worker; el WebSocket del
+proxy Vite quedó corregido y comprobado con los tres roles Roboflow.
+Los apartados siguientes conservan la evolución anterior.
+
 ## Identificación
 
 - **Historia:** DV-US-34 · Ejecutar inferencia mientras se reproduce el vídeo.
-- **Estado:** captura verificada localmente y topología Azure verificada; recorrido visual completo pendiente.
+- **Estado:** recorrido visual completo verificado con MP4 sintético, modelos GPU y transportes Azure; precisión estadística no evaluada.
 - **Prioridad:** P0.
-- **Última actualización:** 25 de octubre de 2026.
+- **Última actualización:** 27 de octubre de 2026.
 - **Responsable:** Persona 1 · Datos y visión.
 
 ## Alcance implementado
@@ -54,9 +67,28 @@ comprueba nuevamente el estado después de la inferencia y descarta su salida.
    `match-metrics` para telemetría reconstruible o `important-events` para
    jugadas durables. Una detección espacial aislada no se inventa como evento.
 
-La última regla es deliberada: TeamSpotting y GameState todavía deben terminar
-su despliegue y producir evidencia temporal/espacial compatible para activar
-la fusión completa.
+La última regla es deliberada: TeamSpotting ya puede producir observaciones
+temporales, pero GameState y la resolución de identidad todavía deben aportar
+evidencia espacial compatible antes de activar la fusión nominal completa.
+
+## Integración de TeamSpotting
+
+El backend acepta ahora `SOCCERNET_ENDPOINT` y `SOCCERNET_API_KEY`. Antes de
+habilitar Play, descarga el mismo MP4 privado configurado para la interfaz y lo
+envía una sola vez al servicio SoccerNet T-DEED. Sus predicciones se normalizan
+como observaciones `temporal_action`, conservando tiempo de vídeo, etiqueta,
+equipo visual, confianza, identificador y procedencia. Se publican mediante el
+mismo transporte y WebSocket que las detecciones de Roboflow.
+
+La interfaz presenta nombres comprensibles como “Pase detectado”, “Tiro
+detectado” y “Gol detectado”, junto con equipo visual y confianza. También avisa
+que atribuir un jugador requiere fusión. No transforma `left` o `right` en un
+equipo nominal ni inventa pasador y receptor.
+
+El servicio TeamSpotting amplió su límite de 90 a 240 segundos para aceptar los
+MP4 sintéticos comprimidos de 180 segundos. Ariel debe reconstruir y desplegar
+esa revisión antes de la prueba completa. La clave compartida por mensajería debe
+rotarse y guardarse solo en `SOCCERNET_API_KEY`; no se incorporó al repositorio.
 
 ## Archivos
 
@@ -72,6 +104,8 @@ la fusión completa.
 | `experience.css` y `match.css` | Bandeja responsive y cajas sobre el vídeo |
 | `compose.integration.yml` | Variables de modelo, Blob y colas |
 | `test_live_vision_capture.py` | Pruebas del control y normalización |
+| `application/teamspotting_analysis.py` | Cliente, descarga privada, caché y acciones temporales |
+| `test_teamspotting_analysis.py` | Normalización y configuración opcional de SoccerNet |
 
 ## Matriz de aceptación
 
@@ -89,6 +123,7 @@ la fusión completa.
 | Cajas sincronizadas | Último fotograma dentro de una tolerancia de 2,5 segundos | Verificado por código y compilación |
 | Separación de datos simulados | Los overlays sintéticos no aparecen encima de un MP4 | Verificado por código y compilación |
 | Lenguaje comprensible | Detecciones agrupadas por fotograma; no inventa acciones deportivas | Verificado en español e inglés por compilación |
+| Acciones de TeamSpotting | Etiqueta, equipo visual, confianza y tiempo sincronizable | Verificado localmente; endpoint Azure pendiente de clave rotada y redespliegue |
 
 El 25 de octubre de 2026 se desplegó la topología aislada de DV-US-29. Event
 Hubs y Service Bus están activos y se verificó una publicación real. Esa prueba
@@ -102,6 +137,10 @@ No se debe guardar la clave en Git ni colocarla en variables `VITE_*`.
 ```bash
 export ROBOFLOW_SUITE_ENDPOINT="https://ca-mentox-roboflow-dev.lemonisland-c8dd17c4.northcentralus.azurecontainerapps.io"
 export MENTOX_MODEL_API_KEY="<clave-del-equipo>"
+
+export SOCCERNET_ENDPOINT="https://ca-mentox-teamspotting-dev.<entorno>.northcentralus.azurecontainerapps.io"
+export SOCCERNET_API_KEY="<clave-rotada-de-teamspotting>"
+export SOCCERNET_TIMEOUT_SECONDS=900
 
 export AZURE_BLOB_SERVICE_ENDPOINT="https://stdamonhxwjzbiyupwqc.blob.core.windows.net/"
 export VISION_VIDEO_CONTAINER="synthetic-videos"
@@ -138,6 +177,10 @@ uv run --project apps/backend --python 3.12 \
 ```
 
 Resultado: **12 pruebas aprobadas en 0,37 segundos**.
+
+La ampliación TeamSpotting se verificó con 16 pruebas dirigidas aprobadas y con
+la compilación de producción del frontend. Esta prueba usa dobles locales; no se
+registra todavía como una inferencia real contra el endpoint de Ariel.
 
 ```bash
 cd apps/frontend
@@ -241,3 +284,33 @@ Resultados obtenidos:
 - `pytest`: 10 pruebas aprobadas en los módulos seleccionados.
 - `vite build`: 58 módulos transformados y compilación terminada correctamente.
 - `bash -n`: scripts común y de Ariel sin errores de sintaxis.
+
+# Actualización: preparación automática al iniciar el backend (2026-10-26)
+
+El backend ahora inicia en segundo plano la preparación conjunta de Roboflow,
+TeamSpotting y GameState cuando están configurados los tres servicios y el vídeo.
+El servidor HTTP no queda bloqueado y una pulsación posterior de Play reutiliza
+la tarea en curso en lugar de duplicar la inferencia.
+
+El estado reproducible se expone en `GET /api/v1/integration/status` bajo
+`runtime.model_preparation`, con los estados `idle`, `preparing`, `ready` y
+`failed`. `VISION_PREPARE_ON_STARTUP=false` permite desactivar expresamente el
+comportamiento; `VISION_STARTUP_MATCH_ID` cambia el partido inicial.
+
+Verificación local realizada:
+
+```bash
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 \
+  python -m compileall -q apps/backend/src
+
+UV_CACHE_DIR=/tmp/mentox-uv-cache \
+uv run --project apps/backend --python 3.12 \
+  pytest -q apps/backend/tests/test_live_vision_capture.py \
+            apps/backend/tests/test_teamspotting_analysis.py \
+            apps/backend/tests/test_gamestate_analysis.py
+```
+
+Resultado: compilación correcta y 10 pruebas aprobadas. La suite completa se
+interrumpió después del 43 % porque entró en una prueba de larga duración; no se
+declara verificada en esta actualización.

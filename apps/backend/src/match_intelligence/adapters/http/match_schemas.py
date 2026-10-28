@@ -56,6 +56,7 @@ class MatchDetailResponse(BaseModel):
     duration_ms: int
     event_count: int
     video: VideoSource
+    data_source: str | None = None
 
 
 class EventsResponse(BaseModel):

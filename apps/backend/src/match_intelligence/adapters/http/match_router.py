@@ -101,11 +101,14 @@ def _detail(session: MatchSession) -> MatchDetailResponse:
     has_blob_video = bool(
         os.getenv("AZURE_BLOB_SERVICE_ENDPOINT")
         and os.getenv("VISION_VIDEO_BLOB_NAME")
+        and session.match_id == os.getenv("VISION_STARTUP_MATCH_ID", "synthetic-live-001")
+        and session.data_source == "messi_simulator"
     )
     return MatchDetailResponse(
         metadata=session.metadata,
         duration_ms=session.duration_ms,
         event_count=len(session.events),
+        data_source=session.data_source,
         video=VideoSource(
             kind="file" if has_blob_video else "synthetic_timeline",
             url="/api/v1/integration/live/video" if has_blob_video else None,

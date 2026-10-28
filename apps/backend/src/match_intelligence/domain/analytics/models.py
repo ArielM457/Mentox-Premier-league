@@ -51,7 +51,7 @@ class TrackingEvidence(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    source: str = Field(description="synthetic_mock o video_model")
+    source: str = Field(description="synthetic_mock, synthetic_simulator o video_model")
     track_ids: list[str] = Field(default_factory=list)
     start_period: int | None = None
     start_clock_ms: int | None = None

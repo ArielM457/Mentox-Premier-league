@@ -101,13 +101,19 @@ export const api = {
     }),
   visionStatus: () => request('/api/v1/integration/status'),
   visionLiveStatus: () => request('/api/v1/integration/live/status'),
-  prepareVisionModels: () => request('/api/v1/integration/live/models/prepare', { method: 'POST' }),
+  visionObservations: (matchId, start, end, limit = 1000) => request(
+    `/api/v1/integration/live/observations?match_id=${encodeURIComponent(matchId)}&start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&limit=${limit}`,
+  ),
+  prepareVisionModels: (matchId) => request(
+    `/api/v1/integration/live/models/prepare?match_id=${encodeURIComponent(matchId)}`,
+    { method: 'POST' },
+  ),
   visionTimeline: (start, end, limit = 40) =>
     request(`/api/v1/integration/timeline?start_ms=${Math.floor(start)}&end_ms=${Math.floor(end)}&spatial_limit=${limit}`),
-  visionPlayback: (action, t, matchId) =>
+  visionPlayback: (action, t, matchId, playbackGeneration = null) =>
     request(`/api/v1/integration/live/playback/${action}`, {
       method: 'POST',
-      body: JSON.stringify({ video_time_ms: Math.floor(t ?? 0), match_id: matchId }),
+      body: JSON.stringify({ video_time_ms: Math.floor(t ?? 0), match_id: matchId, playback_generation: playbackGeneration }),
     }),
   captureVisionFrame: (matchId, t, image) => request(
     `/api/v1/integration/live/capture/frame?match_id=${encodeURIComponent(matchId)}&video_time_ms=${Math.floor(t)}`,

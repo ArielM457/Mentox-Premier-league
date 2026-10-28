@@ -1,0 +1,22 @@
+{
+  "server_processing_seconds": 1613.558932,
+  "processing_to_video_duration_ratio": 8.964216288888888,
+  "total_video_frames": 2700,
+  "frames_with_any_detection": 3,
+  "frame_coverage_percent": 0.1111111111111111,
+  "detected_frame_indices": [
+    1890,
+    2643,
+    2644
+  ],
+  "detected_video_times_ms": [
+    126000,
+    176200,
+    176267
+  ],
+  "observations": 4,
+  "unique_track_ids": 3,
+  "observations_with_pitch": 0,
+  "observations_with_jersey_and_confidence": 0,
+  "scope": "Cobertura de cuadros, no recall ni precisión etiquetada; referencia sintética no usada como entrada."
+}

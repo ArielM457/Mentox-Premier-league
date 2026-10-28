@@ -39,20 +39,27 @@ export function useMatchClock(durationMs, videoRef) {
     return () => clearInterval(id)
   }, [playing, speed, durationMs, update, videoRef])
 
-  const play = useCallback(() => {
+  const play = useCallback(async () => {
     if (timeRef.current >= durationMs) update(0)
     const video = activeVideo(videoRef)
     if (video) {
       video.currentTime = timeRef.current / 1000
-      video.play().catch(() => setPlaying(false))
+      try {
+        await video.play()
+      } catch (error) {
+        setPlaying(false)
+        throw error
+      }
     }
     setPlaying(true)
   }, [durationMs, update, videoRef])
 
   const pause = useCallback(() => {
-    activeVideo(videoRef)?.pause()
+    const video = activeVideo(videoRef)
+    video?.pause()
+    if (video) update(Math.min(durationMs, Math.round(video.currentTime * 1000)))
     setPlaying(false)
-  }, [videoRef])
+  }, [videoRef, durationMs, update])
 
   const seek = useCallback((value) => {
     const next = Math.min(Math.max(0, value), durationMs)

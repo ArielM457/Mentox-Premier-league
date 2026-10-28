@@ -1,0 +1,25 @@
+{
+  "configured": true,
+  "runs": 1,
+  "failures": 0,
+  "cached_detections": 4,
+  "analysis_id": "bed13a88ebaf4110a00e74fce99d881f",
+  "device": "Tesla T4",
+  "tracking_frames": 0,
+  "metrics": 11,
+  "resolved_identities": 0,
+  "ambiguous_identities": 0,
+  "match_id": "gamestate-validation",
+  "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+  "status": "ready",
+  "error": null,
+  "video": {
+    "fps": 15.0,
+    "frames": 2700,
+    "duration_ms": 180000,
+    "width": 1920,
+    "height": 1080
+  },
+  "roster_verified": false,
+  "team_mapping_configured": false
+}

@@ -1,0 +1,1151 @@
+{
+  "scope": "real_browser_blob_mp4_remote_gpu_models_azure_queues",
+  "started_at": "2026-10-28T01:39:00.757088+00:00",
+  "status": "passed",
+  "checks": [
+    "Ambos modelos reales preparados sobre el MP4 verificado; GameState retirado",
+    "Abrir el partido no captura antes de Play",
+    "Pausa detiene reloj y nuevas capturas contra Roboflow remoto",
+    "MP4 completo reproducido a velocidad normal",
+    "Roboflow remoto procesó capturas sin fallos",
+    "TeamSpotting no repitió inferencia al reanudar",
+    "Event Hubs publicó y su consumidor aceptó observaciones",
+    "Métricas y jugadas importantes entregadas a sus transportes Azure",
+    "Sin errores JavaScript ni HTTP de la API durante la reproducción"
+  ],
+  "before": {
+    "status": "ready",
+    "artifact_scope": "current_blob_video",
+    "match_id": "synthetic-live-001",
+    "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+    "video_available": true,
+    "duration_ms": 180000,
+    "roboflow": {
+      "configured": true,
+      "model_ready": true,
+      "playing": false,
+      "interval_ms": 1000,
+      "frames_received": 4,
+      "frames_processed": 3,
+      "frames_skipped": 1,
+      "observations_published": 54,
+      "failures": 0
+    },
+    "soccernet": {
+      "configured": true,
+      "runs": 1,
+      "failures": 0,
+      "cached_predictions": 177,
+      "device": "Tesla T4",
+      "status": "ready",
+      "error": null,
+      "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+    },
+    "fusion": {
+      "status": "synthetic_reference_with_unverified_model_candidates",
+      "events_available": 170,
+      "match_events_routed": 5
+    },
+    "runtime": {
+      "event_transport": "azure_event_hubs",
+      "event_hubs_configured": true,
+      "blob_storage_configured": true,
+      "credentials_present": false,
+      "vision_observations": {
+        "transport": "azure_event_hubs",
+        "eventhub_name": "vision-observations",
+        "consumer_group": "backend",
+        "producer_published": 65,
+        "producer_failures": 0,
+        "consumer_accepted": 65,
+        "consumer_rejected": 0,
+        "consumer_failures": 0,
+        "consumer_running": true,
+        "consumer_error": null
+      },
+      "live_capture": {
+        "configured": true,
+        "model_ready": true,
+        "playing": false,
+        "interval_ms": 1000,
+        "frames_received": 4,
+        "frames_processed": 3,
+        "frames_skipped": 1,
+        "observations_published": 54,
+        "failures": 0
+      },
+      "teamspotting": {
+        "configured": true,
+        "runs": 1,
+        "failures": 0,
+        "cached_predictions": 177,
+        "device": "Tesla T4",
+        "status": "ready",
+        "error": null,
+        "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+      },
+      "gamestate": {
+        "configured": false,
+        "status": "retired"
+      },
+      "simulator": {
+        "configured": true,
+        "status": "ready",
+        "error": null,
+        "source": "messi_simulator",
+        "match_id": "synthetic-live-001",
+        "events": 170,
+        "tracking_frames": 181,
+        "ignored_records": {
+          "period_start": 2,
+          "touch": 234,
+          "possession:unknown_team": 2,
+          "gk_hold_start": 3,
+          "offside_flag": 3,
+          "gk_hold_end": 3,
+          "period_end": 2,
+          "period": 1,
+          "match_end": 1
+        },
+        "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+        "events_routed": 5,
+        "events_pending_delivery": 0,
+        "observation_error": null,
+        "limitations": [
+          "Las identidades y métricas del simulador no son detecciones de IA."
+        ]
+      },
+      "model_preparation": {
+        "status": "ready",
+        "match_id": "synthetic-live-001",
+        "error": null,
+        "models": {
+          "roboflow": {
+            "status": "ready",
+            "models": [
+              "player",
+              "ball",
+              "pitch"
+            ],
+            "device": "Tesla T4"
+          },
+          "teamspotting": {
+            "status": "ready",
+            "configured": true,
+            "model": "SoccerNet T-DEED TeamSpotting",
+            "device": "Tesla T4",
+            "predictions": 177,
+            "observations_published": 5,
+            "processing_time_ms": 19128.686,
+            "cached": true,
+            "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+          },
+          "gamestate": {
+            "status": "retired",
+            "configured": false
+          }
+        }
+      },
+      "video_source": {
+        "configured": true,
+        "container": "synthetic-videos"
+      }
+    }
+  },
+  "after": {
+    "status": "ready",
+    "artifact_scope": "current_blob_video",
+    "match_id": "synthetic-live-001",
+    "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+    "video_available": true,
+    "duration_ms": 180000,
+    "roboflow": {
+      "configured": true,
+      "model_ready": true,
+      "playing": false,
+      "interval_ms": 1000,
+      "frames_received": 117,
+      "frames_processed": 101,
+      "frames_skipped": 16,
+      "observations_published": 1525,
+      "failures": 0
+    },
+    "soccernet": {
+      "configured": true,
+      "runs": 1,
+      "failures": 0,
+      "cached_predictions": 177,
+      "device": "Tesla T4",
+      "status": "ready",
+      "error": null,
+      "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+    },
+    "fusion": {
+      "status": "synthetic_reference_with_unverified_model_candidates",
+      "events_available": 170,
+      "match_events_routed": 164
+    },
+    "runtime": {
+      "event_transport": "azure_event_hubs",
+      "event_hubs_configured": true,
+      "blob_storage_configured": true,
+      "credentials_present": false,
+      "vision_observations": {
+        "transport": "azure_event_hubs",
+        "eventhub_name": "vision-observations",
+        "consumer_group": "backend",
+        "producer_published": 1872,
+        "producer_failures": 0,
+        "consumer_accepted": 1872,
+        "consumer_rejected": 0,
+        "consumer_failures": 0,
+        "consumer_running": true,
+        "consumer_error": null
+      },
+      "live_capture": {
+        "configured": true,
+        "model_ready": true,
+        "playing": false,
+        "interval_ms": 1000,
+        "frames_received": 117,
+        "frames_processed": 101,
+        "frames_skipped": 16,
+        "observations_published": 1525,
+        "failures": 0
+      },
+      "teamspotting": {
+        "configured": true,
+        "runs": 1,
+        "failures": 0,
+        "cached_predictions": 177,
+        "device": "Tesla T4",
+        "status": "ready",
+        "error": null,
+        "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+      },
+      "gamestate": {
+        "configured": false,
+        "status": "retired"
+      },
+      "simulator": {
+        "configured": true,
+        "status": "ready",
+        "error": null,
+        "source": "messi_simulator",
+        "match_id": "synthetic-live-001",
+        "events": 170,
+        "tracking_frames": 181,
+        "ignored_records": {
+          "period_start": 2,
+          "touch": 234,
+          "possession:unknown_team": 2,
+          "gk_hold_start": 3,
+          "offside_flag": 3,
+          "gk_hold_end": 3,
+          "period_end": 2,
+          "period": 1,
+          "match_end": 1
+        },
+        "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+        "events_routed": 164,
+        "events_pending_delivery": 0,
+        "observation_error": null,
+        "limitations": [
+          "Las identidades y métricas del simulador no son detecciones de IA."
+        ]
+      },
+      "model_preparation": {
+        "status": "ready",
+        "match_id": "synthetic-live-001",
+        "error": null,
+        "models": {
+          "roboflow": {
+            "status": "ready",
+            "models": [
+              "player",
+              "ball",
+              "pitch"
+            ],
+            "device": "Tesla T4"
+          },
+          "teamspotting": {
+            "status": "ready",
+            "configured": true,
+            "model": "SoccerNet T-DEED TeamSpotting",
+            "device": "Tesla T4",
+            "predictions": 177,
+            "observations_published": 5,
+            "processing_time_ms": 19128.686,
+            "cached": true,
+            "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+          },
+          "gamestate": {
+            "status": "retired",
+            "configured": false
+          }
+        }
+      },
+      "video_source": {
+        "configured": true,
+        "container": "synthetic-videos"
+      }
+    }
+  },
+  "routing": {
+    "transport": "azure",
+    "ingress_published": 164,
+    "metrics_published": 162,
+    "important_published": 2,
+    "telemetry_failures": 0,
+    "last_telemetry_failure": null
+  },
+  "capture_responses": [
+    {
+      "accepted": true,
+      "video_time_ms": 40,
+      "models": 3,
+      "observations": 23,
+      "inference_ms": 169.777,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 2063,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 163.765,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 4062,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 161.962,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 6060,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 158.769,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 8070,
+      "models": 3,
+      "observations": 21,
+      "inference_ms": 163.35,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 10082,
+      "models": 3,
+      "observations": 19,
+      "inference_ms": 158.354,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 12091,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 156.784,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 14085,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 159.478,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 16086,
+      "models": 3,
+      "observations": 10,
+      "inference_ms": 158.165,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 18080,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 164.543,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 20084,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 167.587,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 21087,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 114.362,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 23079,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 168.288,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 25085,
+      "models": 3,
+      "observations": 20,
+      "inference_ms": 168.313,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 27082,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 169.24,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 28085,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 105.495,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 30085,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 168.506,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 32084,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 159.037,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 34084,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 168.21,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 36079,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 158.521,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 37086,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 111.282,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 39079,
+      "models": 3,
+      "observations": 8,
+      "inference_ms": 167.627,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 40080,
+      "models": 3,
+      "observations": 9,
+      "inference_ms": 116.898,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 41085,
+      "models": 3,
+      "observations": 10,
+      "inference_ms": 100.128,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 43079,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 168.378,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 45079,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 146.896,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 46085,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 143.457,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 48081,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 168.681,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 50083,
+      "models": 3,
+      "observations": 10,
+      "inference_ms": 168.266,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 52085,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 117.967,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 54081,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 168.131,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 56086,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 142.648,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 57092,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 169.92,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 59089,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 108.878,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 61087,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 168.638,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 63089,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 154.167,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 65086,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 164.117,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 67085,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 169.255,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 69088,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 136.524,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 71085,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 160.639,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 73095,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 158.085,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 75088,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 158.713,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 77086,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 169.028,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 79084,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 168.181,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 81089,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 168.208,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 83087,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 168.921,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 85087,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 167.882,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 87089,
+      "models": 3,
+      "observations": 10,
+      "inference_ms": 169.931,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 89089,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 104.664,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 91090,
+      "models": 3,
+      "observations": 21,
+      "inference_ms": 168.825,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 93081,
+      "models": 3,
+      "observations": 21,
+      "inference_ms": 169.523,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 95081,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 169.65,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 97086,
+      "models": 3,
+      "observations": 20,
+      "inference_ms": 168.698,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 99083,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 168.238,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 101087,
+      "models": 3,
+      "observations": 19,
+      "inference_ms": 163.269,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 103083,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 156.837,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 105089,
+      "models": 3,
+      "observations": 19,
+      "inference_ms": 168.754,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 107092,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 150.955,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 109088,
+      "models": 3,
+      "observations": 19,
+      "inference_ms": 155.649,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 110090,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 127.686,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 112081,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 167.4,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 113086,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 134.499,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 115087,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 167.894,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 116089,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 136.049,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 117089,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 104.752,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 119086,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 169.316,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 121089,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 150.508,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 123085,
+      "models": 3,
+      "observations": 13,
+      "inference_ms": 169.132,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 125089,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 156.928,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 127084,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 163.014,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 129089,
+      "models": 3,
+      "observations": 20,
+      "inference_ms": 168.991,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 131084,
+      "models": 3,
+      "observations": 18,
+      "inference_ms": 131.483,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 133091,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 160.433,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 136086,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 158.826,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 138092,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 159.307,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 140086,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 167.498,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 142083,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 108.805,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 144087,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 160.229,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 145091,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 113.474,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 147080,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 157.231,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 149087,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 164.866,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 151083,
+      "models": 3,
+      "observations": 19,
+      "inference_ms": 168.578,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 153087,
+      "models": 3,
+      "observations": 12,
+      "inference_ms": 166.304,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 155080,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 167.698,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 156081,
+      "models": 3,
+      "observations": 9,
+      "inference_ms": 102.482,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 157083,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 98.477,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 159090,
+      "models": 3,
+      "observations": 20,
+      "inference_ms": 170.044,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 161087,
+      "models": 3,
+      "observations": 20,
+      "inference_ms": 163.222,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 163080,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 169.633,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 165093,
+      "models": 3,
+      "observations": 16,
+      "inference_ms": 168.607,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 167083,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 157.389,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 168086,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 112.11,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": false,
+      "reason": "capture_interval"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 170081,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 168.651,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 172081,
+      "models": 3,
+      "observations": 15,
+      "inference_ms": 147.416,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 174088,
+      "models": 3,
+      "observations": 17,
+      "inference_ms": 156.343,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 176080,
+      "models": 3,
+      "observations": 14,
+      "inference_ms": 150.229,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 178081,
+      "models": 3,
+      "observations": 9,
+      "inference_ms": 157.052,
+      "device": "Tesla T4"
+    },
+    {
+      "accepted": true,
+      "video_time_ms": 179082,
+      "models": 3,
+      "observations": 11,
+      "inference_ms": 133.41,
+      "device": "Tesla T4"
+    }
+  ],
+  "finished_at": "2026-10-28T01:42:22.118201+00:00",
+  "page_errors": [],
+  "failed_http": []
+}

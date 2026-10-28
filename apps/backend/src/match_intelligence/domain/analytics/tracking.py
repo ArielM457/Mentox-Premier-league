@@ -62,6 +62,7 @@ class TrackedKind(StrEnum):
 
 class TrackingSource(StrEnum):
     SYNTHETIC_MOCK = "synthetic_mock"
+    SYNTHETIC_SIMULATOR = "synthetic_simulator"
     VIDEO_MODEL = "video_model"
 
 
@@ -193,7 +194,8 @@ def window_speeds(
     first = 0
     path = 0.0
     for last, (_, end, length) in enumerate(valid):
-        if valid[first][0].period != end.period:
+        # No unir ventanas a través de un salto descartado o una pista perdida.
+        if last and valid[last - 1][1] != valid[last][0]:
             first, path = last, 0.0
         path += length
         while first < last and end.clock_ms - valid[first][1].clock_ms >= window_ms:
@@ -213,7 +215,10 @@ def episodes(
     current: list[tuple[Sample, Sample, float]] = []
     for item in speeds:
         if item[2] >= threshold:
-            if current and current[-1][1].period != item[1].period:
+            if current and (
+                current[-1][1].period != item[1].period
+                or item[1].clock_ms - current[-1][1].clock_ms > MAX_SAMPLE_GAP_MS
+            ):
                 grouped.append(current)
                 current = []
             current.append(item)
@@ -290,6 +295,8 @@ def tracking_metric(
 
 def frame_source(frames: Sequence[TrackingFrame]) -> TrackingSource:
     sources = {frame.source for frame in frames}
+    if TrackingSource.SYNTHETIC_SIMULATOR in sources:
+        return TrackingSource.SYNTHETIC_SIMULATOR
     return TrackingSource.VIDEO_MODEL if TrackingSource.VIDEO_MODEL in sources else TrackingSource.SYNTHETIC_MOCK
 
 
@@ -303,16 +310,18 @@ def player_tracking_metrics(frames: Sequence[TrackingFrame]) -> list[MetricValue
         summary = movement(track)
         evidence = _evidence([track.track_id], source, summary.start, summary.end, summary.frames)
         owner = {"team_id": track.team_id, "player_id": track.player_id or None}
+        has_segments = any(ok for _, _, _, _, ok in _segments(track.samples, PLAYER_MAX_SPEED_MS))
+        missing = "No hay posiciones consecutivas válidas para medir movimiento"
         discarded = [IndicatorComponent(key="discarded_segments", value=summary.discarded_segments, unit="count")]
         results.extend([
-            tracking_metric("distance_covered_m", round(summary.distance_m, 1), evidence=evidence,
-                            components=discarded, **owner),
-            tracking_metric("high_intensity_distance_m", round(summary.high_intensity_m, 1),
-                            evidence=evidence, **owner),
+            tracking_metric("distance_covered_m", round(summary.distance_m, 1) if has_segments else None, evidence=evidence,
+                            components=discarded, reason=missing, **owner),
+            tracking_metric("high_intensity_distance_m", round(summary.high_intensity_m, 1) if has_segments else None,
+                            evidence=evidence, reason=missing, **owner),
             tracking_metric("top_speed_kmh",
                             round(summary.top_speed_ms * 3.6, 1) if summary.top_speed_ms is not None else None,
                             evidence=evidence, **owner),
-            tracking_metric("sprints", summary.sprints, evidence=evidence, **owner),
+            tracking_metric("sprints", summary.sprints if has_segments else None, evidence=evidence, reason=missing, **owner),
         ])
     return results
 
@@ -495,7 +504,9 @@ def tracking_alerts(frames: Sequence[TrackingFrame]) -> list[TrackingAlert]:
     if not ordered:
         return []
     source = frame_source(ordered)
-    limits = [LIMIT_MOCK if source is TrackingSource.SYNTHETIC_MOCK else LIMIT_VIDEO]
+    limits = ["Posiciones del simulador MESSI; no medidas desde vídeo."
+              if source is TrackingSource.SYNTHETIC_SIMULATOR else
+              LIMIT_MOCK if source is TrackingSource.SYNTHETIC_MOCK else LIMIT_VIDEO]
     match_id = ordered[0].match_id
     video_by_time = {(f.period, f.clock_ms): f.video_time_ms for f in ordered}
     candidates: list[tuple[tuple[int, int], TrackingAlert]] = []

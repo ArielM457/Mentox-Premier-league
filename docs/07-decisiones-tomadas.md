@@ -82,6 +82,28 @@ La infraestructura de esta parte se definirá con Bicep y se desplegará mediant
 
 **16.** Los partidos marcados en vivo usarán un escenario propio con situaciones coordinadas. `MatchEvent 1.0` conserva campos opcionales para receptor, situación y duración del paro. Los pases hacia atrás mayores a ocho unidades requieren una razón táctica declarada; los cambios de orientación y pases al espacio tienen mínimos de distancia o progresión. Faltas, tarjetas, lesiones y reanudaciones siguen el mismo reloj y la interfaz muestra su estado sobre la cancha. Esta primera versión usa un guion sintético validado; el siguiente paso será sustituir la selección del pase por un motor que evalúe opciones en cada cuadro.
 
-## **Estado actual**
+## **Decisión de demo del 27 de octubre de 2026**
+
+Por decisión del usuario, GameState queda fuera de la demo con los renders
+actuales de MESSI. La prueba completa funcionó técnicamente, pero produjo solo
+4 detecciones, sin posiciones calibradas, y tardó unos 27 minutos para un vídeo
+de 3 minutos. Se eliminó únicamente su Container App de Azure; se conservan el
+código, la imagen y las evidencias para investigación posterior.
+
+La dirección acordada es combinar Roboflow Suite (observaciones espaciales),
+SoccerNet TeamSpotting (candidatos temporales) y los eventos, posiciones y
+metadatos del mismo partido MESSI. Las salidas de los modelos siguen siendo
+experimentales hasta contrastarlas; los datos del simulador no prueban que una
+acción o identidad haya sido detectada desde vídeo.
+
+La integración complementaria debe conservar el origen de cada campo, los
+identificadores del partido y el mismo reloj de vídeo. No se sumará dos veces
+una acción presente en varias fuentes ni se confirmará un jugador por mera
+proximidad temporal. La integración ya tiene implementación y pruebas locales
+con contratos HTTP y proveedores de inferencia dobles; falta ejecutar este
+flujo modificado con ambos servicios Azure encendidos y revisar su calidad.
+Véase [la evidencia de integración híbrida](persona-1-datos-y-vision/evidencias/messi-hibrido-20261027.md).
+
+## **Estado histórico de la base del proyecto**
 
 El monorepo y los proyectos iniciales de frontend y backend están preparados. La ingesta sintética y la analítica de Persona 2 tienen módulos y pruebas propios. El flujo de la experiencia usa el adaptador de narrativa de Persona 3 y puede seleccionar el proveedor provisional, fixture o Azure. El filtro, el catálogo inicial, el despacho reproducible, la simulación local de rutas, la revisión de recortes y la previa táctica determinista están implementados. El canal durable real, el corte físico del vídeo, la investigación previa con fuentes externas, la simulación contrafactual, los resúmenes de medio tiempo y la alta disponibilidad todavía están pendientes.

@@ -1,0 +1,19 @@
+{
+  "status": "ready",
+  "model": "SoccerNet GameState Reconstruction",
+  "device": "Tesla T4",
+  "mode": "asynchronous",
+  "weights": {
+    "count": 7,
+    "names": [
+      "reid-soccernet",
+      "reid-hrnet32",
+      "pitch-keypoints",
+      "pitch-lines",
+      "bbox-yolo11m",
+      "jersey-ocr-detector",
+      "jersey-ocr-recognizer"
+    ]
+  },
+  "configured": true
+}

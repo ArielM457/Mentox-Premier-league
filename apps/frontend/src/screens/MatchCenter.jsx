@@ -10,6 +10,7 @@ import { useVisionCapture } from '../hooks/useVisionCapture.js'
 import { useVisionObservationChannel } from '../hooks/useVisionObservationChannel.js'
 import { formatClock, formatMatchClock, momentIdOf, pastOverlays, visibleOverlay } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
+import { preferencesForMatch } from '../lib/matchPreferences.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { Assistant } from '../components/match/Assistant.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
@@ -56,9 +57,17 @@ function LiveMatch({ match }) {
   const { data: catalog } = useCatalog()
   const matchId = match.id
   const metadata = match.metadata
+  const scopedPreferences = useMemo(() => preferencesForMatch(apiPreferences, metadata), [apiPreferences, metadata])
   const videoRef = useRef(null)
+  const visionGeneration = useRef(null)
+  const visionControlVersion = useRef(0)
+  const visionCommands = useRef(Promise.resolve())
+  const playIntent = useRef(0)
+  const playBusy = useRef(false)
   const matchViewRef = useRef(null)
-  const liveDurationMs = match.durationMs
+  const hasVideoSource = match.video?.kind === 'file' && Boolean(match.video.url)
+  const [mediaDurationMs, setMediaDurationMs] = useState(match.durationMs)
+  const liveDurationMs = hasVideoSource ? mediaDurationMs : match.durationMs
   const clock = useMatchClock(liveDurationMs, videoRef)
   const [seekVersion, setSeekVersion] = useState(0)
   const [snapshot, setSnapshot] = useState(null)
@@ -73,7 +82,6 @@ function LiveMatch({ match }) {
   const [selectedPlayerId, setSelectedPlayerId] = useState(null)
   const [selectedMomentId, setSelectedMomentId] = useState(null)
   const activeTab = TABS.includes(tab) ? tab : 'match'
-  const hasVideoSource = match.video?.kind === 'file' && Boolean(match.video.url)
   const matchAgentOpen = activeTab === 'match' && assistantOpen && !hasVideoSource
 
   useEffect(() => {
@@ -92,7 +100,7 @@ function LiveMatch({ match }) {
 
   const live = useLiveChannel({
     matchId,
-    prefs: apiPreferences,
+    prefs: scopedPreferences,
     playing: clock.playing,
     speed: clock.speed,
     timeRef: clock.timeRef,
@@ -104,7 +112,7 @@ function LiveMatch({ match }) {
     seekVersion,
     timeMs: clock.time,
   })
-  const visionChannel = useVisionObservationChannel(matchId, seekVersion)
+  const visionChannel = useVisionObservationChannel(matchId, seekVersion, clock.time)
   const visionCapture = useVisionCapture({
     matchId,
     playing: clock.playing,
@@ -112,31 +120,60 @@ function LiveMatch({ match }) {
     videoRef,
   })
 
+  const videoSecond = Math.floor(clock.time / 1000)
+  const sendVisionControl = useCallback((action, position) => {
+    const request = visionCommands.current.catch(() => {}).then(() => api.visionPlayback(action, position, matchId))
+    visionCommands.current = request
+    return request
+  }, [matchId])
+  useEffect(() => {
+    if (!hasVideoSource || !clock.playing) return
+    if (visionGeneration.current == null) return
+    api.visionPlayback('advance', Math.floor(clock.timeRef.current), matchId, visionGeneration.current)
+      .catch((error) => setActionError(error.message))
+  }, [hasVideoSource, clock.playing, clock.timeRef, matchId, videoSecond])
+
   const crossed = live.events.filter((event) => event.video_time_ms <= clock.time).length
   const pastEvents = useMemo(() => live.events.slice(0, crossed), [live.events, crossed])
   useEffect(() => {
     let active = true
-    api.state(matchId, clock.timeRef.current)
+    api.state(matchId, Math.min(clock.timeRef.current, match.durationMs))
       .then((s) => active && setSnapshot(s))
       .catch((err) => active && setActionError(err.message))
     return () => { active = false }
-  }, [matchId, crossed, seekVersion, clock.timeRef])
+  }, [match.durationMs, matchId, crossed, seekVersion, clock.timeRef])
 
   const seek = useCallback((value) => {
     const next = Math.min(Math.max(0, value), liveDurationMs)
     clock.seek(next)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'seek', next))
-    notify(api.visionPlayback('seek', next, matchId))
-  }, [clock, liveDurationMs, matchId])
+    visionGeneration.current = null
+    const version = ++visionControlVersion.current
+    sendVisionControl('seek', next)
+      .then((result) => { if (version === visionControlVersion.current) visionGeneration.current = result.playback_generation })
+      .catch((error) => setActionError(error.message))
+  }, [clock, liveDurationMs, matchId, sendVisionControl])
 
   const play = async () => {
-    if (preparingVision) return
+    if (playBusy.current) return
+    playBusy.current = true
+    const intent = ++playIntent.current
     setActionError(null)
+    try {
+    if (clock.timeRef.current >= liveDurationMs) {
+      clock.seek(0)
+      await sendVisionControl('restart', 0)
+      setSeekVersion((value) => value + 1)
+    }
     if (hasVideoSource) {
       setPreparingVision(true)
       try {
-        await api.prepareVisionModels()
+        await api.prepareVisionModels(matchId)
+        if (intent !== playIntent.current) return
+        const started = await sendVisionControl('play', clock.timeRef.current)
+        if (intent !== playIntent.current) return
+        visionGeneration.current = started.playback_generation
       } catch (err) {
         setActionError(err.message)
         setPreparingVision(false)
@@ -144,20 +181,51 @@ function LiveMatch({ match }) {
       }
       setPreparingVision(false)
     }
-    clock.play()
+    try {
+      await clock.play()
+      if (intent !== playIntent.current) { clock.pause(); return }
+    } catch (error) {
+      visionGeneration.current = null
+      await sendVisionControl('pause', clock.timeRef.current).catch(() => {})
+      setActionError(`${t.match.videoLoadError} ${error.message}`)
+      return
+    }
     notify(api.playback(matchId, 'play', clock.timeRef.current))
-    notify(api.visionPlayback('play', clock.timeRef.current, matchId))
+    if (!hasVideoSource) notify(sendVisionControl('play', clock.timeRef.current))
+    setSimulationStarted(true)
+    } catch (error) {
+      setActionError(error.message)
+    } finally {
+      playBusy.current = false
+      setPreparingVision(false)
+    }
   }
   const pause = () => {
+    playIntent.current += 1
     clock.pause()
+    visionGeneration.current = null
+    visionControlVersion.current += 1
     notify(api.playback(matchId, 'pause', clock.timeRef.current))
-    notify(api.visionPlayback('pause', clock.timeRef.current, matchId))
+    sendVisionControl('pause', clock.timeRef.current).catch((error) => setActionError(error.message))
   }
+
+  useEffect(() => () => {
+    // Navegar fuera del partido también detiene la captura del servidor.
+    playIntent.current += 1
+    sendVisionControl('pause', Math.floor(clock.timeRef.current)).catch(() => {})
+  }, [sendVisionControl, clock.timeRef])
   const replay = async () => {
+    pause()
     clock.seek(0)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'restart'))
-    notify(api.visionPlayback('restart', 0, matchId))
+    visionGeneration.current = null
+    try {
+      await sendVisionControl('restart', 0)
+    } catch (error) {
+      setActionError(error.message)
+      return
+    }
     await play()
   }
 
@@ -177,13 +245,17 @@ function LiveMatch({ match }) {
   }
 
   async function startSimulation() {
+    if (hasVideoSource) {
+      await play()
+      return
+    }
     setSimulationStarted(true)
     setSimulating(true)
     setActionError(null)
     if (finished) replay()
     else play()
     try {
-      await api.simulate(matchId, apiPreferences)
+      await api.simulate(matchId, scopedPreferences)
     } catch (error) {
       setActionError(error.message)
     } finally {
@@ -241,7 +313,7 @@ function LiveMatch({ match }) {
             <Button disabled={simulating} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {t.match.startLive}</Button>
           ) : (
             <>
-              <Button disabled={preparingVision} onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {preparingVision ? 'Preparando IA…' : (clock.playing ? t.match.pauseLive : t.match.resumeLive)}</Button>
+              <Button disabled={preparingVision} onClick={clock.playing ? pause : play} variant="lime"><Icon name={clock.playing ? 'pause' : 'play'} size={17} /> {preparingVision ? t.match.preparingModels : (clock.playing ? t.match.pauseLive : t.match.resumeLive)}</Button>
               <Button onClick={replay} variant="ghost"><Icon name="replay" size={17} /> {t.match.restartLive}</Button>
             </>
           )}
@@ -270,17 +342,19 @@ function LiveMatch({ match }) {
 
       <div className={`match-layout ${matchAgentOpen ? 'agent-open' : 'agent-closed'}`}>
         <div className="pitch-column" ref={matchViewRef}>
-          {activeTab === 'stats' ? (
+          {activeTab === 'stats' && (
             <StatsPanel metadata={metadata} snapshot={snapshot} timeMs={clock.time} />
-          ) : activeTab === 'summary' ? (
+          )}
+          {activeTab === 'summary' && (
             <div className="match-summary">
               <MomentWorkspace events={pastEvents} metadata={metadata} moment={selectedMoment} onOpen={openMoment} />
               <InsightsPanel events={pastEvents} metadata={metadata} moments={history} onOpen={openMoment} />
             </div>
-          ) : activeTab === 'tactical' ? (
+          )}
+          {activeTab === 'tactical' && (
             <TacticalPanel compact={false} events={pastEvents} matchId={matchId} metadata={metadata} />
-          ) : (
-            <>
+          )}
+          <div hidden={activeTab !== 'match'}>
               <div className="pitch-wrap">
                 <div className="match-view-controls">
                   {!hasVideoSource && <label className="live-comments-switch">
@@ -309,6 +383,11 @@ function LiveMatch({ match }) {
                       className="match-source-video"
                       crossOrigin="anonymous"
                       onEnded={pause}
+                      onError={() => { pause(); setActionError(t.match.videoLoadError) }}
+                      onLoadedMetadata={(event) => {
+                        const duration = event.currentTarget.duration * 1000
+                        if (Number.isFinite(duration) && duration > 0) setMediaDurationMs(Math.round(duration))
+                      }}
                       playsInline
                       preload="metadata"
                       ref={videoRef}
@@ -348,11 +427,10 @@ function LiveMatch({ match }) {
                   </button>
                 )}
                 {!hasVideoSource && <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />}
-                <VisionPanel capture={visionCapture} liveChannel={visionChannel} matchId={matchId} seekVersion={seekVersion} timeMs={clock.time} />
+                {hasVideoSource && <VisionPanel capture={visionCapture} liveChannel={visionChannel} matchId={matchId} metadata={metadata} onSeek={seek} seekVersion={seekVersion} timeMs={clock.time} />}
               </div>
               {!hasVideoSource && preferences.liveComments && <LiveCommentsPanel compact events={pastEvents} metadata={metadata} moments={history} timeMs={clock.time} />}
-            </>
-          )}
+          </div>
           <div className="playback">
             <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
               {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
@@ -396,7 +474,7 @@ function LiveMatch({ match }) {
         )}
         {matchAgentOpen && (
           <div className="match-agent-rail" id="match-agent-panel">
-            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, scopedPreferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, scopedPreferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} requestPreferences={scopedPreferences} timeRef={clock.timeRef} />
           </div>
         )}
       </div>

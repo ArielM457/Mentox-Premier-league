@@ -1,0 +1,46 @@
+{
+  "started_at": "2026-10-27T21:14:55.673298+00:00",
+  "endpoint": "https://ca-mentox-gamestate-dev.yellowdune-bc941df0.northcentralus.azurecontainerapps.io",
+  "video_bytes": 116020,
+  "media_sha256": "576cfc9bd1975b6cd7dec4150dcec6009f59c875b17a26226d8012091cacebdf",
+  "transport": "memory",
+  "scope": "remote_model_and_backend_adapter",
+  "identity_roster_verified": false,
+  "status": "failed",
+  "error_type": "GameStateFailedError",
+  "error": "GameState falló: GameState terminó con código 1",
+  "client_status": {
+    "configured": true,
+    "runs": 0,
+    "failures": 1,
+    "cached_detections": 0,
+    "analysis_id": null,
+    "device": "Tesla T4",
+    "tracking_frames": 0,
+    "metrics": 0,
+    "resolved_identities": 0,
+    "ambiguous_identities": 0,
+    "match_id": "gamestate-validation",
+    "media_sha256": "576cfc9bd1975b6cd7dec4150dcec6009f59c875b17a26226d8012091cacebdf",
+    "status": "failed",
+    "error": "GameState falló: GameState terminó con código 1",
+    "video": {
+      "fps": 15.0,
+      "frames": 30,
+      "duration_ms": 2000,
+      "width": 1920,
+      "height": 1080
+    },
+    "roster_verified": false,
+    "team_mapping_configured": false
+  },
+  "analysis_id": "990b074412a54de597e792a9a26b1443",
+  "elapsed_seconds": 124.649,
+  "finished_at": "2026-10-27T21:17:00.322239+00:00",
+  "download_log_lines": [
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth"
+  ]
+}

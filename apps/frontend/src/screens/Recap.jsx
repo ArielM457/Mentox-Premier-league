@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { api } from '../api/client.js'
 import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { formatMatchClock, momentIdOf } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
+import { preferencesForMatch } from '../lib/matchPreferences.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -18,6 +19,7 @@ export function Recap({ matchId }) {
   const { t, preferences, apiPreferences } = usePreferences()
   const { data: catalog, error: catalogError, reload } = useCatalog()
   const match = catalog?.matches.find((m) => m.id === matchId)
+  const scopedPreferences = useMemo(() => preferencesForMatch(apiPreferences, match?.metadata), [apiPreferences, match])
   const [summary, setSummary] = useState(null)
   const [moments, setMoments] = useState(null)
   const [error, setError] = useState(null)
@@ -26,7 +28,7 @@ export function Recap({ matchId }) {
     if (!match) return undefined
     recordExperience(matchId, 'recap')
     let active = true
-    Promise.all([api.summary(matchId, apiPreferences), api.overlays(matchId, apiPreferences, match.durationMs)])
+    Promise.all([api.summary(matchId, scopedPreferences), api.overlays(matchId, scopedPreferences, match.durationMs)])
       .then(([record, batch]) => {
         if (!active) return
         const top = batch.overlays
@@ -40,7 +42,7 @@ export function Recap({ matchId }) {
       })
       .catch((err) => active && setError(err.message))
     return () => { active = false }
-  }, [apiPreferences, match, matchId])
+  }, [scopedPreferences, match, matchId])
 
   return (
     <AppShell active="matches">

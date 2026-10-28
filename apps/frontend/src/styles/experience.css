@@ -153,9 +153,15 @@ select, textarea { font: inherit; }
 .vision-panel-inline { margin-top: 12px; padding: 16px; color: #ece9f5; background: linear-gradient(145deg, #211c3b, #17142a); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; }
 .vision-panel-inline h2 { margin: 3px 0 0; font-size: 16px; }
 .vision-statuses { display: flex; justify-content: flex-end; gap: 7px; flex-wrap: wrap; }
-.vision-summary { display: grid; grid-template-columns: minmax(180px, .65fr) minmax(360px, 1.35fr); gap: 14px; align-items: center; }
+.vision-summary { display: grid; grid-template-columns: minmax(180px, .6fr) minmax(210px, .7fr) minmax(360px, 1.35fr); gap: 14px; align-items: center; }
 .vision-summary > p { margin: 0; color: #aaa5bd; font-size: 10px; line-height: 1.5; }
-.vision-counters { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.vision-models { display: grid; gap: 6px; }
+.vision-models span { align-items: center; color: #aaa5bd; display: flex; font-size: 9px; gap: 7px; }
+.vision-models i { background: #77728a; border-radius: 50%; height: 7px; width: 7px; }
+.vision-models .ready i { background: var(--lime); box-shadow: 0 0 8px rgba(216,255,101,.5); }
+.vision-models .warming i { background: #ffcf5a; }
+.vision-models .disabled { opacity: .65; }
+.vision-counters { display: grid; gap: 10px; grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .vision-counters span { background: #24203d; border: 1px solid rgba(255,255,255,.07); border-radius: 10px; display: grid; padding: 10px; color: #aaa5bd; font-size: 9px; text-transform: uppercase; }
 .vision-counters strong { color: var(--lime); font-size: 18px; }
 .vision-feed { display: grid; gap: 7px; max-height: 230px; overflow: auto; }
@@ -171,3 +177,5 @@ select, textarea { font: inherit; }
   .vision-statuses { justify-content: flex-start; }
   .vision-counters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.vision-event-seek { background: transparent; border: 0; color: inherit; cursor: pointer; padding: 6px 0; }
+.vision-event-seek:hover, .vision-event-seek:focus-visible { text-decoration: underline; outline: 1px solid currentColor; outline-offset: 3px; }

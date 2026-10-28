@@ -8,11 +8,29 @@ Esta guía permite que un integrante del equipo despliegue los modelos que ya ti
 |---|---|---|---|
 | Roboflow Suite | Imagen JPEG, PNG o WebP | Jugadores, árbitro, balón y puntos del campo | Preparado para desplegar |
 | SoccerNet TeamSpotting | Clip MP4 de hasta 90 segundos | Candidatos de acciones con tiempo, equipo y confianza | Preparado para desplegar |
-| SoccerNet GameState | MP4 mediante TrackLab `ExternalVideo` | Estado, tracking, equipo, dorsal y calibración | Adaptador implementado; inferencia GPU pendiente |
+| SoccerNet GameState | MP4 mediante TrackLab `ExternalVideo` | Estado, tracking, equipo, dorsal y calibración | Retirado de la demo MESSI; Container App eliminado el 27 de octubre |
 
-GameState no se crea en Azure todavía. Su adaptador MP4 está implementado en
-DV-US-33, pero falta ejecutar el pipeline completo y comprobar calidad, memoria
-y duración antes de autorizar costos en Azure.
+GameState conserva su código experimental y sus pruebas, pero no debe
+desplegarse para la demo actual. Se continuará con Roboflow y TeamSpotting,
+complementados con datos del mismo partido MESSI y procedencia visible.
+La integración complementaria está implementada y probada localmente. El
+recorrido actualizado con ambos servicios remotos sigue pendiente de ejecutar.
+Use [la guía del flujo híbrido](guia-flujo-hibrido-messi.md) para preparar
+las variables y comprobar que los datos corresponden al vídeo.
+
+Antes de arrancar el backend desde una terminal que usó GameState, ejecute:
+
+```bash
+unset SOCCERNET_GAMESTATE_ENDPOINT SOCCERNET_GAMESTATE_API_KEY
+```
+
+Quite también esas variables de cualquier archivo local o configuración que
+las vuelva a exportar. Si el backend ya estaba ejecutándose, reinícielo desde
+esa terminal: cambiar variables en otra terminal no cambia el proceso activo.
+Esto evita que la preparación espere al servicio eliminado. No quite las
+variables de Roboflow, TeamSpotting, Blob Storage ni las colas.
+
+Véase [la evidencia del retiro](evidencias/gamestate-retiro-20261027.md).
 
 ## Requisitos del equipo
 
@@ -142,17 +160,27 @@ Para el análisis de fotogramas en la pantalla Partido, el backend usa estas var
 ```bash
 export ROBOFLOW_SUITE_ENDPOINT="https://<fqdn-roboflow>"
 export ROBOFLOW_SUITE_API_KEY="<clave-privada-del-servicio>"
+export SOCCERNET_ENDPOINT="https://<fqdn-teamspotting>"
+export SOCCERNET_API_KEY="<clave-privada-teamspotting>"
+export SOCCERNET_GAMESTATE_ENDPOINT="https://<fqdn-gamestate>"
+export SOCCERNET_GAMESTATE_API_KEY="<clave-privada-gamestate>"
 ```
 
-Antes de reproducir un MP4, el frontend llama `POST /api/v1/integration/live/models/prepare`. El backend consulta `/health/ready` del servicio. El video solo empieza si el modelo responde `ready`; si sigue en arranque en frío, la interfaz mantiene el video pausado y muestra el error. `MENTOX_MODEL_API_KEY` permanece como compatibilidad temporal, pero se recomienda la variable específica `ROBOFLOW_SUITE_API_KEY` cuando los servicios pertenecen a cuentas distintas.
+Antes de reproducir un MP4, el frontend llama `POST /api/v1/integration/live/models/prepare`. El backend prepara Roboflow, TeamSpotting y GameState en paralelo. El video solo empieza cuando los tres servicios configurados terminan; si alguno sigue iniciando o falla, la interfaz mantiene el video pausado y muestra el error. Use una clave específica por servicio porque pertenecen a cuentas distintas.
 
 ## GameState
 
 ```bash
-bash infra/azure/preflight-soccernet-gamestate.sh
+export MENTOX_MODEL_API_KEY="$(openssl rand -hex 32)"
+export MENTOX_ACCEPT_MODEL_LICENSES=1
+export MENTOX_IMAGE_BUILD_MODE=local
+
+bash infra/azure/gamestate-operator.sh deploy
+bash infra/azure/gamestate-operator.sh start
 ```
 
-El código de salida `2` es deliberado. El siguiente trabajo es ejecutar DV-US-27
-y DV-US-33 en GPU sobre un MP4 permitido, revisar sus salidas y solo entonces
-autorizar un despliegue.
+La guía completa, incluida la carga asíncrona, consulta, descarga de resultados
+y apagado, está en `deploy/azure-soccernet-gamestate/README.md`. GameState aún
+no se considera verificado: DV-US-36 enumera la evidencia que debe devolver la
+persona responsable de la segunda suscripción.
 

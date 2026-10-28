@@ -3,7 +3,7 @@
 ## Estado
 
 **Implementada y desplegada; prueba corta GPU verificada, lote de 30 pendiente.**
-**Última revisión:** 25 de octubre de 2026.
+**Última revisión:** 26 de octubre de 2026.
 
 Se preparó un Azure Container Apps Job para generar 30 vídeos tácticos sintéticos
 con MESSI en una T4. No se afirma que el lote exista en Storage hasta ejecutar el
@@ -93,12 +93,33 @@ decisión permite producir un catálogo de prueba sin almacenar 2.700 minutos de
 vídeo. La duración es configurable, pero un MP4 de 90 minutos por partido debe
 evaluarse por separado.
 
+Se añadió un modo `clean` para la reproducción dentro de The Prime Moment. Este
+modo usa la calidad 1920 × 1080 del render `rich`, pero elimina del MP4 el panel
+`MATCH EVENTS`, la minimapa, paneles tácticos, banca, línea de fuera de juego y
+las dos barras de energía que se dibujaban encima de cada jugador. Conserva
+cancha, jugadores, dorsales, balón, marcador y reloj. Los eventos y el tracking
+no se pierden: permanecen en sus archivos JSONL y pueden mostrarse en la interfaz
+sin quedar grabados permanentemente sobre la imagen.
+
+La primera ejecución Azure del modo `clean`,
+`job-mentox-messi-dev-q4um0z0`, terminó en `Succeeded` el 26 de octubre de 2026.
+La inspección visual detectó que los puntos dinámicos de la minimapa seguían
+dibujándose aunque su eje y fondo estuvieran ocultos. Se corrigió incluyendo
+`mm_view`, `mm_dots` y `mm_ball` en el conjunto de artistas invisibles. Esta
+corrección visual requiere reconstruir la imagen y repetir el preflight; no afecta
+los JSONL, el modo `rich` ni los demás componentes.
+
+La adaptación se mantiene como un parche pequeño sobre el commit fijado de MESSI.
+La construcción ejecuta `git apply --check` antes de instalarlo, por lo que una
+incompatibilidad futura falla de forma explícita.
+
 ## Archivos
 
 | Archivo | Propósito |
 |---|---|
 | `deploy/azure-messi-generator/Dockerfile` | Imagen CUDA/JAX y MESSI fijado |
 | `deploy/azure-messi-generator/generate_batch.py` | Generación, manifiestos, hashes y carga |
+| `deploy/azure-messi-generator/patches/clean-hud.patch` | Oculta el HUD técnico y las barras de energía en modo `clean` |
 | `deploy/azure-messi-generator/requirements.txt` | Azure Identity y Blob Storage fijados |
 | `deploy/azure-messi-generator/test_generate_batch.py` | Configuración, estilos y requisito CUDA |
 | `deploy/azure-messi-generator/README.md` | Alcance, artefactos y operación |
@@ -117,6 +138,7 @@ evaluarse por separado.
 - Simulación y renderizado a 15 Hz/FPS para evitar la captura de subpasos físicos.
 - Tracking persistido cada 15 pasos.
 - Renderizado táctico `light`.
+- Modo opcional `clean` en 1920 × 1080 para reproducción en la aplicación.
 - Timeout del Job: 86.400 segundos.
 - Una réplica y un reintento.
 
@@ -156,6 +178,8 @@ bash -n infra/azure/deploy-messi-generator.sh
 bash -n infra/azure/inspect-messi-generator.sh
 bash -n infra/azure/delete-messi-generator-job.sh
 python3.12 -m py_compile deploy/azure-messi-generator/generate_batch.py
+git -C /tmp/mentox-messi-source apply --check \
+  deploy/azure-messi-generator/patches/clean-hud.patch
 UV_CACHE_DIR=/tmp/mentox-uv-cache \
 uv run --project apps/backend --python 3.12 \
   python -m unittest deploy/azure-messi-generator/test_generate_batch.py
@@ -165,6 +189,12 @@ git diff --check
 Se inspeccionó la revisión fijada de MESSI y se verificaron sus opciones públicas
 `--compressed-match`, `--render-fps`, `--state-stride`, `--out` y la producción de
 `events.jsonl`, `tracking.jsonl` y `metadata.jsonl` junto al MP4.
+
+El 26 de octubre se validó que el parche `clean-hud.patch` aplica sin conflictos
+sobre el commit fijado, que el modo `clean` se traduce a `rich --clean-hud`, y que
+las ocho pruebas unitarias terminan correctamente. La comprobación visual del
+nuevo MP4 queda pendiente de reconstruir la imagen y ejecutar el preflight GPU;
+por ello todavía no se afirma que el render limpio esté verificado en Azure.
 
 Después de corregir la selección de identidad se repitieron `bash -n`, las cinco
 pruebas unitarias con Python 3.12 y `git diff --check`; todos terminaron

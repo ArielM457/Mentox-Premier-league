@@ -4,6 +4,7 @@ import { usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { formatClock, formatMatchClock, momentIdOf } from '../lib/overlays.js'
+import { preferencesForMatch } from '../lib/matchPreferences.js'
 import { Pitch } from '../components/match/Pitch.jsx'
 import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
@@ -27,7 +28,7 @@ export function MomentDetail({ matchId, momentId }) {
   const load = useCallback(async () => {
     if (!match) return
     try {
-      const batch = await api.overlays(matchId, apiPreferences, match.durationMs)
+      const batch = await api.overlays(matchId, preferencesForMatch(apiPreferences, match.metadata), match.durationMs)
       const found = batch.overlays.find((o) => momentIdOf(o) === momentId)
       if (!found) {
         setError(t.moment.notFound)

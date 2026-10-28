@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
 import { formatMatchClock } from '../../lib/overlays.js'
+import { describeSimulatedEvent } from '../../lib/simulatedEvent.js'
 import { Button } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 import { TeamBadge } from '../ui/TeamBadge.jsx'
@@ -416,10 +417,11 @@ function visionLabel(t, label) {
 
 function observationsForFrame(observations, matchId, timeMs) {
   const candidates = observations.filter((item) => (
-    item.kind === 'spatial_detection'
+    ['spatial_detection', 'game_state_detection'].includes(item.kind)
     && item.payload?.match_id === matchId
     && Array.isArray(item.payload?.bounding_box)
-    && Math.abs(item.timestamp_ms - timeMs) <= 2500
+    && item.timestamp_ms <= timeMs
+    && timeMs - item.timestamp_ms <= 1000
   ))
   const latestTimestamp = Math.max(-1, ...candidates.map((item) => item.timestamp_ms))
   return candidates.filter((item) => item.timestamp_ms === latestTimestamp)
@@ -428,9 +430,10 @@ function observationsForFrame(observations, matchId, timeMs) {
 function groupLiveObservations(observations) {
   const groups = new Map()
   for (const item of observations) {
-    const group = groups.get(item.timestamp_ms) ?? []
+    const timestamp = Math.round(item.timestamp_ms / 1000) * 1000
+    const group = groups.get(timestamp) ?? []
     group.push(item)
-    groups.set(item.timestamp_ms, group)
+    groups.set(timestamp, group)
   }
   return [...groups.entries()]
     .sort(([left], [right]) => right - left)
@@ -450,6 +453,37 @@ function detectionSummary(t, observations) {
   }).join(' · ')
 }
 
+function actionSummary(t, observations) {
+  return observations.map((item) => {
+    const label = t.match.visionActionLabels[item.payload?.label] ?? item.payload?.label ?? t.match.visionAction
+    const team = item.payload?.team ? ` · ${t.match.visionTeam} ${item.payload.team}` : ''
+    const confidence = Number(item.payload?.confidence)
+    const score = Number.isFinite(confidence) ? ` · ${(confidence * 100).toFixed(0)}%` : ''
+    return `${label}${team}${score}`
+  }).join(' · ')
+}
+
+function gameStateSummary(t, observations) {
+  const players = observations.filter((item) => ['player', 'goalkeeper'].includes(item.payload?.label))
+  const teams = new Set(players.map((item) => item.payload?.team).filter(Boolean))
+  const shirts = [...new Set(players.map((item) => item.payload?.jersey_number).filter((value) => value != null))]
+  const shirtCopy = shirts.length ? ` · ${t.match.visionShirts}: ${shirts.slice(0, 8).join(', ')}` : ''
+  return `${players.length} ${t.match.visionTrackedPlayers}${teams.size ? ` · ${teams.size} ${t.match.visionTeams}` : ''}${shirtCopy}`
+}
+
+function eventSummary(t, items, metadata) {
+  const simulated = items.filter((item) => item.kind === 'simulated_match_event')
+  if (simulated.length) return describeSimulatedEvent(simulated[0].payload, metadata, t.match.simulatedEvent)
+  const actions = items.filter((item) => item.kind === 'temporal_action')
+  const gameState = items.filter((item) => item.kind === 'game_state_detection')
+  const spatial = items.filter((item) => item.kind === 'spatial_detection')
+  if (actions.length) {
+    return { title: actionSummary(t, actions), evidence: t.match.visionActionEvidence }
+  }
+  if (gameState.length) return { title: gameStateSummary(t, gameState), evidence: t.match.visionGameStateEvidence }
+  return { title: `${t.match.visionLive} · ${detectionSummary(t, spatial)}`, evidence: t.match.visionFrameEvidence(spatial.length) }
+}
+
 export function VisionVideoOverlay({ observations, matchId, timeMs }) {
   const { t } = usePreferences()
   const detections = observationsForFrame(observations, matchId, timeMs)
@@ -458,13 +492,16 @@ export function VisionVideoOverlay({ observations, matchId, timeMs }) {
       {detections.map((item) => {
         const [x1, y1, x2, y2] = item.payload.bounding_box
         const label = visionLabel(t, item.payload.label)
+        const shirt = item.payload?.jersey_number != null ? ` #${item.payload.jersey_number}` : ''
+        const track = item.payload?.track_id ? ` · ${item.payload.track_id}` : ''
+        const confidence = Number(item.payload.confidence ?? item.payload.bbox_confidence)
         return (
           <span
             className={`vision-box vision-box-${item.payload.label ?? 'other'}`}
             key={item.observation_id}
             style={{ '--box-x': `${x1 * 100}%`, '--box-y': `${y1 * 100}%`, '--box-width': `${(x2 - x1) * 100}%`, '--box-height': `${(y2 - y1) * 100}%` }}
           >
-            <small>{label} · {(item.payload.confidence * 100).toFixed(0)}%</small>
+            <small>{label}{shirt}{track}{Number.isFinite(confidence) ? ` · ${(confidence * 100).toFixed(0)}%` : ''}</small>
           </span>
         )
       })}
@@ -472,7 +509,7 @@ export function VisionVideoOverlay({ observations, matchId, timeMs }) {
   )
 }
 
-export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId }) {
+export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId, metadata, onSeek }) {
   const { t } = usePreferences()
   const [status, setStatus] = useState(null)
   const [error, setError] = useState(null)
@@ -480,7 +517,7 @@ export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId
 
   useEffect(() => {
     let active = true
-    Promise.allSettled([
+    const refresh = () => Promise.allSettled([
       api.visionLiveStatus(),
       api.visionStatus(),
     ]).then(([liveResult, integrationResult]) => {
@@ -493,7 +530,9 @@ export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId
       })
       setError(liveReady || integrationReady ? null : t.match.visionUnavailable)
     })
-    return () => { active = false }
+    refresh()
+    const interval = window.setInterval(refresh, 5000)
+    return () => { active = false; window.clearInterval(interval) }
   }, [second, seekVersion, t.match.visionUnavailable])
 
   if (error) return (
@@ -508,12 +547,24 @@ export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId
     </section>
   )
   const liveObservations = (liveChannel?.observations ?? [])
-    .filter((item) => item.payload?.match_id === matchId && Math.abs(item.timestamp_ms - timeMs) <= 5000)
-  const liveFrames = groupLiveObservations(liveObservations)
+    .filter((item) => item.payload?.match_id === matchId && item.timestamp_ms <= timeMs && timeMs - item.timestamp_ms <= (item.kind === 'simulated_match_event' ? 30000 : 5000))
+  const liveFrames = [
+    ...liveObservations.filter((item) => item.kind === 'simulated_match_event')
+      .map((item) => ({ timestamp: item.timestamp_ms, items: [item], key: item.observation_id })),
+    ...groupLiveObservations(liveObservations.filter((item) => item.kind !== 'simulated_match_event'))
+      .map((frame) => ({ ...frame, key: `models-${frame.timestamp}` })),
+  ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 10)
   const captureLive = capture?.status === 'live'
-  const sessionObservations = (liveChannel?.observations ?? []).filter((item) => item.payload?.match_id === matchId)
+  const sessionObservations = (liveChannel?.observations ?? []).filter((item) => item.payload?.match_id === matchId && item.timestamp_ms <= timeMs)
   const spatialCount = sessionObservations.filter((item) => item.kind === 'spatial_detection').length
   const actionCount = sessionObservations.filter((item) => item.kind === 'temporal_action').length
+  const simulatedCount = sessionObservations.filter((item) => item.kind === 'simulated_match_event').length
+  const runtime = status.runtime ?? {}
+  const modelStates = [
+    { label: 'Roboflow', ready: runtime.live_capture?.model_ready, configured: runtime.live_capture?.configured },
+    { label: 'TeamSpotting', ready: runtime.teamspotting?.status === 'ready', configured: runtime.teamspotting?.configured, error: runtime.teamspotting?.error },
+    { label: 'MESSI', ready: runtime.simulator?.status === 'ready', configured: runtime.simulator?.configured, error: runtime.simulator?.error },
+  ]
 
   return (
     <section className="vision-panel vision-panel-inline" aria-live="polite">
@@ -526,20 +577,34 @@ export function VisionPanel({ timeMs, seekVersion, capture, liveChannel, matchId
       </header>
       <div className="vision-summary">
         <p>{t.match.visionNotice}</p>
+        <div className="vision-models" aria-label={t.match.visionModelsStatus}>
+          {modelStates.map((model) => (
+            <span className={model.ready ? 'ready' : model.configured ? 'warming' : 'disabled'} key={model.label} title={model.error || undefined}>
+              <i /> {model.label} · {model.error ? t.match.visionUnavailable : model.ready ? t.match.visionModelReady : model.configured ? t.match.visionModelWarming : t.match.visionModelDisabled}
+            </span>
+          ))}
+        </div>
         <div className="vision-counters">
           <span><strong>{capture?.processed ?? 0}</strong>{t.match.visionFrames}</span>
           <span><strong>{spatialCount}</strong>{t.match.visionDetections}</span>
           <span><strong>{actionCount}</strong>{t.match.visionActions}</span>
-          <span><strong>{status.fusion.match_events_published}</strong>MatchEvent</span>
+          <span><strong>{simulatedCount}</strong>{t.match.visionSimulatorEvents}</span>
         </div>
       </div>
       <div className="vision-feed">
-        {liveFrames.length ? liveFrames.map((frame) => (
-          <article className="vision-event-live" key={frame.timestamp}>
-            <time>{(frame.timestamp / 1000).toFixed(2)} s</time>
-            <div><strong>{t.match.visionLive} · {detectionSummary(t, frame.items)}</strong><small>{t.match.visionFrameEvidence(frame.items.length)}</small></div>
-          </article>
-        )) : <p className="vision-empty">{t.match.visionPlayPrompt}</p>}
+        {liveFrames.length ? liveFrames.map((frame) => {
+          const summary = eventSummary(t, frame.items, metadata)
+          const actions = frame.items.filter((item) => item.kind === 'temporal_action')
+          return (
+            <article className={`vision-event-live ${actions.length || frame.items[0]?.kind === 'simulated_match_event' ? 'vision-event-action' : ''}`} key={frame.key}>
+              <button className="vision-event-seek" onClick={() => onSeek?.(frame.timestamp)} title={t.match.visionSeekMoment} type="button"><time>{(frame.timestamp / 1000).toFixed(2)} s</time></button>
+              <div>
+                <strong>{summary.title}</strong>
+                <small>{summary.evidence}</small>
+              </div>
+            </article>
+          )
+        }) : <p className="vision-empty">{t.match.visionPlayPrompt}</p>}
       </div>
       {capture?.error && <p className="vision-error">{capture.error}</p>}
     </section>

@@ -1,0 +1,13 @@
+{
+  "checked_at_utc": "2026-10-27T22:08:50Z",
+  "subscription": "7d45d958-156a-4278-9935-755ba5a395ca",
+  "resource_group": "rg-prime-moment-dev",
+  "app": "ca-mentox-gamestate-dev",
+  "image": "mentox138f2e77.azurecr.io/mentox/soccernet-gamestate:60da675eaafb",
+  "latest_revision": "ca-mentox-gamestate-dev--0000015",
+  "min_replicas": 0,
+  "max_replicas": 1,
+  "replicas": [],
+  "revision_check": [{"name": "ca-mentox-gamestate-dev--0000015", "active": true, "replicas": 0}],
+  "note": "Confirmado por Azure CLI; consola de diagnóstico cerrada. No implica costo cero de ACR o almacenamiento."
+}

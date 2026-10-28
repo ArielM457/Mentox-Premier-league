@@ -1,0 +1,18 @@
+{
+  "analysis_id": "77755ee192bf4e3badd3475d464ed37a",
+  "status": "succeeded",
+  "created_at": "2026-10-27T21:35:10.691975+00:00",
+  "bytes": 116020,
+  "video": {
+    "fps": 15.0,
+    "frames": 30,
+    "duration_ms": 2000,
+    "width": 1920,
+    "height": 1080
+  },
+  "model": "SoccerNet GameState Reconstruction",
+  "started_at": "2026-10-27T21:35:10.693035+00:00",
+  "finished_at": "2026-10-27T21:35:34.164750+00:00",
+  "observations": 0,
+  "result_path": "/v1/analyses/77755ee192bf4e3badd3475d464ed37a/result"
+}

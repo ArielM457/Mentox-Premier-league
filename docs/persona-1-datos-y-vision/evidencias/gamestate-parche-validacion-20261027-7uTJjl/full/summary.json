@@ -1,0 +1,40 @@
+{
+  "started_at": "2026-10-27T21:35:38.152522+00:00",
+  "endpoint": "https://ca-mentox-gamestate-dev.yellowdune-bc941df0.northcentralus.azurecontainerapps.io",
+  "video_bytes": 4615080,
+  "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+  "transport": "memory",
+  "scope": "remote_model_and_backend_adapter",
+  "identity_roster_verified": false,
+  "status": "succeeded",
+  "observations": 4,
+  "tracking_frames": 0,
+  "roles": {
+    "player": 3,
+    "goalkeeper": 1
+  },
+  "teams": {
+    "right": 1,
+    "nan": 1,
+    "left": 2
+  },
+  "observations_with_jersey": 1,
+  "observations_with_pitch": 0,
+  "available_metrics": 0,
+  "video": {
+    "fps": 15.0,
+    "frames": 2700,
+    "duration_ms": 180000,
+    "width": 1920,
+    "height": 1080
+  },
+  "analysis_id": "bed13a88ebaf4110a00e74fce99d881f",
+  "elapsed_seconds": 1622.142,
+  "finished_at": "2026-10-27T22:02:40.299572+00:00",
+  "download_log_lines": [
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth"
+  ]
+}

@@ -93,6 +93,25 @@ def test_periods_are_never_joined() -> None:
     assert metrics["distance_covered_m"].value == pytest.approx(12.0, abs=0.01)
 
 
+def test_short_segments_separated_by_tracking_loss_do_not_form_a_speed_window() -> None:
+    path = _line(8, 0.6) + _line(8, 0.6, start_ms=5000, x0=40)
+    metrics = _by_key(player_tracking_metrics(_frames({"a-1": path})), "a-1")
+    assert metrics["distance_covered_m"].value == pytest.approx(9.6)
+    assert metrics["top_speed_kmh"].available is False
+    assert metrics["sprints"].value == 0
+
+
+def test_separate_sprints_do_not_merge_across_missing_tracking() -> None:
+    path = _line(8, 2) + _line(8, 2, start_ms=5000, x0=40)
+    metrics = _by_key(player_tracking_metrics(_frames({"a-1": path})), "a-1")
+    assert metrics["sprints"].value == 2
+
+
+def test_isolated_position_does_not_report_zero_distance_as_measured() -> None:
+    metrics = player_tracking_metrics(_frames({"a-1": [(0, 20, 30)]}))
+    assert all(item.available is False and item.value is None for item in metrics)
+
+
 def test_ball_and_shot_speed_use_the_second_after_the_shot() -> None:
     events = Events(video_offset_ms=0)
     shot = events.shot(2.0, A, "a-9", (80, 50), outcome=EventOutcome.SAVED)

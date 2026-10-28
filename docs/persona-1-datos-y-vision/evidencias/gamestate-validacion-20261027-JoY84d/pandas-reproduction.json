@@ -1,0 +1,10 @@
+{
+  "image": "mentox138f2e77.azurecr.io/mentox/soccernet-gamestate:37e20cf190c4",
+  "network": "none",
+  "gpu_requested": false,
+  "pandas": "2.3.3",
+  "batch_index": [1],
+  "label_lookup_0_raises_KeyError": true,
+  "positional_lookup_works": true,
+  "scope": "Reproducción mínima del error de indexación; no valida el pipeline corregido."
+}
