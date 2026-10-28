@@ -48,6 +48,9 @@ param(
     # $env:SUPABASE_URL o SUPABASE_URL de apps/backend/.env.
     [string] $SupabaseUrl,
 
+    # Vídeo MESSI en el contenedor authorized-videos del Storage del despliegue. Vacío: sin estadio.
+    [string] $VisionVideoBlobName = 'messi/messi-clean-2x180s-20261026/messi-001/match.mp4',
+
     # Carga el esquema y los datos ficticios en Supabase antes de la fase 2.
     [switch] $SeedDatabase,
 
@@ -490,6 +493,7 @@ $appParameters = $baseParameters + @{
     webImage       = $(if ($SkipWeb) { '' } else { $webImage })
     supabaseDbUrl  = $(if ($databaseUrl) { $databaseUrl } else { '' })
     supabaseUrl    = $(if ($SupabaseUrl) { $SupabaseUrl } else { '' })
+    visionVideoBlobName = $VisionVideoBlobName
     apiMinReplicas = $(if ($ApiAlwaysOn) { 1 } else { 0 })
     workerReplicas = $(if ($WorkerOn) { 1 } else { 0 })
     replayMatchId  = $ReplayMatchId

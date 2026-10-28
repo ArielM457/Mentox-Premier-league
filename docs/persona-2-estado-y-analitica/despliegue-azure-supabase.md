@@ -157,10 +157,25 @@ El script:
 | `-ApiAlwaysOn` | Mantiene una réplica de la API para evitar el arranque en frío el día de la demo |
 | `-ReplayMatchId`, `-ReplaySpeed` | Partido y velocidad del trabajo `replay` |
 | `-SupabaseUrl` | URL del proyecto de Supabase con la que la API valida las sesiones de los editores. Por defecto usa `$env:SUPABASE_URL` o `SUPABASE_URL` de `apps/backend/.env`; sin ella, la revisión editorial responde `503` |
+| `-VisionVideoBlobName` | Ruta del vídeo MESSI en el contenedor `authorized-videos` del Storage del despliegue. Por defecto, `messi/messi-clean-2x180s-20261026/messi-001/match.mp4`; vacía, la API muestra la cancha sintética |
 | `-InfraOnly` | Solo la fase 1 |
 | `-Yes` | No pide confirmación |
 
 Si no hay cadena de Supabase, la API usa los partidos sintéticos en memoria y no se crea el trabajo `replay`.
+
+### Estadio MESSI en Azure
+
+La pestaña Partido muestra el vídeo MESSI cuando la API puede leer el vídeo y sus cuatro archivos compañeros: `manifest.json`, `events.jsonl`, `tracking.jsonl` y `metadata.jsonl`. La API los lee de su propio Storage con su identidad administrada; no puede leer el Blob de Damon porque está en otro tenant. Antes del primer despliegue con estadio, copie los cinco archivos a `authorized-videos`, en la misma ruta. Su cuenta necesita el rol Storage Blob Data Contributor sobre ese Storage:
+
+```bash
+PREFIX=messi/messi-clean-2x180s-20261026/messi-001
+for f in manifest.json match.mp4 events.jsonl tracking.jsonl metadata.jsonl; do
+  az storage blob download --account-name stdamonhxwjzbiyupwqc --container-name synthetic-videos --name "$PREFIX/$f" --file "$f" --auth-mode login --subscription <suscripción-de-Damon>
+  az storage blob upload --account-name <storage-del-despliegue> --container-name authorized-videos --name "$PREFIX/$f" --file "$f" --auth-mode login --subscription <su-suscripción>
+done
+```
+
+Con el estadio activo, la API descarga esos archivos al arrancar. El reproductor solo acepta avances de la reproducción vigente que no superen el tiempo transcurrido, y solo el partido con vídeo puede preparar los modelos.
 
 ## Paso 4. Mostrar el flujo en directo
 

@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 import json
 import os
 from pathlib import PurePosixPath
+import time
 
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import BlobServiceClient
@@ -13,6 +14,10 @@ from match_intelligence.adapters.sources.messi_replay import convert_messi_repla
 from match_intelligence.application.realtime_observations import LiveObservation
 from match_intelligence.application.routing.contracts import RoutingEvaluationRequest
 from match_intelligence.domain.analytics.tracking import track_set_from_frames, tracking_metrics
+
+# Un avance pedido por HTTP no puede ir más rápido que el reproductor (8×), con margen de red.
+MAX_PLAYBACK_SPEED = 8
+ADVANCE_SLACK_MS = 2_000
 
 
 class SimulatedVideo:
@@ -27,6 +32,7 @@ class SimulatedVideo:
         self._session = None
         self._playing = False
         self._position = 0
+        self._position_at = time.monotonic()
         self._generation = 0
         self._delivered = set()
         self._routed = set()
@@ -93,6 +99,7 @@ class SimulatedVideo:
                 self._routed.clear()
                 self._pending.clear()
                 self._position, self._playing = 0, False
+                self._position_at = time.monotonic()
                 self.phase = "ready"
                 return self.status()
             except Exception as error:
@@ -180,7 +187,7 @@ class SimulatedVideo:
             if action == "pause":
                 self._playing = False
             if action in {"seek", "restart", "play"}:
-                self._position = position
+                self._position, self._position_at = position, time.monotonic()
                 if action == "play":
                     self._playing = True
                 elif action == "restart":
@@ -226,13 +233,31 @@ class SimulatedVideo:
                         self._delivered.add(observation.observation_id)
                         self._pending.pop(observation.observation_id, None)
                 if self._generation == current_generation:
-                    self._position = position
+                    self._position, self._position_at = position, time.monotonic()
                 self._observation_error = str(observation_error) if observation_error else None
                 if observation_error is not None:
                     raise RuntimeError(f"Observaciones pendientes de entrega: {observation_error}") from observation_error
             if action == "pause":
                 self._playing = False
             return self._generation
+
+    def advance_problem(self, match_id, position, generation):
+        """Motivo para rechazar un avance pedido por HTTP, o None si se puede aplicar.
+
+        El simulador es compartido: sin la generación vigente, cualquiera podría
+        adelantarlo y publicar eventos que todavía no ocurrieron en el vídeo. Un
+        avance con una generación vieja no es un problema: ``control`` lo ignora.
+        """
+        if self.replay is None or self.match_id != match_id:
+            return None
+        if generation is None:
+            return "El avance necesita playback_generation de la reproducción vigente"
+        if generation != self._generation or not self._playing:
+            return None
+        elapsed_ms = (time.monotonic() - self._position_at) * 1000
+        if position > self._position + elapsed_ms * MAX_PLAYBACK_SPEED + ADVANCE_SLACK_MS:
+            return "El avance supera el tiempo transcurrido de la reproducción"
+        return None
 
     def halt(self, match_id):
         """Pausa inmediata, también cuando una cola está esperando red."""

@@ -258,7 +258,7 @@
           "request": {
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/live/models/prepare?match_id=demo"
+            "url": "{{baseUrl}}/api/v1/integration/live/models/prepare?match_id=synthetic-live-001"
           },
           "event": [
             {
@@ -425,12 +425,12 @@
           ]
         },
         {
-          "name": "POST Preparar modelos de visión",
+          "name": "POST Preparar modelos de otro partido",
           "request": {
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/v1/integration/live/models/prepare",
-            "description": "Despierta la suite de Roboflow en la GPU antes de Play (DV-US-34). Sin ROBOFLOW_SUITE_ENDPOINT y su clave responde 503; configurada, 200 con el modelo listo."
+            "url": "{{baseUrl}}/api/v1/integration/live/models/prepare?match_id=synthetic-acceptance-001",
+            "description": "Solo el partido con vídeo puede despertar los modelos: otro partido responde 404 sin encender la GPU."
           },
           "event": [
             {
@@ -438,8 +438,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('HTTP 503', () => pm.response.to.have.status(503));",
-                  "pm.test('Explica la configuración que falta', () => pm.expect(pm.response.json().detail).to.include('ROBOFLOW_SUITE_ENDPOINT'));"
+                  "pm.test('HTTP 404', () => pm.response.to.have.status(404));"
                 ]
               }
             }

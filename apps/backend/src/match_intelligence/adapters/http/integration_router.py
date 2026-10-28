@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 import asyncio
 
 from datetime import UTC, datetime
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response, StreamingResponse
 from azure.identity.aio import DefaultAzureCredential
 from azure.storage.blob.aio import BlobServiceClient
@@ -335,10 +335,18 @@ async def live_video_analytics(
     }
 
 
+def _video_match(match_id: str = Query(min_length=1, max_length=160)) -> str:
+    """Solo el partido con vídeo se prepara: despertar los modelos cuesta y su estado es compartido.
+
+    Así nadie puede encender la GPU con otro partido ni dejar el del vídeo esperando un 409.
+    """
+    if match_id != os.getenv("VISION_STARTUP_MATCH_ID", "synthetic-live-001"):
+        raise HTTPException(status_code=404, detail="Este partido no tiene vídeo para preparar")
+    return match_id
+
+
 @router.post("/live/models/prepare")
-async def prepare_live_models(
-    match_id: str = Query(default="demo", min_length=1, max_length=160),
-) -> dict[str, object]:
+async def prepare_live_models(match_id: Annotated[str, Depends(_video_match)]) -> dict[str, object]:
     """Despierta el servicio de visión y no habilita Play hasta que esté listo."""
     try:
         # Una desconexión del navegador no debe cancelar la inferencia compartida.
@@ -491,6 +499,9 @@ async def playback_pause(position: PlaybackPositionRequest) -> dict[str, object]
 
 @router.post("/live/playback/advance")
 async def playback_advance(position: PlaybackPositionRequest) -> dict[str, object]:
+    problem = simulated_video.advance_problem(position.match_id, position.video_time_ms, position.playback_generation)
+    if problem:
+        raise HTTPException(status_code=409, detail=problem)
     try:
         await _simulator_control("advance", position)
         return await get_observation_playback().advance(position.video_time_ms)

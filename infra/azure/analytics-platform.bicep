@@ -45,6 +45,9 @@ param supabaseDbUrl string = ''
 @description('URL del proyecto de Supabase (https://<ref>.supabase.co). La API valida con ella las sesiones de los editores; vacía, la revisión editorial responde 503.')
 param supabaseUrl string = ''
 
+@description('Ruta del vídeo MESSI (…/match.mp4, con sus archivos compañeros) en el contenedor authorized-videos del Storage del despliegue. Vacía: la API muestra la cancha sintética.')
+param visionVideoBlobName string = ''
+
 @description('1 mantiene la API encendida (sin arranque en frío); 0 la apaga sin tráfico.')
 @minValue(0)
 @maxValue(1)
@@ -212,6 +215,21 @@ var editorAuthEnv = empty(supabaseUrl) ? [] : [
     value: supabaseUrl
   }
 ]
+// El estadio: la API descarga el vídeo MESSI y sus datos del Storage propio con su identidad.
+var stadiumEnv = empty(visionVideoBlobName) ? [] : [
+  {
+    name: 'AZURE_BLOB_SERVICE_ENDPOINT'
+    value: data.outputs.blobServiceEndpoint
+  }
+  {
+    name: 'VISION_VIDEO_CONTAINER'
+    value: 'authorized-videos'
+  }
+  {
+    name: 'VISION_VIDEO_BLOB_NAME'
+    value: visionVideoBlobName
+  }
+]
 var azureEnv = [
   {
     name: 'AZURE_CLIENT_ID'
@@ -301,7 +319,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
               name: 'COMMUNITY_EVENT_HUB_CONSUMER_GROUP'
               value: community.outputs.communityConsumerGroup
             }
-          ], databaseEnv, editorAuthEnv)
+          ], databaseEnv, editorAuthEnv, stadiumEnv)
           probes: [
             {
               // /matches carga los partidos (y su seguimiento) antes de recibir tráfico.
@@ -516,6 +534,7 @@ output apiUrl string = 'https://${apiFqdn}'
 output webUrl string = deployWeb ? 'https://${names.web}.${environment.properties.defaultDomain}' : ''
 output databaseConfigured bool = hasDatabase
 output editorAuthConfigured bool = !empty(supabaseUrl)
+output stadiumConfigured bool = !empty(visionVideoBlobName)
 output eventHubNamespaceName string = data.outputs.eventHubNamespaceName
 output eventHubFullyQualifiedNamespace string = data.outputs.eventHubFullyQualifiedNamespace
 output insightsEventHubName string = insights.outputs.insightsEventHubName
