@@ -61,8 +61,8 @@ class InsightCandidate(StrictModel):
 
 
 class ViewerPreferences(StrictModel):
-    language: Literal["es", "en"] = "es"
-    mode: Literal["casual", "analyst", "player"] = "casual"
+    language: Literal["es", "en", "de", "zh", "hi", "fr", "pt"] = "es"
+    mode: Literal["casual", "analyst", "professional_analyst", "player"] = "casual"
     level: Literal["simple", "normal", "advanced"] = "normal"
     favorite_team_id: str | None = None
     favorite_player_id: str | None = None
@@ -71,6 +71,8 @@ class ViewerPreferences(StrictModel):
     def player_mode_has_player(self) -> ViewerPreferences:
         if self.mode == "player" and not self.favorite_player_id:
             raise ValueError("player mode requires favorite_player_id")
+        if self.mode == "professional_analyst":
+            self.level = "advanced"
         return self
 
 
@@ -110,8 +112,8 @@ class NarrativeDraft(StrictModel):
     match_id: str = Field(min_length=1)
     period: int = Field(ge=1, le=4)
     clock_ms: int = Field(ge=0)
-    language: Literal["es", "en"]
-    mode: Literal["casual", "analyst", "player"]
+    language: Literal["es", "en", "de", "zh", "hi", "fr", "pt"]
+    mode: Literal["casual", "analyst", "professional_analyst", "player"]
     level: Literal["simple", "normal", "advanced"]
     content_kind: Literal["live", "answer", "final"]
     headline: str

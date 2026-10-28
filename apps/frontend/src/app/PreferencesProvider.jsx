@@ -45,7 +45,7 @@ export function PreferencesProvider({ children }) {
     const apiPreferences = {
       language: preferences.language,
       mode: preferences.mode === 'player' && !preferences.favoritePlayerId ? 'casual' : preferences.mode,
-      level: preferences.level,
+      level: preferences.mode === 'professional_analyst' ? 'advanced' : preferences.level,
       favoriteTeamId: preferences.favoriteTeamId,
       favoritePlayerId: preferences.favoritePlayerId,
     }

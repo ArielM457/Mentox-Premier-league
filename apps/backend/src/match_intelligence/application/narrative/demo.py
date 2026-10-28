@@ -16,7 +16,11 @@ def main() -> None:
     parser.add_argument("fixture", type=Path)
     parser.add_argument("--provider", choices=("fixture", "azure"), default="fixture")
     parser.add_argument("--language", choices=("es", "en"), default="es")
-    parser.add_argument("--mode", choices=("casual", "analyst", "player"), default="casual")
+    parser.add_argument(
+        "--mode",
+        choices=("casual", "analyst", "professional_analyst", "player"),
+        default="casual",
+    )
     parser.add_argument("--level", choices=("simple", "normal", "advanced"), default="normal")
     parser.add_argument("--favorite-team-id")
     parser.add_argument("--favorite-player-id")

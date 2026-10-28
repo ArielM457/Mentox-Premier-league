@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Sequence
 
+from match_intelligence.application.callouts import ActionCallout
 from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence, PersistedSummary
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
 from match_intelligence.domain.presentation import EditorialStatus, NarrativeDraft, OverlayMessage
@@ -122,6 +123,14 @@ class SupabaseMatchRepository:
         note: str | None,
         decided_at,
     ) -> None:
+        summary_type = next(
+            (tag.split(":", 1)[1] for tag in draft.applied_preferences if tag.startswith("summary_type:")),
+            "extended",
+        )
+        player_id = next(
+            (tag.split(":", 1)[1] for tag in draft.applied_preferences if tag.startswith("summary_player:")),
+            None,
+        )
         self._safe("save_summary", lambda: self._client.table("match_summaries").upsert({
             "draft_id": draft.draft_id,
             "match_id": match_id,
@@ -131,6 +140,8 @@ class SupabaseMatchRepository:
             "decided_at": decided_at.isoformat() if decided_at else None,
             "headline": draft.headline,
             "explanation": draft.explanation,
+            "summary_type": summary_type,
+            "player_id": player_id,
             "payload": draft.model_dump(mode="json"),
         }).execute())
 
@@ -154,3 +165,15 @@ class SupabaseMatchRepository:
             ]
 
         return self._safe_read("load_summaries", read, [])
+
+    def load_callouts(self) -> list[ActionCallout]:
+        def read() -> list[ActionCallout]:
+            response = (
+                self._client.table("action_callouts")
+                .select("callout_id,kind,language,text")
+                .eq("active", True)
+                .execute()
+            )
+            return [ActionCallout(**row) for row in (response.data or [])]
+
+        return self._safe_read("load_callouts", read, [])

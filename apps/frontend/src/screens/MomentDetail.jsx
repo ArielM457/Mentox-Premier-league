@@ -15,7 +15,7 @@ import { Icon } from '../components/ui/Icon.jsx'
 const STEP_MS = 900
 
 export function MomentDetail({ matchId, momentId }) {
-  const { t, apiPreferences } = usePreferences()
+  const { t, apiPreferences, preferences } = usePreferences()
   const { data: catalog, error: catalogError, reload } = useCatalog()
   const match = catalog?.matches.find((m) => m.id === matchId)
   const [overlay, setOverlay] = useState(null)
@@ -50,7 +50,7 @@ export function MomentDetail({ matchId, momentId }) {
   const back = () => navigate(paths.match(matchId))
 
   return (
-    <main className="detail-page">
+    <main className={`detail-page ${['analyst', 'professional_analyst'].includes(preferences.mode) ? 'analyst-moment-detail' : ''}`}>
       <header className="detail-header">
         <Button variant="ghost" onClick={back}>
           <Icon name="back" /> {t.moment.back}

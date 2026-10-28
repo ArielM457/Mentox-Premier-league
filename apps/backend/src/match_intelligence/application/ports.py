@@ -16,6 +16,7 @@ from match_intelligence.domain.presentation import (
     InsightCandidate,
     MatchSnapshot,
     NarrativeDraft,
+    SummaryType,
     ViewerPreferences,
 )
 
@@ -74,6 +75,8 @@ class NarrativePort(Protocol):
         snapshot: MatchSnapshot,
         candidates: Sequence[InsightCandidate],
         preferences: ViewerPreferences,
+        summary_type: SummaryType = SummaryType.EXTENDED,
+        player_id: str | None = None,
     ) -> NarrativeDraft: ...
 
     def verify(

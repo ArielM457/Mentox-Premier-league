@@ -38,6 +38,7 @@ const es = {
   modes: {
     casual: { name: 'Aficionado', description: 'Explicaciones claras y sencillas' },
     analyst: { name: 'Analista', description: 'Más detalle táctico y datos' },
+    professional_analyst: { name: 'Analista profesional', description: 'Vista inclinada, narración completa y datos avanzados' },
     player: { name: 'Centrado en jugador', description: 'Sigue a tu jugador durante todo el partido' },
   },
   levels: {
@@ -98,9 +99,12 @@ const es = {
     playersOf: (club) => `Jugadores de ${club}`,
     chooseClubFirst: 'Elige primero un club',
     playerCopy: 'Selecciona al jugador que quieres seguir.',
+    noPlayers: 'Este club todavía no tiene jugadores cargados en los partidos de la demo. Puedes continuar sin elegir uno.',
     chooseClub: 'Elegir un club',
     modeTitle: 'Modo de visualización',
     modeCopy: 'Elige cómo quieres ver y entender cada jugada.',
+    selectionTitle: 'Resumen de tu experiencia',
+    selectionCopy: 'Esto es lo que elegiste. Puedes cambiarlo después en Preferencias.',
     finish: 'Explorar partidos',
     crest: (club) => `Escudo de ${club}`,
   },
@@ -431,6 +435,25 @@ const es = {
   recap: {
     kicker: 'Final · Resumen del partido',
     title: (n) => `Un partido. ${n} momentos clave.`,
+    chooseKicker: 'Elige el cierre',
+    chooseTitle: '¿Qué resumen quieres ver?',
+    choosePlayer: 'Jugador para el resumen personalizado',
+    liveKicker: 'Resumen hasta este momento',
+    liveCopy: 'Se actualiza con las jugadas que ya ocurrieron. No muestra acciones futuras.',
+    liveResult: (type) => `${type} del partido en vivo`,
+    liveEmpty: 'Todavía no ocurrió una jugada que corresponda a este tipo de resumen.',
+    mockLabel: 'Resumen sintético de la demo',
+    mockHeadline: (home, homeScore, away, awayScore) => `${home} ${homeScore} - ${awayScore} ${away}`,
+    mockExplanation: (type) => type === 'short'
+      ? 'Resumen mock del partido pasado con sus goles registrados.'
+      : type === 'player_danger'
+        ? 'Resumen mock de las acciones de peligro del jugador elegido.'
+        : 'Resumen mock con el marcador y los momentos disponibles del partido pasado.',
+    types: {
+      short: { name: 'Resumen corto', description: 'Solo los goles, pensado para cerrar el programa.' },
+      extended: { name: 'Resumen extendido', description: 'Goles, estadísticas y momentos importantes del juego.' },
+      player_danger: { name: 'Resumen personalizado', description: 'Solo jugadas de peligro del jugador que elijas.' },
+    },
     summaryKicker: 'Resumen del partido',
     personal: (mode) => `Personalizado para ${mode}`,
     status: { pending: 'Pendiente de revisión', approved: 'Aprobado y publicado', rejected: 'Rechazado' },
@@ -547,6 +570,7 @@ const en = {
   modes: {
     casual: { name: 'Casual fan', description: 'Clear, simple explanations' },
     analyst: { name: 'Analyst', description: 'More tactical detail and data' },
+    professional_analyst: { name: 'Professional analyst', description: 'Angled view, full commentary and advanced data' },
     player: { name: 'Player focus', description: 'Follow your player all match long' },
   },
   levels: {
@@ -607,9 +631,12 @@ const en = {
     playersOf: (club) => `${club} players`,
     chooseClubFirst: 'Pick a club first',
     playerCopy: 'Select the player you want to follow.',
+    noPlayers: 'This club does not have players loaded in the demo matches yet. You can continue without choosing one.',
     chooseClub: 'Pick a club',
     modeTitle: 'View mode',
     modeCopy: 'Choose how you want to see and understand each play.',
+    selectionTitle: 'Your experience summary',
+    selectionCopy: 'This is what you selected. You can change it later in Preferences.',
     finish: 'Explore matches',
     crest: (club) => `${club} crest`,
   },
@@ -939,6 +966,25 @@ const en = {
   recap: {
     kicker: 'Full time · Match recap',
     title: (n) => `One match. ${n} turning points.`,
+    chooseKicker: 'Choose the ending',
+    chooseTitle: 'Which recap do you want to watch?',
+    choosePlayer: 'Player for the personalised recap',
+    liveKicker: 'Recap up to this moment',
+    liveCopy: 'It updates with plays that have already happened. It does not reveal future actions.',
+    liveResult: (type) => `${type} for the live match`,
+    liveEmpty: 'No play matches this recap type yet.',
+    mockLabel: 'Synthetic demo recap',
+    mockHeadline: (home, homeScore, away, awayScore) => `${home} ${homeScore} - ${awayScore} ${away}`,
+    mockExplanation: (type) => type === 'short'
+      ? 'Mock recap of the past match with its recorded goals.'
+      : type === 'player_danger'
+        ? 'Mock recap of the selected player’s dangerous actions.'
+        : 'Mock recap with the score and available moments from the past match.',
+    types: {
+      short: { name: 'Short recap', description: 'Goals only, designed to close the programme.' },
+      extended: { name: 'Extended recap', description: 'Goals, statistics and important moments from the match.' },
+      player_danger: { name: 'Personalised recap', description: 'Only dangerous plays involving the player you choose.' },
+    },
     summaryKicker: 'Match summary',
     personal: (mode) => `Personalised for ${mode}`,
     status: { pending: 'Pending review', approved: 'Approved and published', rejected: 'Rejected' },
@@ -1038,4 +1084,78 @@ const en = {
   },
 }
 
-export const strings = { es, en }
+function translated(base, overrides) {
+  const result = { ...base }
+  for (const [key, value] of Object.entries(overrides)) {
+    result[key] = value && typeof value === 'object' && !Array.isArray(value)
+      ? translated(base[key] ?? {}, value)
+      : value
+  }
+  return result
+}
+
+const locale = (modes, onboarding, profile, recap, common) => translated(en, {
+  common,
+  modes,
+  onboarding,
+  profile,
+  recap,
+})
+
+const de = locale(
+  {
+    casual: { name: 'Fan', description: 'Klare und einfache Erklärungen' },
+    analyst: { name: 'Analyst', description: 'Mehr taktische Details und Daten' },
+    professional_analyst: { name: 'Profi-Analyst', description: 'Geneigte Ansicht, vollständiger Kommentar und erweiterte Daten' },
+    player: { name: 'Spielerfokus', description: 'Folge deinem Spieler durch das ganze Spiel' },
+  },
+  { languageTitle: 'In welcher Sprache möchtest du das Spiel erleben?', languageCopy: 'Passt die Oberfläche und Erklärungen an.', modeTitle: 'Erlebnismodus', modeCopy: 'Wähle, wie du jede Aktion sehen und verstehen möchtest.' },
+  { language: 'Sprache', club: 'Lieblingsverein', player: 'Lieblingsspieler', mode: 'Erlebnismodus', level: 'Erklärungsniveau', playerNeeded: 'Der Spielerfokus benötigt einen Lieblingsspieler.' },
+  { chooseKicker: 'Abschluss wählen', chooseTitle: 'Welche Zusammenfassung möchtest du sehen?', choosePlayer: 'Spieler für die persönliche Zusammenfassung', types: { short: { name: 'Kurze Zusammenfassung', description: 'Nur Tore, als Abschluss der Sendung.' }, extended: { name: 'Ausführliche Zusammenfassung', description: 'Tore, Statistiken und wichtige Spielszenen.' }, player_danger: { name: 'Persönliche Zusammenfassung', description: 'Nur gefährliche Aktionen des gewählten Spielers.' } } },
+  { save: 'Einstellungen speichern', saved: 'Einstellungen gespeichert', none: 'Keine', shirt: 'Trikotnummer' },
+)
+
+const zh = locale(
+  { casual: { name: '球迷', description: '清晰简洁的说明' }, analyst: { name: '分析师', description: '更多战术细节和数据' }, professional_analyst: { name: '专业分析师', description: '倾斜视角、完整解说和高级数据' }, player: { name: '球员视角', description: '全场关注你选择的球员' } },
+  { languageTitle: '你想用哪种语言体验比赛？', languageCopy: '界面和比赛说明会随之调整。', modeTitle: '体验模式', modeCopy: '选择你理解每次进攻的方式。' },
+  { language: '语言', club: '喜爱的俱乐部', player: '喜爱的球员', mode: '体验模式', level: '说明级别', playerNeeded: '球员视角需要先选择一名球员。' },
+  { chooseKicker: '选择赛后内容', chooseTitle: '你想看哪种比赛摘要？', choosePlayer: '选择个性化摘要的球员', types: { short: { name: '简短摘要', description: '只看进球，适合节目收尾。' }, extended: { name: '完整摘要', description: '进球、统计和比赛关键时刻。' }, player_danger: { name: '个性化摘要', description: '只看所选球员参与的危险进攻。' } } },
+  { save: '保存偏好', saved: '偏好已保存', none: '无', shirt: '球衣号码' },
+)
+
+const hi = locale(
+  { casual: { name: 'प्रशंसक', description: 'स्पष्ट और सरल व्याख्या' }, analyst: { name: 'विश्लेषक', description: 'अधिक रणनीतिक विवरण और आँकड़े' }, professional_analyst: { name: 'पेशेवर विश्लेषक', description: 'झुका हुआ दृश्य, पूर्ण कमेंट्री और उन्नत आँकड़े' }, player: { name: 'खिलाड़ी केंद्रित', description: 'पूरे मैच में अपने खिलाड़ी को देखें' } },
+  { languageTitle: 'आप मैच किस भाषा में देखना चाहते हैं?', languageCopy: 'इंटरफ़ेस और व्याख्याएँ उसी भाषा में होंगी।', modeTitle: 'अनुभव मोड', modeCopy: 'चुनें कि आप हर खेल को कैसे समझना चाहते हैं।' },
+  { language: 'भाषा', club: 'पसंदीदा क्लब', player: 'पसंदीदा खिलाड़ी', mode: 'अनुभव मोड', level: 'व्याख्या स्तर', playerNeeded: 'खिलाड़ी मोड के लिए पसंदीदा खिलाड़ी चुनें।' },
+  { chooseKicker: 'समापन चुनें', chooseTitle: 'आप कौन सा सारांश देखना चाहते हैं?', choosePlayer: 'व्यक्तिगत सारांश के लिए खिलाड़ी', types: { short: { name: 'छोटा सारांश', description: 'सिर्फ गोल, कार्यक्रम के समापन के लिए।' }, extended: { name: 'विस्तृत सारांश', description: 'गोल, आँकड़े और मैच के महत्वपूर्ण क्षण।' }, player_danger: { name: 'व्यक्तिगत सारांश', description: 'चुने हुए खिलाड़ी की केवल खतरनाक चालें।' } } },
+  { save: 'पसंद सहेजें', saved: 'पसंद सहेजी गई', none: 'कोई नहीं', shirt: 'जर्सी नंबर' },
+)
+
+const fr = locale(
+  { casual: { name: 'Supporter', description: 'Des explications claires et simples' }, analyst: { name: 'Analyste', description: 'Plus de détails tactiques et de données' }, professional_analyst: { name: 'Analyste professionnel', description: 'Vue inclinée, commentaire complet et données avancées' }, player: { name: 'Suivi joueur', description: 'Suivez votre joueur pendant tout le match' } },
+  { languageTitle: 'Dans quelle langue voulez-vous vivre le match ?', languageCopy: 'L’interface et les explications seront adaptées.', modeTitle: 'Mode d’expérience', modeCopy: 'Choisissez comment voir et comprendre chaque action.' },
+  { language: 'Langue', club: 'Club favori', player: 'Joueur favori', mode: 'Mode d’expérience', level: 'Niveau d’explication', playerNeeded: 'Le suivi joueur nécessite un joueur favori.' },
+  { chooseKicker: 'Choisissez la conclusion', chooseTitle: 'Quel résumé voulez-vous voir ?', choosePlayer: 'Joueur du résumé personnalisé', types: { short: { name: 'Résumé court', description: 'Uniquement les buts, pour conclure l’émission.' }, extended: { name: 'Résumé étendu', description: 'Buts, statistiques et moments importants du match.' }, player_danger: { name: 'Résumé personnalisé', description: 'Uniquement les actions dangereuses du joueur choisi.' } } },
+  { save: 'Enregistrer les préférences', saved: 'Préférences enregistrées', none: 'Aucun', shirt: 'Numéro' },
+)
+
+const pt = locale(
+  { casual: { name: 'Torcedor', description: 'Explicações claras e simples' }, analyst: { name: 'Analista', description: 'Mais detalhes táticos e dados' }, professional_analyst: { name: 'Analista profissional', description: 'Vista inclinada, narração completa e dados avançados' }, player: { name: 'Foco no jogador', description: 'Acompanhe seu jogador durante toda a partida' } },
+  { languageTitle: 'Em qual idioma você quer viver a partida?', languageCopy: 'A interface e as explicações serão adaptadas.', modeTitle: 'Modo de experiência', modeCopy: 'Escolha como ver e entender cada jogada.' },
+  { language: 'Idioma', club: 'Clube favorito', player: 'Jogador favorito', mode: 'Modo de experiência', level: 'Nível de explicação', playerNeeded: 'O foco no jogador precisa de um jogador favorito.' },
+  { chooseKicker: 'Escolha o encerramento', chooseTitle: 'Qual resumo você quer ver?', choosePlayer: 'Jogador do resumo personalizado', types: { short: { name: 'Resumo curto', description: 'Somente gols, para encerrar o programa.' }, extended: { name: 'Resumo estendido', description: 'Gols, estatísticas e momentos importantes da partida.' }, player_danger: { name: 'Resumo personalizado', description: 'Somente jogadas perigosas do jogador escolhido.' } } },
+  { save: 'Salvar preferências', saved: 'Preferências salvas', none: 'Nenhum', shirt: 'Camisa' },
+)
+
+Object.assign(de.onboarding, { selectionTitle: 'Zusammenfassung deiner Auswahl', selectionCopy: 'Das hast du ausgewählt. Du kannst es später in den Einstellungen ändern.' })
+Object.assign(de.recap, { liveKicker: 'Zusammenfassung bis jetzt', liveCopy: 'Sie enthält nur bereits gespielte Szenen.', liveResult: (type) => `${type} des laufenden Spiels`, liveEmpty: 'Für diese Zusammenfassung gibt es noch keine passende Szene.', mockLabel: 'Synthetische Demo-Zusammenfassung', mockHeadline: (home, hs, away, as) => `${home} ${hs} - ${as} ${away}`, mockExplanation: () => 'Mock-Zusammenfassung des vergangenen Demo-Spiels.' })
+Object.assign(zh.onboarding, { selectionTitle: '你的体验摘要', selectionCopy: '这是你的选择，之后可以在偏好设置中修改。' })
+Object.assign(zh.recap, { liveKicker: '当前比赛摘要', liveCopy: '只包含已经发生的比赛片段。', liveResult: (type) => `直播比赛的${type}`, liveEmpty: '目前没有符合此摘要类型的片段。', mockLabel: '合成演示摘要', mockHeadline: (home, hs, away, as) => `${home} ${hs} - ${as} ${away}`, mockExplanation: () => '过去演示比赛的模拟摘要。' })
+Object.assign(hi.onboarding, { selectionTitle: 'आपके अनुभव का सारांश', selectionCopy: 'यह आपका चयन है। इसे बाद में पसंद में बदल सकते हैं।' })
+Object.assign(hi.recap, { liveKicker: 'अब तक का सारांश', liveCopy: 'इसमें केवल हो चुकी चालें दिखाई जाती हैं।', liveResult: (type) => `लाइव मैच का ${type}`, liveEmpty: 'इस सारांश के लिए अभी कोई चाल नहीं है।', mockLabel: 'सिंथेटिक डेमो सारांश', mockHeadline: (home, hs, away, as) => `${home} ${hs} - ${as} ${away}`, mockExplanation: () => 'पिछले डेमो मैच का मॉक सारांश।' })
+Object.assign(fr.onboarding, { selectionTitle: 'Résumé de votre expérience', selectionCopy: 'Voici votre choix. Vous pourrez le modifier dans les préférences.' })
+Object.assign(fr.recap, { liveKicker: 'Résumé jusqu’à maintenant', liveCopy: 'Il contient uniquement les actions déjà jouées.', liveResult: (type) => `${type} du match en direct`, liveEmpty: 'Aucune action ne correspond encore à ce résumé.', mockLabel: 'Résumé synthétique de la démo', mockHeadline: (home, hs, away, as) => `${home} ${hs} - ${as} ${away}`, mockExplanation: () => 'Résumé mock du match passé de la démo.' })
+Object.assign(pt.onboarding, { selectionTitle: 'Resumo da sua experiência', selectionCopy: 'Estas são suas escolhas. Você pode alterá-las depois em Preferências.' })
+Object.assign(pt.recap, { liveKicker: 'Resumo até este momento', liveCopy: 'Mostra somente as jogadas que já aconteceram.', liveResult: (type) => `${type} da partida ao vivo`, liveEmpty: 'Ainda não há uma jogada para este tipo de resumo.', mockLabel: 'Resumo sintético da demo', mockHeadline: (home, hs, away, as) => `${home} ${hs} - ${as} ${away}`, mockExplanation: (type) => type === 'short' ? 'Resumo mock do jogo passado apenas com os gols.' : type === 'player_danger' ? 'Resumo mock das jogadas de perigo do jogador escolhido.' : 'Resumo mock com os momentos do jogo passado.' })
+
+export const strings = { es, en, de, zh, hi, fr, pt }

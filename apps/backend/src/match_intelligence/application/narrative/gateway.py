@@ -66,7 +66,10 @@ class FixtureGateway:
             indexes.sort(
                 key=lambda index: candidate.facts[index].team_id != preferences.favorite_team_id
             )
-        limit = 1 if preferences.mode == "casual" or preferences.level == "simple" else 2
+        if preferences.mode == "professional_analyst":
+            limit = 3
+        else:
+            limit = 1 if preferences.mode == "casual" or preferences.level == "simple" else 2
         return NarrativePlan(
             fact_indexes=indexes[:limit],
             angle="decisive" if candidate.kind in {"goal", "shot"} else "observed",

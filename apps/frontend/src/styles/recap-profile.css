@@ -1,6 +1,25 @@
 /* Resumen final y perfil. Basado en el diseño de Figma de Persona 5. */
 /* Recap and profile */
 .recap-content > .match-score { max-width: 650px; margin: auto 0 28px; color: var(--navy); background: white; border-color: var(--line); }
+.summary-picker { margin: 0 0 28px; padding: 24px; color: var(--text); background: var(--surface-raised, white); border: 1px solid var(--line); border-radius: 22px; }
+.summary-picker h2 { margin: 6px 0 18px; }
+.summary-type-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.summary-type-grid button { min-height: 104px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 15px; text-align: left; }
+.summary-type-grid button.selected { border: 2px solid var(--violet); background: var(--surface-soft, #f5f1ff); }
+.summary-type-grid strong, .summary-type-grid small { display: block; }
+.summary-type-grid small { margin-top: 5px; color: var(--muted); line-height: 1.4; }
+.summary-player-select { max-width: 420px; margin-top: 18px; display: grid; gap: 7px; font-weight: 700; }
+.summary-player-select select { min-height: 44px; padding: 0 12px; color: inherit; background: var(--surface-raised, white); border: 1px solid var(--line); border-radius: 10px; }
+.live-summary-picker { margin: 0; }
+.live-summary-picker > div:first-child > p { margin: -8px 0 18px; color: var(--muted); }
+.live-summary-result { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+.live-summary-result h3 { margin: 0 0 12px; }
+.compact-summary-picker { padding: 13px 16px; display: flex; align-items: end; gap: 12px; }
+.summary-mode-select, .compact-player-select { min-width: 0; display: grid; gap: 6px; color: var(--text); font-size: 12px; font-weight: 800; }
+.summary-mode-select { flex: 1; }
+.compact-player-select { flex: 0 1 360px; max-width: none; margin-top: 0; }
+.summary-mode-select select, .compact-player-select select { width: 100%; min-height: 42px; padding: 0 38px 0 12px; color: inherit; background: var(--surface-raised, white); border: 1px solid var(--line); border-radius: 10px; text-overflow: ellipsis; }
+.recap-list.compact button { min-height: 72px; }
 .recap-hero { min-height: 350px; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; color: white; background: var(--navy); border-radius: 26px; overflow: hidden; }
 .recap-art { height: 100%; position: relative; display: grid; place-items: center; background: var(--violet); overflow: hidden; }
 .recap-art .player-illustration { width: 105%; margin: 0 0 -45% -20%; }
@@ -45,7 +64,7 @@
 .player-options button > img { width: 42px; height: 42px; object-fit: cover; object-position: center top; border-radius: 11px; }
 .player-options strong, .player-options small { display: block; }
 .player-options small { color: var(--muted); font-size: 10px; }
-.profile-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.profile-modes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .profile-modes button { padding: 16px; display: flex; gap: 12px; align-items: center; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
 .profile-modes button.selected { border: 2px solid var(--violet); background: #f1ebff; }
 .profile-modes .icon { color: var(--violet); }

@@ -1,0 +1,70 @@
+create table if not exists public.action_callouts (
+  callout_id text primary key,
+  kind text not null,
+  language text not null default 'es',
+  text text not null check (char_length(text) between 8 and 180),
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists action_callouts_kind_language_idx
+  on public.action_callouts (kind, language) where active;
+
+alter table public.action_callouts enable row level security;
+
+insert into public.action_callouts (callout_id, kind, language, text) values
+  ('cta-goal-01', 'goal', 'es', '¿Cómo nació el gol? Revisa la jugada completa.'),
+  ('cta-goal-02', 'goal', 'es', 'El marcador cambió. Mira los eventos que explican el gol.'),
+  ('cta-goal-03', 'goal', 'es', '¿Gol inevitable o error evitable? Descubre qué pasó.'),
+  ('cta-goal-04', 'goal', 'es', 'La red se movió, pero la historia empezó antes. Mírala.'),
+  ('cta-goal-05', 'goal', 'es', '¿Quién hizo posible el gol? Sigue la secuencia.'),
+  ('cta-shot-01', 'shot', 'es', '¿Era una ocasión clara? Mira la posición y el contexto.'),
+  ('cta-shot-02', 'shot', 'es', 'El remate cuenta una historia. Revisa cómo se creó.'),
+  ('cta-shot-03', 'shot', 'es', '¿Peligro real o intento lejano? Comprueba la jugada.'),
+  ('cta-shot-04', 'shot', 'es', 'Estuvo cerca. Mira qué abrió el espacio para rematar.'),
+  ('cta-shot-05', 'shot', 'es', '¿Quién fabricó esta ocasión? Sigue el ataque.'),
+  ('cta-progressive_pass-01', 'progressive_pass', 'es', '¿Un pase que rompió líneas? Mira cuánto avanzó.'),
+  ('cta-progressive_pass-02', 'progressive_pass', 'es', 'Ese pase cambió el ataque. Descubre por qué.'),
+  ('cta-progressive_pass-03', 'progressive_pass', 'es', '¿Pase de gol en camino? Revisa la secuencia.'),
+  ('cta-progressive_pass-04', 'progressive_pass', 'es', 'El balón encontró un espacio. Mira cómo ocurrió.'),
+  ('cta-progressive_pass-05', 'progressive_pass', 'es', 'Un pase puede cambiarlo todo. Comprueba su impacto.'),
+  ('cta-foul-01', 'foul', 'es', 'Una falta cambió el ritmo. Revisa qué ocurrió.'),
+  ('cta-foul-02', 'foul', 'es', '¿Falta táctica o llegada tarde? Mira la evidencia.'),
+  ('cta-foul-03', 'foul', 'es', 'El juego se detuvo aquí. Descubre la razón.'),
+  ('cta-foul-04', 'foul', 'es', 'Contacto decisivo. Revisa quién llegó primero.'),
+  ('cta-foul-05', 'foul', 'es', '¿Esta falta frenó un ataque? Sigue la jugada.'),
+  ('cta-yellow_card-01', 'yellow_card', 'es', 'Tremenda falta de tarjeta. Revisa los amonestados.'),
+  ('cta-yellow_card-02', 'yellow_card', 'es', 'Hay amarilla. Mira la acción que la provocó.'),
+  ('cta-yellow_card-03', 'yellow_card', 'es', '¿Amonestación justa? Revisa el contexto de la falta.'),
+  ('cta-yellow_card-04', 'yellow_card', 'es', 'La tarjeta cambia el duelo. Descubre qué pasó.'),
+  ('cta-yellow_card-05', 'yellow_card', 'es', 'Un jugador queda condicionado. Mira por qué fue amonestado.'),
+  ('cta-red_card-01', 'red_card', 'es', 'El partido cambia con esta roja. Revisa la acción.'),
+  ('cta-red_card-02', 'red_card', 'es', 'Expulsión decisiva. Mira qué ocurrió antes de la tarjeta.'),
+  ('cta-red_card-03', 'red_card', 'es', 'Un equipo queda con diez. Descubre el motivo.'),
+  ('cta-red_card-04', 'red_card', 'es', '¿Roja directa? Revisa la evidencia de la jugada.'),
+  ('cta-red_card-05', 'red_card', 'es', 'Momento crítico: mira cómo llegó la expulsión.'),
+  ('cta-recovery-01', 'recovery', 'es', 'Todo empezó al recuperar el balón. Sigue la secuencia.'),
+  ('cta-recovery-02', 'recovery', 'es', '¿Robo clave? Mira dónde cambió la posesión.'),
+  ('cta-recovery-03', 'recovery', 'es', 'Recuperó y activó el ataque. Descubre cómo.'),
+  ('cta-recovery-04', 'recovery', 'es', 'Aquí volvió a tener el balón. Revisa la presión previa.'),
+  ('cta-recovery-05', 'recovery', 'es', 'Una recuperación puede abrir el partido. Mira esta.'),
+  ('cta-turnover-01', 'turnover', 'es', 'Cambió la posesión. Mira quién ganó el duelo.'),
+  ('cta-turnover-02', 'turnover', 'es', 'Una pérdida dejó espacio. Revisa qué ocurrió después.'),
+  ('cta-turnover-03', 'turnover', 'es', '¿Error forzado o pase impreciso? Descúbrelo.'),
+  ('cta-turnover-04', 'turnover', 'es', 'El balón cambió de dueño. Sigue la transición.'),
+  ('cta-turnover-05', 'turnover', 'es', 'Esta pérdida pudo costar caro. Mira la jugada.'),
+  ('cta-pressure-01', 'pressure', 'es', '¿Presión efectiva o acción aislada? Revisa la evidencia.'),
+  ('cta-pressure-02', 'pressure', 'es', 'La presión obligó a decidir rápido. Mira el resultado.'),
+  ('cta-pressure-03', 'pressure', 'es', 'Aquí empezó el asedio. Descubre cómo cerraron espacios.'),
+  ('cta-pressure-04', 'pressure', 'es', 'Sin dejar respirar al rival. Revisa esta presión.'),
+  ('cta-pressure-05', 'pressure', 'es', 'La presión cambió la jugada. Mira quién la inició.'),
+  ('cta-generic-01', 'generic', 'es', 'Hay más detrás de esta jugada. Descubre por qué importa.'),
+  ('cta-generic-02', 'generic', 'es', 'Este momento merece otra mirada. Revisa la evidencia.'),
+  ('cta-generic-03', 'generic', 'es', '¿Qué cambió aquí? Abre el análisis de la jugada.'),
+  ('cta-generic-04', 'generic', 'es', 'No fue una acción cualquiera. Mira su impacto.'),
+  ('cta-generic-05', 'generic', 'es', 'La clave está en los detalles. Descúbrelos aquí.')
+on conflict (callout_id) do update set
+  kind = excluded.kind,
+  language = excluded.language,
+  text = excluded.text,
+  active = true;

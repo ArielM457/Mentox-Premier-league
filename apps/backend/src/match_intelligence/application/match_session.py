@@ -17,6 +17,7 @@ from match_intelligence.application.ports import (
     VerificationOutcome,
 )
 from match_intelligence.application.persistence import MatchPersistence, NullMatchPersistence
+from match_intelligence.application.callouts import ActionCallout, DEFAULT_CALLOUTS, select_callout
 from match_intelligence.application.video_sync import (
     SynchronizedEvent,
     VideoSynchronizedReplay,
@@ -37,9 +38,18 @@ from match_intelligence.domain.presentation import (
     VerificationStatus,
     ViewerMode,
     ViewerPreferences,
+    SummaryType,
 )
 
 CASUAL_MIN_PRIORITY = 50
+CATALOG_TEAM_IDS = {
+    "team-aurora",
+    "team-rio",
+    "team-north-city",
+    "team-harborline",
+    "team-summit-vale",
+    "team-ember-borough",
+}
 PLAYER_QUIET_GAP_MS = 10_000
 END_PADDING_MS = 8_000
 MAX_TRACKING_WINDOW_MS = 30_000
@@ -114,6 +124,7 @@ class MatchSession:
     _replay: VideoSynchronizedReplay | None = None
     _tracking_frames: tuple[TrackingFrame, ...] | None = field(default=None, init=False, repr=False)
     _track_set: TrackSet | None = field(default=None, init=False, repr=False)
+    _callouts: tuple[ActionCallout, ...] = field(default=(), init=False, repr=False)
 
     def __post_init__(self) -> None:
         missing = [e.event_id for e in self.events if e.video_time_ms is None]
@@ -122,6 +133,7 @@ class MatchSession:
                 "Todos los eventos necesitan video_time_ms para sincronizar: " + ", ".join(missing)
             )
         self.events = tuple(sorted(self.events, key=_video_time))
+        self._callouts = tuple(self.persistence.load_callouts()) or DEFAULT_CALLOUTS
         for saved in self.persistence.load_summaries(self.match_id):
             decided_at = saved.decided_at
             if isinstance(decided_at, str):
@@ -310,8 +322,8 @@ class MatchSession:
         last = previous[-1]
         return last.clock_ms + (video_time_ms - _video_time(last))
 
-    @staticmethod
     def _overlay(
+        self,
         draft: NarrativeDraft,
         kind: str,
         priority: int,
@@ -322,7 +334,7 @@ class MatchSession:
         corrected: bool,
     ) -> OverlayMessage:
         show_for = 4_000 + priority * 40
-        if preferences.mode is ViewerMode.ANALYST or preferences.level is DetailLevel.ADVANCED:
+        if preferences.mode in {ViewerMode.ANALYST, ViewerMode.PROFESSIONAL_ANALYST} or preferences.level is DetailLevel.ADVANCED:
             show_for += 1_500
         if preferences.level is DetailLevel.SIMPLE:
             show_for -= 1_000
@@ -342,6 +354,12 @@ class MatchSession:
             level=draft.level,
             headline=draft.headline,
             explanation=draft.explanation,
+            call_to_action=select_callout(
+                self._callouts,
+                kind=kind,
+                language=draft.language,
+                stable_id=draft.candidate_id or draft.draft_id,
+            ),
             source_event_ids=draft.source_event_ids,
             display_until_ms=video_time_ms + show_for,
             corrected=corrected,
@@ -378,12 +396,29 @@ class MatchSession:
         return draft
 
     # ----- resumen y revisión editorial -------------------------------------
-    def summary(self, preferences: ViewerPreferences) -> EditorialRecord:
+    def summary(
+        self,
+        preferences: ViewerPreferences,
+        summary_type: SummaryType = SummaryType.EXTENDED,
+        player_id: str | None = None,
+    ) -> EditorialRecord:
         """Genera el resumen final; queda pendiente hasta su revisión (RF-38)."""
         self._validate_preferences(preferences)
+        if summary_type is SummaryType.PLAYER_DANGER:
+            if not player_id:
+                raise SessionError("El resumen personalizado necesita un jugador")
+            if player_id not in {p.player_id for p in self.metadata.players}:
+                raise SessionError(f"El jugador {player_id} no participa en este partido")
         snapshot = self.snapshot(self.duration_ms)
         candidates = self.analytics.candidates(self.metadata, self.events, preferences)
-        draft = self.narrative.summary(self.metadata, snapshot, candidates, preferences)
+        draft = self.narrative.summary(
+            self.metadata,
+            snapshot,
+            candidates,
+            preferences,
+            summary_type,
+            player_id,
+        )
         record = self._editorial.get(draft.draft_id)
         if record is None:
             record = EditorialRecord(draft=draft)
@@ -518,9 +553,8 @@ class MatchSession:
 
     # ----- validaciones --------------------------------------------------
     def _validate_preferences(self, preferences: ViewerPreferences) -> None:
-        team_ids = {self.metadata.home_team.team_id, self.metadata.away_team.team_id}
-        if preferences.favorite_team_id and preferences.favorite_team_id not in team_ids:
-            raise SessionError(f"El club {preferences.favorite_team_id} no juega este partido")
+        if preferences.favorite_team_id and preferences.favorite_team_id not in CATALOG_TEAM_IDS:
+            raise SessionError(f"El club {preferences.favorite_team_id} no existe en el catálogo")
         player_ids = {p.player_id for p in self.metadata.players}
         if (
             preferences.mode is ViewerMode.PLAYER

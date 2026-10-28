@@ -23,6 +23,7 @@ from match_intelligence.domain.presentation import (
     InsightCandidate,
     MatchSnapshot,
     NarrativeDraft,
+    SummaryType,
     VerificationStatus,
     ViewerPreferences,
 )
@@ -237,10 +238,14 @@ class Persona3NarrativeAdapter:
         snapshot: MatchSnapshot,
         candidates: Sequence[InsightCandidate],
         preferences: ViewerPreferences,
+        summary_type=SummaryType.EXTENDED,
+        player_id: str | None = None,
     ) -> NarrativeDraft:
         # El resumen provisional conserva hoy el enfoque por jugador y la
         # revisión editorial que consume la API de Persona 4.
-        return self.fallback.summary(metadata, snapshot, candidates, preferences)
+        return self.fallback.summary(
+            metadata, snapshot, candidates, preferences, summary_type, player_id
+        )
 
     def verify(
         self,

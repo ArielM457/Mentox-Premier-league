@@ -9,8 +9,6 @@ import { TeamBadge } from '../ui/TeamBadge.jsx'
 import { Pitch } from './Pitch.jsx'
 import { TacticalSimulationPitch } from './TacticalSimulationPitch.jsx'
 
-const IMPORTANT_KINDS = new Set(['goal', 'shot'])
-
 function eventsOf(moment, events) {
   const ids = new Set(moment?.source_event_ids ?? [])
   return events.filter((event) => ids.has(event.event_id))
@@ -128,7 +126,7 @@ function WhatIfResult({ reading, metadata, t }) {
   )
 }
 
-export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
+export function MomentWorkspace({ matchId, moment, moments, events, metadata, onOpen, onSelect }) {
   const { t, apiPreferences } = usePreferences()
   const [change, setChange] = useState('earlier_pass')
   const { loading, data: analysis, error } = useMomentAnalysis(matchId, moment, apiPreferences)
@@ -148,7 +146,17 @@ export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
     <section className="moment-workspace">
       <header>
         <div>
-          <span className="section-kicker">{t.match.selectedMoment}</span>
+          <label className="moment-workspace-select">
+            <span>{t.match.selectedMoment}</span>
+            <select value={moment.message_id} onChange={(event) => {
+              const nextMoment = moments.find((item) => item.message_id === event.target.value)
+              if (nextMoment) onSelect(nextMoment)
+            }}>
+              {moments.map((item) => (
+                <option key={item.message_id} value={item.message_id}>{formatMatchClock(item, t.match.period)} · {item.headline}</option>
+              ))}
+            </select>
+          </label>
           <h2>{moment.headline}</h2>
           <p>{moment.explanation}</p>
         </div>
@@ -212,7 +220,6 @@ export function MomentWorkspace({ matchId, moment, events, metadata, onOpen }) {
             })}
           </div>
           {loading ? <InlineLoading message={t.match.analysis.loading} /> : <WhatIfResult metadata={metadata} reading={reading} t={t} />}
-          <small className="simulation-disclaimer">{simulated ? t.match.counterfactualDisclaimer : t.match.counterfactualDisclaimerVideo}</small>
         </aside>
       </div>
     </section>
@@ -479,9 +486,9 @@ export function TacticalPanel({ compact = false, events, matchId, metadata }) {
   )
 }
 
-export function InsightsPanel({ moments, events, metadata, onOpen }) {
+export function InsightsPanel({ moments, events, metadata, onSelect, selectedId }) {
   const { t } = usePreferences()
-  const important = moments.filter((moment) => !moment.suppressed && (IMPORTANT_KINDS.has(moment.kind) || moment.priority >= 70))
+  const important = moments.filter((moment) => !moment.suppressed)
   if (!important.length) return <section className="insight-list empty-comments"><h2>{t.match.importantMoments}</h2><p>{t.match.noImportantMoments}</p></section>
   return (
     <section className="insight-list">
@@ -490,9 +497,9 @@ export function InsightsPanel({ moments, events, metadata, onOpen }) {
         const sources = eventsOf(moment, events)
         const author = sources.slice().reverse().find((event) => event.player_id)
         return (
-          <button key={moment.message_id} onClick={() => onOpen(moment)} type="button">
+          <button aria-pressed={selectedId === moment.message_id} className={selectedId === moment.message_id ? 'selected' : ''} key={moment.message_id} onClick={() => onSelect(moment)} type="button">
             <div className="insight-mini-pitch"><Pitch events={sources} highlightIds={moment.source_event_ids} homeTeamId={metadata.home_team.team_id} label={moment.headline} players={metadata.players} trail={Math.max(1, sources.length)} /></div>
-            <div><span>{formatMatchClock(moment, t.match.period)} · {kindLabel(t.kinds, moment.kind)}</span><strong>{moment.headline}</strong><p>{moment.explanation}</p><small>{t.match.author}: {playerName(metadata, author?.player_id)} · {t.match.viewAnalysis}</small></div>
+            <div><span>{formatMatchClock(moment, t.match.period)} · {kindLabel(t.kinds, moment.kind)}</span><strong>{moment.headline}</strong><p>{moment.explanation}</p><small>{moment.call_to_action || t.match.viewAnalysis}</small><small>{t.match.author}: {playerName(metadata, author?.player_id)}</small></div>
             <Icon name="arrow" />
           </button>
         )

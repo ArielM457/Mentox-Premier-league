@@ -13,6 +13,7 @@ import { teamBranding } from '../data/branding.js'
 import { playerOf, teamOf, useCatalog } from '../hooks/useCatalog.js'
 
 const FILTERS = ['all', 'LIVE', 'FT', 'UPCOMING']
+const EMPTY_CARDS = []
 
 function scoreOf(match, teamId) {
   return Number(match.finalScore?.[teamId] ?? 0)
@@ -29,28 +30,29 @@ export function Editorial() {
   const { t, apiPreferences } = usePreferences()
   const { data: catalog, error: catalogError, reload } = useCatalog()
   const copy = t.editorial.library
-  const [cards, setCards] = useState([])
+  const [library, setLibrary] = useState({ key: null, cards: [], error: null })
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('all')
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const requestKey = useMemo(() => catalog
+    ? `${catalog.matches.map((match) => match.id).join(',')}|${JSON.stringify(apiPreferences)}`
+    : null, [catalog, apiPreferences])
+  const loading = !catalogError && (!catalog || library.key !== requestKey)
+  const cards = library.key === requestKey ? library.cards : EMPTY_CARDS
+  const error = library.key === requestKey ? library.error : null
 
   useEffect(() => {
     if (!catalog) return
     let active = true
-    setLoading(true)
-    setCards([])
     Promise.all(catalog.matches.map(async (match) => {
       const record = await api.summary(match.id, apiPreferences)
       const tallies = await api.communityTallies(match.id).catch(() => [])
       const tally = tallies.find((item) => item.draft_id === record.draft.draft_id)?.tally ?? { approve: 0, reject: 0, total: 0 }
       return { match, record, tally }
     }))
-      .then((items) => { if (active) { setCards(items); setError(null) } })
-      .catch((err) => { if (active) setError(err.message) })
-      .finally(() => { if (active) setLoading(false) })
+      .then((items) => { if (active) setLibrary({ key: requestKey, cards: items, error: null }) })
+      .catch((err) => { if (active) setLibrary({ key: requestKey, cards: [], error: err.message }) })
     return () => { active = false }
-  }, [catalog, apiPreferences])
+  }, [catalog, apiPreferences, requestKey])
 
   const visible = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase()
