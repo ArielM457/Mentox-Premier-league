@@ -37,6 +37,7 @@ from match_intelligence.domain.presentation import (
     SummaryType,
 )
 
+from .editor_auth import EDITOR_ERRORS, CurrentEditor
 from .match_schemas import (
     AnswerResponse,
     EditorialRecordResponse,
@@ -366,10 +367,11 @@ def editorial_queue(session: Session) -> list[EditorialRecordResponse]:
     "/{match_id}/editorial/{draft_id}/review",
     response_model=EditorialRecordResponse,
     summary="Aprobar o rechazar un análisis final",
-    responses={409: {"model": ErrorResponse, "description": "Ya fue revisado"}},
+    description="Exige una sesión de Supabase Auth con el rol de editor; quien revisa es el usuario del token.",
+    responses={**EDITOR_ERRORS, 409: {"model": ErrorResponse, "description": "Ya fue revisado"}},
 )
-def review(session: Session, draft_id: str, body: ReviewRequest) -> EditorialRecordResponse:
-    record = session.review(draft_id, ReviewDecision(body.decision), body.reviewer, body.note)
+def review(session: Session, draft_id: str, body: ReviewRequest, editor: CurrentEditor) -> EditorialRecordResponse:
+    record = session.review(draft_id, ReviewDecision(body.decision), editor.user_id, body.note)
     return _editorial(record)
 
 
@@ -430,12 +432,14 @@ def list_highlights(session: Session) -> list[HighlightClip]:
     "/{match_id}/highlights/{clip_id}/review",
     response_model=HighlightClip,
     summary="Confirmar o rechazar un recorte destacado",
+    description="Exige una sesión de Supabase Auth con el rol de editor; quien revisa es el usuario del token.",
+    responses=EDITOR_ERRORS,
 )
 def review_highlight(
-    session: Session, clip_id: str, body: HighlightReviewRequest
+    session: Session, clip_id: str, body: HighlightReviewRequest, editor: CurrentEditor
 ) -> HighlightClip:
     try:
-        return simulation_store.review(session.match_id, clip_id, body.decision, body.reviewer)
+        return simulation_store.review(session.match_id, clip_id, body.decision, editor.user_id)
     except KeyError as exc:
         raise NotFoundError(f"No existe el recorte {clip_id}") from exc
 

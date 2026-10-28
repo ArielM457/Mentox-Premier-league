@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+import editor_tokens
 from match_intelligence.adapters.http.registry import (
     DEMO_MATCH_ID,
     LIVE_MATCH_ID,
@@ -285,24 +286,29 @@ def test_question_does_not_count_future_events(client: TestClient) -> None:
     assert "Aurora FC 0" in body["answer"]["headline"]
 
 
-def test_final_summary_is_held_until_approved(client: TestClient) -> None:
+def test_final_summary_is_held_until_approved(client: TestClient, editor_headers: dict) -> None:
     """RF-38."""
     summary = client.get(f"{BASE}/summary").json()
     draft_id = summary["draft"]["draft_id"]
     assert summary["status"] == "pending"
     assert client.get(f"{BASE}/editorial/{draft_id}/published").status_code == 409
 
-    approved = client.post(f"{BASE}/editorial/{draft_id}/review", json={"decision": "approve", "reviewer": "Ana"})
+    approved = client.post(f"{BASE}/editorial/{draft_id}/review", json={"decision": "approve"}, headers=editor_headers)
     assert approved.json()["status"] == "approved"
+    assert approved.json()["reviewer"] == editor_tokens.EDITOR_ID
     published = client.get(f"{BASE}/editorial/{draft_id}/published")
     assert published.status_code == 200 and published.json()["editorial_status"] == "approved"
-    again = client.post(f"{BASE}/editorial/{draft_id}/review", json={"decision": "reject", "reviewer": "Ana"})
+    again = client.post(f"{BASE}/editorial/{draft_id}/review", json={"decision": "reject"}, headers=editor_headers)
     assert again.status_code == 409
 
 
-def test_rejected_summary_is_not_published(client: TestClient) -> None:
+def test_rejected_summary_is_not_published(client: TestClient, editor_headers: dict) -> None:
     draft_id = client.get(f"{BASE}/summary", params={"language": "en"}).json()["draft"]["draft_id"]
-    client.post(f"{BASE}/editorial/{draft_id}/review", json={"decision": "reject", "reviewer": "Ana", "note": "Falta contexto"})
+    client.post(
+        f"{BASE}/editorial/{draft_id}/review",
+        json={"decision": "reject", "note": "Falta contexto"},
+        headers=editor_headers,
+    )
     assert client.get(f"{BASE}/editorial/{draft_id}/published").status_code == 409
 
 

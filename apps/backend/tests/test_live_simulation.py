@@ -5,7 +5,7 @@ import httpx
 from match_intelligence.main import app
 
 
-def test_simulation_routes_six_cases_and_proposes_human_review() -> None:
+def test_simulation_routes_six_cases_and_proposes_human_review(editor_headers: dict) -> None:
     async def scenario() -> None:
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(
@@ -34,7 +34,8 @@ def test_simulation_routes_six_cases_and_proposes_human_review() -> None:
             if clips:
                 reviewed = await client.post(
                     f"/api/v1/matches/synthetic-acceptance-001/highlights/{clips[0]['clip_id']}/review",
-                    json={"decision": "approved", "reviewer": "Analista local"},
+                    json={"decision": "approved"},
+                    headers=editor_headers,
                 )
                 assert reviewed.status_code == 200
                 assert reviewed.json()["status"] == "approved"

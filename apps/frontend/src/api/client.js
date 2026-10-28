@@ -51,6 +51,12 @@ async function request(path, options = {}) {
 
 const base = (matchId) => `/api/v1/matches/${encodeURIComponent(matchId)}`
 
+// Revisar exige el access_token de una sesión de Supabase Auth con el rol de editor.
+const editorHeaders = (accessToken) => ({
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${accessToken}`,
+})
+
 export const api = {
   health: () => request('/api/v1/health'),
   listMatches: () => request('/api/v1/matches'),
@@ -89,10 +95,11 @@ export const api = {
     return request(`${base(id)}/summary?${params}`)
   },
   editorial: (id) => request(`${base(id)}/editorial`),
-  review: (id, draftId, decision, reviewer, note) =>
+  review: (id, draftId, decision, note, accessToken) =>
     request(`${base(id)}/editorial/${encodeURIComponent(draftId)}/review`, {
       method: 'POST',
-      body: JSON.stringify({ decision, reviewer, note: note || null }),
+      headers: editorHeaders(accessToken),
+      body: JSON.stringify({ decision, note: note || null }),
     }),
   published: (id, draftId) => request(`${base(id)}/editorial/${encodeURIComponent(draftId)}/published`),
   report: (id, draftId, messageId, reason) =>
@@ -103,10 +110,11 @@ export const api = {
   reports: (id) => request(`${base(id)}/reports`),
   simulate: (id, prefs) => request(`${base(id)}/simulation?${prefsQuery(prefs)}`, { method: 'POST' }),
   highlights: (id) => request(`${base(id)}/highlights`),
-  reviewHighlight: (id, clipId, decision, reviewer) =>
+  reviewHighlight: (id, clipId, decision, accessToken) =>
     request(`${base(id)}/highlights/${encodeURIComponent(clipId)}/review`, {
       method: 'POST',
-      body: JSON.stringify({ decision, reviewer }),
+      headers: editorHeaders(accessToken),
+      body: JSON.stringify({ decision }),
     }),
   playback: (id, action, t) =>
     request(`${base(id)}/playback`, {

@@ -23,12 +23,12 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 | `GET /matches/{id}/drafts/{draft_id}/sources` | Explicación y eventos de origen de un mensaje. |
 | `POST /matches/{id}/questions` | Preguntas sobre el partido hasta el tiempo actual. |
 | `GET /matches/{id}/summary?preferencias` | Resumen final; queda pendiente de revisión. |
-| `GET /matches/{id}/editorial` · `POST …/editorial/{draft_id}/review` | Cola de revisión, aprobar o rechazar. |
+| `GET /matches/{id}/editorial` · `POST …/editorial/{draft_id}/review` | Cola de revisión, aprobar o rechazar. Revisar exige una sesión de editor. |
 | `GET /matches/{id}/editorial/{draft_id}/published` | Responde `409` mientras falte la aprobación. |
 | `POST /matches/{id}/reports` · `GET …/reports` | Reportar un error y consultar la verificación. |
 | `GET /matches/{id}/playback` · `POST …/playback` | Reproducir, pausar, adelantar y reiniciar con `VideoSynchronizedReplay` de Persona 1. |
 | `POST /matches/{id}/simulation` | Ejecutar localmente las seis rutas del filtro y los agentes configurados. |
-| `GET /matches/{id}/highlights` · `POST …/highlights/{clip_id}/review` | Consultar, confirmar o rechazar recortes propuestos. |
+| `GET /matches/{id}/highlights` · `POST …/highlights/{clip_id}/review` | Consultar, confirmar o rechazar recortes propuestos. Confirmar o rechazar exige una sesión de editor. |
 
 Las preferencias se envían como parámetros: `language` (`es`, `en`, `de`, `zh`, `hi`, `fr`, `pt`), `mode` (`casual`, `analyst`, `professional_analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`. `professional_analyst` siempre usa el nivel avanzado.
 
@@ -102,6 +102,14 @@ Se eligió Event Hubs porque ya está desplegado y la API tiene permisos; Servic
 Pruebas: `tests/test_moderation.py`, `tests/test_community.py` y el grupo «Comunidad» de Postman.
 
 Event Hubs solo transporta los eventos. Con `SUPABASE_ENABLED=true`, los resúmenes, decisiones, votos y mensajes se guardan mediante la Data API. Con Supabase deshabilitado o temporalmente inaccesible, el flujo continúa en memoria y los votos y mensajes se pierden al reiniciar la API. El identificador anónimo se puede reiniciar borrando los datos del navegador, así que el conteo sigue siendo orientativo; la lista de palabras bloqueadas es fija y puede ampliarse en `BLOCKED_ROOTS`.
+
+## **Revisión editorial protegida**
+
+Aprobar o rechazar resúmenes y recortes exige una sesión de Supabase Auth con `app_metadata.role = "editor"`. La API comprueba la firma del token con las claves públicas del proyecto y registra como revisor el identificador de usuario del token, no un nombre enviado en la petición. Sin sesión responde `401`; con una cuenta sin el rol, `403`; y sin `SUPABASE_URL`, `503`. Las rutas de lectura, como la cola editorial y la publicación aprobada, siguen abiertas. El alta de editores y la forma de obtener la sesión para Postman están en [Persistencia en Supabase](../13-supabase.md).
+
+La interfaz actual no tiene pantalla de revisión, así que no pide iniciar sesión. Si se recupera esa pantalla, deberá iniciar sesión con Supabase Auth y enviar el token en `Authorization`, como ya hace `api.review` en `api/client.js`. **El equipo debe confirmar quiénes serán editores.**
+
+Pruebas: `tests/test_editor_auth.py`.
 
 ## **Decisiones de Persona 4**
 
@@ -193,6 +201,7 @@ La base remota no se migró: `SUPABASE_ENABLED` sigue en `false`, las claves act
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
 - **Analítica provisional.** Narrativa ya admite Persona 3, pero algunas operaciones conservan respaldo determinista. Ver la decisión 6.
 - **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.
+- **Revisión editorial en Azure.** El despliegue todavía no define `SUPABASE_URL` para la API, así que allí la revisión responde `503` hasta configurarla.
 - **Partidos de la demo.** Hay tres: el corto finalizado de aceptación, el próximo partido analítico de dos tiempos y otro escenario analítico marcado en vivo para revisar el centro del partido con once jugadores por equipo. Los tres enfrentan a Aurora FC y Río Unido.
 - **Persistencia opcional.** Con Supabase activo se recuperan resúmenes, decisiones, votos y mensajes. Los reportes de error todavía se conservan solo en memoria. Sin Supabase, toda la participación comunitaria vuelve al respaldo local en memoria.
 - **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.

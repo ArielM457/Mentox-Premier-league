@@ -20,14 +20,18 @@ ITEMS = [item for group in COLLECTION["item"] for item in group["item"]]
 
 
 @pytest.mark.parametrize("item", ITEMS, ids=[item["name"] for item in ITEMS])
-def test_postman_request_matches_http_route(item):
+def test_postman_request_matches_http_route(item, editor_headers):
     request = item["request"]
     path = request["url"].replace("{{baseUrl}}", "")
     body = request.get("body")
+    # La revisión editorial usa {{editorToken}}; aquí lo reemplaza una sesión de prueba.
+    token = editor_headers["Authorization"].removeprefix("Bearer ")
+    headers = {header["key"]: header["value"].replace("{{editorToken}}", token) for header in request.get("header", [])}
     response = TestClient(app).request(
         request["method"],
         path,
         json=json.loads(body["raw"]) if body else None,
+        headers=headers,
     )
     scripts = [line for event in item["event"] for line in event["script"]["exec"]]
     expected = re.search(r"have\.status\((\d+)\)", "\n".join(scripts))

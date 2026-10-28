@@ -10,14 +10,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COLLECTION = Path(__file__).with_name("match-intelligence.postman_collection.json")
 FIXTURES = ROOT / "apps" / "backend" / "tests" / "fixtures"
+# Las revisiones exigen una sesión de Supabase Auth con el rol de editor.
+EDITOR_AUTH = {"key": "Authorization", "value": "Bearer {{editorToken}}"}
 
 
-def request(name: str, path: str, body: dict, checks: list[str], description: str) -> dict:
+def request(
+    name: str, path: str, body: dict, checks: list[str], description: str, headers: list[dict] | None = None
+) -> dict:
     return {
         "name": name,
         "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [{"key": "Content-Type", "value": "application/json"}, *(headers or [])],
             "url": "{{baseUrl}}" + path,
             "description": description,
             "body": {
@@ -169,9 +173,10 @@ def match_experience_items() -> list[dict]:
         request(
             "POST Aprobar resumen",
             base + f"/editorial/{summary}/review",
-            {"decision": "approve", "reviewer": "Editor de prueba"},
+            {"decision": "approve"},
             [status(200), body, "pm.test('Aprobado', () => pm.expect(body.status).to.equal('approved'));"],
-            "Registra la decisión editorial.",
+            "Registra la decisión editorial. Necesita editorToken: una sesión de Supabase Auth con el rol de editor.",
+            [EDITOR_AUTH],
         ),
         get(
             "GET Publicación aprobada",
@@ -227,9 +232,10 @@ def match_experience_items() -> list[dict]:
         request(
             "POST Confirmar recorte destacado",
             base + "/highlights/clip-overlay-moment-evt-010-es-casual-normal/review",
-            {"decision": "approved", "reviewer": "Analista de prueba"},
+            {"decision": "approved"},
             [status(200), body, "pm.test('Confirmado', () => pm.expect(body.status).to.equal('approved'));"],
-            "Registra la confirmación humana antes de publicar el recorte.",
+            "Registra la confirmación humana antes de publicar el recorte. Necesita editorToken.",
+            [EDITOR_AUTH],
         ),
     ]
 
@@ -512,8 +518,12 @@ def main() -> None:
         "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. "
         "El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa "
         "usan provider=fixture y no llaman a Azure. La experiencia del partido recorre "
-        "estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético."
+        "estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético. "
+        "Las revisiones necesitan editorToken: el access_token de una cuenta de Supabase Auth con "
+        "app_metadata.role = editor."
     )
+    if not any(variable["key"] == "editorToken" for variable in collection["variable"]):
+        collection["variable"].append({"key": "editorToken", "value": ""})
     COLLECTION.write_text(
         json.dumps(collection, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

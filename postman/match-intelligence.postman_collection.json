@@ -1,13 +1,17 @@
 {
   "info": {
     "name": "Match Intelligence API",
-    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure. La experiencia del partido recorre estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético.",
+    "description": "Pruebas de todas las rutas HTTP actuales. Usa datos sintéticos y baseUrl local. El filtro y el orquestador usan proveedores reproducibles. Las rutas de narrativa usan provider=fixture y no llaman a Azure. La experiencia del partido recorre estado, mensajes, preguntas, revisión editorial y reportes sobre el partido sintético. Las revisiones necesitan editorToken: el access_token de una cuenta de Supabase Auth con app_metadata.role = editor.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8000"
+    },
+    {
+      "key": "editorToken",
+      "value": ""
     }
   ],
   "item": [
@@ -1314,13 +1318,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{editorToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/editorial/summary-synthetic-acceptance-001-es-casual-extended/review",
-            "description": "Registra la decisión editorial.",
+            "description": "Registra la decisión editorial. Necesita editorToken: una sesión de Supabase Auth con el rol de editor.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"decision\": \"approve\",\n  \"reviewer\": \"Editor de prueba\"\n}",
+              "raw": "{\n  \"decision\": \"approve\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1568,13 +1576,17 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{editorToken}}"
               }
             ],
             "url": "{{baseUrl}}/api/v1/matches/synthetic-acceptance-001/highlights/clip-overlay-moment-evt-010-es-casual-normal/review",
-            "description": "Registra la confirmación humana antes de publicar el recorte.",
+            "description": "Registra la confirmación humana antes de publicar el recorte. Necesita editorToken.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"decision\": \"approved\",\n  \"reviewer\": \"Analista de prueba\"\n}",
+              "raw": "{\n  \"decision\": \"approved\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

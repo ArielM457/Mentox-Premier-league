@@ -107,7 +107,6 @@ class ReviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     decision: Literal["approve", "reject"]
-    reviewer: str = Field(min_length=1, max_length=80)
     note: str | None = Field(default=None, max_length=500)
 
 
@@ -115,7 +114,6 @@ class HighlightReviewRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     decision: Literal["approved", "rejected"]
-    reviewer: str = Field(min_length=1, max_length=80)
 
 
 class ReportRequest(BaseModel):

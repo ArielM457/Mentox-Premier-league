@@ -1339,6 +1339,7 @@ dependencies = [
     { name = "azure-storage-blob" },
     { name = "fastapi" },
     { name = "pydantic" },
+    { name = "pyjwt", extra = ["crypto"] },
     { name = "supabase" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -1369,6 +1370,7 @@ requires-dist = [
     { name = "httpx", marker = "extra == 'dev'", specifier = "==0.28.1" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'db'", specifier = ">=3.2,<4" },
     { name = "pydantic", specifier = ">=2.10,<3" },
+    { name = "pyjwt", extras = ["crypto"], specifier = ">=2.10,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.3.5" },
     { name = "supabase", specifier = ">=2,<3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30,<1" },
