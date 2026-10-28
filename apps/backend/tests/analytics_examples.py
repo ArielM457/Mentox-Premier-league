@@ -1,6 +1,6 @@
 """Ejemplos de contrato de Persona 2 para trabajar en paralelo.
 
-Genera los archivos de ``docs/persona-2-estado-y-analitica/ejemplos``. Una
+Genera los archivos de ``apps/backend/tests/fixtures/contracts/analytics``. Una
 prueba vuelve a generarlos y compara el resultado con los archivos guardados:
 si alguien cambia una regla sin regenerar los ejemplos, la prueba falla.
 """

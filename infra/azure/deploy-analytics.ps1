@@ -414,7 +414,7 @@ if (-not $ImageTag) {
 $apiImage = "$loginServer/match-intelligence-api:$ImageTag"
 $webImage = "$loginServer/match-intelligence-web:$ImageTag"
 # La API se construye desde la raíz: copia también los resultados de visión de
-# Persona 1 que están en docs/ (el .dockerignore de la raíz limita lo que se envía).
+# visión que están en apps/backend/data/vision/ (el .dockerignore de la raíz limita lo que se envía).
 $builds = @(@{
         Image = $apiImage; Name = "match-intelligence-api:$ImageTag"; Context = $RepoRoot
         File = (Join-Path $RepoRoot 'apps/backend/Dockerfile')

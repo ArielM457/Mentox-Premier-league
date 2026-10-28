@@ -1,95 +1,72 @@
-# **The Prime Moment**
+# The Prime Moment
 
-Monorepo de The Prime Moment, una experiencia que convierte eventos sintéticos de fútbol en explicaciones y momentos personalizados. La [documentación](docs/README.md) contiene el alcance, las decisiones, los casos de uso y el contrato de eventos.
+Experiencia de inteligencia de partidos: eventos sintéticos, estadísticas, momentos explicados, reproducción sincronizada y personalización por club, jugador y modo.
 
-## **Estructura**
+La documentación vigente empieza en [docs/README.md](docs/README.md): [contexto](docs/contexto-del-proyecto.md), [plan del 1 al 27 de octubre](docs/plan-octubre.md), [desarrollo con Spec Driven Design](docs/desarrollo/README.md) y [funcionamiento del programa](docs/funcionamiento/README.md).
 
-- `apps/frontend`: interfaz React en JavaScript, creada con Vite.
-- `apps/backend`: API FastAPI en Python con Uvicorn.
-- `docs`: decisiones, requisitos e investigación.
-- `.agents/skills`: instrucciones del proyecto para futuros agentes.
+## Estructura
 
-## **Codex y Context7**
+| Directorio | Contenido |
+|---|---|
+| `apps/frontend/` | React, JavaScript, Vite y estilos del producto |
+| `apps/backend/` | FastAPI, dominio, analítica, narrativa, adaptadores y pruebas |
+| `docs/` | Contexto, planificación, especificaciones y guías vigentes |
+| `docs-anteirores/` | Archivo local ignorado de los 158 documentos anteriores |
+| `experiments/` | Experimentos de datos/visión y tablero analítico |
+| `infra/`, `deploy/` | Infraestructura, scripts y servicios de modelos |
+| `supabase/` | Migraciones de la experiencia |
+| `postman/` | Colección de peticiones y comprobaciones HTTP |
+| `.agents/`, `.codex/` | Instrucciones del proyecto y configuración de herramientas |
 
-El repositorio incluye una configuración de Context7 para consultar documentación vigente de bibliotecas y frameworks desde Codex. Cada integrante debe autorizar su propia cuenta antes de usarla; no se comparten claves ni sesiones.
+El archivo anterior no se distribuye en los siguientes clones. Los datos necesarios para pruebas y empaquetado se conservan versionados fuera de ese archivo.
 
-Las instrucciones de confianza, autenticación, verificación y solución de problemas están en [`.codex/README.md`](.codex/README.md).
+## Preparación
 
-## **Preparación local**
+Se requiere Node compatible con Vite, Python 3.12 y uv. Desde la raíz:
 
-Se necesita Python 3.12, [uv](https://docs.astral.sh/uv/) y una versión de Node compatible con Vite. `uv` puede instalar automáticamente la versión fijada en `.python-version`. Desde la raíz del repositorio:
-
-```bash
-npm install
-uv python install 3.12
-uv sync --project apps/backend --extra dev
+```powershell
+npm ci
+uv sync --project apps/backend --locked --all-extras
 ```
 
-En una terminal, inicia la API con la configuración local de `apps/backend/.env`:
+Si no existe `apps/backend/.env`, copiar `apps/backend/.env.example` con ese nombre. La demo local usa datos sintéticos, memoria y narrativa provisional. Los proveedores remotos necesitan configuración adicional.
 
-```bash
-uv run --project apps/backend uvicorn match_intelligence.main:app --reload --app-dir apps/backend/src --env-file apps/backend/.env
+## Backend
+
+En una terminal, desde la raíz:
+
+```powershell
+cd apps/backend
+.\.venv\Scripts\Activate.ps1
+uvicorn match_intelligence.main:app --reload --app-dir src --env-file .env
 ```
 
-Copia primero `apps/backend/.env.example` como `apps/backend/.env`. El archivo real está ignorado por Git. Usa `NARRATIVE_PROVIDER=provisional` para trabajar sin servicios externos, `fixture` para probar los contratos reales de Persona 3 sin Azure o `azure` para usar los despliegues configurados.
+Swagger: `http://localhost:8000/docs`.
 
-En otra terminal, inicia el frontend:
+## Frontend
 
-```bash
-npm run dev:frontend
+En otra terminal, desde la raíz:
+
+```powershell
+cd apps/frontend
+npm run dev
 ```
 
-La interfaz local aparece en `http://localhost:5173`. Swagger UI está en `http://localhost:8000/docs`. La interfaz reproduce los partidos sintéticos con mensajes sincronizados, preferencias, preguntas, resumen y revisión editorial. También permite simular las seis rutas del filtro, revisar propuestas de recorte y consultar el flujo desde el perfil analista. La experiencia ya puede consumir el módulo de Persona 3 mediante el proveedor configurado; el detalle está en [Persona 4](docs/persona-4-api-y-frontend/README.md).
+Interfaz: `http://localhost:5173`. Vite reenvía `/api` al backend local del puerto 8000, salvo que se configure `VITE_BACKEND_PROXY`.
 
-CrewAI es una dependencia opcional del backend. Para usar la integración con Azure OpenAI, se puede instalar con `uv sync --project apps/backend --extra agents`.
+## Compilación y pruebas
 
-El módulo de la persona 3 ya tiene contratos, un flujo de narración y pruebas con un partido sintético. Consulta la [guía de agentes y narrativa](apps/backend/README-narrativa.md) para ejecutarlo. La API expone las operaciones de narrativa con un proveedor sintético de prueba o con Azure OpenAI si se configura el recurso y los despliegues. El adaptador de la experiencia del partido usa ese mismo flujo sin cambiar los contratos del frontend.
+Desde la raíz:
 
-El backend también tiene una primera versión del filtro y el enrutamiento de agentes. La ruta `/api/v1/agent-routing/evaluate` separa eventos de solo métricas y solicitudes relevantes, reconoce dos patrones iniciales y prepara un despacho reproducible. `POST /api/v1/matches/{match_id}/simulation` recorre seis escenarios sintéticos. Todavía no existe almacenamiento persistente ni un canal durable real.
-
-La [colección de Postman](postman/README.md) contiene peticiones y pruebas listas para importar.
-
-## **Demostración integrada de datos y visión**
-
-La demostración reutiliza el backend oficial y una interfaz técnica de validación. No modifica el frontend de producto. Requiere el vídeo permitido y las exportaciones locales de Roboflow Sports, SoccerNet y DV-US-21.
-
-```bash
-UV_CACHE_DIR=/tmp/mentox-uv-cache \
-uv run --project apps/backend --python 3.12 \
-  uvicorn video_sync_diagnostic.app:app \
-  --app-dir experiments --host 127.0.0.1 --port 8018
+```powershell
+npm run build:frontend
+npm run lint:frontend
+uv run --project apps/backend --no-sync pytest apps/backend/tests -q
+uv build --project apps/backend --out-dir apps/backend/dist
 ```
 
-Abra <http://127.0.0.1:8018>. La API integrada está en `GET /api/v1/integration/status`, `GET /api/v1/integration/timeline` y `/docs`.
+Consultar los [resultados y fallos conocidos](docs/desarrollo/validacion.md). La existencia de adaptadores Azure/CrewAI/Supabase no significa que esos servicios se hayan comprobado en esta máquina.
 
-Con Docker:
+La [ejecución local](docs/funcionamiento/ejecucion-local.md) incluye dependencias, recursos regenerables y configuración. La [guía de despliegue](docs/funcionamiento/despliegue.md) explica Docker, Azure y las dos familias de migraciones de Supabase. El [flujo del programa](docs/funcionamiento/flujo-del-programa.md) describe el recorrido completo.
 
-```bash
-docker-compose -f compose.integration.yml up --build
-```
-
-El vídeo y los resultados se montan como volúmenes de solo lectura y no se incorporan a la imagen. Para Azure, exporte las variables de `apps/backend/.env.example`; el modo predeterminado sigue siendo `memory`.
-
-La interfaz controla la reproducción de las observaciones ya calculadas. No se
-publica nada hasta pulsar **Play**; pausa, salto y reinicio actualizan el cursor
-del backend sin volver a presentar el historial como nuevo.
-
-Para iniciar la prueba integrada:
-
-```bash
-sudo docker-compose -f compose.integration.yml up --build
-```
-
-En Azure, añada antes:
-
-```bash
-export VISION_OBSERVATION_TRANSPORT=azure_event_hubs
-export EVENT_HUB_FULLY_QUALIFIED_NAMESPACE="<namespace>.servicebus.windows.net"
-export VISION_EVENT_HUB_NAME="vision-observations"
-export VISION_EVENT_HUB_CONSUMER_GROUP="backend"
-```
-
-El reproductor ordena al backend publicar el tramo cruzado. En Azure, el backend
-produce en Event Hubs, su consumidor recibe y deduplica, y finalmente WebSocket
-actualiza la interfaz. Esta prueba reutiliza inferencias ya calculadas; no vuelve
-a ejecutar los modelos.
+Para el trabajo con Codex y Context7, consultar [la configuración del repositorio](.codex/README.md).

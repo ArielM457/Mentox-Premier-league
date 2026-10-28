@@ -242,7 +242,7 @@ az deployment group what-if \
   --parameters infra/azure/analytics.bicepparam
 ```
 
-Los roles, las variables, el procesador continuo y la prueba de humo están en [integración de la analítica con Azure](../../docs/persona-2-estado-y-analitica/integracion-azure.md).
+Los roles, las variables, el procesador continuo y la prueba de humo están en [integración de la analítica con Azure](../../docs/funcionamiento/arquitectura.md).
 
 ## Despliegue completo de la analítica
 
@@ -261,4 +261,4 @@ Los roles, las variables, el procesador continuo y la prueba de humo están en [
 ./infra/azure/remove-analytics.ps1 -ResourceGroup "<grupo>"
 ```
 
-La guía, los costos con Azure for Students y la carga de datos ficticios en Supabase están en [despliegue en Azure y Supabase](../../docs/persona-2-estado-y-analitica/despliegue-azure-supabase.md).
+La guía, los costos con Azure for Students y la carga de datos ficticios en Supabase están en [despliegue en Azure y Supabase](../../docs/funcionamiento/despliegue.md).

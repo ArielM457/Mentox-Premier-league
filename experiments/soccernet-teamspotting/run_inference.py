@@ -49,7 +49,7 @@ PERMISSION_BASIS = os.environ.get(
 ).strip()
 PERMISSION_REFERENCE = os.environ.get(
     "MENTOX_PERMISSION_REFERENCE",
-    "docs/persona-1-datos-y-vision/evidencias/DV-US-17.md",
+    "docs/funcionamiento/datos-y-vision.md",
 ).strip()
 
 

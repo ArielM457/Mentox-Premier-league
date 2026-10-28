@@ -16,4 +16,4 @@ Se aplica de tres formas:
 
 - **Supabase CLI:** `supabase --workdir infra db push`, con el proyecto ya enlazado mediante `supabase link`.
 
-Nunca guarde la cadena de conexión ni la contraseña en el repositorio. La guía completa está en [despliegue en Azure y Supabase](../../docs/persona-2-estado-y-analitica/despliegue-azure-supabase.md).
+Nunca guarde la cadena de conexión ni la contraseña en el repositorio. La guía completa está en [despliegue en Azure y Supabase](../../docs/funcionamiento/despliegue.md).

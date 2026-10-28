@@ -44,7 +44,7 @@ MEDIA_ID = os.getenv("MENTOX_MEDIA_ID", "grf-dv-us-17").strip()
 PERMISSION_BASIS = os.getenv("MENTOX_PERMISSION_BASIS", "project_generated").strip()
 PERMISSION_REFERENCE = os.getenv(
     "MENTOX_PERMISSION_REFERENCE",
-    "docs/persona-1-datos-y-vision/evidencias/DV-US-17.md",
+    "docs/funcionamiento/datos-y-vision.md",
 ).strip()
 TRACKER = "bytetrack.yaml"
 ANNOTATED_FRAMES = {50, 150, 250}

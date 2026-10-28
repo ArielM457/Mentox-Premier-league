@@ -10,10 +10,6 @@
 !apps/backend/scripts
 !experiments/video_sync_diagnostic
 
-# Resultados de los modelos de visión de Persona 1 para la pestaña «Visión IA».
-!docs/mentox-modelos-20261023T045413Z/resultados/roboflow-sports-predictions.json
-!docs/mentox-modelos-20261023T045413Z/resultados/soccernet-predictions.json
-!docs/mentox-modelos-20261023T045413Z/resultados/dv-us-21-report-recalculado.json
 
 **/__pycache__
 **/*.pyc

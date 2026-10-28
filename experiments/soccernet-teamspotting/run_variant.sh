@@ -14,7 +14,7 @@ input_video="${MENTOX_INPUT_VIDEO:-${repository_root}/experiments/google-researc
 input_annotations="${MENTOX_INPUT_ANNOTATIONS:-${experiment_directory}/annotations/grf-dv-us-17-actions.csv}"
 media_id="${MENTOX_MEDIA_ID:-grf-dv-us-17}"
 permission_basis="${MENTOX_PERMISSION_BASIS:-project_generated}"
-permission_reference="${MENTOX_PERMISSION_REFERENCE:-docs/persona-1-datos-y-vision/evidencias/DV-US-17.md}"
+permission_reference="${MENTOX_PERMISSION_REFERENCE:-docs/funcionamiento/datos-y-vision.md}"
 
 if [[ ! -f "${input_video}" ]]; then
   echo "Falta el vídeo de entrada: ${input_video}" >&2

@@ -47,6 +47,6 @@ La carpeta `tests/fixtures` contiene un partido válido, un candidato con datos 
 
 `agent-routing-scenarios.json` añade seis casos para el filtro. La implementación actual procesa cada petición sin guardar estado local. El cliente debe enviar `existing_event_ids` para evitar reprocesar eventos conocidos. El almacenamiento durable, el canal de eventos y GPT-4.1 mini en el orquestador todavía están pendientes.
 
-La asignación propuesta para cada tarea está en [política de modelos de IA](../../docs/12-politica-modelos-ia.md). La configuración actual usa un solo despliegue de Azure OpenAI y deberá separarse al implementar el orquestador y los trabajadores especializados.
+La asignación propuesta para cada tarea está en [política de modelos de IA](../../docs/funcionamiento/agentes.md). CrewAIGateway permite separar los despliegues rápidos y de narrativa mediante variables de entorno; el despacho de rutas sigue siendo determinista por defecto.
 
 La aprobación editorial y la publicación pertenecen al módulo de la persona 4. `NarrativeDraft.publishable` devuelve falso para un resumen final pendiente. El módulo tampoco conoce aún el endpoint ni el nombre del despliegue reales, así que la ejecución con Azure y su tiempo de respuesta deben comprobarse con esa configuración.

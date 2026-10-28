@@ -1,4 +1,2 @@
-# Evidencias de los modelos de visión (Persona 1): sus archivos se verifican por SHA-256
-# (sha256sum.txt y los informes de fusión). Sin convertir finales de línea, se
-# descargan idénticos en Windows, Linux y macOS y las huellas coinciden.
-docs/mentox-modelos-*/** -text
+# Conservar los bytes de los resultados de visión: la fusión verifica sus SHA-256.
+apps/backend/data/vision/** -text

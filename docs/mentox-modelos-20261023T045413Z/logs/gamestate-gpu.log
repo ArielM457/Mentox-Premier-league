@@ -1,5 +1,0 @@
-2026-10-23: no ejecutado.
-Motivo: falta experiments/soccernet-gamestate/data/ con el conjunto SoccerNet GSR autorizado.
-El overview de pruebas exige ese conjunto antes de ejecutar el smoke y no autoriza descargarlo por iniciativa propia.
-GPU disponible: NVIDIA GeForce RTX 3060 Laptop GPU, 6144 MiB.
-No se construyó la imagen ni se produjo sn-gamestate.pklz.

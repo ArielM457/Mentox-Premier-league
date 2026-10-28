@@ -406,7 +406,7 @@ def test_live_stream_sends_new_messages_with_timing(client: TestClient) -> None:
     assert all("emitted_at_ms" in p and "pipeline_ms" in p for p in payloads)
 
 
-EXAMPLES = Path(__file__).resolve().parents[3] / "docs" / "persona-4-api-y-frontend" / "ejemplos"
+EXAMPLES = Path(__file__).resolve().parent / "fixtures" / "contracts" / "presentation"
 
 
 @pytest.mark.parametrize(

@@ -26,7 +26,8 @@ experiments/soccernet-gamestate/output/
 evidencias-generadas/
 experiments/evidence-logs/
 experiments/fusion-calibration/output/
-docs/persona-1-datos-y-vision/evidencias/dv-us-22-acceptance-report.json
 apps/frontend/src/assets/hero.png
 infra/azure/*.bicepparam
-/docs/sistema-diseno-ui.md
+
+# Archivo local de la documentación anterior; se conserva sin versionarlo.
+/docs-anteirores/

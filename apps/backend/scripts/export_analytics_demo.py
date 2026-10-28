@@ -5,7 +5,7 @@ Desde la raíz del repositorio::
     python apps/backend/scripts/export_analytics_demo.py
     python apps/backend/scripts/export_analytics_demo.py --fragmento <ruta.html>
 
-Escribe ``docs/persona-2-estado-y-analitica/demo/tablero.html``, que se abre
+Escribe ``experiments/analytics-demo/tablero.html``, que se abre
 directamente en el navegador. ``--fragmento`` escribe además la misma página sin
 el envoltorio ``<html>`` para publicarla como artefacto.
 """
@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
 
 from analytics_demo import build_demo_data
 
-DEMO = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "demo"
+DEMO = Path(__file__).resolve().parents[3] / "experiments" / "analytics-demo"
 WRAPPER = (
     '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'

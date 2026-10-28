@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tests"))
 
 from analytics_examples import build_examples, render
 
-TARGET = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "ejemplos"
+TARGET = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "contracts" / "analytics"
 
 
 def main() -> None:

@@ -1,33 +1,54 @@
-# **Documentación del proyecto**
+# Documentación de The Prime Moment
 
-The Prime Moment nace de un reto de hackathon. El proyecto convierte eventos sintéticos de fútbol en información explicable para una transmisión en directo y en experiencias personalizadas para distintos aficionados.
+Documentación consolidada el **28 de octubre de 2026** sobre la rama `Re-design-frontend`. Describe el código disponible y distingue las funciones locales, las integraciones configurables y el trabajo pendiente.
 
-La documentación distingue el alcance del reto, las decisiones del equipo y lo que ya existe en el repositorio. La ingesta sintética, el estado calculado, la analítica y la narrativa tienen módulos propios. La experiencia completa del partido todavía debe conectar esos módulos con la interfaz.
+## Por dónde empezar
 
-## **Documentos**
+| Necesidad | Documento |
+|---|---|
+| Entender el producto, su alcance y su estado | [Contexto del proyecto](contexto-del-proyecto.md) |
+| Consultar el desarrollo del 1 al 27 de octubre | [Plan y reconstrucción de octubre](plan-octubre.md) |
+| Revisar especificaciones, diseño, tareas y pruebas por módulo | [Desarrollo con Spec Driven Design](desarrollo/README.md) |
+| Entender y operar el programa | [Documentación de funcionamiento](funcionamiento/README.md) |
+| Instalar y ejecutar backend y frontend | [Ejecución local](funcionamiento/ejecucion-local.md) |
+| Saber qué se ha comprobado y qué falta | [Validación y pendientes](desarrollo/validacion.md) |
 
-- [Objetivos y alcance](01-objetivos-y-alcance.md): qué pide el reto, qué proponemos construir y qué sigue abierto.
-- [Responsabilidades del sistema](02-responsabilidades.md): tareas de cada parte del programa y límites entre ellas.
-- [Análisis de requisitos](03-requisitos.md): requisitos pequeños y verificables, con prioridad inicial.
-- [Casos de uso](06-Casos%20de%20Uso%20%E2%80%94%20Plataforma%20de%20Inteligencia%20de%20Partidos%20con%20IA.md): usuarios y recorridos concretos que complementan los requisitos.
-- [Evaluación y evidencias](04-evaluacion.md): cómo demostrar los cinco criterios de la rúbrica.
-- [Decisiones tomadas](07-decisiones-tomadas.md): tecnologías, arquitectura, agentes, datos e idiomas acordados.
-- [Formato de eventos](08-formato-de-eventos.md): contrato inicial para eventos y sincronización con vídeo.
-- [Investigación de métricas y herramientas](09-investigacion-metricas-y-herramientas.md): opciones compatibles con Python y límites de los datos.
-- [Sistema de diseño](sistema-de-diseno.md): paleta, tipografía, tokens, componentes y guía de uso visual del producto.
-- [Equipo de agentes](10-arquitectura-agentes.md): responsabilidades, autonomía, verificación y revisión antes de publicar.
-- [Plan de implementación de agentes por eventos](11-plan-implementacion-agentes-eventos.md): filtro, orquestación, simulación, resúmenes, escalado y pruebas de disponibilidad.
-- [Política de modelos de IA](12-politica-modelos-ia.md): asignación de modelos por demanda, búsqueda web, embeddings y criterios para cambiar de modelo.
-- [Persistencia en Supabase](13-supabase.md): variables locales, migraciones y tablas de la experiencia.
-- [Despliegue en Azure paso a paso](14-despliegue-en-azure.md): cómo crea cualquier integrante el entorno de la demo en Azure for Students y la base de Supabase, con costos y problemas conocidos.
-- [Azure Architecture Diagrams](azure-architecture-diagrams.md): deployment, agent orchestration and end-to-end application diagrams in English.
-- [Plan de desarrollo](plan-de-desarrollo/README.md): reparto entre cuatro personas de programación y una de UX/UI, con contratos para trabajar en paralelo.
-- [Detalle de datos y visión](persona-1-datos-y-vision/README.md): plan, requisitos e historias de usuario de Persona 1, incluida la integración reproducible con Azure.
-- [Overview para pruebas GPU](persona-1-datos-y-vision/overview-para-pruebas-de-modelos.md): contexto operativo para otra persona o IA que deba ejecutar y documentar los modelos de visión.
-- [Detalle de estado y analítica](persona-2-estado-y-analitica/README.md): estado del partido, catálogo de métricas, patrones, motor de atención, modelos de valor e integración con Azure de Persona 2.
-- [API y experiencia funcional](persona-4-api-y-frontend/README.md): rutas, canal en directo, interfaz, decisiones y evidencia de Persona 4.
-- [Decisiones pendientes](05-decisiones-pendientes.md): elecciones que aún necesitan datos o acuerdos del equipo.
+## Organización
 
-## **Cómo leer el estado de cada punto**
+```text
+docs/
+  README.md
+  contexto-del-proyecto.md
+  plan-octubre.md
+  desarrollo/
+    README.md
+    requisitos.md
+    decisiones.md
+    contratos.md
+    01-datos-y-vision.md
+    02-estado-y-analitica.md
+    03-agentes-y-narrativa.md
+    04-api-y-experiencia.md
+    05-editorial-y-comunidad.md
+    06-integracion-y-despliegue.md
+    validacion.md
+    evidencias/README.md
+  funcionamiento/
+    README.md
+    arquitectura.md
+    flujo-del-programa.md
+    agentes.md
+    datos-y-vision.md
+    ejecucion-local.md
+    despliegue.md
+```
 
-Un requisito del reto viene del texto compartido por el usuario. Una propuesta inicial es una forma de cumplirlo que aún puede cambiar. Una decisión pendiente no debe aparecer como si ya estuviera resuelta.
+## Archivo anterior
+
+Los 158 archivos que estaban en `docs` se conservaron en `docs-anteirores/`, en la raíz del repositorio. Se respeta ese nombre solicitado. La carpeta está ignorada por Git y es un archivo local; los siguientes clones no la recibirán. Las versiones anteriores también siguen disponibles en el historial de Git.
+
+La documentación vigente no depende de ese archivo. Los JSON que consumen las pruebas están ahora en `apps/backend/tests/fixtures/contracts/`, la demo HTML en `experiments/analytics-demo/` y los tres resultados de visión que copia Docker en `apps/backend/data/vision/`. Son recursos técnicos versionados, separados de los documentos archivados.
+
+## Cómo mantener estos documentos
+
+Para cada cambio, actualizar la especificación del módulo y registrar su validación. «Implementado» significa que existe código; «verificado» requiere un comando y su resultado; «configurable» requiere infraestructura o credenciales que no vienen con el repositorio. Una propuesta de la documentación histórica no se considera una función entregada.

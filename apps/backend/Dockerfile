@@ -23,7 +23,7 @@ RUN uv sync --frozen --extra db --no-install-project
 
 # Resultados de los modelos de visión de Persona 1 (pestaña «Visión IA»). Se usa el
 # informe de fusión recalculado, que corresponde a estas predicciones.
-ARG VISION_RESULTS=docs/mentox-modelos-20261023T045413Z/resultados
+ARG VISION_RESULTS=apps/backend/data/vision
 COPY ${VISION_RESULTS}/roboflow-sports-predictions.json \
      ${VISION_RESULTS}/soccernet-predictions.json \
      ${VISION_RESULTS}/dv-us-21-report-recalculado.json \

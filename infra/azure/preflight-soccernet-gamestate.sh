@@ -17,7 +17,6 @@ Primero ejecute y documente el smoke local:
 No se crea ningún recurso Azure para evitar costo y una falsa sensación de integración.
 Consulte:
   experiments/soccernet-gamestate/README.md
-  docs/persona-1-datos-y-vision/evidencias/DV-US-27.md
-  docs/persona-1-datos-y-vision/evidencias/DV-US-33.md
+  docs/funcionamiento/datos-y-vision.md
 EOF
 exit 2

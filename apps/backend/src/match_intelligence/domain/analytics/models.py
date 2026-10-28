@@ -1,6 +1,6 @@
 """Contratos de Persona 2: ``MatchSnapshot v1`` e ``InsightCandidate v1``.
 
-Conservan los campos de ``docs/plan-de-desarrollo/contratos-de-trabajo.md`` y
+Conservan los campos de ``docs/desarrollo/contratos.md`` y
 de los modelos provisionales de Persona 4 con el mismo nombre y tipo. Los
 campos añadidos son opcionales y explican de dónde sale cada cifra y por qué
 se emitió o descartó cada momento.

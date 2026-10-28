@@ -1,6 +1,6 @@
 """Contratos de trabajo v1 entre analítica, narración y pantalla.
 
-Siguen los ejemplos de ``docs/plan-de-desarrollo/contratos-de-trabajo.md``.
+Siguen los ejemplos de ``docs/desarrollo/contratos.md``.
 ``MatchSnapshot`` e ``InsightCandidate`` pertenecen a Persona 2 y
 ``NarrativeDraft`` a Persona 3; se definen aquí para que la API y el frontend
 puedan avanzar con ejemplos mientras esos módulos se implementan.

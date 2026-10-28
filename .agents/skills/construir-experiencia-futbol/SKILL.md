@@ -5,11 +5,11 @@ description: Guia la planificacion, implementacion y demostracion de la experien
 
 # Construcción de la experiencia de partido
 
-Lee `docs/README.md`, `docs/02-responsabilidades.md`, `docs/03-requisitos.md`, `docs/04-evaluacion.md` y `docs/07-decisiones-tomadas.md` antes de definir una solución. Usa `docs/08-formato-de-eventos.md` como contrato inicial. Revisa `docs/05-decisiones-pendientes.md` antes de fijar detalles todavía abiertos y `docs/09-investigacion-metricas-y-herramientas.md` al seleccionar métricas o bibliotecas.
+Lee `docs/README.md`, `docs/contexto-del-proyecto.md`, `docs/desarrollo/requisitos.md`, `docs/desarrollo/validacion.md` y `docs/desarrollo/decisiones.md` antes de definir una solución. Usa `docs/desarrollo/contratos.md` para los contratos y `docs/desarrollo/README.md` para localizar la especificación del módulo. Revisa los pendientes de validación antes de fijar detalles abiertos.
 
-Cuando selecciones, configures o cambies modelos, agentes, búsqueda web o recuperación semántica, lee `references/politica-modelos.md` y `docs/12-politica-modelos-ia.md`. No asignes un único modelo a todo el flujo.
+Cuando selecciones, configures o cambies modelos, agentes, búsqueda web o recuperación semántica, lee `references/politica-modelos.md` y `docs/funcionamiento/agentes.md`. No asignes un único modelo a todo el flujo.
 
-Para trabajos del equipo, consulta `docs/plan-de-desarrollo/README.md` y el documento de la persona responsable antes de cambiar módulos compartidos.
+Para trabajos del equipo, consulta `docs/plan-octubre.md`, la especificación del módulo en `docs/desarrollo/` y `docs/funcionamiento/arquitectura.md` antes de cambiar módulos compartidos.
 
 La marca visible del producto es The Prime Moment. Usa ese nombre en la interfaz, la documentación y las instrucciones de agentes; conserva los identificadores técnicos ya establecidos.
 
@@ -17,6 +17,6 @@ Construye un flujo comprobable desde eventos sintéticos hasta estado, métricas
 
 Demuestra diferencias reales entre los modos de analista y casual. Las preferencias de club, jugador e idioma deben afectar la selección o redacción del contenido cuando estén implementadas. No declares una función completa hasta probar su entrada, salida e interfaz en ejecución.
 
-Prepara evidencias para los cinco criterios de `docs/04-evaluacion.md`. Reporta por separado lo probado localmente y lo que siga pendiente en una transmisión real. Usa solo datos sintéticos o material autorizado y conserva la distinción entre métricas derivadas de eventos y métricas obtenidas de vídeo.
+Prepara evidencias para los cinco criterios de `docs/desarrollo/validacion.md`. Reporta por separado lo probado localmente y lo que siga pendiente en una transmisión real. Usa solo datos sintéticos o material autorizado y conserva la distinción entre métricas derivadas de eventos y métricas obtenidas de vídeo.
 
 Aplica la skill personal de escritura de Ariel a documentación y respuestas en español.

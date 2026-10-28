@@ -13,7 +13,7 @@ from match_intelligence.domain.analytics.models import (
     MatchSnapshot,
 )
 
-EXAMPLES = Path(__file__).resolve().parents[3] / "docs" / "persona-2-estado-y-analitica" / "ejemplos"
+EXAMPLES = Path(__file__).resolve().parent / "fixtures" / "contracts" / "analytics"
 
 
 def _load(name: str) -> dict:
