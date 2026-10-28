@@ -428,9 +428,10 @@ class MatchSession:
         )
         record = self._editorial.get(draft.draft_id)
         if record is None:
+            # Pedir un resumen no lo guarda: cualquiera puede pedirlo y se vuelve a generar igual.
+            # Se guarda cuando un editor decide o una verificación lo retira.
             record = EditorialRecord(draft=draft)
             self._editorial[draft.draft_id] = record
-            self._save_editorial(record)
         return record
 
     def editorial_queue(self) -> list[EditorialRecord]:

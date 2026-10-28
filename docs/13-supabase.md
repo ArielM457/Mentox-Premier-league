@@ -86,7 +86,7 @@ $session.access_token | Set-Clipboard
 - `match_events`: eventos normalizados y su carga original.
 - `moments`: explicaciones, prioridad y eventos de origen.
 - `assistant_messages`: pregunta, respuesta y fuentes disponibles en ese tiempo.
-- `match_summaries`: resumen final, estado editorial, identificador del editor y nota de revisión.
+- `match_summaries`: resumen final, estado editorial, identificador del editor y nota de revisión. Solo se guarda cuando un editor decide o una verificación lo retira; pedir un resumen no lo guarda.
 - `action_callouts`: frases breves por tipo de jugada para invitar a abrir su análisis.
 - `community_votes`: un like o dislike por navegador y resumen.
 - `community_messages`: sugerencias y comentarios de cada resumen.

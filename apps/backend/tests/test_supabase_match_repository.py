@@ -2,7 +2,7 @@ from match_intelligence.adapters.provisional.analytics import ProvisionalAnalyti
 from match_intelligence.adapters.provisional.narrative import ProvisionalNarrative
 from match_intelligence.adapters.sources.synthetic import generate_acceptance_match
 from match_intelligence.adapters.storage.supabase_match import SupabaseMatchRepository
-from match_intelligence.application.match_session import MatchSession
+from match_intelligence.application.match_session import MatchSession, ReviewDecision
 from match_intelligence.application.persistence import NullMatchPersistence
 from match_intelligence.domain.presentation import ViewerPreferences
 from types import SimpleNamespace
@@ -66,18 +66,40 @@ def test_match_moments_and_questions_are_written_idempotently() -> None:
     first = session.overlays(ViewerPreferences(mode="analyst"))
     session.overlays(ViewerPreferences(mode="analyst"))
     session.ask("¿Qué está pasando en el partido?", 40_000, ViewerPreferences())
-    session.summary(ViewerPreferences())
 
     tables = [table for table, _, _ in client.writes]
     assert tables.count("matches") == 1
     assert tables.count("match_events") == 1
     assert tables.count("moments") == 1
     assert tables.count("assistant_messages") == 1
-    assert tables.count("match_summaries") == 1
-    summary_write = next(value for table, operation, value in client.writes if table == "match_summaries" and operation == "upsert")
-    assert summary_write["summary_type"] == "extended"
-    assert summary_write["player_id"] is None
     assert first.overlays
+
+
+def test_summary_is_saved_only_after_an_editorial_decision() -> None:
+    match = generate_acceptance_match()
+    client = FakeClient()
+    session = MatchSession(
+        metadata=match.metadata,
+        events=match.events,
+        analytics=ProvisionalAnalytics(),
+        narrative=ProvisionalNarrative(),
+        correction_narrative=ProvisionalNarrative(),
+        persistence=SupabaseMatchRepository(client),
+    )
+
+    record = session.summary(ViewerPreferences())
+    session.summary(ViewerPreferences(language="en"))
+    assert not [write for write in client.writes if write[0] == "match_summaries"]
+
+    session.review(record.draft.draft_id, ReviewDecision.APPROVE, "editor-id", None)
+
+    summary_writes = [value for table, _, value in client.writes if table == "match_summaries"]
+    assert len(summary_writes) == 1
+    assert summary_writes[0]["draft_id"] == record.draft.draft_id
+    assert summary_writes[0]["status"] == "approved"
+    assert summary_writes[0]["reviewer"] == "editor-id"
+    assert summary_writes[0]["summary_type"] == "extended"
+    assert summary_writes[0]["player_id"] is None
 
 
 def test_action_callouts_are_loaded_from_supabase() -> None:
