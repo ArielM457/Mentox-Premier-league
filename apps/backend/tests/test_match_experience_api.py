@@ -341,6 +341,16 @@ def test_player_summary_requires_a_player_from_the_match(client: TestClient) -> 
     assert unknown.status_code == 400
 
 
+def test_summary_ignores_identifiers_outside_the_roster(client: TestClient) -> None:
+    plain = client.get(f"{BASE}/summary").json()["draft"]
+    stray_player = client.get(f"{BASE}/summary", params={"player_id": "anything"}).json()["draft"]
+    stray_favorite = client.get(f"{BASE}/summary", params={"favorite_player_id": "anything"}).json()["draft"]
+
+    assert stray_player["draft_id"] == stray_favorite["draft_id"] == plain["draft_id"]
+    assert "anything" not in stray_favorite["explanation"]
+    assert len(client.get(f"{BASE}/editorial").json()) == 1
+
+
 def test_new_summary_languages_are_accepted_and_translated(client: TestClient) -> None:
     expected = {"de": "Zusammenfassung", "zh": "比赛摘要", "hi": "मैच सारांश", "fr": "Résumé", "pt": "Resumo"}
     for language, title in expected.items():

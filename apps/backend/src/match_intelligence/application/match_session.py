@@ -404,11 +404,18 @@ class MatchSession:
     ) -> EditorialRecord:
         """Genera el resumen final; queda pendiente hasta su revisión (RF-38)."""
         self._validate_preferences(preferences)
+        roster = {p.player_id for p in self.metadata.players}
         if summary_type is SummaryType.PLAYER_DANGER:
             if not player_id:
                 raise SessionError("El resumen personalizado necesita un jugador")
-            if player_id not in {p.player_id for p in self.metadata.players}:
+            if player_id not in roster:
                 raise SessionError(f"El jugador {player_id} no participa en este partido")
+        else:
+            player_id = None
+        # El identificador del borrador se arma con estos valores y cada uno se guarda:
+        # solo se aceptan jugadores de la plantilla para no crear borradores sin límite.
+        if preferences.favorite_player_id and preferences.favorite_player_id not in roster:
+            preferences = preferences.model_copy(update={"favorite_player_id": None})
         snapshot = self.snapshot(self.duration_ms)
         candidates = self.analytics.candidates(self.metadata, self.events, preferences)
         draft = self.narrative.summary(
