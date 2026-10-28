@@ -58,6 +58,12 @@ def test_adapter_returns_presentation_contracts_with_the_same_facts() -> None:
         (c.candidate_id, c.priority, c.source_event_ids) for c in expected
     ]
 
+    professional = presentation.ViewerPreferences(
+        mode=presentation.ViewerMode.PROFESSIONAL_ANALYST,
+        level=presentation.DetailLevel.SIMPLE,
+    )
+    assert professional.level is presentation.DetailLevel.ADVANCED
+
 
 @pytest.mark.parametrize("match_id", [DEMO_MATCH_ID, ANALYTICS_MATCH_ID])
 def test_api_routes_work_with_the_real_engine(client: TestClient, match_id: str) -> None:

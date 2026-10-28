@@ -21,6 +21,7 @@ from match_intelligence.domain.presentation import (
     MatchSnapshot,
     MetricValue,
     NarrativeDraft,
+    SummaryType,
     VerificationStatus,
     ViewerMode,
     ViewerPreferences,
@@ -192,7 +193,7 @@ class ProvisionalNarrative:
         if self._inject_error_in == candidate.kind:
             player = self._wrong_teammate(metadata, candidate)
         es = lang is Language.ES
-        analyst = preferences.mode is ViewerMode.ANALYST
+        analyst = preferences.mode in {ViewerMode.ANALYST, ViewerMode.PROFESSIONAL_ANALYST}
         kind = candidate.kind
 
         if kind == "goal":
@@ -318,12 +319,14 @@ class ProvisionalNarrative:
     ) -> str:
         es = preferences.language is Language.ES
         level = preferences.level
-        if preferences.mode is ViewerMode.ANALYST and level is DetailLevel.SIMPLE:
+        if preferences.mode is ViewerMode.PROFESSIONAL_ANALYST:
+            level = DetailLevel.ADVANCED
+        elif preferences.mode is ViewerMode.ANALYST and level is DetailLevel.SIMPLE:
             level = DetailLevel.NORMAL
         if level is DetailLevel.SIMPLE:
             return _simple_live_explanation(candidate.kind, why, es=es)
         text = why
-        if level is DetailLevel.ADVANCED or preferences.mode is ViewerMode.ANALYST:
+        if level is DetailLevel.ADVANCED or preferences.mode in {ViewerMode.ANALYST, ViewerMode.PROFESSIONAL_ANALYST}:
             context = _friendly_fact_context(candidate, es=es)
             if context:
                 text += f" {context}"
@@ -556,68 +559,101 @@ class ProvisionalNarrative:
         snapshot: MatchSnapshot,
         candidates: Sequence[InsightCandidate],
         preferences: ViewerPreferences,
+        summary_type: SummaryType = SummaryType.EXTENDED,
+        player_id: str | None = None,
     ) -> NarrativeDraft:
-        es = preferences.language is Language.ES
+        copy = {
+            "es": {"title": "Resumen", "shots": "tiros", "accuracy": "precisión de pase", "no_data": "sin datos", "moments": "Momentos", "none": "No se registraron jugadas para este resumen.", "goal": "Gol", "shot": "Ocasión de peligro", "focus": "Peligro de"},
+            "en": {"title": "Summary", "shots": "shots", "accuracy": "pass accuracy", "no_data": "no data", "moments": "Moments", "none": "No plays were recorded for this recap.", "goal": "Goal", "shot": "Dangerous chance", "focus": "Danger from"},
+            "de": {"title": "Zusammenfassung", "shots": "Schüsse", "accuracy": "Passgenauigkeit", "no_data": "keine Daten", "moments": "Momente", "none": "Für diese Zusammenfassung wurden keine Szenen erfasst.", "goal": "Tor", "shot": "Gefährliche Chance", "focus": "Gefahr durch"},
+            "zh": {"title": "比赛摘要", "shots": "射门", "accuracy": "传球成功率", "no_data": "无数据", "moments": "关键时刻", "none": "本摘要没有可用的比赛片段。", "goal": "进球", "shot": "危险机会", "focus": "球员危险进攻"},
+            "hi": {"title": "मैच सारांश", "shots": "शॉट", "accuracy": "पास सटीकता", "no_data": "डेटा नहीं", "moments": "मुख्य क्षण", "none": "इस सारांश के लिए कोई खेल दर्ज नहीं हुआ।", "goal": "गोल", "shot": "खतरनाक मौका", "focus": "खतरा"},
+            "fr": {"title": "Résumé", "shots": "tirs", "accuracy": "précision des passes", "no_data": "aucune donnée", "moments": "Moments", "none": "Aucune action n’a été enregistrée pour ce résumé.", "goal": "But", "shot": "Occasion dangereuse", "focus": "Danger créé par"},
+            "pt": {"title": "Resumo", "shots": "finalizações", "accuracy": "precisão de passe", "no_data": "sem dados", "moments": "Momentos", "none": "Nenhuma jogada foi registrada para este resumo.", "goal": "Gol", "shot": "Chance perigosa", "focus": "Perigo de"},
+        }[preferences.language.value]
         home, away = metadata.home_team, metadata.away_team
         score = f"{home.name} {snapshot.score.get(home.team_id, 0)} - {snapshot.score.get(away.team_id, 0)} {away.name}"
 
         def metric(key: str, team_id: str) -> MetricValue | None:
             return next((m for m in snapshot.metrics if m.key == key and m.team_id == team_id), None)
 
+        if summary_type is SummaryType.SHORT:
+            selected = [candidate for candidate in candidates if candidate.kind == "goal"]
+        elif summary_type is SummaryType.PLAYER_DANGER:
+            selected = [
+                candidate
+                for candidate in candidates
+                if player_id in candidate.player_ids and candidate.kind in {"goal", "shot"}
+            ]
+        else:
+            selected = sorted(candidates, key=lambda c: (-c.priority, c.clock_ms))[:3]
+        selected.sort(key=lambda candidate: candidate.clock_ms)
+
         lines: list[str] = []
         sources: set[str] = set()
-        for team in (home, away):
-            shots = metric("shots", team.team_id)
-            accuracy = metric("pass_accuracy", team.team_id)
-            acc = f"{_num(accuracy.value)}%" if accuracy and accuracy.available else ("sin datos" if es else "no data")
-            lines.append(
-                f"{team.name}: {_num(shots.value if shots else None)} {('tiro' if es else 'shot') if shots and shots.value == 1 else ('tiros' if es else 'shots')}, "
-                f"{'precisión de pase' if es else 'pass accuracy'} {acc}."
-            )
-            for m in (shots, accuracy):
-                if m:
-                    sources.update(m.source_event_ids)
+        if summary_type is SummaryType.EXTENDED:
+            for team in (home, away):
+                shots = metric("shots", team.team_id)
+                accuracy = metric("pass_accuracy", team.team_id)
+                acc = f"{_num(accuracy.value)}%" if accuracy and accuracy.available else copy["no_data"]
+                lines.append(
+                    f"{team.name}: {_num(shots.value if shots else None)} {copy['shots']}, "
+                    f"{copy['accuracy']} {acc}."
+                )
+                for item in (shots, accuracy):
+                    if item:
+                        sources.update(item.source_event_ids)
 
-        key_moments = sorted(candidates, key=lambda c: (-c.priority, c.clock_ms))[:3]
-        key_moments.sort(key=lambda c: c.clock_ms)
-        moments = []
-        for c in key_moments:
-            live = self.live(metadata, snapshot, c, preferences.model_copy(update={"level": DetailLevel.SIMPLE, "mode": ViewerMode.CASUAL}))
-            moments.append(f"{_clock(c.clock_ms)} {live.headline}")
-            sources.update(c.source_event_ids)
+        moments: list[str] = []
+        for candidate in selected:
+            actor = self._player(metadata, candidate.player_ids[0]) if candidate.player_ids else self._team(metadata, candidate.team_id)
+            label = copy["goal"] if candidate.kind == "goal" else copy["shot"]
+            moments.append(f"{_clock(candidate.clock_ms)} {label}: {actor}")
+            sources.update(candidate.source_event_ids)
 
+        applied = [
+            f"language:{preferences.language.value}",
+            f"mode:{preferences.mode.value}",
+            f"summary_type:{summary_type.value}",
+        ]
         focus = ""
-        applied = [f"language:{preferences.language.value}", f"mode:{preferences.mode.value}"]
-        if preferences.favorite_player_id:
+        if summary_type is SummaryType.PLAYER_DANGER and player_id:
+            name = self._player(metadata, player_id)
+            applied.append(f"summary_player:{player_id}")
+            focus = f"{copy['focus']} {name}."
+        elif summary_type is SummaryType.EXTENDED and preferences.favorite_player_id:
             name = self._player(metadata, preferences.favorite_player_id)
             involved = [c for c in candidates if preferences.favorite_player_id in c.player_ids]
             applied.append(f"favorite_player:{preferences.favorite_player_id}")
-            if involved:
-                kinds = ", ".join(sorted({c.kind for c in involved}))
-                n = len(involved)
-                focus = (
-                    f" Enfoque en {name}: participó en {n} {'momento destacado' if n == 1 else 'momentos destacados'} ({kinds})."
-                    if es else f" Focus on {name}: involved in {n} key {'moment' if n == 1 else 'moments'} ({kinds})."
-                )
+            if preferences.language is Language.ES:
+                label = "momento destacado" if len(involved) == 1 else "momentos destacados"
+                focus = f"Enfoque en {name}: participó en {len(involved)} {label}."
             else:
-                focus = (
-                    f" Enfoque en {name}: no participó en los momentos destacados."
-                    if es else f" Focus on {name}: not involved in the key moments."
-                )
-        elif preferences.favorite_team_id:
+                focus = f"Focus on {name}: involved in {len(involved)} key moments."
+        elif summary_type is SummaryType.EXTENDED and preferences.favorite_team_id:
             team_name = self._team(metadata, preferences.favorite_team_id)
             mine = [c for c in candidates if c.team_id == preferences.favorite_team_id]
             applied.append(f"favorite_team:{preferences.favorite_team_id}")
             focus = (
-                f" Enfoque en {team_name}: {len(mine)} {'momento destacado propio' if len(mine) == 1 else 'momentos destacados propios'}."
-                if es else f" Focus on {team_name}: {len(mine)} key {'moment' if len(mine) == 1 else 'moments'} of their own."
+                f"Enfoque en {team_name}: {len(mine)} momentos destacados propios."
+                if preferences.language is Language.ES
+                else f"Focus on {team_name}: {len(mine)} key moments of their own."
             )
 
-        title = ("Resumen: " if es else "Summary: ") + score
-        body = " ".join(lines)
-        body += (" Momentos: " if es else " Moments: ") + "; ".join(moments) + "." + focus
+        title = f"{copy['title']}: {score}"
+        parts = [*lines]
+        parts.append(f"{copy['moments']}: {'; '.join(moments)}." if moments else copy["none"])
+        parts.append(focus)
+        body = " ".join(part for part in parts if part)
         suffix = "-".join(
-            filter(None, [preferences.language.value, preferences.mode.value, preferences.favorite_team_id, preferences.favorite_player_id])
+            filter(None, [
+                preferences.language.value,
+                preferences.mode.value,
+                summary_type.value,
+                player_id,
+                preferences.favorite_team_id,
+                preferences.favorite_player_id,
+            ])
         )
         return NarrativeDraft(
             draft_id=f"summary-{metadata.match_id}-{suffix}",

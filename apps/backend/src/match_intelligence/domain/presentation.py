@@ -9,17 +9,29 @@ puedan avanzar con ejemplos mientras esos módulos se implementan.
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Language(StrEnum):
     ES = "es"
     EN = "en"
+    DE = "de"
+    ZH = "zh"
+    HI = "hi"
+    FR = "fr"
+    PT = "pt"
+
+
+class SummaryType(StrEnum):
+    SHORT = "short"
+    EXTENDED = "extended"
+    PLAYER_DANGER = "player_danger"
 
 
 class ViewerMode(StrEnum):
     CASUAL = "casual"
     ANALYST = "analyst"
+    PROFESSIONAL_ANALYST = "professional_analyst"
     PLAYER = "player"
 
 
@@ -39,6 +51,12 @@ class ViewerPreferences(BaseModel):
     level: DetailLevel = DetailLevel.NORMAL
     favorite_team_id: str | None = None
     favorite_player_id: str | None = None
+
+    @model_validator(mode="after")
+    def professional_mode_uses_advanced_detail(self) -> "ViewerPreferences":
+        if self.mode is ViewerMode.PROFESSIONAL_ANALYST:
+            self.level = DetailLevel.ADVANCED
+        return self
 
 
 class MetricValue(BaseModel):
@@ -153,6 +171,7 @@ class OverlayMessage(BaseModel):
     level: DetailLevel
     headline: str
     explanation: str
+    call_to_action: str = Field(default="Descubre por qué importa", min_length=1)
     source_event_ids: list[str]
     display_until_ms: int = Field(
         description="Fin efectivo en el vídeo; menor que video_time_ms + show_for_ms si otro mensaje lo reemplaza"

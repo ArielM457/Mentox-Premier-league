@@ -7,8 +7,8 @@ import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
+import { LANGUAGES, languageName } from '../i18n/languages.js'
 
-const LANGUAGES = [['en', 'EN', 'English'], ['es', 'ES', 'Español']]
 const LEVEL_ICONS = { simple: 'spark', normal: 'match', advanced: 'chart' }
 
 export function Profile() {
@@ -31,7 +31,10 @@ export function Profile() {
 
   function save() {
     if (invalidMode) return
-    update({ ...draft, onboarded: true })
+    const professionalDefaults = draft.mode === 'professional_analyst'
+      ? { level: 'advanced', liveComments: true }
+      : {}
+    update({ ...draft, ...professionalDefaults, onboarded: true })
     setSaved(true)
   }
 
@@ -62,7 +65,7 @@ export function Profile() {
           <div className="preference-summary four">
             <span>
               <small>{copy.language}</small>
-              <strong>{draft.language === 'es' ? 'Español' : 'English'}</strong>
+              <strong>{languageName(draft.language)}</strong>
             </span>
             <span>
               <small>{copy.player}</small>
@@ -81,7 +84,7 @@ export function Profile() {
           <div className="preference-block">
             <h3>{copy.language}</h3>
             <div className="language-options">
-              {LANGUAGES.map(([value, code, name]) => (
+              {LANGUAGES.map(({ value, code, name }) => (
                 <button aria-pressed={draft.language === value} className={draft.language === value ? 'selected' : ''} key={value} onClick={() => set({ language: value })} type="button">
                   <span>{code}</span>
                   <strong>{name}</strong>
@@ -132,8 +135,8 @@ export function Profile() {
           <div className="preference-block">
             <h3>{copy.mode}</h3>
             <div className="profile-modes">
-              {['casual', 'analyst', 'player'].map((mode) => (
-                <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} key={mode} onClick={() => set({ mode })} type="button">
+              {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => (
+                <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} key={mode} onClick={() => set(mode === 'professional_analyst' ? { mode, level: 'advanced', liveComments: true } : { mode })} type="button">
                   <Icon name={MODE_ART[mode].icon} />
                   <span>
                     <strong>{t.modes[mode].name}</strong>
@@ -143,11 +146,12 @@ export function Profile() {
               ))}
             </div>
             {invalidMode && <p className="form-warning" role="alert">{copy.playerNeeded}</p>}
-            {draft.mode === 'analyst' && (
+            {['analyst', 'professional_analyst'].includes(draft.mode) && (
               <button
-                aria-checked={draft.liveComments}
+                aria-checked={draft.mode === 'professional_analyst' || draft.liveComments}
                 role="switch"
-                className={`analyst-comments-toggle ${draft.liveComments ? 'selected' : ''}`}
+                className={`analyst-comments-toggle ${draft.mode === 'professional_analyst' || draft.liveComments ? 'selected' : ''}`}
+                disabled={draft.mode === 'professional_analyst'}
                 onClick={() => set({ liveComments: !draft.liveComments })}
                 type="button"
               >

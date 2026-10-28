@@ -71,7 +71,7 @@ def test_seek_rebuilds_same_screen_without_future_messages(client: TestClient) -
 
 def test_only_one_message_competes_for_screen(client: TestClient) -> None:
     """RNF-05: nunca hay dos mensajes visibles a la vez."""
-    for params in ({}, {"mode": "analyst"}, {"mode": "player", "favorite_player_id": "aurora-8"}):
+    for params in ({}, {"mode": "analyst"}, {"mode": "professional_analyst"}, {"mode": "player", "favorite_player_id": "aurora-8"}):
         messages = overlays(client, **params)
         for t in range(0, 42_000, 100):
             assert len(visible_at(messages, t)) <= 1
@@ -104,6 +104,14 @@ def test_casual_and_analyst_differ_but_share_sources(client: TestClient) -> None
     assert casual[goal]["source_event_ids"] == analyst[goal]["source_event_ids"]
 
 
+def test_professional_analyst_returns_advanced_overlays(client: TestClient) -> None:
+    messages = overlays(client, mode="professional_analyst", level="simple")
+
+    assert messages
+    assert all(message["mode"] == "professional_analyst" for message in messages)
+    assert all(message["level"] == "advanced" for message in messages)
+
+
 def test_language_changes_text_not_facts(client: TestClient) -> None:
     """RF-22 y RF-27."""
     es = {m["candidate_id"]: m for m in overlays(client, language="es")}
@@ -114,6 +122,31 @@ def test_language_changes_text_not_facts(client: TestClient) -> None:
         assert es[key]["source_event_ids"] == en[key]["source_event_ids"]
         assert es[key]["language"] == "es" and en[key]["language"] == "en"
     assert "M. Luz" in es["moment-evt-010"]["headline"] and "M. Luz" in en["moment-evt-010"]["headline"]
+
+
+def test_portuguese_player_mode_advanced_returns_overlays(client: TestClient) -> None:
+    response = client.get(
+        f"{BASE}/overlays",
+        params={
+            "language": "pt",
+            "mode": "player",
+            "level": "advanced",
+            "favorite_team_id": "team-rio",
+            "favorite_player_id": "rio-8",
+            "until_video_ms": 173_000,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    items = response.json()["overlays"]
+    assert items
+    assert all(item["language"] == "pt" for item in items)
+    portuguese_terms = ("recupera", "progressão", "pressão", "passe", "finalização", "gol")
+    assert any(
+        term in item["explanation"].casefold()
+        for item in items
+        for term in portuguese_terms
+    )
 
 
 def test_levels_change_detail_not_facts(client: TestClient) -> None:
@@ -280,6 +313,43 @@ def test_summary_focus_keeps_facts(client: TestClient) -> None:
     assert plain["draft_id"] != focused["draft_id"]
     assert focused["explanation"].startswith(plain["explanation"].rstrip("."))
     assert "Enfoque en M. Luz" in focused["explanation"]
+
+
+def test_summary_variants_select_the_expected_events(client: TestClient) -> None:
+    short = client.get(f"{BASE}/summary", params={"summary_type": "short"}).json()["draft"]
+    extended = client.get(f"{BASE}/summary", params={"summary_type": "extended"}).json()["draft"]
+    player = client.get(
+        f"{BASE}/summary",
+        params={"summary_type": "player_danger", "player_id": "aurora-9"},
+    ).json()["draft"]
+
+    assert short["draft_id"] != extended["draft_id"] != player["draft_id"]
+    assert "tiros" not in short["explanation"]
+    assert "tiros" in extended["explanation"]
+    assert "Peligro de M. Luz" in player["explanation"]
+    assert set(short["source_event_ids"]) < set(extended["source_event_ids"])
+
+
+def test_player_summary_requires_a_player_from_the_match(client: TestClient) -> None:
+    missing = client.get(f"{BASE}/summary", params={"summary_type": "player_danger"})
+    unknown = client.get(
+        f"{BASE}/summary",
+        params={"summary_type": "player_danger", "player_id": "unknown"},
+    )
+
+    assert missing.status_code == 400
+    assert unknown.status_code == 400
+
+
+def test_new_summary_languages_are_accepted_and_translated(client: TestClient) -> None:
+    expected = {"de": "Zusammenfassung", "zh": "比赛摘要", "hi": "मैच सारांश", "fr": "Résumé", "pt": "Resumo"}
+    for language, title in expected.items():
+        response = client.get(
+            f"{BASE}/summary",
+            params={"summary_type": "short", "language": language},
+        )
+        assert response.status_code == 200
+        assert response.json()["draft"]["headline"].startswith(title)
 
 
 def test_valid_report_withdraws_and_corrects(client: TestClient) -> None:

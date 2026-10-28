@@ -162,6 +162,28 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-82 · P1.** Los controles de tema y sesión de invitado deben estar dentro del sidebar izquierdo en escritorio. En el centro del partido, la línea de tiempo y sus controles deben quedar dentro del contenedor de Partido, debajo de los comentarios cuando estén visibles. Se verifica alternando el sidebar y los comentarios sin reiniciar el reloj.
 
+**RF-83 · P1.** Cada momento narrativo debe mostrar un llamado breve y visible para abrir “Por qué importa”. La frase debe corresponder al tipo de acción, conservar el vínculo con los eventos de origen y mantenerse estable para la misma jugada. El catálogo debe poder leerse desde Supabase y contar con una alternativa local cuando la base esté deshabilitada. Se verifica con goles, remates, pases, faltas, tarjetas, recuperaciones y pérdidas, además de una ejecución sin Supabase.
+
+**RF-84 · P1.** Al salir del centro de un partido y volver, la experiencia debe recuperar el minuto y velocidad guardados, la pestaña activa, la jugada y el jugador seleccionados, el tipo de resumen, el jugador del resumen personalizado, el estado de la simulación y la posición vertical. La reproducción debe volver pausada para no avanzar sin que la persona la vea. Se verifica navegando a otra pantalla y regresando al mismo partido.
+
+**RF-85 · P1.** Los controles del partido deben usar una barra compacta pegada al borde inferior del estadio, sin encabezado de momentos ni un contador que aumente su altura. Las marcas de jugadas pueden mantenerse como puntos sobre la línea. Se verifica en escritorio y móvil sin espacio entre la barra y el borde inferior del campo.
+
+**RF-86 · P1.** El selector de velocidad debe estar oculto en el punto en directo y aparecer solo después de retroceder. La barra debe ofrecer una acción para volver al punto en directo y recuperar automáticamente la velocidad normal al alcanzarlo. Se verifica reproduciendo en directo, retrocediendo, acelerando y regresando al borde en vivo.
+
+**RF-87 · P1.** Partido debe narrar cada evento ocurrido mediante los datos disponibles. Un pase debe nombrar al pasador y al receptor. Remates, recuperaciones, presiones, faltas, tarjetas, interrupciones y reanudaciones deben tener una frase propia. Un momento importante debe aparecer encima de la barra con su minuto y una acción para cerrarlo, sin cubrir los controles. Se verifica con una secuencia sintética que incluya cada tipo de evento.
+
+**RF-88 · P1.** La experiencia debe ofrecer un cuarto perfil llamado “Analista profesional”. Este perfil debe activar el nivel avanzado, mantener los comentarios del partido y permitir más hechos respaldados por la evidencia disponible. Se verifica seleccionándolo durante la configuración, desde Preferencias y dentro del Centro del Partido.
+
+**RF-89 · P1.** Los perfiles Analista y Analista profesional deben mostrar el campo con una inclinación media en Partido, Resumen y detalle de un momento. Aficionado y Centrado en jugador deben conservar la vista plana. Los controles, comentarios y textos no deben inclinarse con el campo. Se verifica cambiando el perfil sin recargar la página en escritorio y móvil.
+
+**RF-90 · P1.** En escritorio, Partido debe alinear el estadio a la izquierda y usar una columna derecha para los comentarios en vivo y los momentos. Los comentarios no deben cubrir el campo. Los momentos deben tener un espacio propio debajo de los comentarios. En pantallas pequeñas, ambos espacios deben pasar debajo del estadio sin producir desplazamiento horizontal. Se verifica con comentarios y momentos de distinta longitud.
+
+**RF-91 · P1.** La barra de reproducción sobre el estadio debe permanecer oculta cuando no se usa y aparecer al pasar el cursor por el reproductor o enfocar uno de sus controles con teclado. En dispositivos sin cursor debe permanecer visible. Se verifica con ratón, navegación por teclado y una pantalla táctil.
+
+**RF-92 · P1.** En pantalla completa, el panel derecho debe dedicar más espacio al momento actual. La acción que abre el análisis debe mostrar únicamente la frase vinculada a la jugada, sin una etiqueta adicional, usar todo el ancho disponible y tener una animación de atención que se desactive cuando la persona prefiera menos movimiento. Se verifica con mensajes de distinta longitud, pantalla completa y la preferencia de movimiento reducido.
+
+**RF-93 · P1.** Resumen debe usar un único desplegable compacto para elegir entre resumen corto, extendido y personalizado. Cada opción debe incluir su descripción. El jugador solo debe elegirse cuando el tipo sea personalizado. Debajo, “Momento seleccionado” debe permitir elegir entre los momentos filtrados: solo goles en el resumen corto, varias jugadas relevantes en el extendido y jugadas de peligro del jugador en el personalizado. La jugada elegida debe actualizar tanto el análisis como el resaltado de la lista inferior. Se verifica cambiando tipo, jugador y momento sin salir de Resumen.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.

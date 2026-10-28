@@ -271,6 +271,6 @@ def _apply_preferences(
         priority += FAVORITE_TEAM_BONUS
     if preferences.favorite_player_id and preferences.favorite_player_id in candidate.player_ids:
         priority += FAVORITE_PLAYER_BONUS
-    if preferences.mode is ViewerMode.ANALYST and candidate.kind in {"pressure", "progressive_pass"}:
+    if preferences.mode in {ViewerMode.ANALYST, ViewerMode.PROFESSIONAL_ANALYST} and candidate.kind in {"pressure", "progressive_pass"}:
         priority += 10
     return candidate.model_copy(update={"priority": min(100, priority)})

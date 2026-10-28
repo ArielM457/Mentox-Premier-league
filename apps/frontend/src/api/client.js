@@ -82,7 +82,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ question, video_time_ms: Math.floor(t), preferences: prefsBody(prefs) }),
     }),
-  summary: (id, prefs) => request(`${base(id)}/summary?${prefsQuery(prefs)}`),
+  summary: (id, prefs, options = {}) => {
+    const params = prefsQuery(prefs)
+    params.set('summary_type', options.type ?? 'extended')
+    if (options.playerId) params.set('player_id', options.playerId)
+    return request(`${base(id)}/summary?${params}`)
+  },
   editorial: (id) => request(`${base(id)}/editorial`),
   review: (id, draftId, decision, reviewer, note) =>
     request(`${base(id)}/editorial/${encodeURIComponent(draftId)}/review`, {

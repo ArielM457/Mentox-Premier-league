@@ -81,9 +81,10 @@
 .evidence-stats small { color: #aaa5bd; }
 .home-modes { text-align: center; }
 .home-modes .home-section-heading { margin-inline: auto; }
-.home-mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+.home-mode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: left; }
 .mode-preview { min-height: 340px; position: relative; overflow: hidden; color: white; background: radial-gradient(circle at 70% 10%, #9a76ff, transparent 36%), linear-gradient(145deg, #332260, var(--navy)); border: 1px solid rgba(130,87,245,.28); border-radius: 26px; box-shadow: 0 16px 45px rgba(35,24,73,.12); transition: transform 250ms, box-shadow 250ms; }
 .mode-preview-3 { background: radial-gradient(circle at 72% 12%, #78b9eb, transparent 38%), linear-gradient(145deg, #285f9e, #173f73); border-color: rgba(120,185,235,.45); }
+.mode-preview-4 { background: radial-gradient(circle at 72% 12%, #6e9ee7, transparent 38%), linear-gradient(145deg, #284d88, #172f5b); border-color: rgba(110,158,231,.45); }
 .mode-preview::before { content: ""; width: 70%; height: 200%; position: absolute; z-index: 3; left: -110%; top: -50%; pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent); transform: rotate(18deg); transition: left 650ms ease; }
 .mode-preview:hover::before { left: 150%; }
 .mode-preview:hover { transform: translateY(-7px); box-shadow: 0 26px 60px rgba(53,34,105,.22); }

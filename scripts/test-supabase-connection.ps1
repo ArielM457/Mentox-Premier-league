@@ -30,7 +30,8 @@ $tables = @(
     'assistant_messages',
     'match_summaries',
     'community_votes',
-    'community_messages'
+    'community_messages',
+    'action_callouts'
 )
 $failed = $false
 

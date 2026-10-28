@@ -10,7 +10,7 @@ Los ejemplos se guardarán como archivos de prueba en una carpeta compartida del
 
 ## **Entrada: evento y preferencias**
 
-Persona 1 entrega eventos según `MatchEvent 1.0`. Persona 4 entrega preferencias con idioma `es` o `en`, modo `casual`, `analyst` o `player`, nivel `simple`, `normal` o `advanced`, y los identificadores opcionales de club y jugador favoritos. Persona 2 usa esas preferencias solo para puntuar relevancia; Persona 3 las usa para redactar y seleccionar contenido.
+Persona 1 entrega eventos según `MatchEvent 1.0`. Persona 4 entrega preferencias con idioma `es`, `en`, `de`, `zh`, `hi`, `fr` o `pt`; modo `casual`, `analyst`, `professional_analyst` o `player`; nivel `simple`, `normal` o `advanced`; y los identificadores opcionales de club y jugador favoritos. `professional_analyst` fuerza el nivel avanzado. Persona 2 usa esas preferencias solo para puntuar relevancia; Persona 3 las usa para redactar y seleccionar contenido.
 
 ## **Salida de Persona 2: estado**
 

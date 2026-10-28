@@ -16,6 +16,7 @@
   .team-grid { grid-template-columns: repeat(3, 1fr); }
   .live-tactical-grid { grid-template-columns: 1fr; }
   .live-tactic-choices { grid-template-columns: 1fr 1fr; }
+  .home-mode-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 760px) {
@@ -187,6 +188,7 @@
   .video-controls { grid-template-columns: auto 1fr auto; }
   .video-controls > .btn-ghost { grid-column: 1/-1; }
   .recap-content > .match-score { margin-bottom: 18px; }
+  .summary-type-grid { grid-template-columns: 1fr; }
   .recap-hero { grid-template-columns: 1fr; }
   .recap-art { height: 240px; }
   .recap-art .player-illustration { width: 90%; margin-bottom: -44%; }

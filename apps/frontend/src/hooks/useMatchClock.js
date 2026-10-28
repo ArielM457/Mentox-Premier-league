@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 function readPlayback(key, duration) {
   try {
-    const saved = JSON.parse(sessionStorage.getItem(`itg:playback:${key}`) || '{}')
-    return { time: Math.min(duration, Math.max(0, Number(saved.time) || 0)), speed: [1, 2, 4, 8].includes(saved.speed) ? saved.speed : 1 }
-  } catch { return { time: 0, speed: 1 } }
+    const saved = JSON.parse(localStorage.getItem(`itg:playback:${key}`) || sessionStorage.getItem(`itg:playback:${key}`) || '{}')
+    const time = Math.min(duration, Math.max(0, Number(saved.time) || 0))
+    return { time, liveEdge: Math.min(duration, Math.max(time, Number(saved.liveEdge) || 0)), speed: [1, 2, 4, 8].includes(saved.speed) ? saved.speed : 1 }
+  } catch { return { time: 0, liveEdge: 0, speed: 1 } }
 }
 
 function activeVideo(ref) { return ref?.current?.src ? ref.current : null }
@@ -13,14 +14,23 @@ function activeVideo(ref) { return ref?.current?.src ? ref.current : null }
 export function useMatchClock(durationMs, videoRef, matchId) {
   const [initial] = useState(() => readPlayback(matchId, durationMs))
   const [time, setTime] = useState(initial.time)
+  const [liveEdge, setLiveEdge] = useState(initial.liveEdge)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeedState] = useState(initial.speed)
   const anchor = useRef({ wall: 0, video: initial.time })
   const timeRef = useRef(initial.time)
+  const liveEdgeRef = useRef(initial.liveEdge)
   const speedRef = useRef(initial.speed)
-  const update = useCallback((value) => { timeRef.current = value; setTime(value) }, [])
+  const update = useCallback((value) => {
+    timeRef.current = value
+    setTime(value)
+    if (value > liveEdgeRef.current) {
+      liveEdgeRef.current = value
+      setLiveEdge(value)
+    }
+  }, [])
   const persist = useCallback(() => {
-    try { sessionStorage.setItem(`itg:playback:${matchId}`, JSON.stringify({ time: timeRef.current, speed: speedRef.current })) } catch { /* Session remains usable without storage. */ }
+    try { localStorage.setItem(`itg:playback:${matchId}`, JSON.stringify({ time: timeRef.current, liveEdge: liveEdgeRef.current, speed: speedRef.current })) } catch { /* Session remains usable without storage. */ }
   }, [matchId])
 
   useEffect(() => {
@@ -64,5 +74,5 @@ export function useMatchClock(durationMs, videoRef, matchId) {
     setSpeedState(value)
     persist()
   }, [videoRef, persist])
-  return { time, playing, speed, play, pause, seek, setSpeed, timeRef }
+  return { time, liveEdge, playing, speed, play, pause, seek, setSpeed, timeRef }
 }

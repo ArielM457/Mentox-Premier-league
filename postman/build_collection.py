@@ -55,7 +55,7 @@ def match_experience_items() -> list[dict]:
     """
     base = "/api/v1/matches/synthetic-acceptance-001"
     goal_draft = "draft-moment-evt-010-es-casual-normal"
-    summary = "summary-synthetic-acceptance-001-es-casual"
+    summary = "summary-synthetic-acceptance-001-es-casual-extended"
     body = "const body = pm.response.json();"
     return [
         request(
@@ -237,7 +237,7 @@ def match_experience_items() -> list[dict]:
 def community_items() -> list[dict]:
     """Revisión comunitaria del resumen creado en «Experiencia del partido» (ejecutar después)."""
     base = "/api/v1/matches/synthetic-acceptance-001/community"
-    summary = "summary-synthetic-acceptance-001-es-casual"
+    summary = "summary-synthetic-acceptance-001-es-casual-extended"
     body = "const body = pm.response.json();"
     person = {"client_id": "postman-cliente-01", "author": "Postman"}
     return [

@@ -34,6 +34,7 @@ from match_intelligence.domain.presentation import (
     NarrativeDraft,
     ViewerMode,
     ViewerPreferences,
+    SummaryType,
 )
 
 from .match_schemas import (
@@ -347,8 +348,13 @@ def ask(session: Session, body: QuestionRequest) -> AnswerResponse:
     summary="Resumen final personalizado",
     description="Crea o recupera el resumen para estas preferencias. Queda pendiente de revisión editorial.",
 )
-def get_summary(session: Session, prefs: Preferences) -> EditorialRecordResponse:
-    return _editorial(session.summary(prefs))
+def get_summary(
+    session: Session,
+    prefs: Preferences,
+    summary_type: SummaryType = SummaryType.EXTENDED,
+    player_id: str | None = None,
+) -> EditorialRecordResponse:
+    return _editorial(session.summary(prefs, summary_type, player_id or None))
 
 
 @router.get("/{match_id}/editorial", response_model=list[EditorialRecordResponse], summary="Cola de revisión editorial")

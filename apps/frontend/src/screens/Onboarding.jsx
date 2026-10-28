@@ -8,8 +8,7 @@ import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
-
-const LANGUAGES = [['es', 'ES', 'Español', 'Experiencia en español'], ['en', 'EN', 'English', 'Experience in English']]
+import { LANGUAGES, languageName } from '../i18n/languages.js'
 
 export function Onboarding() {
   const { t, preferences, update } = usePreferences()
@@ -25,9 +24,13 @@ export function Onboarding() {
   const set = (changes) => setDraft((current) => ({ ...current, ...changes }))
   const club = catalog?.clubs.find((team) => team.team_id === draft.favoriteTeamId)
   const players = catalog?.players.filter((player) => player.team_id === draft.favoriteTeamId) ?? []
+  const selectedPlayer = catalog?.players.find((player) => player.player_id === draft.favoritePlayerId)
 
   function finish() {
-    update({ ...draft, onboarded: true })
+    const professionalDefaults = draft.mode === 'professional_analyst'
+      ? { level: 'advanced', liveComments: true }
+      : {}
+    update({ ...draft, ...professionalDefaults, onboarded: true })
     navigate(paths.discover())
   }
 
@@ -71,7 +74,7 @@ export function Onboarding() {
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="01" title={copy.languageTitle} text={copy.languageCopy} />
               <div className="onboarding-language language-cards">
-                {LANGUAGES.map(([value, code, name, description]) => (
+                {LANGUAGES.map(({ value, code, name, description }) => (
                   <button aria-pressed={draft.language === value} className={draft.language === value ? 'selected' : ''} key={value} onClick={() => { set({ language: value }); update({ language: value }) }} type="button">
                     <b>{code}</b>
                     <span>
@@ -111,7 +114,7 @@ export function Onboarding() {
           {step === 2 && catalog && (
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="03" title={club ? copy.playersOf(club.name) : copy.chooseClubFirst} text={copy.playerCopy} />
-              {club ? (
+              {club && players.length ? (
                 <div className="player-card-grid">
                   {players.map((player) => (
                     <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => set({ favoritePlayerId: player.player_id })} type="button">
@@ -128,6 +131,8 @@ export function Onboarding() {
                     </button>
                   ))}
                 </div>
+              ) : club ? (
+                <p className="form-warning">{copy.noPlayers}</p>
               ) : (
                 <button className="choose-club-prompt" onClick={() => setStep(1)} type="button">
                   <Icon name="match" size={24} /> {copy.chooseClub}
@@ -139,8 +144,8 @@ export function Onboarding() {
           {step === 3 && (
             <div className="onboarding-preference onboarding-step compact-step">
               <StepIntro number="04" title={copy.modeTitle} text={copy.modeCopy} />
-              <div className="visualization-modes three">
-                {['casual', 'analyst', 'player'].map((mode) => {
+              <div className="visualization-modes four">
+                {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => {
                   const disabled = mode === 'player' && !draft.favoritePlayerId
                   return (
                     <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} disabled={disabled} key={mode} onClick={() => set({ mode })} title={disabled ? t.profile.playerNeeded : undefined} type="button">
@@ -160,6 +165,16 @@ export function Onboarding() {
                   )
                 })}
               </div>
+              <section className="onboarding-selection-summary" aria-labelledby="experience-selection-title">
+                <h3 id="experience-selection-title">{copy.selectionTitle}</h3>
+                <p>{copy.selectionCopy}</p>
+                <div className="preference-summary four">
+                  <span><small>{t.profile.language}</small><strong>{languageName(draft.language)}</strong></span>
+                  <span><small>{t.profile.club}</small><strong>{club?.name ?? t.common.none}</strong></span>
+                  <span><small>{t.profile.player}</small><strong>{selectedPlayer?.name ?? t.common.none}</strong></span>
+                  <span><small>{t.profile.mode}</small><strong>{t.modes[draft.mode].name}</strong></span>
+                </div>
+              </section>
             </div>
           )}
 

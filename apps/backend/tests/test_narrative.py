@@ -85,6 +85,37 @@ def test_languages_modes_and_evidence_limits(sample):
     assert goal.draft.source_event_ids == ["evt-105"]
 
 
+def test_professional_analyst_forces_advanced_detail(sample):
+    snapshot, candidates = sample
+    preferences = ViewerPreferences(mode="professional_analyst", level="simple")
+    result = NarrativeService(FixtureGateway()).create_live(
+        NarrativeRequest(snapshot=snapshot, candidate=candidates[0], preferences=preferences)
+    )
+
+    assert preferences.level == "advanced"
+    assert result.draft.mode == "professional_analyst"
+    assert result.draft.level == "advanced"
+    assert len(result.draft.claims) == 2
+
+
+@pytest.mark.parametrize(
+    ("language", "expected"),
+    [("de", "Balleroberung"), ("zh", "夺回球权"), ("hi", "गेंद वापसी"), ("fr", "récupération"), ("pt", "recuperação")],
+)
+def test_additional_languages_render_live_facts(sample, language, expected):
+    snapshot, candidates = sample
+    result = NarrativeService(FixtureGateway()).create_live(
+        NarrativeRequest(
+            snapshot=snapshot,
+            candidate=candidates[0],
+            preferences=ViewerPreferences(language=language, mode="player", level="advanced", favorite_player_id="player-7"),
+        )
+    )
+
+    assert result.draft.publishable
+    assert expected in result.draft.explanation
+
+
 def test_player_preference_and_no_update(sample):
     snapshot, candidates = sample
     service = NarrativeService(FixtureGateway())

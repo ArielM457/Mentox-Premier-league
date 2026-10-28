@@ -30,7 +30,7 @@ Este documento registra lo implementado por Persona 4, cómo se verificó y qué
 | `POST /matches/{id}/simulation` | Ejecutar localmente las seis rutas del filtro y los agentes configurados. |
 | `GET /matches/{id}/highlights` · `POST …/highlights/{clip_id}/review` | Consultar, confirmar o rechazar recortes propuestos. |
 
-Las preferencias se envían como parámetros: `language` (`es`, `en`), `mode` (`casual`, `analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`.
+Las preferencias se envían como parámetros: `language` (`es`, `en`, `de`, `zh`, `hi`, `fr`, `pt`), `mode` (`casual`, `analyst`, `professional_analyst`, `player`), `level` (`simple`, `normal`, `advanced`), `favorite_team_id` y `favorite_player_id`. `professional_analyst` siempre usa el nivel avanzado.
 
 **Frontend.** `apps/frontend` implementa el diseño de Figma de Persona 5 para The Prime Moment en React y JavaScript, como fija la [decisión técnica 3](../07-decisiones-tomadas.md), conectado a la API real.
 
@@ -176,6 +176,8 @@ La verificación final ejecutó 330 pruebas del backend correctamente, además d
 Mi experiencia incluye al final una acción confirmada para borrar la configuración local. Reinicia idioma, tema, modo, nivel, club, jugador, comentarios en vivo, estado del sidebar y apertura del agente, marca el onboarding como pendiente y vuelve a la selección inicial. Conserva el historial de partidos y resúmenes, la identidad de comunidad, los votos y los comentarios.
 
 Las esperas del frontend muestran un indicador de carga visible y accesible. El patrón cubre la carga inicial, catálogo, previa, resúmenes, comunidad, conexión en vivo, agente, reportes, analítica táctica, seguimiento y procesamiento de visión. Los botones asíncronos se bloquean mientras esperan su respuesta y muestran el progreso dentro del mismo control.
+
+Los controles de reproducción y la línea de tiempo de momentos se muestran encima de la cancha sintética como si fuera un video. Permanecen ocultos para no tapar la jugada y aparecen al pasar el cursor o enfocar un control con el teclado. En una pantalla táctil permanecen visibles. En escritorio, los comentarios en vivo ocupan una columna a la derecha y los momentos tienen un espacio propio debajo. En pantallas pequeñas pasan debajo de la cancha. El reloj conserva su estado al cambiar de vista.
 
 La migración `202610260001_summary_community.sql` añade resúmenes, votos y mensajes. Los adaptadores recuperan y guardan esos datos cuando Supabase está activo y mantienen respaldo en memoria cuando falla. Se superaron 53 pruebas específicas de experiencia, comunidad y persistencia; la suite disponible sin los artefactos reales de visión terminó con 412 pruebas superadas y 7 omitidas. El linter y la compilación del frontend terminaron correctamente con las dos advertencias anteriores. La comprobación HTTP local cargó tres resúmenes y tres salas de comunidad. La revisión visual automatizada no pudo completarse porque Chrome y Edge no generaron la captura en este entorno.
 

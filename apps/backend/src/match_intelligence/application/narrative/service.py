@@ -44,6 +44,49 @@ LABELS = {
         "forward_progress": ("metre of progression", "metres of progression"),
         "pressure": ("pressure", "pressures"),
     },
+    "de": {
+        "recoveries": ("Balleroberung", "Balleroberungen"), "shots": ("Schuss", "Schüsse"),
+        "goals": ("Tor", "Tore"), "goal": ("Tor", "Tore"), "passes": ("Pass", "Pässe"),
+        "passes_in_build_up": ("Pass im Angriff", "Pässe im Angriff"),
+        "seconds_since_recovery": ("Sekunde seit der Balleroberung", "Sekunden seit der Balleroberung"),
+        "forward_progress": ("Meter Raumgewinn", "Meter Raumgewinn"), "pressure": ("Pressingaktion", "Pressingaktionen"),
+    },
+    "zh": {
+        "recoveries": ("夺回球权", "夺回球权"), "shots": ("射门", "射门"), "goals": ("进球", "进球"),
+        "goal": ("进球", "进球"), "passes": ("传球", "传球"), "passes_in_build_up": ("进攻传球", "进攻传球"),
+        "seconds_since_recovery": ("夺回球权后的秒数", "夺回球权后的秒数"),
+        "forward_progress": ("推进米数", "推进米数"), "pressure": ("逼抢", "逼抢"),
+    },
+    "hi": {
+        "recoveries": ("गेंद वापसी", "गेंद वापसी"), "shots": ("शॉट", "शॉट"), "goals": ("गोल", "गोल"),
+        "goal": ("गोल", "गोल"), "passes": ("पास", "पास"), "passes_in_build_up": ("चाल में पास", "चाल में पास"),
+        "seconds_since_recovery": ("गेंद वापसी के बाद सेकंड", "गेंद वापसी के बाद सेकंड"),
+        "forward_progress": ("मीटर प्रगति", "मीटर प्रगति"), "pressure": ("दबाव", "दबाव"),
+    },
+    "fr": {
+        "recoveries": ("récupération", "récupérations"), "shots": ("tir", "tirs"),
+        "goals": ("but", "buts"), "goal": ("but", "buts"), "passes": ("passe", "passes"),
+        "passes_in_build_up": ("passe dans l’action", "passes dans l’action"),
+        "seconds_since_recovery": ("seconde depuis la récupération", "secondes depuis la récupération"),
+        "forward_progress": ("mètre de progression", "mètres de progression"), "pressure": ("pression", "pressions"),
+    },
+    "pt": {
+        "recoveries": ("recuperação", "recuperações"), "shots": ("finalização", "finalizações"),
+        "goals": ("gol", "gols"), "goal": ("gol", "gols"), "passes": ("passe", "passes"),
+        "passes_in_build_up": ("passe na jogada", "passes na jogada"),
+        "seconds_since_recovery": ("segundo desde a recuperação", "segundos desde a recuperação"),
+        "forward_progress": ("metro de progressão", "metros de progressão"), "pressure": ("pressão", "pressões"),
+    },
+}
+
+LIVE_COPY = {
+    "es": {"match": "El partido", "no_update": "Sin novedades de {player}", "no_action": "Los eventos disponibles no registran una nueva acción suya.", "insufficient": "Datos insuficientes", "insufficient_body": "No se puede determinar con los datos disponibles.", "answer": "Respuesta", "goal": "Gol de {focus} - {clock}", "shot": "Tiro de {focus} - {clock}", "moment": "Momento de {focus} - {clock}", "window": "Ventana de {seconds} segundos.", "limit": "No hay datos suficientes para afirmar una causa táctica.", "final": "Resumen final - {score}"},
+    "en": {"match": "The match", "no_update": "No update on {player}", "no_action": "Available events do not record a new action by this player.", "insufficient": "Insufficient evidence", "insufficient_body": "The available data cannot determine this.", "answer": "Answer", "goal": "Goal for {focus} - {clock}", "shot": "Shot by {focus} - {clock}", "moment": "Moment for {focus} - {clock}", "window": "Window of {seconds} seconds.", "limit": "There is not enough evidence to assert a tactical cause.", "final": "Final summary - {score}"},
+    "de": {"match": "Das Spiel", "no_update": "Keine neue Aktion von {player}", "no_action": "Die verfügbaren Ereignisse enthalten keine neue Aktion dieses Spielers.", "insufficient": "Nicht genügend Daten", "insufficient_body": "Die verfügbaren Daten reichen für diese Aussage nicht aus.", "answer": "Antwort", "goal": "Tor von {focus} - {clock}", "shot": "Schuss von {focus} - {clock}", "moment": "Moment von {focus} - {clock}", "window": "Zeitfenster von {seconds} Sekunden.", "limit": "Es gibt nicht genug Daten für eine taktische Ursache.", "final": "Endzusammenfassung - {score}"},
+    "zh": {"match": "本场比赛", "no_update": "{player} 暂无新动态", "no_action": "现有事件没有记录该球员的新动作。", "insufficient": "数据不足", "insufficient_body": "现有数据无法得出结论。", "answer": "回答", "goal": "{focus} 进球 - {clock}", "shot": "{focus} 射门 - {clock}", "moment": "{focus} 的关键时刻 - {clock}", "window": "统计窗口为 {seconds} 秒。", "limit": "没有足够数据判断战术原因。", "final": "赛后摘要 - {score}"},
+    "hi": {"match": "मैच", "no_update": "{player} की कोई नई कार्रवाई नहीं", "no_action": "उपलब्ध घटनाओं में इस खिलाड़ी की नई कार्रवाई दर्ज नहीं है।", "insufficient": "पर्याप्त डेटा नहीं", "insufficient_body": "उपलब्ध डेटा से निष्कर्ष नहीं निकाला जा सकता।", "answer": "उत्तर", "goal": "{focus} का गोल - {clock}", "shot": "{focus} का शॉट - {clock}", "moment": "{focus} का महत्वपूर्ण क्षण - {clock}", "window": "{seconds} सेकंड की अवधि।", "limit": "रणनीतिक कारण बताने के लिए पर्याप्त डेटा नहीं है।", "final": "अंतिम सारांश - {score}"},
+    "fr": {"match": "Le match", "no_update": "Aucune nouvelle action de {player}", "no_action": "Les événements disponibles ne signalent aucune nouvelle action de ce joueur.", "insufficient": "Données insuffisantes", "insufficient_body": "Les données disponibles ne permettent pas de conclure.", "answer": "Réponse", "goal": "But de {focus} - {clock}", "shot": "Tir de {focus} - {clock}", "moment": "Moment de {focus} - {clock}", "window": "Fenêtre de {seconds} secondes.", "limit": "Les données ne suffisent pas pour affirmer une cause tactique.", "final": "Résumé final - {score}"},
+    "pt": {"match": "A partida", "no_update": "Sem novidades de {player}", "no_action": "Os eventos disponíveis não registram uma nova ação deste jogador.", "insufficient": "Dados insuficientes", "insufficient_body": "Os dados disponíveis não permitem determinar isso.", "answer": "Resposta", "goal": "Gol de {focus} - {clock}", "shot": "Finalização de {focus} - {clock}", "moment": "Momento de {focus} - {clock}", "window": "Janela de {seconds} segundos.", "limit": "Não há dados suficientes para afirmar uma causa tática.", "final": "Resumo final - {score}"},
 }
 
 QUESTION_TERMS = {
@@ -83,11 +126,9 @@ def _grounded(claim: Claim, facts: list[EvidenceFact]) -> bool:
 def _fact_text(fact: EvidenceFact, language: str) -> str:
     labels = LABELS[language].get(fact.key)
     label = labels[0 if fact.value == 1 else 1] if labels else fact.key.replace("_", " ")
-    subject = fact.player_id or fact.team_id or ("El partido" if language == "es" else "The match")
+    subject = fact.player_id or fact.team_id or LIVE_COPY[language]["match"]
     unit = "" if fact.unit in (None, "count") else f" {fact.unit}"
     value = int(fact.value) if isinstance(fact.value, float) and fact.value.is_integer() else fact.value
-    if language == "es":
-        return f"{subject}: {value}{unit} {label}".strip()
     return f"{subject}: {value}{unit} {label}".strip()
 
 
@@ -97,51 +138,36 @@ def _render(
     preferences: ViewerPreferences,
 ) -> tuple[str, str]:
     language = preferences.language
+    copy = LIVE_COPY[language]
     clock = f"{candidate.clock_ms // 60000}'"
     if not facts:
         if preferences.mode == "player":
             player = preferences.favorite_player_id
             return (
-                (f"Sin novedades de {player}" if language == "es" else f"No update on {player}"),
-                (
-                    "Los eventos disponibles no registran una nueva acción suya."
-                    if language == "es"
-                    else "Available events do not record a new action by this player."
-                ),
+                copy["no_update"].format(player=player),
+                copy["no_action"],
             )
         return (
-            "Datos insuficientes" if language == "es" else "Insufficient evidence",
-            "No se puede determinar con los datos disponibles."
-            if language == "es"
-            else "The available data cannot determine this.",
+            copy["insufficient"],
+            copy["insufficient_body"],
         )
     focus = facts[0].player_id or facts[0].team_id
     if candidate.kind == "question":
-        headline = "Respuesta" if language == "es" else "Answer"
+        headline = copy["answer"]
     elif candidate.kind == "goal" and any(fact.key in {"goal", "goals"} and fact.value for fact in facts):
-        headline = f"Gol de {focus} - {clock}" if language == "es" else f"Goal for {focus} - {clock}"
+        headline = copy["goal"].format(focus=focus, clock=clock)
     elif candidate.kind == "shot" and any(fact.key == "shots" for fact in facts):
-        headline = f"Tiro de {focus} - {clock}" if language == "es" else f"Shot by {focus} - {clock}"
+        headline = copy["shot"].format(focus=focus, clock=clock)
     else:
-        headline = (
-            f"Momento de {focus} - {clock}" if language == "es" else f"Moment for {focus} - {clock}"
-        )
+        headline = copy["moment"].format(focus=focus, clock=clock)
     explanation = ". ".join(_fact_text(fact, language) for fact in facts) + "."
     if preferences.level == "advanced":
         windows = [fact.window_ms for fact in facts if fact.window_ms is not None]
         if windows:
             seconds = min(windows) // 1000
-            explanation += (
-                f" Ventana de {seconds} segundos."
-                if language == "es"
-                else f" Window of {seconds} seconds."
-            )
+            explanation += " " + copy["window"].format(seconds=seconds)
     if candidate.evidence_limits and preferences.level != "simple":
-        explanation += (
-            " No hay datos suficientes para afirmar una causa táctica."
-            if language == "es"
-            else " There is not enough evidence to assert a tactical cause."
-        )
+        explanation += " " + copy["limit"]
     return headline, explanation
 
 
@@ -204,7 +230,10 @@ class NarrativeService:
             if goal_indexes:
                 goal_index = goal_indexes[0]
                 indexes = [goal_index, *[index for index in indexes if index != goal_index]]
-        limit = 1 if preferences.mode == "casual" or preferences.level == "simple" else 2
+        if preferences.mode == "professional_analyst":
+            limit = 3
+        else:
+            limit = 1 if preferences.mode == "casual" or preferences.level == "simple" else 2
         facts = [candidate.facts[index] for index in indexes[:limit]]
         draft = self._draft(candidate, preferences, facts)
         reason = "; ".join(
@@ -312,9 +341,7 @@ class NarrativeService:
             return self._failure(candidate, "unavailable", "No verified moments for summary", start)
         language = request.preferences.language
         score = " - ".join(f"{team} {goals}" for team, goals in request.snapshot.score.items())
-        headline = (
-            f"Resumen final - {score}" if language == "es" else f"Final summary - {score}"
-        )
+        headline = LIVE_COPY[language]["final"].format(score=score)
         explanation = " ".join(
             f"{draft.headline}: {draft.explanation}" for draft in accepted
         )
@@ -492,12 +519,8 @@ class NarrativeService:
             mode=preferences.mode,
             level=preferences.level,
             content_kind="answer",
-            headline="Datos insuficientes" if preferences.language == "es" else "Insufficient evidence",
-            explanation=(
-                "No se puede determinar con los datos disponibles."
-                if preferences.language == "es"
-                else "The available data cannot determine this."
-            ),
+            headline=LIVE_COPY[preferences.language]["insufficient"],
+            explanation=LIVE_COPY[preferences.language]["insufficient_body"],
             verification_status="approved",
         )
         return NarrativeOutcome(

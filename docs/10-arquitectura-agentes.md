@@ -159,7 +159,7 @@ La primera implementación es determinista y vive en `apps/backend/src/match_int
 
 ## **Personalización**
 
-La personalización será una configuración común. Incluye idioma, modo casual o analista, nivel de detalle, club favorito, jugador favorito, rol del usuario y canal de salida. El filtro puede usarla para calcular relevancia, el orquestador para priorizar y el narrador para elegir tono y detalle. Ninguna preferencia puede modificar hechos o cifras.
+La personalización será una configuración común. Incluye idioma, modo aficionado, analista, analista profesional o centrado en jugador; nivel de detalle; club favorito; jugador favorito; rol del usuario y canal de salida. El perfil profesional fuerza el nivel avanzado, pero ninguna preferencia puede modificar hechos o cifras. El filtro puede usarla para calcular relevancia, el orquestador para priorizar y el narrador para elegir tono y detalle.
 
 ## **Validación antes de publicar**
 

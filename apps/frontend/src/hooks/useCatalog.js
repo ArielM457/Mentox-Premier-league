@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
+import { ADDITIONAL_CLUBS, ADDITIONAL_PLAYERS } from '../data/branding.js'
 
 // Catálogo de la demo: partidos cargados en la API, sus equipos y jugadores.
 // Se pide una vez y se comparte entre pantallas; reload() lo vuelve a pedir.
@@ -38,6 +39,12 @@ async function fetchCatalog() {
   for (const match of matches) {
     for (const team of [match.metadata.home_team, match.metadata.away_team]) clubs.set(team.team_id, team)
     for (const player of match.metadata.players) players.set(player.player_id, player)
+  }
+  for (const club of ADDITIONAL_CLUBS) {
+    if (!clubs.has(club.team_id)) clubs.set(club.team_id, club)
+  }
+  for (const player of ADDITIONAL_PLAYERS) {
+    if (!players.has(player.player_id)) players.set(player.player_id, player)
   }
   const actions = {}
   for (const match of matches) {

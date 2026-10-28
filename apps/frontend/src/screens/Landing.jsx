@@ -130,7 +130,7 @@ export function Landing() {
           </h2>
         </div>
         <div className="home-mode-grid">
-          {['casual', 'analyst', 'player'].map((mode, index) => (
+          {['casual', 'analyst', 'professional_analyst', 'player'].map((mode, index) => (
             <article className={`mode-preview mode-preview-${index + 1}`} key={mode}>
               <div className="mode-preview-art">
                 <img alt="" src={MODE_ART[mode].image} />

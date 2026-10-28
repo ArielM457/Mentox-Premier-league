@@ -7,6 +7,7 @@ from typing import Protocol
 
 from match_intelligence.domain.contracts import MatchEvent, MatchMetadata
 from match_intelligence.domain.presentation import EditorialStatus, NarrativeDraft, OverlayMessage
+from match_intelligence.application.callouts import ActionCallout
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,8 @@ class MatchPersistence(Protocol):
 
     def load_summaries(self, match_id: str) -> list[PersistedSummary]: ...
 
+    def load_callouts(self) -> list[ActionCallout]: ...
+
 
 class NullMatchPersistence:
     def save_match(self, metadata: MatchMetadata, events: Sequence[MatchEvent]) -> None:
@@ -78,4 +81,7 @@ class NullMatchPersistence:
         return None
 
     def load_summaries(self, match_id: str) -> list[PersistedSummary]:
+        return []
+
+    def load_callouts(self) -> list[ActionCallout]:
         return []
