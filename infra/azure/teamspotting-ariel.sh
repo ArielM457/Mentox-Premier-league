@@ -29,7 +29,8 @@ case "${action}" in
     az containerapp revision set-mode --resource-group "${resource_group}" \
       --name "${app_name}" --mode single --output none
     az containerapp update --resource-group "${resource_group}" --name "${app_name}" \
-      --min-replicas 1 --max-replicas 1 --output none
+      --min-replicas 1 --max-replicas 1 \
+      --set-env-vars MENTOX_MAX_VIDEO_SECONDS=240 --output none
     model_endpoint="$(endpoint)"
     echo "Esperando el arranque del modelo en ${model_endpoint} ..."
     for attempt in $(seq 1 30); do

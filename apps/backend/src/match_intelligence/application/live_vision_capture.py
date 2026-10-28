@@ -7,11 +7,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from hashlib import sha256
 import os
+from math import isfinite
 from typing import Any, Protocol
 
 import aiohttp
 
 from match_intelligence.application.realtime_observations import LiveObservation
+from match_intelligence.application.model_http import model_payload, ModelStartingError
 
 
 class ObservationPublisher(Protocol):
@@ -72,18 +74,28 @@ class RoboflowSuitePredictor:
             async with self._session_for_request().get(
                 f"{self.settings.endpoint}/health/ready"
             ) as response:
-                payload = await response.json(content_type=None)
+                payload = await model_payload(response)
+                if response.status in {429, 502, 503, 504}:
+                    raise ModelStartingError(f"Roboflow está iniciando (HTTP {response.status})")
                 if response.status >= 400:
                     raise CaptureUnavailableError(
                         f"El modelo no está listo (HTTP {response.status}): {payload}"
                     )
+                if not {"player", "ball", "pitch"}.issubset(payload.get("models", [])):
+                    raise CaptureUnavailableError("El endpoint Roboflow no tiene listos player, ball y pitch")
                 return payload
         except (aiohttp.ClientError, asyncio.TimeoutError) as error:
-            raise CaptureUnavailableError(
+            raise ModelStartingError(
                 "El modelo todavía está iniciando o no es accesible"
             ) from error
 
     async def predict(self, image: bytes, content_type: str) -> dict[str, Any]:
+        try:
+            return await self._predict(image, content_type)
+        except (aiohttp.ClientError, asyncio.TimeoutError) as error:
+            raise CaptureUnavailableError("Roboflow no respondió a la captura; compruebe su réplica y conectividad") from error
+
+    async def _predict(self, image: bytes, content_type: str) -> dict[str, Any]:
         if not self.settings.endpoint or not self.settings.api_key:
             raise CaptureUnavailableError(
                 "Configure ROBOFLOW_SUITE_ENDPOINT y ROBOFLOW_SUITE_API_KEY en el backend"
@@ -96,11 +108,30 @@ class RoboflowSuitePredictor:
             data=form,
             headers={"X-API-Key": self.settings.api_key},
         ) as response:
-            payload = await response.json(content_type=None)
+            payload = await model_payload(response)
             if response.status >= 400:
                 raise CaptureUnavailableError(
                     f"El modelo respondió HTTP {response.status}: {payload}"
                 )
+            outputs = payload.get("results")
+            if not isinstance(outputs, list) or any(not isinstance(item, dict) for item in outputs):
+                raise CaptureUnavailableError("Roboflow no devolvió resultados válidos")
+            returned_models = {item.get("model") for item in outputs}
+            if returned_models != {"player", "ball", "pitch"} or len(outputs) != 3:
+                raise CaptureUnavailableError("La inferencia Roboflow no devolvió los tres modelos solicitados")
+            for item in outputs:
+                if not isinstance(item.get("detections"), list):
+                    raise CaptureUnavailableError("Roboflow no devolvió la lista de detecciones")
+                for detection in item["detections"]:
+                    if not isinstance(detection, dict):
+                        raise CaptureUnavailableError("Detección Roboflow inválida")
+                    box, confidence = detection.get("bounding_box"), detection.get("confidence")
+                    valid_box = (isinstance(box, list) and len(box) == 4 and all(
+                        isinstance(value, (int, float)) and not isinstance(value, bool) and isfinite(value) and 0 <= value <= 1 for value in box))
+                    if (not valid_box or box[0] > box[2] or box[1] > box[3]
+                            or not isinstance(confidence, (int, float)) or not isfinite(confidence) or not 0 <= confidence <= 1
+                            or not isinstance(detection.get("label"), str)):
+                        raise CaptureUnavailableError("Detección Roboflow sin caja normalizada, clase o confianza válida")
             return payload
 
     async def close(self) -> None:
@@ -122,6 +153,7 @@ class LiveVisionCapture:
         self.settings = settings
         self._playing: set[str] = set()
         self._last_timestamp: dict[str, int] = {}
+        self._generation: dict[str, int] = {}
         self._locks: dict[str, asyncio.Lock] = {}
         self.frames_received = 0
         self.frames_processed = 0
@@ -147,10 +179,15 @@ class LiveVisionCapture:
 
     def pause(self, match_id: str) -> None:
         self._playing.discard(match_id)
+        self.seek(match_id)
+
+    def seek(self, match_id: str) -> None:
+        # Permite volver a capturar tras retroceder o volver al inicio del vídeo.
+        self._last_timestamp.pop(match_id, None)
+        self._generation[match_id] = self._generation.get(match_id, 0) + 1
 
     def restart(self, match_id: str) -> None:
-        self._playing.discard(match_id)
-        self._last_timestamp.pop(match_id, None)
+        self.pause(match_id)
 
     def status(self, match_id: str | None = None) -> dict[str, object]:
         return {
@@ -199,8 +236,9 @@ class LiveVisionCapture:
             if match_id not in self._playing:
                 raise CaptureNotPlayingError("La captura fue pausada")
             try:
+                generation = self._generation.get(match_id, 0)
                 prediction = await self.predictor.predict(image, content_type)
-                if match_id not in self._playing:
+                if match_id not in self._playing or generation != self._generation.get(match_id, 0):
                     self.frames_skipped += 1
                     return {"accepted": False, "reason": "paused_during_inference"}
                 observations = self._observations(match_id, video_time_ms, image, prediction)

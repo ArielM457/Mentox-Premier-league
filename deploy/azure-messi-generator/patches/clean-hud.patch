@@ -1,0 +1,158 @@
+diff --git a/src/soccerworld/_engine/render.py b/src/soccerworld/_engine/render.py
+index 5580564..5b91ade 100644
+--- a/src/soccerworld/_engine/render.py
++++ b/src/soccerworld/_engine/render.py
+@@ -1041,7 +1041,7 @@ class Render:
+             "trail_len", "player_scale",
+         }
+         rich_render_keys = {
+-            "every", "feed_n", "feed_secs", "dynamic_cam", "cam_zoom",
++            "every", "feed_n", "feed_secs", "dynamic_cam", "cam_zoom", "clean_hud",
+         }
+         if mode == "light" and rich_kwargs:
+             names = ", ".join(sorted(rich_kwargs))
+@@ -4892,7 +4892,7 @@ class RichRenderer:
+     def render(self, states, out_path="match.mp4", fps=25, title=None, verbose=True,
+                every=1, feed_n=10, feed_secs=12.0,
+                dynamic_cam=DEFAULT_DYNAMIC_CAMERA, cam_zoom=0.66,
+-               frame_annotations=None, structured_events=None):
++               frame_annotations=None, structured_events=None, clean_hud=False):
+         _ensure_render_dependencies()
+         _ensure_mpl()   # matplotlib 지연 로드(모듈 전역 plt/LineCollection/… 채움) — rich 진입점
+         source_fps = float(fps)
+@@ -4934,8 +4934,9 @@ class RichRenderer:
+                             (self.bench_x0[1] - 2, self.bench_x0[1] + 22, "#141b28")]:
+             dug.append(np.array([[x0, byi, 0], [x1, byi, 0], [x1, byo, 0], [x0, byo, 0]], float))
+         dug_uv = [self.cam.proj(q) for q in dug]
+-        ax.add_collection(PolyCollection(dug_uv, facecolors=["#141b28", "#141b28"],
+-                                         edgecolors=[TEAM[0], TEAM[1]], linewidths=1.2, zorder=-1))
++        dugout_art = PolyCollection(dug_uv, facecolors=["#141b28", "#141b28"],
++                                    edgecolors=[TEAM[0], TEAM[1]], linewidths=1.2, zorder=-1)
++        ax.add_collection(dugout_art)
+         line_uv = [self.cam.proj(np.c_[ln, np.zeros(len(ln))]) for ln in self.lines]
+         ax.add_collection(LineCollection(line_uv, colors=self.LINE, linewidths=1.3, zorder=1))
+         rich_anchor_cache = {}
+@@ -5024,23 +5025,25 @@ class RichRenderer:
+             s=np.zeros(reserve_capacity), marker="o", c="#d3a27d",
+             edgecolors="#000000", linewidths=0.7, zorder=7.2,
+         )
++        bench_captions = []
+         for tm in (TEAM_0, TEAM_1):
+             bench_caption = self.cam.proj(np.asarray([[
+                 self.bench_x0[tm], -(self.W / 2.0 + 2.0), 0.0,
+             ]]))[0]
+-            ax.text(
++            bench_captions.append(ax.text(
+                 bench_caption[0], bench_caption[1],
+                 f"{team_label(tm)} BENCH", color=TEAM[tm], fontsize=6.8,
+                 fontweight="bold", family="monospace", zorder=8,
+-            )
+-        ax.add_patch(Rectangle((0.006, 0.165), 0.165, 0.715, transform=ax.transAxes,
+-                               facecolor="#070e18", alpha=0.55, edgecolor="#24405e", linewidth=1.0, zorder=18))
+-        ax.text(0.020, 0.860, "MATCH EVENTS", transform=ax.transAxes, ha="left", va="center",
+-                color="#8fb6e0", fontsize=10.5, fontweight="bold", family="monospace", zorder=19)
++            ))
++        feed_panel = ax.add_patch(Rectangle((0.006, 0.165), 0.165, 0.715, transform=ax.transAxes,
++                                            facecolor="#070e18", alpha=0.55, edgecolor="#24405e", linewidth=1.0, zorder=18))
++        feed_title = ax.text(0.020, 0.860, "MATCH EVENTS", transform=ax.transAxes, ha="left", va="center",
++                             color="#8fb6e0", fontsize=10.5, fontweight="bold", family="monospace", zorder=19)
++        match_title = None
+         if title:
+-            ax.text(0.020, 0.924, str(title), transform=ax.transAxes, ha="left", va="center",
+-                    color="#9fb4c8", fontsize=9.5, fontweight="bold",
+-                    fontproperties=_rich_title_font(), zorder=22)
++            match_title = ax.text(0.020, 0.924, str(title), transform=ax.transAxes, ha="left", va="center",
++                                  color="#9fb4c8", fontsize=9.5, fontweight="bold",
++                                  fontproperties=_rich_title_font(), zorder=22)
+         self._draw_minimap_static(axm)
+ 
+         ps = self.player_scale
+@@ -5196,6 +5199,21 @@ class RichRenderer:
+                   annotation_border, annotation_txt, score_txt, clock_txt,
+                   goal_txt, *feed_txt]
+         dyn_axm = [mm_view, mm_dots, mm_ball]
++        if clean_hud:
++            for art in (
++                *shape_text, *roster_text, reserve_torsos, reserve_heads,
++                stamina_short_bg, stamina_short_fg, stamina_long_bg, stamina_long_fg,
++                zone_fill, zone_edge, zone_box_fill, zone_box_edge, zone_mark_edge,
++                enc_marks, offside_glow, offside_line, offside_label, off_marks,
++                sp_label, coach_panel, coach_title, *coach_rows,
++                annotation_border, annotation_txt, feed_panel, feed_title,
++                *feed_txt, dugout_art, *bench_captions,
++                mm_view, mm_dots, mm_ball,
++            ):
++                art.set_visible(False)
++            if match_title is not None:
++                match_title.set_visible(False)
++            axm.set_visible(False)
+         bg = None
+         if not dynamic_cam:
+             for art in dyn_ax + dyn_axm: art.set_animated(True)
+@@ -5226,7 +5243,7 @@ class RichRenderer:
+             if coach_feed[t]:
+                 coach_hold = coach_feed[t]
+                 coach_hold_until = t + max(1, int(round(fps * 2.4)))
+-            coach_visible = t < coach_hold_until and bool(coach_hold)
++            coach_visible = not clean_hud and t < coach_hold_until and bool(coach_hold)
+             coach_panel.set_visible(coach_visible)
+             coach_title.set_visible(coach_visible)
+             if coach_visible:
+@@ -5257,7 +5274,7 @@ class RichRenderer:
+             if frame_annotations is not None and frame_annotations[t]:
+                 annotation_hold = str(frame_annotations[t])
+                 annotation_until = t + max(1, int(round(fps * 0.6)))
+-            if t < annotation_until:
++            if not clean_hud and t < annotation_until:
+                 annotation_border.set_alpha(0.95)
+                 _set_text(annotation_txt, annotation_hold)
+                 annotation_txt.set_visible(True)
+@@ -5458,7 +5475,7 @@ class RichRenderer:
+             if imp_segs:
+                 imp_rings.set_color(imp_cols); imp_rings.set_linewidths(imp_lws)
+             spk = int(fr.sp_taker) if fr.sp_taker is not None else -1
+-            if 0 <= spk < N and int(fr.restart_t) > 0:
++            if not clean_hud and 0 <= spk < N and int(fr.restart_t) > 0:
+                 # Runtime restart SSOT와 같은 종류별 총 지연을 표시한다.
+                 lbl = self._restart_status_label(
+                     fr.restart_kind, fr.restart_t
+@@ -5628,7 +5645,7 @@ class RichRenderer:
+                 fr.ball_state,
+                 fr.restart_t,
+             )
+-            if att in (TEAM_0, TEAM_1) and lx is not None:
++            if not clean_hud and att in (TEAM_0, TEAM_1) and lx is not None:
+                 ol = self.cam.proj(np.array([[lx, -self.W / 2, 0.0], [lx, self.W / 2, 0.0]]))
+                 offside_glow.set_data(ol[:, 0], ol[:, 1]); offside_glow.set_color(TEAM[att]); offside_glow.set_alpha(0.22)
+                 offside_line.set_data(ol[:, 0], ol[:, 1]); offside_line.set_color(TEAM[att]); offside_line.set_alpha(0.95)
+diff --git a/src/soccerworld/demo/arguments.py b/src/soccerworld/demo/arguments.py
+index a801d2c..0480bc7 100644
+--- a/src/soccerworld/demo/arguments.py
++++ b/src/soccerworld/demo/arguments.py
+@@ -115,6 +115,14 @@ def build_parser() -> argparse.ArgumentParser:
+         action="store_true",
+         help="rich 모드에서 공을 따라가는 동적 카메라 사용",
+     )
++    parser.add_argument(
++        "--clean-hud",
++        action="store_true",
++        help=(
++            "rich 모드에서 분석 패널, 미니맵, 오프사이드 표시와 선수 stamina 바를 "
++            "숨기고 경기 화면·등번호·스코어·시계만 유지"
++        ),
++    )
+     parser.add_argument(
+         "--camera-zoom",
+         type=float,
+diff --git a/src/soccerworld/demo/cli.py b/src/soccerworld/demo/cli.py
+index 4500fae..6a054e8 100644
+--- a/src/soccerworld/demo/cli.py
++++ b/src/soccerworld/demo/cli.py
+@@ -147,6 +147,7 @@ def _render(
+         {
+             "dynamic_cam": args.dynamic_camera,
+             "cam_zoom": args.camera_zoom,
++            "clean_hud": args.clean_hud,
+         }
+         if args.mode == "rich"
+         else {}

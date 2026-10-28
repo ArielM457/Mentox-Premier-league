@@ -1,0 +1,79 @@
+{"cuda_available": true, "cuda_version": "11.7", "gpu_name": "Tesla T4", "gpu_memory_bytes": 16703356928, "torch_version": "1.13.1+cu117"}
+[10/27/26 21:35:14] INFO     Run directory:                          main.py:103
+                             /work/analyses/77755ee192bf4e3badd3475d            
+                             464ed37a/output/run                                
+                    INFO     Using device: 'cuda'.                   main.py:104
+Creating new Ultralytics Settings v0.0.8 file ✅ 
+View Ultralytics Settings with 'yolo settings' or at '/tmp/.config/Ultralytics/settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/usage/settings.
+[10/27/26 21:35:17] INFO     ExternalVideo= val set: 1                main.py:32
+Overwriting current config with config loaded from /models/reid/prtreid-soccernet-baseline.pth.tar
+Diff from default config :
+{'batch_size': 32,
+ 'ce': 0.0,
+ 'dim_reduce_output': 256,
+ 'hrnet_pretrained_path': '/models/reid',
+ 'id': 0.0,
+ 'load_config': True,
+ 'mask_filtering_testing': False,
+ 'max_epoch': 20,
+ 'preprocess': 'id',
+ 'test_embeddings': "['globl']",
+ 'tr': 0.0,
+ 'train_sampler': 'PrtreidSampler',
+ 'train_sampler_t': 'PrtreidSampler'}
+[10/27/26 21:35:22] INFO     => init weights from normal        cls_hrnet.py:450
+                             distribution                                       
+[10/27/26 21:35:23] INFO     => init weights from normal      cls_hrnet_l.py:449
+                             distribution                                       
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+10/27 21:35:25 - mmengine - WARNING - Failed to search registry with scope "mmocr" in the "function" registry tree. As a workaround, the current "function" registry in "mmengine" is used to build instance. This may cause unexpected failure when running the built modules. Please check whether "mmocr" is a correct scope, or whether the registry is initialized.
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+[10/27/26 21:35:27] INFO     Pipeline: YOLOUltralytics -> PRTReId   module.py:67
+                             -> BPBReIDStrongSORT ->                            
+                             NBJW_Calib_Keypoints -> NBJW_Calib ->              
+                             MMOCR -> MajorityVoteTracklet ->                   
+                             TrackletTeamClustering ->                          
+                             TrackletTeamSideLabeling                           
+                    INFO     Starting tracking operation on val set.  main.py:50
+                    INFO     Saving TrackerState to          tracker_state.py:52
+                             /work/analyses/77755ee192bf4e3b                    
+                             add3475d464ed37a/output/sn-game                    
+                             state.pklz                                         
+                    INFO     Pipeline has been validated            module.py:84
+[10/27/26 21:35:29] INFO     Created a temporary directory at instantiator.py:21
+                             /tmp/tmpqhwm1gyz                                   
+                    INFO     Writing                          instantiator.py:76
+                             /tmp/tmpqhwm1gyz/_remote_module_                   
+                             non_scriptable.py                                  
+Tracking videos (input) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1/1 0:00:02 • 0:00:00
+[10/27/26 21:35:32] INFO     Tracking ended, final          tracker_state.py:262
+                             TrackerState stats:                                
+                    INFO     Total # detections: 0 (GT=0)   tracker_state.py:378
+                    INFO     Total # detections with        tracker_state.py:387
+                             track_id:                                          
+                    INFO     Total # track_ids:             tracker_state.py:388
+                    WARNING  Skipping evaluation because             main.py:120
+                             'eval_tracking' was set to False.                  
+                    INFO     Saved state at :                         main.py:69
+                             /work/analyses/77755ee192bf4e3badd3475d4           
+                             64ed37a/output/sn-gamestate.pklz                   
+{"status": "complete", "observations": 0, "output": "/work/analyses/77755ee192bf4e3badd3475d464ed37a/output/gamestate-observations.jsonl"}

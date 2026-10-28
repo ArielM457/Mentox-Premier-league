@@ -28,10 +28,16 @@ export function useVisionCapture({ matchId, playing, timeRef, videoRef }) {
       if (!active || busy.current) return
       busy.current = true
       try {
-        const image = await frameBlob(videoRef.current)
+        const video = videoRef.current
+        if (!video || video.paused || video.seeking || video.readyState < 2) return
+        // El JPEG se genera de forma asíncrona: fijar el timestamp antes
+        // para no estamparlo con el tiempo de un fotograma posterior.
+        const timestamp = Math.round(video.currentTime * 1000)
+        const image = await frameBlob(video)
         if (!image || !active) return
+        if (video.seeking || Math.abs(video.currentTime * 1000 - timestamp) > 1000) return
         setState((current) => ({ ...current, status: 'processing', error: null }))
-        const result = await api.captureVisionFrame(matchId, timeRef.current, image)
+        const result = await api.captureVisionFrame(matchId, timestamp, image)
         if (!active) return
         setState((current) => ({
           status: 'live',

@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cat >&2 <<'EOF'
-SoccerNet GameState NO está listo todavía para desplegar como API de The Prime Moment.
+cat <<'EOF'
+SoccerNet GameState dispone ahora de un paquete experimental de despliegue.
 
-Motivos verificables:
-- TrackLab 1.3.24 acepta MP4 mediante ExternalVideo y el adaptador está implementado;
-- requiere descargar pesos y datos sujetos a las condiciones de SoccerNet;
-- la conversión a VisionObservation está verificada localmente, no con una salida real;
-- DV-US-27 y DV-US-33 siguen pendientes de una inferencia GPU completa.
+Antes de crear recursos:
+- lea deploy/azure-soccernet-gamestate/README.md;
+- confirme cuota Consumption-GPU-NC8as-T4 en la suscripción seleccionada;
+- acepte las condiciones de SoccerNet, TrackLab, pesos y datos aplicables;
+- use únicamente un MP4 sintético o autorizado;
+- recuerde que DV-US-36 sigue pendiente de verificación real en Azure.
 
-Primero ejecute y documente el smoke local:
-  MENTOX_GAMESTATE_VIDEO_PATH=/ruta/video-permitido.mp4 \
-    bash experiments/soccernet-gamestate/run.sh
+Para desplegar:
+  export MENTOX_MODEL_API_KEY="$(openssl rand -hex 32)"
+  export MENTOX_ACCEPT_MODEL_LICENSES=1
+  export MENTOX_IMAGE_BUILD_MODE=local
+  bash infra/azure/gamestate-operator.sh deploy
 
-No se crea ningún recurso Azure para evitar costo y una falsa sensación de integración.
-Consulte:
-  experiments/soccernet-gamestate/README.md
-  docs/persona-1-datos-y-vision/evidencias/DV-US-27.md
-  docs/persona-1-datos-y-vision/evidencias/DV-US-33.md
+Este preflight no crea recursos ni genera costos.
 EOF
-exit 2

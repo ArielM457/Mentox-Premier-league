@@ -801,7 +801,11 @@ nativo durante el rollout y la corrección queda pendiente de una prueba corta e
 - El lanzador acepta un MP4 mediante el `ExternalVideo` incluido en TrackLab 1.3.24.
 - El estado `.pklz` se exporta dentro del contenedor a JSONL sin obligar al backend Python 3.12 a cargar pickle.
 - El adaptador produce `VisionObservation` y `TrackingFrame v1` con tiempos reproducibles desde cuadro y FPS.
-- Equipo, dorsal y pista conservan su condición de estimaciones; `player_id` permanece vacío.
+- Equipo, dorsal y pista conservan su condición de estimaciones. `player_id` solo se completa
+  cuando al menos tres lecturas válidas del mismo track alcanzan 70 % de acuerdo y la combinación
+  equipo-dorsal corresponde a una sola persona de la plantilla verificada; los casos ambiguos
+  permanecen vacíos. El backend exige un mapeo explícito de lados a equipos y la confirmación de
+  que la plantilla corresponde al MP4; no deduce local/visitante a partir del cluster del modelo.
 - Una fila sin calibración sigue disponible como observación, pero no produce una posición de seguimiento falsa.
 - La historia no se marca como verificada en integración hasta completar una inferencia GPU sobre un MP4 permitido.
 

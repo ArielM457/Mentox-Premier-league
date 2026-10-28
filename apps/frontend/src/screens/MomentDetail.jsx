@@ -1,7 +1,7 @@
 import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client.js'
-import { describePreferences, usePreferences } from '../app/preferences.js'
+import { describePreferences, preferencesForMatch, usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
 import { formatClock, formatMatchClock, kindLabel, momentIdOf } from '../lib/overlays.js'
@@ -29,7 +29,7 @@ export function MomentDetail({ matchId, momentId }) {
   const load = useCallback(async () => {
     if (!match) return
     try {
-      const batch = await api.overlays(matchId, apiPreferences, match.durationMs)
+      const batch = await api.overlays(matchId, preferencesForMatch(apiPreferences, match.metadata), match.durationMs)
       const found = batch.overlays.find((o) => momentIdOf(o) === momentId)
       if (!found) {
         setError(t.moment.notFound)

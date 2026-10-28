@@ -43,7 +43,9 @@ class LiveObservation:
 
 
 class RealtimeObservationHub:
-    def __init__(self, *, history_size: int = 5_000, subscriber_size: int = 500) -> None:
+    def __init__(self, *, history_size: int = 50_000, subscriber_size: int = 500) -> None:
+        if history_size < 1 or subscriber_size < 1:
+            raise ValueError("Los límites de observaciones deben ser positivos")
         self._history: deque[LiveObservation] = deque(maxlen=history_size)
         self._seen: set[tuple[str, str]] = set()
         self._subscribers: set[asyncio.Queue[LiveObservation]] = set()
@@ -57,6 +59,9 @@ class RealtimeObservationHub:
         if key in self._seen:
             self.duplicates += 1
             return False
+        if len(self._history) == self._history.maxlen:
+            oldest = self._history[0]
+            self._seen.discard((oldest.source, oldest.observation_id))
         self._seen.add(key)
         self._history.append(observation)
         self.accepted += 1
@@ -85,6 +90,16 @@ class RealtimeObservationHub:
             "subscribers": len(self._subscribers),
             "latest": self._history[-1].as_dict() if self._history else None,
         }
+
+    def observations_between(
+        self, *, match_id: str, start_ms: int, end_ms: int, limit: int = 1_000
+    ) -> list[dict[str, Any]]:
+        return [
+            item.as_dict()
+            for item in self._history
+            if item.payload.get("match_id") == match_id
+            and start_ms <= item.timestamp_ms <= end_ms
+        ][-limit:]
 
     def clear(self) -> None:
         self._history.clear()

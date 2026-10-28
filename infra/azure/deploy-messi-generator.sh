@@ -38,8 +38,8 @@ done
 [[ "${base_seed}" =~ ^[1-9][0-9]*$ ]] || die "MENTOX_BASE_SEED debe ser un entero positivo."
 [[ "${replica_timeout}" =~ ^[1-9][0-9]*$ ]] || die "MENTOX_JOB_TIMEOUT_SECONDS debe ser positivo."
 [[ "${start_job}" == "0" || "${start_job}" == "1" ]] || die "MENTOX_START_JOB debe ser 0 o 1."
-[[ "${render_mode}" == "light" || "${render_mode}" == "rich" ]] || \
-  die "MENTOX_RENDER_MODE debe ser light o rich."
+[[ "${render_mode}" == "light" || "${render_mode}" == "rich" || "${render_mode}" == "clean" ]] || \
+  die "MENTOX_RENDER_MODE debe ser light, rich o clean."
 [[ "${image_build_mode}" == "local" || "${image_build_mode}" == "acr" || "${image_build_mode}" == "existing" ]] || \
   die "MENTOX_IMAGE_BUILD_MODE debe ser local, acr o existing."
 

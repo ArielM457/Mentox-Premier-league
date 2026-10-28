@@ -1,0 +1,15 @@
+{
+  "status": "ready",
+  "configured": true,
+  "model": "SoccerNet GameState Reconstruction",
+  "device": "Tesla T4",
+  "analysis_id": "bed13a88ebaf4110a00e74fce99d881f",
+  "detections": 4,
+  "observations_published": 3,
+  "cached": false,
+  "tracking_frames": 0,
+  "metrics": 11,
+  "resolved_identities": 0,
+  "ambiguous_identities": 0,
+  "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+}

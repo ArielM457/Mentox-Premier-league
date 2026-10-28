@@ -88,8 +88,8 @@ class Settings:
                 "usar valores distintos activa la captura completa de subpasos de MESSI"
             )
         render_mode = os.environ.get("MENTOX_RENDER_MODE", "light")
-        if render_mode not in {"light", "rich"}:
-            raise ValueError("MENTOX_RENDER_MODE debe ser light o rich")
+        if render_mode not in {"light", "rich", "clean"}:
+            raise ValueError("MENTOX_RENDER_MODE debe ser light, rich o clean")
         batch_id = os.environ.get(
             "MENTOX_BATCH_ID",
             f"messi-{base_seed}-{count}x{seconds:g}s",
@@ -210,12 +210,14 @@ def _run_match(settings: Settings, index: int, match_dir: Path) -> dict[str, obj
         str(settings.render_fps),
         "--compressed-match",
         "--mode",
-        settings.render_mode,
+        "rich" if settings.render_mode == "clean" else settings.render_mode,
         "--state-stride",
         str(settings.state_stride),
         "--out",
         str(video),
     ]
+    if settings.render_mode == "clean":
+        command.append("--clean-hud")
     started = time.perf_counter()
     completed = subprocess.run(command, check=False, text=True)
     duration = time.perf_counter() - started

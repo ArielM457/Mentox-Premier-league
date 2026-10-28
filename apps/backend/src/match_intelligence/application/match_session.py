@@ -125,6 +125,8 @@ class MatchSession:
     _tracking_frames: tuple[TrackingFrame, ...] | None = field(default=None, init=False, repr=False)
     _track_set: TrackSet | None = field(default=None, init=False, repr=False)
     _callouts: tuple[ActionCallout, ...] = field(default=(), init=False, repr=False)
+    video_duration_ms: int | None = None
+    data_source: str | None = None
 
     def __post_init__(self) -> None:
         missing = [e.event_id for e in self.events if e.video_time_ms is None]
@@ -153,6 +155,8 @@ class MatchSession:
 
     @property
     def duration_ms(self) -> int:
+        if self.video_duration_ms is not None:
+            return self.video_duration_ms
         if not self.events:
             return END_PADDING_MS
         return _video_time(self.events[-1]) + END_PADDING_MS
@@ -162,9 +166,15 @@ class MatchSession:
 
     def snapshot(self, video_time_ms: int) -> MatchSnapshot:
         self._check_time(video_time_ms)
-        return self.analytics.snapshot(
+        snapshot = self.analytics.snapshot(
             self.metadata, self.events_until(video_time_ms), video_time_ms=video_time_ms
         )
+        if self.data_source == "messi_simulator":
+            # La ausencia de un tipo que el adaptador no soporta no prueba cero.
+            snapshot = snapshot.model_copy(update={"metrics": [
+                metric.model_copy(update={"available": False, "value": None})
+                if metric.key == "pressures" else metric for metric in snapshot.metrics]})
+        return snapshot
 
     def tracking_frames(self, from_video_ms: int, to_video_ms: int) -> list[TrackingFrame]:
         """Devuelve una ventana y sus cuadros limítrofes para interpolar sin saltos."""
@@ -210,6 +220,15 @@ class MatchSession:
         if self._tracking_frames is None:
             self._tracking_frames = tuple(tracking_frames(self.track_set()))
         return self._tracking_frames
+
+    def set_tracking_frames(self, frames: Sequence[TrackingFrame]) -> None:
+        """Sustituye el tracking de demostración por evidencia del vídeo del partido."""
+        invalid = [frame.match_id for frame in frames if frame.match_id != self.match_id]
+        if invalid:
+            raise SessionError("El seguimiento pertenece a otro partido")
+        self._tracking_frames = tuple(
+            sorted(frames, key=lambda frame: (frame.period, frame.clock_ms))
+        )
 
     # ----- mensajes para pantalla -------------------------------------------
     def overlays(

@@ -33,6 +33,17 @@ for command_name in az openssl sha256sum find sort xargs; do
   command -v "${command_name}" >/dev/null 2>&1 || die "Falta el comando ${command_name}."
 done
 
+# Fijar la suscripción al iniciar: otra terminal puede cambiar el valor global
+# de Azure CLI mientras Docker construye una imagen durante varios minutos.
+deployment_subscription="${MENTOX_AZURE_SUBSCRIPTION_ID:-$(command az account show --query id --output tsv)}"
+az() {
+  if [[ "${1:-}" == "extension" ]]; then
+    command az "$@"
+  else
+    command az "$@" --subscription "${deployment_subscription}"
+  fi
+}
+
 [[ -d "${context_path}" ]] || die "No existe el contexto ${context_path}."
 [[ -f "${context_path}/Dockerfile" ]] || die "No existe ${context_path}/Dockerfile."
 [[ "${MENTOX_ACCEPT_MODEL_LICENSES:-0}" == "1" ]] || die \
@@ -50,7 +61,9 @@ done
 az account show --query '{subscription:name,state:state,tenant:tenantId}' --output table
 [[ "$(az account show --query state --output tsv)" == "Enabled" ]] || die "La suscripción activa no está habilitada."
 
-az extension add --name containerapp --upgrade --yes >/dev/null
+if ! az extension show --name containerapp >/dev/null 2>&1; then
+  az extension add --name containerapp --yes >/dev/null
+fi
 for provider in Microsoft.App Microsoft.ContainerRegistry Microsoft.ManagedIdentity; do
   az provider register --namespace "${provider}" --wait
 done
@@ -68,7 +81,7 @@ fi
 
 suffix="$(printf '%s' "$(az account show --query id --output tsv):${resource_group}" | sha256sum | cut -c1-8)"
 acr_name="${MENTOX_ACR_NAME:-mentox${suffix}}"
-content_hash="$(find "${context_path}" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-12)"
+content_hash="$(find "${context_path}" -type f ! -path '*/__pycache__/*' ! -path '*/.pytest_cache/*' ! -name '*.pyc' -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-12)"
 image_tag="${MENTOX_IMAGE_TAG:-${content_hash}}"
 
 if ! az acr show --resource-group "${resource_group}" --name "${acr_name}" >/dev/null 2>&1; then
@@ -87,20 +100,29 @@ if [[ "${image_build_mode}" == "acr" ]]; then
     --file "${context_path}/Dockerfile" "${context_path}"
 elif [[ "${image_build_mode}" == "local" ]]; then
   command -v docker >/dev/null 2>&1 || die "Falta Docker."
-  command -v sudo >/dev/null 2>&1 || die "Falta sudo para Docker local."
+  docker_prefix=()
+  if ! docker info >/dev/null 2>&1; then
+    command -v sudo >/dev/null 2>&1 || die "Docker no está disponible para el usuario y falta sudo."
+    docker_prefix=(sudo)
+  fi
   docker_config_dir="$(mktemp -d /tmp/mentox-docker-config.XXXXXX)"
   cleanup_docker_auth() {
-    sudo docker --config "${docker_config_dir}" logout "${login_server}" >/dev/null 2>&1 || true
-    sudo rm -rf -- "${docker_config_dir}"
+    "${docker_prefix[@]}" docker --config "${docker_config_dir}" logout "${login_server}" >/dev/null 2>&1 || true
+    "${docker_prefix[@]}" rm -rf -- "${docker_config_dir}"
   }
   trap cleanup_docker_auth EXIT
   acr_access_token="$(az acr login --name "${acr_name}" --expose-token --query accessToken --output tsv)"
-  printf '%s' "${acr_access_token}" | sudo docker --config "${docker_config_dir}" login \
+  printf '%s' "${acr_access_token}" | "${docker_prefix[@]}" docker --config "${docker_config_dir}" login \
     "${login_server}" --username 00000000-0000-0000-0000-000000000000 --password-stdin >/dev/null
   unset acr_access_token
-  sudo docker --config "${docker_config_dir}" build --tag "${image}" \
+  "${docker_prefix[@]}" docker --config "${docker_config_dir}" build --tag "${image}" \
     --file "${context_path}/Dockerfile" "${context_path}"
-  sudo docker --config "${docker_config_dir}" push "${image}"
+  if [[ "${MENTOX_DEPLOY_SLUG}" == "soccernet-gamestate" ]]; then
+    # Detecta errores de importación Python y pesos incompletos antes de publicar.
+    "${docker_prefix[@]}" docker run --rm --network none --entrypoint python "${image}" \
+      -c 'import sys; sys.path.insert(0, "/opt/prime"); from app import inspect_preloaded_models; print(inspect_preloaded_models())'
+  fi
+  "${docker_prefix[@]}" docker --config "${docker_config_dir}" push "${image}"
   cleanup_docker_auth
   trap - EXIT
 else
@@ -138,7 +160,19 @@ if ! az containerapp env workload-profile show --resource-group "${resource_grou
     --workload-profile-type "${workload_profile_type}" --output none
 fi
 
+model_env=("MENTOX_MODEL_API_KEY=secretref:model-api-key")
+if [[ "${MENTOX_DEPLOY_SLUG}" == "soccernet-gamestate" ]]; then
+  model_env+=(
+    "MENTOX_MAX_VIDEO_SECONDS=${MENTOX_MAX_VIDEO_SECONDS:-240}"
+    "MENTOX_GAMESTATE_ANALYSIS_TIMEOUT_SECONDS=${MENTOX_GAMESTATE_ANALYSIS_TIMEOUT_SECONDS:-3600}"
+    "MENTOX_GAMESTATE_SAVE_VISUALIZATION=${MENTOX_GAMESTATE_SAVE_VISUALIZATION:-false}"
+  )
+fi
+
 if az containerapp show --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" >/dev/null 2>&1; then
+  # Fijar el modo antes de cambiar la imagen reduce revisiones activas simultáneas.
+  az containerapp revision set-mode --resource-group "${resource_group}" \
+    --name "${MENTOX_DEPLOY_APP_NAME}" --mode single --output none
   az containerapp identity assign --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" \
     --user-assigned "${identity_id}" --output none
   az containerapp registry set --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" \
@@ -147,7 +181,7 @@ if az containerapp show --resource-group "${resource_group}" --name "${MENTOX_DE
     --secrets model-api-key="${MENTOX_MODEL_API_KEY}" --output none
   az containerapp update --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" \
     --image "${image}" --cpu 8 --memory 56Gi --min-replicas "${min_replicas}" \
-    --max-replicas "${max_replicas}" --set-env-vars MENTOX_MODEL_API_KEY=secretref:model-api-key --output none
+    --max-replicas "${max_replicas}" --set-env-vars "${model_env[@]}" --output none
 else
   az containerapp create --resource-group "${resource_group}" --name "${MENTOX_DEPLOY_APP_NAME}" \
     --environment "${environment_name}" --image "${image}" --user-assigned "${identity_id}" \
@@ -156,7 +190,7 @@ else
     --ingress "${ingress}" --target-port 8000 --transport auto \
     --min-replicas "${min_replicas}" --max-replicas "${max_replicas}" \
     --secrets model-api-key="${MENTOX_MODEL_API_KEY}" \
-    --env-vars MENTOX_MODEL_API_KEY=secretref:model-api-key --output none
+    --env-vars "${model_env[@]}" --output none
 fi
 
 # Una sola revisión evita que dos versiones compitan por la GPU T4 disponible.

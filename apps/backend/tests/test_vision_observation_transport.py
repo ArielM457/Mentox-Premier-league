@@ -33,6 +33,9 @@ class ProducerClient:
 
 
 class ConsumerClient:
+    async def receive(self, **kwargs):
+        self.kwargs = kwargs
+
     async def close(self) -> None:
         pass
 
@@ -119,5 +122,31 @@ def test_azure_publisher_groups_observations_into_batches_by_source() -> None:
         assert producer_client.partition_keys == ["roboflow", "soccernet"]
         assert len(producer_client.events) == 3
         assert publisher.published == 3
+
+    asyncio.run(scenario())
+
+
+def test_consumer_start_position_covers_connection_setup_time() -> None:
+    async def scenario():
+        client = ConsumerClient()
+        consumer = VisionObservationConsumer(client, RealtimeObservationHub().publish)
+        before_connect = datetime.now(UTC)
+        await consumer.receive()
+        assert client.kwargs["starting_position"] <= before_connect
+        assert client.kwargs["starting_position_inclusive"] is True
+
+    asyncio.run(scenario())
+
+
+def test_observation_history_eviction_also_bounds_deduplication_memory() -> None:
+    async def scenario():
+        hub = RealtimeObservationHub(history_size=1)
+        first = observation()
+        second = LiveObservation("other", "soccernet", "temporal_action", 100, {}, datetime.now(UTC))
+        assert await hub.publish(first)
+        assert not await hub.publish(first)
+        assert await hub.publish(second)
+        assert len(hub._seen) == 1
+        assert await hub.publish(first)
 
     asyncio.run(scenario())

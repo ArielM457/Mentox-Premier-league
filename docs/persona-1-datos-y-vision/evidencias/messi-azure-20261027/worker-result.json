@@ -1,0 +1,20 @@
+{
+  "scope": "azure_service_bus_event_triggered_container_apps_job",
+  "execution": "job-mentox-agent-worker-dev-qvgmn",
+  "status": "Succeeded",
+  "started_at": "2026-10-28T01:40:41+00:00",
+  "finished_at": "2026-10-28T01:41:14+00:00",
+  "log_timestamp": "2026-10-28T01:41:11.2906795Z",
+  "worker_result": {
+    "processed": 2,
+    "duplicate": 0,
+    "abandoned": 0,
+    "dead_lettered": 0
+  },
+  "queue_after": {
+    "active": 0,
+    "dead_letter": 0
+  },
+  "handler": "DispatchRecordingHandler",
+  "remote_llm_execution_verified": false
+}

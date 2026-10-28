@@ -89,6 +89,7 @@ def video(monkeypatch: pytest.MonkeyPatch):
     blob_client = blob
     monkeypatch.setenv("AZURE_BLOB_SERVICE_ENDPOINT", "https://cuenta.blob.core.windows.net")
     monkeypatch.setenv("VISION_VIDEO_BLOB_NAME", "messi/lote/match.mp4")
+    monkeypatch.setenv("VISION_SIMULATOR_ENABLED", "false")
     monkeypatch.setattr(integration_router, "BlobServiceClient", Service)
     monkeypatch.setattr(integration_router, "DefaultAzureCredential", Credential)
     monkeypatch.setattr(integration_router, "VIDEO_RANGE_MAX_BYTES", 4_096)

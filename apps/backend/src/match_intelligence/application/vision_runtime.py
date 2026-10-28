@@ -52,6 +52,7 @@ class VisionObservationRuntime:
         self.publisher: VisionObservationPublisher | None = None
         self.consumer: VisionObservationConsumer | None = None
         self._consumer_task: asyncio.Task[None] | None = None
+        self._consumer_error: str | None = None
         self._start_lock = asyncio.Lock()
 
     async def start(self) -> None:
@@ -61,6 +62,7 @@ class VisionObservationRuntime:
             if self.publisher is not None:
                 return
             assert self.settings.namespace is not None
+            self._consumer_error = None
             self.publisher = VisionObservationPublisher.from_default_credential(
                 fully_qualified_namespace=self.settings.namespace,
                 eventhub_name=self.settings.eventhub_name,
@@ -72,11 +74,22 @@ class VisionObservationRuntime:
                 handler=self.hub.publish,
             )
             self._consumer_task = asyncio.create_task(self.consumer.receive())
+            self._consumer_task.add_done_callback(self._consumer_done)
+
+    def _consumer_done(self, task: asyncio.Task[None]) -> None:
+        if not task.cancelled():
+            error = task.exception()
+            self._consumer_error = str(error) if error else "El consumidor terminó inesperadamente"
+
+    def _require_consumer(self) -> None:
+        if self._consumer_task is not None and self._consumer_task.done():
+            raise RuntimeError(f"El consumidor de visión no está activo: {self._consumer_error}")
 
     async def publish(self, observation: LiveObservation) -> bool:
         if self.settings.transport == "memory":
             return await self.hub.publish(observation)
         await self.start()
+        self._require_consumer()
         assert self.publisher is not None
         await self.publisher.publish(observation)
         return True
@@ -92,6 +105,7 @@ class VisionObservationRuntime:
                 accepted += int(await self.hub.publish(observation))
             return accepted
         await self.start()
+        self._require_consumer()
         assert self.publisher is not None
         await self.publisher.publish_many(observations)
         return len(observations)
@@ -99,12 +113,15 @@ class VisionObservationRuntime:
     async def close(self) -> None:
         if self._consumer_task is not None:
             self._consumer_task.cancel()
-            with suppress(asyncio.CancelledError):
+            with suppress(asyncio.CancelledError, Exception):
                 await self._consumer_task
         if self.publisher is not None:
             await self.publisher.close()
         if self.consumer is not None:
             await self.consumer.close()
+        self._consumer_task = None
+        self.publisher = None
+        self.consumer = None
 
     def status(self) -> dict[str, object]:
         return {
@@ -116,4 +133,6 @@ class VisionObservationRuntime:
             "consumer_accepted": self.consumer.accepted if self.consumer else 0,
             "consumer_rejected": self.consumer.rejected if self.consumer else 0,
             "consumer_failures": self.consumer.failures if self.consumer else 0,
+            "consumer_running": bool(self._consumer_task and not self._consumer_task.done()),
+            "consumer_error": self._consumer_error,
         }

@@ -1,0 +1,208 @@
+INFO:     Started server process [41100]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8127 (Press CTRL+C to quit)
+INFO:     127.0.0.1:37188 - "GET /__test__/teamspotting/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37188 - "POST /__test__/teamspotting/v1/predict HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37200 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /assets/index-D45FPrP1.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "GET /assets/index-DE5hBKM7.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-acceptance-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37268 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37234 - "GET /api/v1/matches/synthetic-acceptance-001/events?until_video_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "GET /api/v1/matches/synthetic-acceptance-001/state?video_time_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-analytics-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37254 - "GET /api/v1/matches/synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37234 - "GET /api/v1/integration/live/video HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:37254 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37254 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=3000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37284 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:37220 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-live-001/tracking?from_video_ms=0&to_video_ms=28000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37268 - "GET /api/v1/matches/synthetic-live-001/overlays?language=es&mode=analyst&level=normal&until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "GET /api/v1/integration/live/video HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:37220 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37288 - "GET /__test__/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "GET /__test__/roboflow/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "POST /api/v1/integration/live/models/prepare?match_id=synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "POST /api/v1/integration/live/playback/play HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37220 - "GET /api/v1/integration/live/video HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:37214 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37268 - "GET /api/v1/integration/live/video HTTP/1.1" 206 Partial Content
+INFO:     127.0.0.1:37214 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37268 - "GET /api/v1/matches/synthetic-live-001/stream?language=es&mode=analyst&level=normal&from_video_ms=0&speed=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=10 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=809 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=4000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=1019 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=5000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=2019 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37240 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47430 - "GET /__test__/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47430 - "GET /__test__/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=51000&end_ms=84000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47466 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:37214 - "POST /api/v1/integration/live/playback/seek HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=81752 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-live-001/overlays?language=es&mode=analyst&level=normal&until_video_ms=81752 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=81752 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "GET /api/v1/matches/synthetic-live-001/tracking?from_video_ms=78000&to_video_ms=106000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=81752 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "GET /__test__/roboflow/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47480 - "GET /__test__/teamspotting/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "POST /api/v1/integration/live/models/prepare?match_id=synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "POST /api/v1/integration/live/playback/play HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47434 - "GET /api/v1/matches/synthetic-live-001/stream?language=es&mode=analyst&level=normal&from_video_ms=81752&speed=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=81755 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=52000&end_ms=85000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=82655 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=82763 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:47450 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=53000&end_ms=86000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=83255 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47430 - "GET /__test__/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-live-001/preview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=3000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47484 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "POST /api/v1/integration/live/playback/restart HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/overlays?language=es&mode=analyst&level=normal&until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47500 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/tracking?from_video_ms=0&to_video_ms=28000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "GET /__test__/roboflow/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47480 - "GET /__test__/teamspotting/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/models/prepare?match_id=synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/playback/play HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47500 - "GET /api/v1/matches/synthetic-live-001/stream?language=es&mode=analyst&level=normal&from_video_ms=0&speed=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=2 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47430 - "GET /__test__/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37240 - "GET /assets/index-D45FPrP1.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37320 - "GET /assets/index-DE5hBKM7.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-acceptance-001/events?until_video_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-acceptance-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-acceptance-001/state?video_time_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-analytics-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=3000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47506 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-live-001/overlays?language=en&mode=analyst&level=normal&until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/tracking?from_video_ms=0&to_video_ms=28000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "GET /__test__/roboflow/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47480 - "GET /__test__/teamspotting/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/integration/live/models/prepare?match_id=synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/integration/live/playback/play HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47450 - "GET /api/v1/matches/synthetic-live-001/stream?language=en&mode=analyst&level=normal&from_video_ms=0&speed=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=2 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=802 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=4000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=1011 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37320 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET / HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:37320 - "GET /assets/index-DE5hBKM7.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47502 - "GET /assets/index-D45FPrP1.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches/synthetic-acceptance-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37214 - "GET /api/v1/matches/synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-acceptance-001/events?until_video_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-analytics-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-acceptance-001/state?video_time_ms=42000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=180000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "GET /api/v1/matches/synthetic-live-001/overlays?language=en&mode=casual&level=normal&until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=3000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47524 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:47502 - "GET /api/v1/matches/synthetic-live-001/events?until_video_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/tracking?from_video_ms=0&to_video_ms=28000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "GET /__test__/roboflow/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47480 - "GET /__test__/teamspotting/health/ready HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/models/prepare?match_id=synthetic-live-001 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/play HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37240 - "GET /api/v1/matches/synthetic-live-001/stream?language=en&mode=casual&level=normal&from_video_ms=0&speed=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=3 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37320 - "GET /api/v1/matches/synthetic-live-001/state?video_time_ms=802 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47502 - "GET /api/v1/integration/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "GET /api/v1/integration/live/observations?match_id=synthetic-live-001&start_ms=0&end_ms=4000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/integration/live/playback/advance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37302 - "POST /__test__/roboflow/v1/predict?models=all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37316 - "POST /api/v1/integration/live/capture/frame?match_id=synthetic-live-001&video_time_ms=1010 HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:37316 - "POST /api/v1/matches/synthetic-live-001/playback HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39714 - "WebSocket /api/v1/integration/live/ws" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:37320 - "GET /api/v1/integration/live/observations?match_id=synthetic-acceptance-001&start_ms=0&end_ms=3000&limit=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37320 - "POST /api/v1/integration/live/playback/pause HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [41100]

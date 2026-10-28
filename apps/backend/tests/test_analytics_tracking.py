@@ -20,15 +20,20 @@ from match_intelligence.application.visual_identity import (
 )
 from match_intelligence.domain.analytics.catalog import METRIC_CATALOG
 from match_intelligence.domain.analytics.tracking import (
+    LIMIT_SIMULATOR,
+    SIMULATOR_ORIGIN,
     Sample,
     Track,
     TrackedKind,
+    TrackingSource,
     TrackSet,
     ball_tracking_metrics,
     player_tracking_metrics,
     pressure_metrics,
     team_shape_metrics,
+    track_set_from_frames,
     tracking_alerts,
+    tracking_frames,
     tracking_metrics,
 )
 from match_intelligence.domain.contracts import EventOutcome, Position
@@ -106,6 +111,42 @@ def test_periods_are_never_joined() -> None:
     both = _merge(_tracks({"a-1": _line(3.0, 2.0)}), _tracks({"a-1": _line(3.0, 2.0, x0=80.0)}, period=2))
 
     assert _by_key(player_tracking_metrics(both), "a-1")["distance_covered_m"].value == pytest.approx(12.0, abs=0.01)
+
+
+def test_short_segments_separated_by_tracking_loss_do_not_form_a_speed_window() -> None:
+    path = _line(8, 0.6) + _line(8, 0.6, start_ms=5000, x0=40)
+    metrics = _by_key(player_tracking_metrics(_tracks({"a-1": path})), "a-1")
+    assert metrics["distance_covered_m"].value == pytest.approx(9.6)
+    assert metrics["top_speed_kmh"].available is False
+    assert metrics["sprints"].value == 0
+
+
+def test_separate_sprints_do_not_merge_across_missing_tracking() -> None:
+    path = _line(8, 2) + _line(8, 2, start_ms=5000, x0=40)
+    metrics = _by_key(player_tracking_metrics(_tracks({"a-1": path})), "a-1")
+    assert metrics["sprints"].value == 2
+
+
+def test_isolated_position_does_not_report_zero_distance_as_measured() -> None:
+    metrics = player_tracking_metrics(_tracks({"a-1": [(0, 20, 30)]}))
+    assert all(item.available is False and item.value is None for item in metrics)
+
+
+def test_simulator_frames_become_tracks_that_keep_their_origin() -> None:
+    tracks = _tracks({"a-1": _line(9.0, 2.0)})  # 32,4 km/h: deja un récord de velocidad
+    frames = [
+        frame.model_copy(update={"source": TrackingSource.SYNTHETIC_SIMULATOR})
+        for frame in tracking_frames(tracks)
+    ]
+    rebuilt = track_set_from_frames(frames)
+
+    assert rebuilt.origin == SIMULATOR_ORIGIN and rebuilt.is_simulated
+    assert player_tracking_metrics(rebuilt) == player_tracking_metrics(
+        TrackSet(tracks.match_id, SIMULATOR_ORIGIN, tracks.tracks)
+    )
+    assert {frame.source for frame in tracking_frames(rebuilt)} == {TrackingSource.SYNTHETIC_SIMULATOR}
+    alerts = tracking_alerts(rebuilt)
+    assert alerts and all(alert.evidence_limits == [LIMIT_SIMULATOR] for alert in alerts)
 
 
 def test_ball_and_shot_speed_use_the_second_after_the_shot() -> None:

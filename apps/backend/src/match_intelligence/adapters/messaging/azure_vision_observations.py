@@ -109,6 +109,7 @@ class VisionObservationConsumer:
         self.accepted = 0
         self.rejected = 0
         self.failures = 0
+        self.started_at = datetime.now(UTC)
 
     @classmethod
     def from_default_credential(
@@ -162,7 +163,10 @@ class VisionObservationConsumer:
         await self._client.receive(
             on_event=self._on_event,
             on_error=self._on_error,
-            starting_position="@latest",
+            # @latest se evalúa al conectar cada partición y perdería mensajes
+            # publicados mientras el consumidor estaba estableciendo la conexión.
+            starting_position=self.started_at,
+            starting_position_inclusive=True,
         )
 
     async def close(self) -> None:

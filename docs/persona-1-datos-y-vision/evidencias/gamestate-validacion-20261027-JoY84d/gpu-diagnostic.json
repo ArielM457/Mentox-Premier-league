@@ -1,0 +1,12 @@
+{
+  "scope": "snapshot_during_validation",
+  "analysis_id": "6dcc306a4fa34eb69a510940a8132fdd",
+  "revision": "ca-mentox-gamestate-dev--0000005",
+  "device": "Tesla T4",
+  "gpu_total_memory_mib": 16384,
+  "gpu_utilization_percent": 94,
+  "gpu_used_memory_mib": 3857,
+  "tracklab_process_state": "R",
+  "tracklab_data_workers": 4,
+  "note": "Lectura puntual por nvidia-smi y /proc; no es un promedio ni una medida de FPS."
+}

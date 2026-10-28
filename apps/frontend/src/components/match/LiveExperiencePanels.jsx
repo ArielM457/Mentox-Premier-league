@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api } from '../../api/client.js'
 import { usePreferences } from '../../app/preferences.js'
 import { formatClock, formatMatchClock, kindLabel } from '../../lib/overlays.js'
+import { describeSimulatedEvent } from '../../lib/simulatedEvent.js'
 import { Button, Spinner } from '../ui/Button.jsx'
 import { InlineLoading } from '../ui/Feedback.jsx'
 import { Icon } from '../ui/Icon.jsx'
@@ -539,10 +540,11 @@ function visionLabel(t, label) {
 // Detecciones del fotograma capturado más cercano al instante visible (hasta 2,5 s de distancia).
 function observationsForFrame(observations, matchId, timeMs) {
   const candidates = observations.filter((item) => (
-    item.kind === 'spatial_detection'
+    ['spatial_detection', 'game_state_detection'].includes(item.kind)
     && item.payload?.match_id === matchId
     && Array.isArray(item.payload?.bounding_box)
-    && Math.abs(item.timestamp_ms - timeMs) <= 2500
+    && item.timestamp_ms <= timeMs
+    && timeMs - item.timestamp_ms <= 1000
   ))
   const latestTimestamp = Math.max(-1, ...candidates.map((item) => item.timestamp_ms))
   return candidates.filter((item) => item.timestamp_ms === latestTimestamp)
@@ -551,9 +553,10 @@ function observationsForFrame(observations, matchId, timeMs) {
 function groupLiveObservations(observations) {
   const groups = new Map()
   for (const item of observations) {
-    const group = groups.get(item.timestamp_ms) ?? []
+    const timestamp = Math.round(item.timestamp_ms / 1000) * 1000
+    const group = groups.get(timestamp) ?? []
     group.push(item)
-    groups.set(item.timestamp_ms, group)
+    groups.set(timestamp, group)
   }
   return [...groups.entries()]
     .sort(([left], [right]) => right - left)
@@ -573,6 +576,37 @@ function detectionSummary(t, observations) {
   }).join(' · ')
 }
 
+function actionSummary(t, observations) {
+  return observations.map((item) => {
+    const label = t.match.visionActionLabels[item.payload?.label] ?? item.payload?.label ?? t.match.visionAction
+    const team = item.payload?.team ? ` · ${t.match.visionTeam} ${item.payload.team}` : ''
+    const confidence = Number(item.payload?.confidence)
+    const score = Number.isFinite(confidence) ? ` · ${(confidence * 100).toFixed(0)}%` : ''
+    return `${label}${team}${score}`
+  }).join(' · ')
+}
+
+function gameStateSummary(t, observations) {
+  const players = observations.filter((item) => ['player', 'goalkeeper'].includes(item.payload?.label))
+  const teams = new Set(players.map((item) => item.payload?.team).filter(Boolean))
+  const shirts = [...new Set(players.map((item) => item.payload?.jersey_number).filter((value) => value != null))]
+  const shirtCopy = shirts.length ? ` · ${t.match.visionShirts}: ${shirts.slice(0, 8).join(', ')}` : ''
+  return `${players.length} ${t.match.visionTrackedPlayers}${teams.size ? ` · ${teams.size} ${t.match.visionTeams}` : ''}${shirtCopy}`
+}
+
+function eventSummary(t, items, metadata) {
+  const simulated = items.filter((item) => item.kind === 'simulated_match_event')
+  if (simulated.length) return describeSimulatedEvent(simulated[0].payload, metadata, t.match.simulatedEvent)
+  const actions = items.filter((item) => item.kind === 'temporal_action')
+  const gameState = items.filter((item) => item.kind === 'game_state_detection')
+  const spatial = items.filter((item) => item.kind === 'spatial_detection')
+  if (actions.length) {
+    return { title: actionSummary(t, actions), evidence: t.match.visionActionEvidence }
+  }
+  if (gameState.length) return { title: gameStateSummary(t, gameState), evidence: t.match.visionGameStateEvidence }
+  return { title: `${t.match.visionLive} · ${detectionSummary(t, spatial)}`, evidence: t.match.visionFrameEvidence(spatial.length) }
+}
+
 export function VisionVideoOverlay({ observations, matchId, timeMs }) {
   const { t } = usePreferences()
   const detections = observationsForFrame(observations, matchId, timeMs)
@@ -580,13 +614,17 @@ export function VisionVideoOverlay({ observations, matchId, timeMs }) {
     <div aria-label={t.match.visionOverlayLabel} className="vision-box-layer" role="group">
       {detections.map((item) => {
         const [x1, y1, x2, y2] = item.payload.bounding_box
+        const label = visionLabel(t, item.payload.label)
+        const shirt = item.payload?.jersey_number != null ? ` #${item.payload.jersey_number}` : ''
+        const track = item.payload?.track_id ? ` · ${item.payload.track_id}` : ''
+        const confidence = Number(item.payload.confidence ?? item.payload.bbox_confidence)
         return (
           <span
             className={`vision-box vision-box-${item.payload.label ?? 'other'}`}
             key={item.observation_id}
             style={{ '--box-x': `${x1 * 100}%`, '--box-y': `${y1 * 100}%`, '--box-width': `${(x2 - x1) * 100}%`, '--box-height': `${(y2 - y1) * 100}%` }}
           >
-            <small>{visionLabel(t, item.payload.label)} · {t.common.number(Math.round(item.payload.confidence * 100))}%</small>
+            <small>{label}{shirt}{track}{Number.isFinite(confidence) ? ` · ${t.common.number(Math.round(confidence * 100))}%` : ''}</small>
           </span>
         )
       })}
@@ -596,25 +634,72 @@ export function VisionVideoOverlay({ observations, matchId, timeMs }) {
 
 const visionCount = (t, value, noun) => <span><b>{t.common.number(value)}</b> {noun(value)}</span>
 
-// Captura en vivo (DV-US-34): solo lo recibido en esta sesión, nunca predicciones guardadas.
-function LiveVisionResults({ capture, observations, timeMs }) {
+// Estado de Roboflow, TeamSpotting y el simulador MESSI. Se consulta cada 5 s porque los
+// modelos tardan en despertar.
+function useVisionModels() {
+  const [runtime, setRuntime] = useState(null)
+  useEffect(() => {
+    let active = true
+    const refresh = () => api.visionStatus()
+      .then((next) => active && setRuntime(next.runtime ?? {}))
+      .catch(() => active && setRuntime(null))
+    refresh()
+    const interval = window.setInterval(refresh, 5000)
+    return () => { active = false; window.clearInterval(interval) }
+  }, [])
+  if (!runtime) return []
+  return [
+    { label: 'Roboflow', ready: runtime.live_capture?.model_ready, configured: runtime.live_capture?.configured },
+    { label: 'TeamSpotting', ready: runtime.teamspotting?.status === 'ready', configured: runtime.teamspotting?.configured, error: runtime.teamspotting?.error },
+    { label: 'MESSI', ready: runtime.simulator?.status === 'ready', configured: runtime.simulator?.configured, error: runtime.simulator?.error },
+  ]
+}
+
+// Captura en vivo (DV-US-34) y eventos del simulador MESSI: solo lo recibido en esta sesión
+// hasta el instante visible, nunca predicciones guardadas.
+function LiveVisionResults({ capture, metadata, observations, onSeek, timeMs }) {
   const { t } = usePreferences()
-  const frames = groupLiveObservations(observations.filter((item) => Math.abs(item.timestamp_ms - timeMs) <= 5000)).slice(0, 4)
+  const models = useVisionModels()
+  const past = observations.filter((item) => item.timestamp_ms <= timeMs)
+  // Un evento del simulador sigue a la vista 30 s; las detecciones, 5 s.
+  const recent = past.filter((item) => timeMs - item.timestamp_ms <= (item.kind === 'simulated_match_event' ? 30_000 : 5_000))
+  const frames = [
+    ...recent.filter((item) => item.kind === 'simulated_match_event')
+      .map((item) => ({ timestamp: item.timestamp_ms, items: [item], key: item.observation_id })),
+    ...groupLiveObservations(recent.filter((item) => item.kind !== 'simulated_match_event'))
+      .map((frame) => ({ ...frame, key: `models-${frame.timestamp}` })),
+  ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 4)
+  const count = (kind) => past.filter((item) => item.kind === kind).length
   return (
     <>
+      {models.length > 0 && (
+        <p aria-label={t.match.visionModelsStatus} className="vision-models">
+          {models.map((model) => (
+            <span className={model.error ? 'failed' : model.ready ? 'ready' : model.configured ? 'warming' : 'disabled'} key={model.label} title={model.error || undefined}>
+              <i aria-hidden="true" /> {model.label} · {model.error ? t.match.visionModelFailed : model.ready ? t.match.visionModelReady : model.configured ? t.match.visionModelWarming : t.match.visionModelDisabled}
+            </span>
+          ))}
+        </p>
+      )}
       <p className="vision-window">
         {visionCount(t, capture?.processed ?? 0, t.match.visionFrames)}
-        {visionCount(t, observations.filter((item) => item.kind === 'spatial_detection').length, t.match.visionDetections)}
-        {visionCount(t, observations.filter((item) => item.kind === 'temporal_action').length, t.match.visionActions)}
+        {visionCount(t, count('spatial_detection'), t.match.visionDetections)}
+        {visionCount(t, count('temporal_action'), t.match.visionActions)}
+        {visionCount(t, count('simulated_match_event'), t.match.visionSimulatorEvents)}
       </p>
       {frames.length ? (
         <ul className="vision-rows">
-          {frames.map((frame) => (
-            <li key={frame.timestamp}>
-              <time>{t.common.number(frame.timestamp / 1000)} s</time>
-              <div><strong>{detectionSummary(t, frame.items)}</strong><small>{t.match.visionFrameEvidence(frame.items.length)}</small></div>
-            </li>
-          ))}
+          {frames.map((frame) => {
+            const summary = eventSummary(t, frame.items, metadata)
+            return (
+              <li key={frame.key}>
+                <button className="vision-seek" onClick={() => onSeek?.(frame.timestamp)} title={t.match.visionSeekMoment} type="button">
+                  <time>{t.common.number(frame.timestamp / 1000)} s</time>
+                </button>
+                <div><strong>{summary.title}</strong><small>{summary.evidence}</small></div>
+              </li>
+            )
+          })}
         </ul>
       ) : <p className="vision-note">{t.match.visionPlayPrompt}</p>}
       {capture?.error && <p className="vision-note vision-error">{capture.error}</p>}
@@ -631,8 +716,10 @@ function SavedVisionResults({ timeMs, seekVersion }) {
   const second = Math.floor(timeMs / 1000)
   const from = Math.max(0, second * 1000 - 1000)
   const to = second * 1000 + 1000
+  // Con el simulador MESSI o sin los archivos guardados, el estado no trae resultados de otro vídeo.
+  const saved = status?.artifact_scope === 'historical_local_video_only' && status.duration_ms != null
   // Fuera de la duración del vídeo analizado no hay nada que pedir.
-  const covered = status != null && second * 1000 <= status.duration_ms
+  const covered = saved && second * 1000 <= status.duration_ms
 
   // El estado no cambia con el reloj: se pide al abrir la tarjeta y al reintentar.
   useEffect(() => {
@@ -655,6 +742,7 @@ function SavedVisionResults({ timeMs, seekVersion }) {
 
   const n = t.common.number
   if (error) return <p className="vision-note">{t.match.visionUnavailable}<small>{error}</small></p>
+  if (status && !saved) return <p className="vision-note">{t.match.visionUnavailable}</p>
   if (status && !covered) {
     return (
       <p className="vision-note">
@@ -693,7 +781,7 @@ function SavedVisionResults({ timeMs, seekVersion }) {
 
 // Tarjeta «Visión IA» del Partido. Con vídeo, o si llegan observaciones de esta sesión, muestra la
 // captura en vivo de Persona 1; si no, los resultados guardados de otro vídeo, dichos como tales.
-export function VisionCard({ timeMs, seekVersion, matchId, videoMode, capture, liveChannel }) {
+export function VisionCard({ timeMs, seekVersion, matchId, videoMode, capture, liveChannel, metadata, onSeek }) {
   const { t } = usePreferences()
   const observations = (liveChannel?.observations ?? []).filter((item) => item.payload?.match_id === matchId)
   const live = videoMode || observations.length > 0
@@ -713,7 +801,7 @@ export function VisionCard({ timeMs, seekVersion, matchId, videoMode, capture, l
         ) : <span className="channel-pill">{t.match.visionBadge}</span>}
       </header>
       {live
-        ? <LiveVisionResults capture={capture} observations={observations} timeMs={timeMs} />
+        ? <LiveVisionResults capture={capture} metadata={metadata} observations={observations} onSeek={onSeek} timeMs={timeMs} />
         : <SavedVisionResults seekVersion={seekVersion} timeMs={timeMs} />}
       <p className="vision-footnote">{t.match.visionNotice}</p>
     </section>

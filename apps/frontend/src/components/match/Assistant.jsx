@@ -5,7 +5,7 @@ import { Button, Spinner } from '../ui/Button.jsx'
 import { Icon } from '../ui/Icon.jsx'
 
 // Preguntas sobre el partido respondidas con los eventos ya ocurridos (RF-34).
-export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onExplore, canExplore }) {
+export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onExplore, canExplore, requestPreferences }) {
   const { t, apiPreferences, preferences } = usePreferences()
   const [question, setQuestion] = useState('')
   const [asked, setAsked] = useState(null)
@@ -20,7 +20,7 @@ export function Assistant({ matchId, timeRef, favoriteClub, favoritePlayer, onEx
     setBusy(true)
     setError(null)
     try {
-      const result = await api.ask(matchId, value, timeRef.current, apiPreferences)
+      const result = await api.ask(matchId, value, timeRef.current, requestPreferences ?? apiPreferences)
       setAnswer(result.answer)
       setQuestion('')
     } catch (err) {

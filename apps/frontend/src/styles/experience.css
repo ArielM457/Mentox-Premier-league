@@ -65,6 +65,12 @@ select, textarea { font: inherit; }
 .live-edge-control > span { width: 7px; height: 7px; background: #ff405c; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,64,92,.16); }
 .live-edge-control.is-behind { color: #d3ccdf; }
 .live-edge-control.is-behind > span { background: #8f899c; box-shadow: none; }
+/* Retroceder y adelantar junto a Play. */
+.playback-buttons { display: inline-flex; align-items: center; gap: 4px; }
+.skip-control { min-height: 32px; padding: 0 8px; color: #fff; background: transparent; border: 0; border-radius: 8px; font-size: 11px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
+.skip-control:hover:not(:disabled) { background: rgba(255,255,255,.1); }
+.skip-control:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+.skip-control:disabled { opacity: .4; cursor: default; }
 .event-chips button { display: inline-flex; gap: 4px; }
 .dark-shell .btn-ghost { color: #d7d3e1; }
 
@@ -182,3 +188,14 @@ select, textarea { font: inherit; }
 .vision-statuses { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
 .vision-error { color: #f3c27c; }
 .pitch-column:fullscreen .vision-card { display: none; }
+/* Estado de los modelos (Roboflow, TeamSpotting y MESSI) y salto al momento del vídeo. */
+.vision-models { margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; color: #aaa5bd; font-size: 10px; }
+.vision-models span { display: inline-flex; align-items: center; gap: 6px; }
+.vision-models i { width: 7px; height: 7px; background: #77728a; border-radius: 50%; }
+.vision-models .ready i { background: var(--lime); box-shadow: 0 0 8px rgba(216,255,101,.5); }
+.vision-models .warming i { background: #ffcf5a; }
+.vision-models .failed i { background: #f3c27c; }
+.vision-models .disabled { opacity: .65; }
+.vision-seek { padding: 0; color: inherit; background: none; border: 0; cursor: pointer; text-align: left; }
+.vision-seek:hover time, .vision-seek:focus-visible time { text-decoration: underline; }
+.vision-seek:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; border-radius: 4px; }

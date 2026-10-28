@@ -1,0 +1,33 @@
+{
+  "started_at": "2026-10-27T21:33:32.955387+00:00",
+  "endpoint": "https://ca-mentox-gamestate-dev.yellowdune-bc941df0.northcentralus.azurecontainerapps.io",
+  "video_bytes": 116020,
+  "media_sha256": "576cfc9bd1975b6cd7dec4150dcec6009f59c875b17a26226d8012091cacebdf",
+  "transport": "memory",
+  "scope": "remote_model_and_backend_adapter",
+  "identity_roster_verified": false,
+  "status": "succeeded",
+  "observations": 0,
+  "tracking_frames": 0,
+  "roles": {},
+  "teams": {},
+  "observations_with_jersey": 0,
+  "observations_with_pitch": 0,
+  "available_metrics": 0,
+  "video": {
+    "fps": 15.0,
+    "frames": 30,
+    "duration_ms": 2000,
+    "width": 1920,
+    "height": 1080
+  },
+  "analysis_id": "77755ee192bf4e3badd3475d464ed37a",
+  "elapsed_seconds": 124.745,
+  "finished_at": "2026-10-27T21:35:37.700993+00:00",
+  "download_log_lines": [
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth",
+    "Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth"
+  ]
+}

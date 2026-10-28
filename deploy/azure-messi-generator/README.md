@@ -15,9 +15,35 @@ Blob Storage y termina. No mantiene una API ni una réplica encendida.
 - MESSI fijado al commit `b04b15c59d36c1e4f44e02d0886b2d0d7261f689`.
 - Estilos `balanced`, `tiki_taka` y `long_ball` combinados entre los partidos.
 
-El modo se puede cambiar con `MENTOX_RENDER_MODE=rich`. `light` genera una vista
-táctica rápida de 672 × 448; `rich` genera una vista más detallada de 1920 × 1080
-con dorsales visibles, pero aumenta el tiempo de renderizado y el tamaño del MP4.
+El modo se puede cambiar con `MENTOX_RENDER_MODE=rich` o
+`MENTOX_RENDER_MODE=clean`. `light` genera una vista táctica rápida de 672 × 448;
+`rich` genera una vista detallada de 1920 × 1080 con todos los paneles técnicos;
+`clean` usa esa misma vista detallada, pero conserva únicamente el partido,
+los dorsales, el balón, el marcador y el reloj. En `clean` se ocultan el panel
+`MATCH EVENTS`, la minimapa, los paneles tácticos, la línea de fuera de juego,
+las bancas y las barras de energía que cubrían parcialmente los dorsales.
+También se ocultan los puntos dinámicos de la minimapa; no se modifica ningún
+evento ni dato de seguimiento.
+
+Los eventos no se eliminan: continúan disponibles en `events.jsonl`, mientras
+que las posiciones siguen en `tracking.jsonl`. De esta manera, la interfaz de
+The Prime Moment puede mostrar la información fuera del video y sin duplicarla.
+
+Ejemplo de una prueba corta antes de producir un lote:
+
+```bash
+export MENTOX_IMAGE_BUILD_MODE=local
+export MENTOX_MATCH_COUNT=1
+export MENTOX_MATCH_SECONDS=10
+export MENTOX_RENDER_MODE=clean
+export MENTOX_BATCH_ID="messi-preflight-clean-hud"
+export MENTOX_START_JOB=1
+bash infra/azure/deploy-messi-generator.sh
+```
+
+El parche se aplica sobre la revisión fijada de MESSI durante la construcción.
+Si el código externo cambia y el parche deja de coincidir, la imagen falla en
+`git apply --check` en lugar de producir videos con una interfaz inesperada.
 
 No son 90 minutos de vídeo real. Cada archivo representa un partido completo en
 una reproducción táctica comprimida de tres minutos. Generar 30 vídeos de 90

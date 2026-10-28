@@ -29,6 +29,8 @@ TRACKING_RULE = "tracking@1"
 ALERT_RULE = "tracking_alert@1"
 SIMULATED_ORIGIN = "simulated_fixture"
 MODEL_ORIGIN = "actual_model"
+# Posiciones que el simulador MESSI genera junto a su vídeo: tampoco se miden desde vídeo.
+SIMULATOR_ORIGIN = "synthetic_simulator"
 
 PLAYER_MAX_SPEED_MS = 12.0
 BALL_MAX_SPEED_MS = 40.0  # 144 km/h
@@ -52,6 +54,7 @@ LIMIT_VIDEO = (
     "Posiciones estimadas por un modelo de vídeo; dependen de la calidad del seguimiento y "
     "de la homografía del campo."
 )
+LIMIT_SIMULATOR = "Posiciones del simulador MESSI; no medidas desde vídeo."
 LIMIT_IDENTITY = "La pista no está asociada a un jugador confirmado; se informa por track_id."
 
 
@@ -162,7 +165,16 @@ class TrackingSource(StrEnum):
     """Origen de las posiciones en la vista para pantalla (vocabulario de la API)."""
 
     SYNTHETIC_MOCK = "synthetic_mock"
+    SYNTHETIC_SIMULATOR = "synthetic_simulator"
     VIDEO_MODEL = "video_model"
+
+
+_ORIGIN_BY_SOURCE = {
+    TrackingSource.SYNTHETIC_MOCK: SIMULATED_ORIGIN,
+    TrackingSource.SYNTHETIC_SIMULATOR: SIMULATOR_ORIGIN,
+    TrackingSource.VIDEO_MODEL: MODEL_ORIGIN,
+}
+_SOURCE_BY_ORIGIN = {origin: source for source, origin in _ORIGIN_BY_SOURCE.items()}
 
 
 class TrackedObject(BaseModel):
@@ -182,7 +194,8 @@ class TrackingFrame(BaseModel):
 
     Es una vista de salida de un ``TrackSet``; la entrada sigue siendo la de
     Persona 1. ``source`` traduce el origen: ``simulated_fixture`` se muestra
-    como ``synthetic_mock`` y ``actual_model`` como ``video_model``.
+    como ``synthetic_mock``, ``actual_model`` como ``video_model`` y el
+    simulador MESSI como ``synthetic_simulator``.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -196,9 +209,21 @@ class TrackingFrame(BaseModel):
     objects: list[TrackedObject] = Field(default_factory=list)
 
 
+def tracking_source(tracks: TrackSet) -> TrackingSource:
+    """El origen de las pistas en el vocabulario de la API."""
+    return _SOURCE_BY_ORIGIN.get(tracks.origin, TrackingSource.SYNTHETIC_MOCK)
+
+
+def _limit(tracks: TrackSet) -> str:
+    return {
+        TrackingSource.SYNTHETIC_SIMULATOR: LIMIT_SIMULATOR,
+        TrackingSource.VIDEO_MODEL: LIMIT_VIDEO,
+    }.get(tracking_source(tracks), LIMIT_MOCK)
+
+
 def tracking_frames(tracks: TrackSet) -> list[TrackingFrame]:
     """Un cuadro por instante, en orden deportivo, con todas las pistas visibles."""
-    source = TrackingSource.SYNTHETIC_MOCK if tracks.is_simulated else TrackingSource.VIDEO_MODEL
+    source = tracking_source(tracks)
     return [
         TrackingFrame(
             match_id=tracks.match_id,
@@ -216,6 +241,27 @@ def tracking_frames(tracks: TrackSet) -> list[TrackingFrame]:
         )
         for instant in tracks.instants()
     ]
+
+
+def track_set_from_frames(frames: Sequence[TrackingFrame]) -> TrackSet:
+    """Inversa de ``tracking_frames``: pistas para calcular a partir de cuadros ya armados.
+
+    Sirve a las fuentes que entregan cuadros (el simulador MESSI y SoccerNet GameState).
+    Si los cuadros mezclan fuentes, prevalece el simulador y después el modelo de vídeo.
+    """
+    sources = {frame.source for frame in frames}
+    source = next(
+        (s for s in (TrackingSource.SYNTHETIC_SIMULATOR, TrackingSource.VIDEO_MODEL) if s in sources),
+        TrackingSource.SYNTHETIC_MOCK,
+    )
+    tracks: dict[str, Track] = {}
+    for frame in sorted(frames, key=lambda f: (f.period, f.clock_ms)):
+        for item in frame.objects:
+            track = tracks.setdefault(
+                item.track_id, Track(item.track_id, item.kind, item.team_id, item.player_id or None)
+            )
+            track.samples.append(Sample(frame.period, frame.clock_ms, frame.video_time_ms, item.x_m, item.y_m))
+    return TrackSet(frames[0].match_id if frames else "", _ORIGIN_BY_SOURCE[source], tracks)
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,7 +308,8 @@ def window_speeds(
     first = 0
     path = 0.0
     for last, (_, end, length) in enumerate(valid):
-        if valid[first][0].period != end.period:
+        # No unir ventanas a través de un salto descartado o una pista perdida.
+        if last and valid[last - 1][1] != valid[last][0]:
             first, path = last, 0.0
         path += length
         while first < last and end.clock_ms - valid[first][1].clock_ms >= window_ms:
@@ -282,7 +329,10 @@ def episodes(
     current: list[tuple[Sample, Sample, float]] = []
     for item in speeds:
         if item[2] >= threshold:
-            if current and current[-1][1].period != item[1].period:
+            if current and (
+                current[-1][1].period != item[1].period
+                or item[1].clock_ms - current[-1][1].clock_ms > MAX_SAMPLE_GAP_MS
+            ):
                 grouped.append(current)
                 current = []
             current.append(item)
@@ -365,17 +415,20 @@ def player_tracking_metrics(tracks: TrackSet) -> list[MetricValue]:
             continue
         summary = movement(track)
         evidence = _evidence([track.track_id], tracks.origin, summary.start, summary.end, summary.frames)
-        owner = {"team_id": track.team_id, "player_id": track.player_id}
+        owner = {"team_id": track.team_id, "player_id": track.player_id or None}
+        # Sin un tramo válido, 0 m no sería un dato sino la falta de él.
+        has_segments = any(ok for _, _, _, _, ok in _segments(track.samples, PLAYER_MAX_SPEED_MS))
+        missing = "No hay posiciones consecutivas válidas para medir movimiento"
         discarded = [IndicatorComponent(key="discarded_segments", value=summary.discarded_segments, unit="count")]
         results.extend([
-            tracking_metric("distance_covered_m", round(summary.distance_m, 1), evidence=evidence,
-                            components=discarded, **owner),
-            tracking_metric("high_intensity_distance_m", round(summary.high_intensity_m, 1),
-                            evidence=evidence, **owner),
+            tracking_metric("distance_covered_m", round(summary.distance_m, 1) if has_segments else None, evidence=evidence,
+                            components=discarded, reason=missing, **owner),
+            tracking_metric("high_intensity_distance_m", round(summary.high_intensity_m, 1) if has_segments else None,
+                            evidence=evidence, reason=missing, **owner),
             tracking_metric("top_speed_kmh",
                             round(summary.top_speed_ms * 3.6, 1) if summary.top_speed_ms is not None else None,
                             evidence=evidence, **owner),
-            tracking_metric("sprints", summary.sprints, evidence=evidence, **owner),
+            tracking_metric("sprints", summary.sprints if has_segments else None, evidence=evidence, reason=missing, **owner),
         ])
     return results
 
@@ -538,7 +591,7 @@ def tracking_alerts(tracks: TrackSet) -> list[TrackingAlert]:
       menos 1 km/h el último récord avisado del partido.
     * ``distance_milestone``: un jugador alcanza cada 1 000 m recorridos.
     """
-    limits = [LIMIT_MOCK if tracks.is_simulated else LIMIT_VIDEO]
+    limits = [_limit(tracks)]
     video_by_time = {
         (s.period, s.clock_ms): s.video_time_ms for t in tracks.tracks.values() for s in t.samples
     }

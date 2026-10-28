@@ -32,8 +32,8 @@ from .tracking import (
     TrackedObject,
     Track,
     TrackingFrame,
-    TrackingSource,
     TrackSet,
+    tracking_source,
 )
 
 WHAT_IF_RULE = "what_if@1"
@@ -118,7 +118,7 @@ def frame_at(tracks: TrackSet, period: int, clock_ms: int, video_time_ms: int | 
     found = positions_at(tracks, period, clock_ms)
     if not found:
         return None
-    source = TrackingSource.SYNTHETIC_MOCK if tracks.is_simulated else TrackingSource.VIDEO_MODEL
+    source = tracking_source(tracks)
     return TrackingFrame(
         match_id=tracks.match_id, period=period, clock_ms=clock_ms, video_time_ms=video_time_ms,
         source=source,

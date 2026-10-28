@@ -1,0 +1,23 @@
+test_empty_result_passes_the_installed_tracker_update_method (__main__.CalibrationPandasTests) ... ok
+test_empty_tracker_retains_schema_without_fabricating_detections (__main__.CalibrationPandasTests) ... ok
+test_original_failure_is_reproduced (__main__.CalibrationPandasTests) ... ok
+test_patch_matches_installed_upstream_method (__main__.CalibrationPandasTests) ... ok
+test_selects_first_row_without_relabeling_frames (__main__.CalibrationPandasTests) ... ok
+test_dockerfile_patches_after_preloading_weights (__main__.CalibrationPatchTests) ... ok
+test_empty_tracker_file_is_patched (__main__.CalibrationPatchTests) ... ok
+test_empty_tracker_patch_rejects_unrecognized_source (__main__.CalibrationPatchTests) ... ok
+test_empty_tracker_source_is_patched_idempotently (__main__.CalibrationPatchTests) ... ok
+test_file_patch_can_be_repeated (__main__.CalibrationPatchTests) ... ok
+test_invalid_syntax_leaves_original_file_untouched (__main__.CalibrationPatchTests) ... ok
+test_is_idempotent (__main__.CalibrationPatchTests) ... ok
+test_missing_file_is_not_created (__main__.CalibrationPatchTests) ... ok
+test_rejects_duplicate_patched_targets (__main__.CalibrationPatchTests) ... ok
+test_rejects_duplicate_targets (__main__.CalibrationPatchTests) ... ok
+test_rejects_mixed_original_and_patched_source (__main__.CalibrationPatchTests) ... ok
+test_rejects_unrecognized_upstream_source (__main__.CalibrationPatchTests) ... ok
+test_replaces_only_the_faulty_expression (__main__.CalibrationPatchTests) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.262s
+
+OK

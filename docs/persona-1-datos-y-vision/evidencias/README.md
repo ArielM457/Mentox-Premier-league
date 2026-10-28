@@ -4,6 +4,11 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 
 ## Evidencias disponibles
 
+La integración actual de Roboflow, TeamSpotting y el replay MESSI conserva
+su [evidencia local y límites](messi-hibrido-20261027.md) y la
+[prueba real con ambas GPU, colas, worker e interfaz](messi-azure-20261027/README.md).
+GameState está retirado.
+
 | Historia | Estado | Evidencia |
 |---|---|---|
 | DV-US-01 · Generar el partido de aceptación | Implementada y verificada localmente | [DV-US-01](DV-US-01.md) |
@@ -40,6 +45,7 @@ Esta carpeta conserva la evidencia de implementación de cada historia de Person
 | DV-US-33 · Adaptar un MP4 a SoccerNet GameState | Contratos verificados localmente; inferencia GPU pendiente | [DV-US-33](DV-US-33.md) |
 | DV-US-34 · Ejecutar inferencia mientras se reproduce el vídeo | Captura verificada localmente y topología Azure verificada; recorrido visual pendiente | [DV-US-34](DV-US-34.md) |
 | DV-US-35 · Consumir eventos importantes con un worker | Worker y recorrido Service Bus verificados; ejecución real de agentes pendiente | [DV-US-35](DV-US-35.md) |
+| DV-US-36 · Preparar SoccerNet GameState como servicio GPU | Retirado de la demo; Container App eliminado. Evidencia técnica y calidad insuficiente conservadas | [DV-US-36](DV-US-36.md), [retiro](gamestate-retiro-20261027.md) |
 
 La revisión consolidada de la ejecución GPU se encuentra en
 [revisión de modelos GPU del 23 de octubre de 2026](revision-modelos-gpu-2026-10-23.md).

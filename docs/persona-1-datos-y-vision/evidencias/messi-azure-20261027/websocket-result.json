@@ -1,0 +1,117 @@
+{
+  "status": "passed",
+  "tested_at": "2026-10-28T01:43:41.739884+00:00",
+  "scope": "real_chrome_vite_websocket_remote_roboflow_azure_event_hubs",
+  "websocket_observations": 68,
+  "sources": [
+    "roboflow-ball",
+    "roboflow-pitch",
+    "roboflow-player"
+  ],
+  "page_errors": [],
+  "runtime": {
+    "event_transport": "azure_event_hubs",
+    "event_hubs_configured": true,
+    "blob_storage_configured": true,
+    "credentials_present": false,
+    "vision_observations": {
+      "transport": "azure_event_hubs",
+      "eventhub_name": "vision-observations",
+      "consumer_group": "backend",
+      "producer_published": 1940,
+      "producer_failures": 0,
+      "consumer_accepted": 1940,
+      "consumer_rejected": 0,
+      "consumer_failures": 0,
+      "consumer_running": true,
+      "consumer_error": null
+    },
+    "live_capture": {
+      "configured": true,
+      "model_ready": true,
+      "playing": false,
+      "interval_ms": 1000,
+      "frames_received": 121,
+      "frames_processed": 105,
+      "frames_skipped": 16,
+      "observations_published": 1593,
+      "failures": 0
+    },
+    "teamspotting": {
+      "configured": true,
+      "runs": 1,
+      "failures": 0,
+      "cached_predictions": 177,
+      "device": "Tesla T4",
+      "status": "ready",
+      "error": null,
+      "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+    },
+    "gamestate": {
+      "configured": false,
+      "status": "retired"
+    },
+    "simulator": {
+      "configured": true,
+      "status": "ready",
+      "error": null,
+      "source": "messi_simulator",
+      "match_id": "synthetic-live-001",
+      "events": 170,
+      "tracking_frames": 181,
+      "ignored_records": {
+        "period_start": 2,
+        "touch": 234,
+        "possession:unknown_team": 2,
+        "gk_hold_start": 3,
+        "offside_flag": 3,
+        "gk_hold_end": 3,
+        "period_end": 2,
+        "period": 1,
+        "match_end": 1
+      },
+      "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+      "events_routed": 164,
+      "events_pending_delivery": 0,
+      "observation_error": null,
+      "limitations": [
+        "Las identidades y métricas del simulador no son detecciones de IA."
+      ]
+    },
+    "model_preparation": {
+      "status": "ready",
+      "match_id": "synthetic-live-001",
+      "error": null,
+      "models": {
+        "roboflow": {
+          "status": "ready",
+          "models": [
+            "player",
+            "ball",
+            "pitch"
+          ],
+          "device": "Tesla T4"
+        },
+        "teamspotting": {
+          "status": "ready",
+          "configured": true,
+          "model": "SoccerNet T-DEED TeamSpotting",
+          "device": "Tesla T4",
+          "predictions": 177,
+          "observations_published": 177,
+          "processing_time_ms": 19128.686,
+          "cached": true,
+          "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7"
+        },
+        "gamestate": {
+          "status": "retired",
+          "configured": false
+        }
+      }
+    },
+    "video_source": {
+      "configured": true,
+      "container": "synthetic-videos"
+    }
+  }
+}

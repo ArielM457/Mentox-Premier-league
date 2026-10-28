@@ -30,3 +30,6 @@ docs/persona-1-datos-y-vision/evidencias/dv-us-22-acceptance-report.json
 apps/frontend/src/assets/hero.png
 infra/azure/*.bicepparam
 /docs/sistema-diseno-ui.md
+# Notas locales pegadas desde terminal; pueden contener credenciales.
+/infra/azure/log.md
+/postman/log.md

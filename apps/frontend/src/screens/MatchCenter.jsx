@@ -30,6 +30,7 @@ import { Icon } from '../components/ui/Icon.jsx'
 
 const TABS = ['match', 'summary', 'stats', 'tactical']
 const SPEEDS = [1, 2, 4, 8]
+const SKIP_SECONDS = 10
 const notify = (promise) => promise.catch(() => {})
 
 export function MatchCenter({ matchId }) {
@@ -66,7 +67,16 @@ function LiveMatch({ match }) {
   )
   const videoRef = useRef(null)
   const matchViewRef = useRef(null)
-  const liveDurationMs = match.durationMs
+  // Los comandos al reproductor de visión salen en orden; «advance» solo vale para la generación vigente.
+  const visionGeneration = useRef(null)
+  const visionControlVersion = useRef(0)
+  const visionCommands = useRef(Promise.resolve())
+  const playIntent = useRef(0)
+  const playBusy = useRef(false)
+  // El vídeo del estadio (simulador MESSI) manda sobre la duración cuando existe.
+  const hasVideoSource = match.video?.kind === 'file' && Boolean(match.video.url)
+  const [mediaDurationMs, setMediaDurationMs] = useState(match.durationMs)
+  const liveDurationMs = hasVideoSource ? mediaDurationMs : match.durationMs
   const clock = useMatchClock(liveDurationMs, videoRef, matchId)
   const [restoredSession] = useState(() => readMatchSession(matchId))
   const [seekVersion, setSeekVersion] = useState(0)
@@ -86,8 +96,7 @@ function LiveMatch({ match }) {
   const [visionOpen, setVisionOpen] = useState(() => Boolean(restoredSession.visionOpen))
   const [dismissedOverlays, setDismissedOverlays] = useState(() => new Set())
   const activeTab = TABS.includes(tab) ? tab : 'match'
-  const hasVideoSource = match.video?.kind === 'file' && Boolean(match.video.url)
-  const matchAgentOpen = activeTab === 'match' && assistantOpen && !hasVideoSource
+  const matchAgentOpen = activeTab === 'match' && assistantOpen
   const analystPerspective = ['analyst', 'professional_analyst'].includes(preferences.mode)
   const liveCommentsEnabled = preferences.mode === 'professional_analyst' || preferences.liveComments
   const preferredSummaryPlayerId = metadata.players.some((player) => player.player_id === preferences.favoritePlayerId)
@@ -150,7 +159,7 @@ function LiveMatch({ match }) {
     seekVersion,
     timeMs: clock.time,
   })
-  const visionChannel = useVisionObservationChannel(matchId, seekVersion)
+  const visionChannel = useVisionObservationChannel(matchId, seekVersion, clock.time)
   const visionCapture = useVisionCapture({
     matchId,
     playing: clock.playing,
@@ -158,15 +167,28 @@ function LiveMatch({ match }) {
     videoRef,
   })
 
+  const videoSecond = Math.floor(clock.time / 1000)
+  const sendVisionControl = useCallback((action, position) => {
+    const request = visionCommands.current.catch(() => {}).then(() => api.visionPlayback(action, position, matchId))
+    visionCommands.current = request
+    return request
+  }, [matchId])
+  // Con el vídeo en marcha, el servidor avanza los modelos al mismo segundo.
+  useEffect(() => {
+    if (!hasVideoSource || !clock.playing || visionGeneration.current == null) return
+    api.visionPlayback('advance', Math.floor(clock.timeRef.current), matchId, visionGeneration.current)
+      .catch((error) => setActionError(error.message))
+  }, [hasVideoSource, clock.playing, clock.timeRef, matchId, videoSecond])
+
   const crossed = live.events.filter((event) => event.video_time_ms <= clock.time).length
   const pastEvents = useMemo(() => live.events.slice(0, crossed), [live.events, crossed])
   useEffect(() => {
     let active = true
-    api.state(matchId, clock.timeRef.current)
+    api.state(matchId, Math.min(clock.timeRef.current, match.durationMs))
       .then((s) => active && setSnapshot(s))
       .catch((err) => active && setActionError(err.message))
     return () => { active = false }
-  }, [matchId, crossed, seekVersion, clock.timeRef])
+  }, [match.durationMs, matchId, crossed, seekVersion, clock.timeRef])
 
   const seek = useCallback((value) => {
     const next = Math.min(Math.max(0, value), liveDurationMs)
@@ -174,39 +196,81 @@ function LiveMatch({ match }) {
     if (next > 0) setSimulationStarted(true)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'seek', next))
-    notify(api.visionPlayback('seek', next, matchId))
-  }, [clock, liveDurationMs, matchId])
+    visionGeneration.current = null
+    const version = ++visionControlVersion.current
+    sendVisionControl('seek', next)
+      .then((result) => { if (version === visionControlVersion.current) visionGeneration.current = result.playback_generation })
+      // Sin vídeo, la visión es opcional: su error no detiene la simulación.
+      .catch((error) => hasVideoSource && setActionError(error.message))
+  }, [clock, hasVideoSource, liveDurationMs, matchId, sendVisionControl])
 
   const play = async () => {
-    if (preparingVision) return
+    if (playBusy.current) return
+    playBusy.current = true
+    const intent = ++playIntent.current
     setSimulationStarted(true)
     setActionError(null)
-    if (hasVideoSource) {
-      setPreparingVision(true)
-      try {
-        await api.prepareVisionModels()
-      } catch (err) {
-        setActionError(err.message)
+    try {
+      if (clock.timeRef.current >= liveDurationMs) {
+        clock.seek(0)
+        await sendVisionControl('restart', 0).catch((error) => { if (hasVideoSource) throw error })
+        setSeekVersion((value) => value + 1)
+      }
+      if (hasVideoSource) {
+        setPreparingVision(true)
+        await api.prepareVisionModels(matchId)
+        if (intent !== playIntent.current) return
+        const started = await sendVisionControl('play', clock.timeRef.current)
+        if (intent !== playIntent.current) return
+        visionGeneration.current = started.playback_generation
         setPreparingVision(false)
+      }
+      try {
+        await clock.play()
+        if (intent !== playIntent.current) { clock.pause(); return }
+      } catch (error) {
+        visionGeneration.current = null
+        await sendVisionControl('pause', clock.timeRef.current).catch(() => {})
+        setActionError(`${t.match.videoLoadError} ${error.message}`)
         return
       }
+      notify(api.playback(matchId, 'play', clock.timeRef.current))
+      if (!hasVideoSource) notify(sendVisionControl('play', clock.timeRef.current))
+    } catch (error) {
+      setActionError(error.message)
+    } finally {
+      playBusy.current = false
       setPreparingVision(false)
     }
-    clock.play()
-    notify(api.playback(matchId, 'play', clock.timeRef.current))
-    notify(api.visionPlayback('play', clock.timeRef.current, matchId))
   }
   const pause = () => {
+    playIntent.current += 1
     clock.pause()
+    visionGeneration.current = null
+    visionControlVersion.current += 1
     notify(api.playback(matchId, 'pause', clock.timeRef.current))
-    notify(api.visionPlayback('pause', clock.timeRef.current, matchId))
+    sendVisionControl('pause', clock.timeRef.current).catch((error) => hasVideoSource && setActionError(error.message))
   }
+  // Salir del partido también detiene la captura del servidor.
+  useEffect(() => () => {
+    playIntent.current += 1
+    sendVisionControl('pause', Math.floor(clock.timeRef.current)).catch(() => {})
+  }, [sendVisionControl, clock.timeRef])
   const replay = async () => {
+    pause()
     setSimulationStarted(true)
     clock.seek(0)
     setSeekVersion((v) => v + 1)
     notify(api.playback(matchId, 'restart'))
-    notify(api.visionPlayback('restart', 0, matchId))
+    visionGeneration.current = null
+    try {
+      await sendVisionControl('restart', 0)
+    } catch (error) {
+      if (hasVideoSource) {
+        setActionError(error.message)
+        return
+      }
+    }
     await play()
   }
 
@@ -242,6 +306,11 @@ function LiveMatch({ match }) {
   }
 
   async function startSimulation() {
+    // Con el vídeo del estadio, los eventos ya vienen del simulador MESSI.
+    if (hasVideoSource) {
+      await play()
+      return
+    }
     setSimulating(true)
     setActionError(null)
     if (finished) seek(0)
@@ -291,12 +360,20 @@ function LiveMatch({ match }) {
     setPopover(next ? { player, event } : null)
   }
 
+  // Adelantar no pasa del directo: lo que aún no ocurrió no se puede ver.
+  const skipLimit = finished ? liveDurationMs : clock.liveEdge
+  const skip = (deltaMs) => seek(Math.min(skipLimit, clock.timeRef.current + deltaMs))
+
   const playbackControls = (
     <section className="replay-controls pitch-replay-controls" aria-label={t.match.timeline}>
       <div className="playback">
-        <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
-          {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
-        </Button>
+        <div className="playback-buttons">
+          <Button aria-label={clock.playing ? t.match.pause : t.match.play} className="play-main" disabled={preparingVision} onClick={clock.playing ? pause : play}>
+            {clock.playing ? <Icon name="pause" /> : <Icon name="play" />}
+          </Button>
+          <button aria-label={t.match.skipBack(SKIP_SECONDS)} className="skip-control" disabled={clock.time <= 0} onClick={() => skip(-SKIP_SECONDS * 1000)} title={t.match.skipBack(SKIP_SECONDS)} type="button">−{SKIP_SECONDS} s</button>
+          <button aria-label={t.match.skipForward(SKIP_SECONDS)} className="skip-control" disabled={clock.time >= skipLimit} onClick={() => skip(SKIP_SECONDS * 1000)} title={t.match.skipForward(SKIP_SECONDS)} type="button">+{SKIP_SECONDS} s</button>
+        </div>
         <Timeline durationMs={timelineDurationMs} label={t.match.timeline} moments={timelineMoments.slice().reverse()} onSeek={seek} selectedId={selectedMoment?.message_id} time={clock.time} />
         <div className="playback-tools">
           {behindLive && <label className="speed-select"><span className="sr-only">{t.match.speed}</span><select onChange={(event) => clock.setSpeed(Number(event.target.value))} value={clock.speed}>{SPEEDS.map((s) => <option key={s} value={s}>{s}×</option>)}</select></label>}
@@ -304,6 +381,40 @@ function LiveMatch({ match }) {
         </div>
       </div>
     </section>
+  )
+
+  // La cancha con el seguimiento: siempre en Resumen y, sin vídeo del estadio, también en Partido.
+  const trackingPitch = (
+    <LiveTrackingPitch
+      events={pastEvents}
+      eventTypeLabels={t.moment.eventTypes}
+      frames={tracking.frames}
+      homeTeamId={metadata.home_team.team_id}
+      label={t.match.timeline}
+      loading={tracking.loading}
+      onSelectPlayer={selectPlayer}
+      pitchLengthM={metadata.pitch_length_m}
+      pitchWidthM={metadata.pitch_width_m}
+      players={metadata.players}
+      playing={clock.playing}
+      selectedPlayerId={selectedPlayerId}
+      situationLabels={t.match.situations}
+      sourceLabel={tracking.source === 'video_model' ? t.match.trackingVideo : t.match.trackingSynthetic}
+      speed={clock.speed}
+      timeMs={clock.time}
+    />
+  )
+  const playerPopover = popover?.player && (
+    <button className="player-popover" onClick={() => setPopover(null)} type="button">
+      <strong>
+        {popover.player.shirt_number ? `${popover.player.shirt_number} · ` : ''}
+        {popover.player.name}
+      </strong>
+      <span>
+        {popover.event ? `${t.moment.eventTypes[popover.event.type] ?? popover.event.type} · ${formatClock(popover.event.video_time_ms)}` : t.match.playerReady} — {t.match.tapToClose}
+      </span>
+      <Icon name="close" size={15} />
+    </button>
   )
 
   return (
@@ -350,6 +461,10 @@ function LiveMatch({ match }) {
             <StatsPanel metadata={metadata} snapshot={snapshot} timeMs={clock.time} />
           ) : activeTab === 'summary' ? (
             <div className="match-summary">
+              <div className="match-stage-main summary-pitch">
+                {trackingPitch}
+                {playerPopover}
+              </div>
               <LiveSummarySelector onPlayerChange={setSummaryPlayerId} onTypeChange={setSummaryType} playerId={selectedSummaryPlayerId} players={metadata.players} type={summaryType} />
               <MomentWorkspace events={pastEvents} matchId={matchId} metadata={metadata} moment={summarySelectedMoment} moments={summaryMoments} onOpen={openMoment} onSelect={selectMoment} />
               <InsightsPanel events={pastEvents} metadata={metadata} moments={summaryMoments} onSelect={selectMoment} selectedId={summarySelectedMoment?.message_id} />
@@ -360,20 +475,16 @@ function LiveMatch({ match }) {
             <>
               <div className="pitch-wrap">
                 <div className="match-view-controls">
-                  {!hasVideoSource && (
-                    <>
-                      <label className="view-switch">
-                        <span>{t.match.liveCommentsToggle}</span>
-                        <input checked={preferences.mode === 'professional_analyst' || preferences.liveComments} disabled={preferences.mode === 'professional_analyst'} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
-                        <span aria-hidden="true" className="switch-track"><span /></span>
-                      </label>
-                      <label className="view-switch">
-                        <span><Icon name="spark" size={15} /> {t.match.assistantToggle}</span>
-                        <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} type="checkbox" />
-                        <span aria-hidden="true" className="switch-track"><span /></span>
-                      </label>
-                    </>
-                  )}
+                  <label className="view-switch">
+                    <span>{t.match.liveCommentsToggle}</span>
+                    <input checked={preferences.mode === 'professional_analyst' || preferences.liveComments} disabled={preferences.mode === 'professional_analyst'} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
+                    <span aria-hidden="true" className="switch-track"><span /></span>
+                  </label>
+                  <label className="view-switch">
+                    <span><Icon name="spark" size={15} /> {t.match.assistantToggle}</span>
+                    <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} type="checkbox" />
+                    <span aria-hidden="true" className="switch-track"><span /></span>
+                  </label>
                   <Button
                     aria-label={fullscreen ? t.match.exitFullscreen : t.match.enterFullscreen}
                     className="match-fullscreen-toggle"
@@ -391,7 +502,7 @@ function LiveMatch({ match }) {
                     {live.status === 'connecting' && <Spinner size="small" />} {t.match.channel[live.status]}
                   </span>
                 </div>
-                <div className={`match-stage-layout ${hasVideoSource ? 'video-only' : ''}`}>
+                <div className="match-stage-layout">
                   <div className="match-stage-main">
                     <div className="match-playback-stage">
                       {hasVideoSource ? (
@@ -400,6 +511,11 @@ function LiveMatch({ match }) {
                             className="match-source-video"
                             crossOrigin="anonymous"
                             onEnded={pause}
+                            onError={() => { pause(); setActionError(t.match.videoLoadError) }}
+                            onLoadedMetadata={(event) => {
+                              const duration = event.currentTarget.duration * 1000
+                              if (Number.isFinite(duration) && duration > 0) setMediaDurationMs(Math.round(duration))
+                            }}
                             playsInline
                             preload="metadata"
                             ref={videoRef}
@@ -407,65 +523,35 @@ function LiveMatch({ match }) {
                           />
                           <VisionVideoOverlay matchId={matchId} observations={visionChannel.observations} timeMs={clock.time} />
                         </div>
-                      ) : <LiveTrackingPitch
-                        events={pastEvents}
-                        eventTypeLabels={t.moment.eventTypes}
-                        frames={tracking.frames}
-                        homeTeamId={metadata.home_team.team_id}
-                        label={t.match.timeline}
-                        loading={tracking.loading}
-                        onSelectPlayer={selectPlayer}
-                        pitchLengthM={metadata.pitch_length_m}
-                        pitchWidthM={metadata.pitch_width_m}
-                        players={metadata.players}
-                        playing={clock.playing}
-                        selectedPlayerId={selectedPlayerId}
-                        situationLabels={t.match.situations}
-                        sourceLabel={tracking.source === 'video_model' ? t.match.trackingVideo : t.match.trackingSynthetic}
-                        speed={clock.speed}
-                        timeMs={clock.time}
-                      />}
+                      ) : trackingPitch}
                       {playbackControls}
                     </div>
-                    {popover?.player && (
-                      <button className="player-popover" onClick={() => setPopover(null)} type="button">
-                        <strong>
-                          {popover.player.shirt_number ? `${popover.player.shirt_number} · ` : ''}
-                          {popover.player.name}
-                        </strong>
-                        <span>
-                          {popover.event ? `${t.moment.eventTypes[popover.event.type] ?? popover.event.type} · ${formatClock(popover.event.video_time_ms)}` : t.match.playerReady} — {t.match.tapToClose}
-                        </span>
-                        <Icon name="close" size={15} />
-                      </button>
-                    )}
+                    {!hasVideoSource && playerPopover}
                   </div>
-                  {!hasVideoSource && (
-                    <aside className="match-commentary-rail">
-                      <div className="match-commentary-slot">
-                        {liveCommentsEnabled && pastEvents.length ? (
-                          <LiveNarrator events={pastEvents} metadata={metadata} />
-                        ) : (
-                          <section className="live-narrator live-narrator-empty" aria-label={t.match.liveCommentsTitle}>
-                            <header><span className="live-dot" /><strong>{t.match.liveCommentsTitle}</strong></header>
-                            <p>{liveCommentsEnabled ? t.match.waitingCommentary : t.match.liveCommentsCopy}</p>
-                          </section>
-                        )}
-                      </div>
-                      <section className="match-moment-panel" aria-label={t.match.momentSelector}>
-                        <header><span><Icon name="spark" size={14} /> {t.match.selected}</span></header>
-                        {displayedOverlay ? (
-                          <div className="match-current-moment" aria-live="assertive" aria-atomic="true">
-                            <OverlayCard onClose={() => setDismissedOverlays((currentIds) => new Set(currentIds).add(displayedOverlay.message_id))} onOpen={openMoment} overlay={displayedOverlay} playing={clock.playing} time={clock.time} />
-                          </div>
-                        ) : (
-                          <p className="match-moment-empty">{t.match.waiting}</p>
-                        )}
-                        <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
-                        <MomentCarousel currentId={current?.message_id} moments={moments.slice(0, 8)} onOpen={openMoment} />
-                      </section>
-                    </aside>
-                  )}
+                  <aside className="match-commentary-rail">
+                    <div className="match-commentary-slot">
+                      {liveCommentsEnabled && pastEvents.length ? (
+                        <LiveNarrator events={pastEvents} metadata={metadata} />
+                      ) : (
+                        <section className="live-narrator live-narrator-empty" aria-label={t.match.liveCommentsTitle}>
+                          <header><span className="live-dot" /><strong>{t.match.liveCommentsTitle}</strong></header>
+                          <p>{liveCommentsEnabled ? t.match.waitingCommentary : t.match.liveCommentsCopy}</p>
+                        </section>
+                      )}
+                    </div>
+                    <section className="match-moment-panel" aria-label={t.match.momentSelector}>
+                      <header><span><Icon name="spark" size={14} /> {t.match.selected}</span></header>
+                      {displayedOverlay ? (
+                        <div className="match-current-moment" aria-live="assertive" aria-atomic="true">
+                          <OverlayCard onClose={() => setDismissedOverlays((currentIds) => new Set(currentIds).add(displayedOverlay.message_id))} onOpen={openMoment} overlay={displayedOverlay} playing={clock.playing} time={clock.time} />
+                        </div>
+                      ) : (
+                        <p className="match-moment-empty">{t.match.waiting}</p>
+                      )}
+                      <MomentSelector moments={moments} onSelect={selectMoment} selected={selectedMoment} />
+                      <MomentCarousel currentId={current?.message_id} moments={moments.slice(0, 8)} onOpen={openMoment} />
+                    </section>
+                  </aside>
                 </div>
               </div>
             </>
@@ -473,12 +559,12 @@ function LiveMatch({ match }) {
           {activeTab === 'match' && (
             <>
               {hasVideoSource ? (
-                <VisionCard capture={visionCapture} liveChannel={visionChannel} matchId={matchId} seekVersion={seekVersion} timeMs={clock.time} videoMode />
+                <VisionCard capture={visionCapture} liveChannel={visionChannel} matchId={matchId} metadata={metadata} onSeek={seek} seekVersion={seekVersion} timeMs={clock.time} videoMode />
               ) : (
                 <details className="vision-details" open={visionOpen} onToggle={(event) => setVisionOpen(event.currentTarget.open)}>
                   <summary>{t.match.visionDetails}</summary>
                   <p>{t.match.visionDescription}</p>
-                  {visionOpen && <VisionCard capture={visionCapture} liveChannel={visionChannel} matchId={matchId} seekVersion={seekVersion} timeMs={clock.time} videoMode={false} />}
+                  {visionOpen && <VisionCard capture={visionCapture} liveChannel={visionChannel} matchId={matchId} metadata={metadata} onSeek={seek} seekVersion={seekVersion} timeMs={clock.time} videoMode={false} />}
                 </details>
               )}
             </>
@@ -486,7 +572,7 @@ function LiveMatch({ match }) {
         </div>
         {matchAgentOpen && (
           <div className="match-agent-rail" id="match-agent-panel">
-            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, preferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, preferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} timeRef={clock.timeRef} />
+            <Assistant canExplore={Boolean(current)} favoriteClub={teamOf(catalog, matchApiPreferences.favoriteTeamId)} favoritePlayer={playerOf(catalog, matchApiPreferences.favoritePlayerId)} matchId={matchId} onExplore={() => current && openMoment(current)} requestPreferences={matchApiPreferences} timeRef={clock.timeRef} />
           </div>
         )}
       </div>

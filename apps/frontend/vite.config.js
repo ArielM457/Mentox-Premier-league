@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': process.env.VITE_BACKEND_PROXY ?? 'http://127.0.0.1:8000',
+      '/api': {
+        target: process.env.VITE_BACKEND_PROXY ?? 'http://127.0.0.1:8000',
+        // Visión y narración comparten /api con HTTP: reenviar también Upgrade.
+        ws: true,
+      },
     },
   },
 })

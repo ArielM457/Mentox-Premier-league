@@ -1,0 +1,132 @@
+{"cuda_available": true, "cuda_version": "11.7", "gpu_name": "Tesla T4", "gpu_memory_bytes": 16703356928, "torch_version": "1.13.1+cu117"}
+[10/27/26 20:27:06] INFO     Run directory:                          main.py:103
+                             /work/analyses/6dcc306a4fa34eb69a510940            
+                             a8132fdd/output/run                                
+                    INFO     Using device: 'cuda'.                   main.py:104
+Creating new Ultralytics Settings v0.0.8 file ✅ 
+View Ultralytics Settings with 'yolo settings' or at '/tmp/.config/Ultralytics/settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/usage/settings.
+[10/27/26 20:27:14] INFO     ExternalVideo= val set: 1                main.py:32
+Overwriting current config with config loaded from /models/reid/prtreid-soccernet-baseline.pth.tar
+Diff from default config :
+{'batch_size': 32,
+ 'ce': 0.0,
+ 'dim_reduce_output': 256,
+ 'hrnet_pretrained_path': '/models/reid',
+ 'id': 0.0,
+ 'load_config': True,
+ 'mask_filtering_testing': False,
+ 'max_epoch': 20,
+ 'preprocess': 'id',
+ 'test_embeddings': "['globl']",
+ 'tr': 0.0,
+ 'train_sampler': 'PrtreidSampler',
+ 'train_sampler_t': 'PrtreidSampler'}
+[10/27/26 20:27:19] INFO     => init weights from normal        cls_hrnet.py:450
+                             distribution                                       
+[10/27/26 20:27:20] INFO     => init weights from normal      cls_hrnet_l.py:449
+                             distribution                                       
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+10/27 20:27:22 - mmengine - WARNING - Failed to search registry with scope "mmocr" in the "function" registry tree. As a workaround, the current "function" registry in "mmengine" is used to build instance. This may cause unexpected failure when running the built modules. Please check whether "mmocr" is a correct scope, or whether the registry is initialized.
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textdet/dbnet/dbnet_resnet18_fpnc_1200e_icdar2015/dbnet_resnet18_fpnc_1200e_icdar2015_20220825_221614-7c0e94f2.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+Loads checkpoint by http backend from path: https://download.openmmlab.com/mmocr/textrecog/sar/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real/sar_resnet31_parallel-decoder_5e_st-sub_mj-sub_sa_real_20220915_171910-04eb4e75.pth
+The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: data_preprocessor.mean, data_preprocessor.std
+
+[10/27/26 20:27:24] INFO     Pipeline: YOLOUltralytics -> PRTReId   module.py:67
+                             -> BPBReIDStrongSORT ->                            
+                             NBJW_Calib_Keypoints -> NBJW_Calib ->              
+                             MMOCR -> MajorityVoteTracklet ->                   
+                             TrackletTeamClustering ->                          
+                             TrackletTeamSideLabeling                           
+                    INFO     Starting tracking operation on val set.  main.py:50
+                    INFO     Saving TrackerState to          tracker_state.py:52
+                             /work/analyses/6dcc306a4fa34eb6                    
+                             9a510940a8132fdd/output/sn-game                    
+                             state.pklz                                         
+                    INFO     Pipeline has been validated            module.py:84
+[10/27/26 20:27:26] INFO     Created a temporary directory at instantiator.py:21
+                             /tmp/tmp2zok0ea1                                   
+                    INFO     Writing                          instantiator.py:76
+                             /tmp/tmp2zok0ea1/_remote_module_                   
+                             non_scriptable.py                                  
+building model on device cuda
+=> init weights from normal distribution
+Loading pretrained ImageNet HRNet32 model at /models/reid/hrnetv2_w32_imagenet_pretrained.pth
+=> loading pretrained model /models/reid/hrnetv2_w32_imagenet_pretrained.pth
+Successfully loaded pretrained weights from "/models/reid/prtreid-soccernet-baseline.pth.tar"
+** The following layers are discarded due to unmatched keys or layer size: ['global_identity_classifier.classifier.weight', 'background_identity_classifier.classifier.weight', 'foreground_identity_classifier.classifier.weight', 'concat_parts_identity_classifier.classifier.weight', 'parts_identity_classifier.0.classifier.weight']
+Building train transforms ...
++ resize to 256x128
++ normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
++ to torch tensor of range [0, 1]
+Building test transforms ...
++ resize to 256x128
++ to torch tensor of range [0, 1]
++ normalization (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
++ masks preprocess = id
++ use add background mask
+Error executing job with overrides: ['home_dir=/home/prime', 'data_dir=/work/dataset', 'model_dir=/models', 'dataset=video', 'dataset.video_path=/work/analyses/6dcc306a4fa34eb69a510940a8132fdd/input.mp4', 'dataset.eval_set=val', 'dataset.nvid=1', 'eval=trackeval', 'test_tracking=true', 'eval_tracking=false', 'use_wandb=false', 'state.save_file=/work/analyses/6dcc306a4fa34eb69a510940a8132fdd/output/sn-gamestate.pklz', 'visualization.cfg.save_videos=false']
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.9/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "pandas/_libs/index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2606, in pandas._libs.hashtable.Int64HashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2630, in pandas._libs.hashtable.Int64HashTable.get_item
+KeyError: 0
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/bin/tracklab", line 7, in <module>
+    sys.exit(main())
+  File "/usr/local/lib/python3.9/site-packages/hydra/main.py", line 94, in decorated_main
+    _run_hydra(
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/utils.py", line 394, in _run_hydra
+    _run_app(
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/utils.py", line 457, in _run_app
+    run_and_report(
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/utils.py", line 223, in run_and_report
+    raise ex
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
+    return func()
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
+    lambda: hydra.run(
+  File "/usr/local/lib/python3.9/site-packages/hydra/_internal/hydra.py", line 132, in run
+    _ = ret.return_value
+  File "/usr/local/lib/python3.9/site-packages/hydra/core/utils.py", line 263, in return_value
+    raise self._return_value
+  File "/usr/local/lib/python3.9/site-packages/hydra/core/utils.py", line 189, in run_job
+    ret.return_value = task_function(task_cfg)
+  File "/usr/local/lib/python3.9/site-packages/tracklab/main.py", line 62, in main
+    tracking_engine.track_dataset()
+  File "/usr/local/lib/python3.9/site-packages/tracklab/engine/engine.py", line 118, in track_dataset
+    detections, image_pred = self.video_loop(tracker_state, video_metadata, video_idx)
+  File "/usr/local/lib/python3.9/site-packages/tracklab/engine/offline.py", line 31, in video_loop
+    detections, image_pred = self.default_step(batch, model_name, detections, image_pred)
+  File "/usr/local/lib/python3.9/site-packages/tracklab/engine/engine.py", line 162, in default_step
+    batch_detections = self.models[task].process(
+  File "/opt/sn-gamestate/sn_gamestate/calibration/nbjw_calib.py", line 179, in process
+    predictions = metadatas["keypoints"][0]
+  File "/usr/local/lib/python3.9/site-packages/pandas/core/series.py", line 1133, in __getitem__
+    return self._get_value(key)
+  File "/usr/local/lib/python3.9/site-packages/pandas/core/series.py", line 1249, in _get_value
+    loc = self.index.get_loc(label)
+  File "/usr/local/lib/python3.9/site-packages/pandas/core/indexes/base.py", line 3819, in get_loc
+    raise KeyError(key) from err
+KeyError: 0

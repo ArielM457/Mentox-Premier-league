@@ -46,6 +46,9 @@ class RoutingEvent(StrictModel):
     type: Literal["pass", "shot", "tackle", "possession_change", "pressure", "recovery"]
     team_id: str = Field(min_length=1)
     player_id: str | None = None
+    receiver_player_id: str | None = None
+    situation: str | None = None
+    stoppage_ms: int = Field(default=0, ge=0, le=120_000)
     start: Position | None = None
     end: Position | None = None
     outcome: Literal["success", "failure", "goal", "saved", "blocked", "off_target", "unknown"] = "unknown"

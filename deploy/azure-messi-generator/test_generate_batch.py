@@ -52,6 +52,33 @@ class SettingsTests(unittest.TestCase):
         self.assertTrue(all(home != away for home, away in pairs))
         self.assertGreaterEqual(len(set(pairs)), 3)
 
+    def test_clean_render_mode_is_accepted(self) -> None:
+        with patch.dict(
+            os.environ,
+            {"MENTOX_UPLOAD_ENABLED": "0", "MENTOX_RENDER_MODE": "clean"},
+            clear=True,
+        ):
+            settings = MODULE.Settings.from_environment()
+
+        self.assertEqual(settings.render_mode, "clean")
+
+    @patch.object(MODULE.subprocess, "run")
+    def test_clean_mode_uses_rich_renderer_without_hud(self, run) -> None:
+        run.return_value = SimpleNamespace(returncode=1)
+        with patch.dict(
+            os.environ,
+            {"MENTOX_UPLOAD_ENABLED": "0", "MENTOX_RENDER_MODE": "clean"},
+            clear=True,
+        ):
+            settings = MODULE.Settings.from_environment()
+
+        with self.assertRaisesRegex(RuntimeError, "código 1"):
+            MODULE._run_match(settings, 0, Path("/tmp/mentox-clean-render-test"))
+
+        command = run.call_args.args[0]
+        self.assertEqual(command[command.index("--mode") + 1], "rich")
+        self.assertIn("--clean-hud", command)
+
 
 class GpuTests(unittest.TestCase):
     def test_gpu_is_required(self) -> None:

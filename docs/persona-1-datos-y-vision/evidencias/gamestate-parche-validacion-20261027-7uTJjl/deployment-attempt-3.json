@@ -1,0 +1,14 @@
+{
+  "image": "mentox138f2e77.azurecr.io/mentox/soccernet-gamestate:60da675eaafb",
+  "location": "North Central US",
+  "name": "ca-mentox-gamestate-dev",
+  "revision": "ca-mentox-gamestate-dev--0000013",
+  "revisionMode": "Single",
+  "scale": {
+    "cooldownPeriod": 300,
+    "maxReplicas": 1,
+    "minReplicas": 0,
+    "pollingInterval": 30,
+    "rules": null
+  }
+}

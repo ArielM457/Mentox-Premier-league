@@ -87,6 +87,19 @@ class MatchRegistry:
             raise NotFoundError(f"No existe el partido {match_id}")
         return session
 
+    def load_replay(self, replay) -> MatchSession:
+        """Carga solo los eventos y jugadores del vídeo verificado, sin el guion local."""
+        session = MatchSession(
+            metadata=replay.metadata, events=replay.events,
+            analytics=self._analytics(), narrative=self._narrative(None),
+            correction_narrative=self._narrative(None), persistence=self._persistence,
+            video_duration_ms=replay.duration_ms, data_source="messi_simulator",
+        )
+        session.set_tracking_frames(replay.tracking)
+        self._persistence.save_match(replay.metadata, replay.events)
+        self._sessions[session.match_id] = session
+        return session
+
     def all(self) -> list[MatchSession]:
         return list(self._sessions.values())
 

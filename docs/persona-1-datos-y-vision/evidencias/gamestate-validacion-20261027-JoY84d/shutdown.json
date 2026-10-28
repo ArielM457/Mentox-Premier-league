@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-10-27T20:59:35Z",
+  "subscription": "7d45d958-156a-4278-9935-755ba5a395ca",
+  "resource_group": "rg-prime-moment-dev",
+  "app": "ca-mentox-gamestate-dev",
+  "latest_revision": "ca-mentox-gamestate-dev--0000006",
+  "min_replicas": 0,
+  "max_replicas": 1,
+  "replicas": [],
+  "note": "Se comprobó por Azure CLI. No se enviaron peticiones HTTP posteriores al modelo. Escala cero no elimina cargos de almacenamiento o registro."
+}

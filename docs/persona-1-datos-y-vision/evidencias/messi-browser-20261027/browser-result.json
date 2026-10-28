@@ -1,0 +1,76 @@
+{
+  "status": "passed",
+  "tested_at": "2026-10-28T01:19:58.566798+00:00",
+  "scope": "real_browser_real_mp4_http_model_test_doubles_memory_queues",
+  "checks": [
+    "No captura antes de Play",
+    "Play reproduce MP4, JPEG a Roboflow y eventos MESSI legibles",
+    "Cambiar pestaña conserva el mismo vídeo y reloj",
+    "Pausa detiene fotogramas y reloj",
+    "Tres roles Roboflow llamados; TeamSpotting una sola inferencia",
+    "Salto y reanudación muestran tiros del MP4 y entregan ruta importante",
+    "Reinicio reutiliza TeamSpotting y no duplica jugadas en colas",
+    "Interfaz inglesa reproduce y muestra procedencia sin errores",
+    "Vista móvil de 390 px sin desbordamiento horizontal",
+    "Iniciar MP4 no ejecuta el guion de simulación de Ariel",
+    "Preferencias guardadas de otro partido no bloquean MESSI",
+    "El escenario original conserva su cancha, sin superponerle el MP4"
+  ],
+  "page_errors": [],
+  "runtime": {
+    "providers": {
+      "player": 6,
+      "ball": 6,
+      "pitch": 6,
+      "teamspotting": 1,
+      "synthetic_demo": 0
+    },
+    "routing": {
+      "transport": "memory",
+      "ingress_published": 4,
+      "metrics_published": 2,
+      "important_published": 2,
+      "telemetry_failures": 0,
+      "last_telemetry_failure": null
+    },
+    "simulator": {
+      "configured": true,
+      "status": "ready",
+      "error": null,
+      "source": "messi_simulator",
+      "match_id": "synthetic-live-001",
+      "events": 170,
+      "tracking_frames": 181,
+      "ignored_records": {
+        "period_start": 2,
+        "touch": 234,
+        "possession:unknown_team": 2,
+        "gk_hold_start": 3,
+        "offside_flag": 3,
+        "gk_hold_end": 3,
+        "period_end": 2,
+        "period": 1,
+        "match_end": 1
+      },
+      "media_sha256": "188498f09109fbae2f4cb95e6c60b541358d29777c12ea3e261b0c2693807fd7",
+      "events_routed": 4,
+      "events_pending_delivery": 0,
+      "observation_error": null,
+      "limitations": [
+        "Las identidades y métricas del simulador no son detecciones de IA."
+      ]
+    },
+    "capture": {
+      "configured": true,
+      "model_ready": true,
+      "playing": false,
+      "interval_ms": 1000,
+      "frames_received": 6,
+      "frames_processed": 6,
+      "frames_skipped": 0,
+      "observations_published": 12,
+      "failures": 0
+    }
+  },
+  "simulation_requests": []
+}
