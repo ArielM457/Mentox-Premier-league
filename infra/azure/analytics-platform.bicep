@@ -98,6 +98,13 @@ module insights 'analytics.bicep' = {
   }
 }
 
+module community 'community.bicep' = {
+  name: 'community-realtime'
+  params: {
+    eventHubNamespaceName: data.outputs.eventHubNamespaceName
+  }
+}
+
 resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: names.logs
   location: location
@@ -266,6 +273,23 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
             {
               name: 'AZURE_CLIENT_ID'
               value: identity.properties.clientId
+            }
+            {
+              // Votos, sugerencias y chat de la comunidad viajan por Event Hubs.
+              name: 'COMMUNITY_TRANSPORT'
+              value: 'azure_event_hubs'
+            }
+            {
+              name: 'EVENT_HUB_FULLY_QUALIFIED_NAMESPACE'
+              value: data.outputs.eventHubFullyQualifiedNamespace
+            }
+            {
+              name: 'COMMUNITY_EVENT_HUB_NAME'
+              value: community.outputs.communityEventHubName
+            }
+            {
+              name: 'COMMUNITY_EVENT_HUB_CONSUMER_GROUP'
+              value: community.outputs.communityConsumerGroup
             }
           ], databaseEnv)
           probes: [

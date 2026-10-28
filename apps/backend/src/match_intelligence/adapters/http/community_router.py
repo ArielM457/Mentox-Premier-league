@@ -14,7 +14,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from match_intelligence.application.community import (
     CommunityError,
     CommunityService,
-    InMemoryMessageBus,
     MessageKind,
     RateLimitError,
     Vote,
@@ -22,6 +21,7 @@ from match_intelligence.application.community import (
     tally_dict,
     topic_for,
 )
+from match_intelligence.adapters.messaging.azure_community import build_community_bus
 from match_intelligence.application.match_session import MatchSession, NotFoundError
 
 from .match_schemas import ErrorResponse
@@ -38,10 +38,23 @@ def get_community_service() -> CommunityService:
         from match_intelligence.adapters.storage.supabase_community import SupabaseCommunityRepository
 
         _service = CommunityService(
-            InMemoryMessageBus(),
+            build_community_bus(),
             persistence=SupabaseCommunityRepository.from_environment(),
         )
     return _service
+
+
+async def start_community_bus() -> None:
+    """Arranca el envío y la lectura del bus cuando es de Azure."""
+    bus = get_community_service().bus
+    if hasattr(bus, "start"):
+        await bus.start()
+
+
+async def close_community_bus() -> None:
+    bus = _service.bus if _service is not None else None
+    if bus is not None and hasattr(bus, "close"):
+        await bus.close()
 
 
 Community = Annotated[CommunityService, Depends(get_community_service)]

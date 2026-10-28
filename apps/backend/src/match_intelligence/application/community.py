@@ -125,7 +125,7 @@ class NullCommunityPersistence:
 
 
 class MessageBus(Protocol):
-    """Publicación y suscripción por tema. Se puede reemplazar por MQTT o Azure Service Bus."""
+    """Publicación y suscripción por tema: en memoria o sobre Azure Event Hubs."""
 
     def publish(self, topic: str, event: dict) -> None: ...
 
@@ -257,6 +257,10 @@ class CommunityService:
         self._persistence.save_message(topic, client_id, message)
         self._bus.publish(topic, {"type": "message", "message": message_dict(message)})
         return message
+
+    @property
+    def bus(self) -> MessageBus:
+        return self._bus
 
     def subscribe(self, topic: str) -> AsyncIterator[dict]:
         return self._bus.subscribe(topic)
