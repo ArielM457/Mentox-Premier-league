@@ -52,6 +52,51 @@
 .preference-summary small { margin-bottom: 4px; color: #aaa5bd; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
 .preference-summary strong { color: white; font-size: 13px; }
 .preference-block { margin-top: 28px; }
+.profile-language-field { max-width: 320px; }
+.preference-card-row {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+}
+.preference-card {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text);
+  background: var(--surface-raised, white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.preference-card:hover { transform: translateY(-2px); border-color: var(--violet); }
+.preference-card.selected { background: var(--surface-soft, var(--lavender)); border-color: var(--violet); }
+.preference-card:focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; }
+.preference-card-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--accent-ink, var(--violet));
+  background: var(--surface-soft, var(--lavender));
+  border-radius: 15px;
+}
+.preference-card strong { font-size: 15px; line-height: 1.3; }
+.preference-card-image { width: 64px; height: 64px; flex-shrink: 0; object-fit: contain; }
+.preference-card-image-player { object-fit: cover; object-position: center top; border-radius: 15px; }
+.preference-card-value { max-width: 100%; color: var(--muted); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
+.preference-card small { color: var(--violet-light, var(--violet)); font-size: 12px; font-weight: 700; }
+.preference-editor { padding: 20px; background: var(--surface-raised, white); border: 1px solid var(--line); border-radius: 18px; }
 .preference-block h3 { font-size: 18px; }
 .preference-block-heading { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .preference-block-heading h3 { margin: 0; }

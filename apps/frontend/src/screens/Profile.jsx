@@ -7,7 +7,7 @@ import { AppShell } from '../components/layout/AppShell.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
-import { LANGUAGES, languageName } from '../i18n/languages.js'
+import { LANGUAGES } from '../i18n/languages.js'
 
 const LEVEL_ICONS = { simple: 'spark', normal: 'match', advanced: 'chart' }
 
@@ -29,7 +29,6 @@ export function Profile() {
   const players = catalog?.players.filter((p) => !draft.favoriteTeamId || p.team_id === draft.favoriteTeamId) ?? []
   const selectedClub = catalog?.clubs.find((team) => team.team_id === draft.favoriteTeamId)
   const selectedPlayer = catalog?.players.find((p) => p.player_id === draft.favoritePlayerId)
-  const selectedLanguage = LANGUAGES.find((item) => item.value === draft.language) ?? LANGUAGES[0]
   const playerName = selectedPlayer?.name ?? t.common.none
   const invalidMode = draft.mode === 'player' && !draft.favoritePlayerId
   const choose = (changes) => {
@@ -78,59 +77,47 @@ export function Profile() {
               <p>{copy.since}</p>
             </div>
           </div>
-          <div className="preference-summary four">
-            <span>
-              <small>{copy.language}</small>
-              <strong>{languageName(draft.language)}</strong>
-            </span>
-            <span>
-              <small>{copy.player}</small>
-              <strong>{playerName}</strong>
-            </span>
-            <span>
-              <small>{copy.mode}</small>
-              <strong>{t.modes[draft.mode].name}</strong>
-            </span>
-            <span>
-              <small>{copy.level}</small>
-              <strong>{t.levels[draft.level].name}</strong>
-            </span>
+          <div className="profile-language-field preference-block">
+            <label className="preference-field">
+              <span>{copy.language}</span>
+              <select value={draft.language} onChange={(event) => choose({ language: event.target.value })}>
+                {LANGUAGES.map(({ value, code, name }) => (
+                  <option key={value} value={value}>{code} · {name}</option>
+                ))}
+              </select>
+            </label>
           </div>
 
-          <div className="preference-config-grid">
-            <div className="preference-block preference-field-block">
-              <div className="preference-block-heading">
-                <h3>{copy.language}</h3>
-              </div>
-              <label className="preference-field">
-                <span>{copy.language}</span>
-                <select value={draft.language} onChange={(event) => choose({ language: event.target.value })}>
-                  {LANGUAGES.map(({ value, code, name }) => (
-                    <option key={value} value={value}>{code} · {name}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <div className="preference-block preference-field-block">
-              <div className="preference-block-heading">
-                <h3>{copy.level}</h3>
-              </div>
-              <label className="preference-field">
-                <span>{copy.level}</span>
-                <select value={draft.level} onChange={(event) => choose({ level: event.target.value })}>
-                  {['simple', 'normal', 'advanced'].map((level) => (
-                    <option key={level} value={level}>{t.levels[level].name}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
+          <div className="preference-card-row">
+            {[
+              { id: 'club', title: copy.club, icon: 'shield', image: selectedClub ? teamBranding(selectedClub).logo : null, value: selectedClub?.name ?? t.common.none },
+              { id: 'player', title: copy.player, icon: 'user', image: selectedPlayer ? playerPhoto(selectedPlayer.player_id) : null, value: playerName },
+              { id: 'mode', title: copy.mode, icon: MODE_ART[draft.mode].icon, value: t.modes[draft.mode].name },
+              { id: 'level', title: copy.level, icon: LEVEL_ICONS[draft.level], value: t.levels[draft.level].name },
+            ].map(({ id, title, icon, image, value }) => (
+              <button
+                aria-controls={`preference-options-${id}`}
+                aria-expanded={editingSection === id}
+                className={`preference-card ${editingSection === id ? 'selected' : ''}`}
+                key={id}
+                onClick={() => setEditingSection(editingSection === id ? null : id)}
+                type="button"
+              >
+                {image ? (
+                  <img alt="" className={`preference-card-image preference-card-image-${id}`} src={image} />
+                ) : (
+                  <span className="preference-card-icon"><Icon name={icon} size={28} /></span>
+                )}
+                <strong>{title}</strong>
+                <span className="preference-card-value">{value}</span>
+                <small>{editingSection === id ? copy.closeOptions : copy.change}</small>
+              </button>
+            ))}
           </div>
 
-          <div className="preference-two-up-grid">
-            <div className="preference-block">
+          {editingSection === 'club' && (
+            <section className="preference-editor preference-block" id="preference-options-club">
               {sectionHeader('club', copy.club)}
-              {editingSection === 'club' ? (
                 <div className="team-grid compact-grid">
                   <button aria-pressed={!draft.favoriteTeamId} className={`team-select ${!draft.favoriteTeamId ? 'selected' : ''}`} onClick={() => choose({ favoriteTeamId: '', favoritePlayerId: '' })} type="button">
                     <span className="profile-club-logo none-logo">—</span>
@@ -147,16 +134,12 @@ export function Profile() {
                     )
                   })}
                 </div>
-              ) : selectedClub ? (
-                <div className="current-preference">{teamBranding(selectedClub).logo ? <img alt="" src={teamBranding(selectedClub).logo} /> : <span className="current-preference-code">{teamBranding(selectedClub).short}</span>}<div><strong>{selectedClub.name}</strong><small>{copy.selectedClub}</small></div><Icon name="check" size={17} /></div>
-              ) : (
-                <div className="current-preference"><span className="current-preference-code">—</span><div><strong>{t.common.none}</strong><small>{copy.noClub}</small></div></div>
-              )}
-            </div>
+            </section>
+          )}
 
-            <div className="preference-block">
+          {editingSection === 'player' && (
+            <section className="preference-editor preference-block" id="preference-options-player">
               {sectionHeader('player', copy.player)}
-              {editingSection === 'player' ? (
                 <div className="player-options"><button aria-pressed={!draft.favoritePlayerId} className={!draft.favoritePlayerId ? 'selected' : ''} onClick={() => choose({ favoritePlayerId: '', mode: draft.mode === 'player' ? 'casual' : draft.mode })} type="button"><Icon name="user" /><strong>{t.common.none}</strong></button>
                   {players.map((player) => (
                     <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => choose({ favoritePlayerId: player.player_id })} type="button">
@@ -171,17 +154,12 @@ export function Profile() {
                     </button>
                   ))}
                 </div>
-              ) : selectedPlayer ? (
-                <div className="current-preference"><img alt="" src={playerPhoto(selectedPlayer.player_id)} /><div><strong>{selectedPlayer.name}</strong><small>{catalog?.clubs.find((team) => team.team_id === selectedPlayer.team_id)?.name} · {t.common.shirt} {selectedPlayer.shirt_number ?? '—'}</small></div><Icon name="check" size={17} /></div>
-              ) : (
-                <div className="current-preference"><span className="current-preference-code"><Icon name="user" size={18} /></span><div><strong>{t.common.none}</strong><small>{copy.noPlayer}</small></div></div>
-              )}
-            </div>
-          </div>
+            </section>
+          )}
 
-          <div className="preference-block">
-            {sectionHeader('mode', copy.mode)}
-            {editingSection === 'mode' ? (
+          {editingSection === 'mode' && (
+            <section className="preference-editor preference-block" id="preference-options-mode">
+              {sectionHeader('mode', copy.mode)}
               <>
                 <div className="profile-modes">
                   {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => (
@@ -210,14 +188,12 @@ export function Profile() {
                   </button>
                 )}
               </>
-            ) : (
-              <div className="current-preference"><span className="current-preference-code"><Icon name={MODE_ART[draft.mode].icon} size={19} /></span><div><strong>{t.modes[draft.mode].name}</strong><small>{t.modes[draft.mode].description}</small></div><Icon name="check" size={17} /></div>
-            )}
-          </div>
+            </section>
+          )}
 
-          <div className="preference-block">
-            {sectionHeader('level', copy.level)}
-            {editingSection === 'level' ? (
+          {editingSection === 'level' && (
+            <section className="preference-editor preference-block" id="preference-options-level">
+              {sectionHeader('level', copy.level)}
               <div className="profile-modes">
                 {['simple', 'normal', 'advanced'].map((level) => (
                   <button aria-pressed={draft.level === level} className={draft.level === level ? 'selected' : ''} key={level} onClick={() => choose({ level })} type="button">
@@ -229,10 +205,10 @@ export function Profile() {
                   </button>
                 ))}
               </div>
-            ) : (
-              <div className="current-preference"><span className="current-preference-code"><Icon name={LEVEL_ICONS[draft.level]} size={19} /></span><div><strong>{t.levels[draft.level].name}</strong><small>{t.levels[draft.level].description}</small></div><Icon name="check" size={17} /></div>
-            )}
-          </div>
+            </section>
+          )}
+
+          {invalidMode && editingSection !== 'mode' && <p className="form-warning" role="alert">{copy.playerNeeded}</p>}
 
           <div className="save-row"><span className="save-note" role="status">{saved ? t.common.saved : t.profile.saveHint}</span>
             <Button disabled={invalidMode} onClick={save}>
