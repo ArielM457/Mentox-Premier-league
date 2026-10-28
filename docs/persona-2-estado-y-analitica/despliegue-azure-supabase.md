@@ -175,6 +175,8 @@ for f in manifest.json match.mp4 events.jsonl tracking.jsonl metadata.jsonl; do
 done
 ```
 
+El estadio también exige Roboflow Suite y SoccerNet TeamSpotting, los servicios de Damon. El script toma `ROBOFLOW_SUITE_ENDPOINT`, `ROBOFLOW_SUITE_API_KEY`, `SOCCERNET_ENDPOINT` y `SOCCERNET_API_KEY` de la terminal o de `apps/backend/.env`. Guarda las claves como secretos de Container Apps y nunca las muestra. Sin esos cuatro valores, el vídeo no se reproduce. Cada arranque de la API vuelve a analizar el vídeo con TeamSpotting: tarda unos 3,5 minutos y usa la GPU de Damon. Con `-ApiAlwaysOn`, la API no se apaga y el análisis no se repite.
+
 Con el estadio activo, la API descarga esos archivos al arrancar. El reproductor solo acepta avances de la reproducción vigente que no superen el tiempo transcurrido, y solo el partido con vídeo puede preparar los modelos.
 
 ## Paso 4. Mostrar el flujo en directo

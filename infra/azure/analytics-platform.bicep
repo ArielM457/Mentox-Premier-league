@@ -48,6 +48,18 @@ param supabaseUrl string = ''
 @description('Ruta del vídeo MESSI (…/match.mp4, con sus archivos compañeros) en el contenedor authorized-videos del Storage del despliegue. Vacía: la API muestra la cancha sintética.')
 param visionVideoBlobName string = ''
 
+@description('Roboflow Suite: detecciones sobre el vídeo MESSI. El estadio exige este modelo y TeamSpotting.')
+param roboflowEndpoint string = ''
+
+@secure()
+param roboflowApiKey string = ''
+
+@description('SoccerNet TeamSpotting: acciones del vídeo MESSI, analizado antes de Play.')
+param teamspottingEndpoint string = ''
+
+@secure()
+param teamspottingApiKey string = ''
+
 @description('1 mantiene la API encendida (sin arranque en frío); 0 la apaga sin tráfico.')
 @minValue(0)
 @maxValue(1)
@@ -230,6 +242,40 @@ var stadiumEnv = empty(visionVideoBlobName) ? [] : [
     value: visionVideoBlobName
   }
 ]
+// Modelos del estadio: los endpoints van como variables y las claves como secretos.
+var hasModels = !empty(roboflowEndpoint) && !empty(roboflowApiKey) && !empty(teamspottingEndpoint) && !empty(teamspottingApiKey)
+var modelSecrets = hasModels ? [
+  {
+    name: 'roboflow-api-key'
+    value: roboflowApiKey
+  }
+  {
+    name: 'teamspotting-api-key'
+    value: teamspottingApiKey
+  }
+] : []
+var modelEnv = hasModels ? [
+  {
+    name: 'ROBOFLOW_SUITE_ENDPOINT'
+    value: roboflowEndpoint
+  }
+  {
+    name: 'ROBOFLOW_SUITE_API_KEY'
+    secretRef: 'roboflow-api-key'
+  }
+  {
+    name: 'SOCCERNET_ENDPOINT'
+    value: teamspottingEndpoint
+  }
+  {
+    name: 'SOCCERNET_API_KEY'
+    secretRef: 'teamspotting-api-key'
+  }
+  {
+    name: 'SOCCERNET_TIMEOUT_SECONDS'
+    value: '1800'
+  }
+] : []
 var azureEnv = [
   {
     name: 'AZURE_CLIENT_ID'
@@ -278,7 +324,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
         allowInsecure: false
       }
       registries: registries
-      secrets: databaseSecrets
+      secrets: concat(databaseSecrets, modelSecrets)
     }
     template: {
       containers: [
@@ -319,7 +365,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
               name: 'COMMUNITY_EVENT_HUB_CONSUMER_GROUP'
               value: community.outputs.communityConsumerGroup
             }
-          ], databaseEnv, editorAuthEnv, stadiumEnv)
+          ], databaseEnv, editorAuthEnv, stadiumEnv, modelEnv)
           probes: [
             {
               // /matches carga los partidos (y su seguimiento) antes de recibir tráfico.
@@ -535,6 +581,7 @@ output webUrl string = deployWeb ? 'https://${names.web}.${environment.propertie
 output databaseConfigured bool = hasDatabase
 output editorAuthConfigured bool = !empty(supabaseUrl)
 output stadiumConfigured bool = !empty(visionVideoBlobName)
+output stadiumModelsConfigured bool = hasModels
 output eventHubNamespaceName string = data.outputs.eventHubNamespaceName
 output eventHubFullyQualifiedNamespace string = data.outputs.eventHubFullyQualifiedNamespace
 output insightsEventHubName string = insights.outputs.insightsEventHubName

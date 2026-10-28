@@ -293,6 +293,35 @@ else {
     Write-Warning 'Sin SUPABASE_URL: la revisión editorial de la API responderá 503.'
 }
 
+# Un ajuste que la API ya usa en local: primero la terminal, después apps/backend/.env.
+function Get-BackendSetting([string] $Name) {
+    $value = [Environment]::GetEnvironmentVariable($Name)
+    if ($value) { return $value }
+    $backendEnv = Join-Path $RepoRoot 'apps/backend/.env'
+    if (-not (Test-Path -LiteralPath $backendEnv)) { return '' }
+    $line = Get-Content -LiteralPath $backendEnv | Where-Object { $_ -match "^\s*$Name\s*=" } | Select-Object -First 1
+    if (-not $line) { return '' }
+    return ($line -replace "^\s*$Name\s*=\s*", '').Trim().Trim('"', "'")
+}
+
+# El estadio exige Roboflow y TeamSpotting (servicios de Damon). Las claves viajan solo en el
+# archivo temporal de parámetros y quedan como secretos de Container Apps; nunca se muestran.
+$stadiumModels = @{
+    roboflowEndpoint     = Get-BackendSetting 'ROBOFLOW_SUITE_ENDPOINT'
+    roboflowApiKey       = Get-BackendSetting 'ROBOFLOW_SUITE_API_KEY'
+    teamspottingEndpoint = Get-BackendSetting 'SOCCERNET_ENDPOINT'
+    teamspottingApiKey   = Get-BackendSetting 'SOCCERNET_API_KEY'
+}
+if (-not $VisionVideoBlobName) {
+    Write-Host 'Estadio: no configurado. Partido muestra la cancha sintética.'
+}
+elseif (@($stadiumModels.Values | Where-Object { -not $_ }).Count -gt 0) {
+    Write-Warning 'Faltan ROBOFLOW_SUITE_* o SOCCERNET_* (terminal o apps/backend/.env): el vídeo del estadio no podrá reproducirse.'
+}
+else {
+    Write-Host 'Estadio: vídeo MESSI con Roboflow y TeamSpotting.'
+}
+
 # ----- 4. Proveedores y grupo -------------------------------------------------
 Write-Step 'Registrando proveedores de recursos'
 foreach ($provider in $Providers) {
@@ -498,7 +527,7 @@ $appParameters = $baseParameters + @{
     workerReplicas = $(if ($WorkerOn) { 1 } else { 0 })
     replayMatchId  = $ReplayMatchId
     replaySpeed    = [string] $ReplaySpeed
-}
+} + $stadiumModels
 $file = Write-ParameterFile $appParameters
 try {
     $apps = ConvertFrom-AzJson (Invoke-Az deployment group create --name 'mentox-analytics-apps' `
