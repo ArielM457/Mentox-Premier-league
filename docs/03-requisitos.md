@@ -184,6 +184,18 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-93 · P1.** Resumen debe usar un único desplegable compacto para elegir entre resumen corto, extendido y personalizado. Cada opción debe incluir su descripción. El jugador solo debe elegirse cuando el tipo sea personalizado. Debajo, “Momento seleccionado” debe permitir elegir entre los momentos filtrados: solo goles en el resumen corto, varias jugadas relevantes en el extendido y jugadas de peligro del jugador en el personalizado. La jugada elegida debe actualizar tanto el análisis como el resaltado de la lista inferior. Se verifica cambiando tipo, jugador y momento sin salir de Resumen.
 
+**RF-94 · P1.** En el paso Visualización de la configuración inicial, la tarjeta del modo seleccionado debe expandirse y explicar qué contenido estará disponible. Las tarjetas no seleccionadas deben conservar su tamaño normal. El flujo no debe repetir las elecciones en una sección adicional antes de finalizar. Se verifica seleccionando los cuatro modos, comparando sus detalles y terminando la configuración directamente.
+
+**RF-95 · P1.** La cabecera inicial y las cabeceras internas que permitan cambiar el idioma deben usar un único selector con español, inglés, alemán, chino, hindi, francés y portugués. Una sesión nueva o restablecida debe comenzar en inglés, sin reemplazar la elección ya guardada por una persona. Se verifica limpiando las preferencias, recorriendo las siete opciones y recargando después de guardar una selección.
+
+**RF-96 · P1.** La interfaz de partidos debe presentar el encuentro como una experiencia en vivo y no mostrar la palabra “simulación”. La barra principal debe usar “Partido en vivo” e “Iniciar partido”. El perfil de visualización no debe poder cambiarse desde esa barra porque se elige durante la configuración. Se verifica en Partidos, la previa, el Centro del Partido y la Vista táctica en español e inglés.
+
+**RF-97 · P1.** El asistente del Centro del Partido debe abrirse y cerrarse mediante una única flecha sin texto, alineada con las pestañas de Partido, Resumen, Estadísticas y Vista táctica. La flecha solo debe aparecer en Partido y debe conservar el estado del panel. Se verifica abriendo y cerrando el panel, cambiando de pestaña y regresando a Partido.
+
+**RF-98 · P1.** Los filtros de Partidos y sus contadores deben mantener contraste suficiente sobre el tema oscuro. Sus etiquetas y números deben mostrarse en blanco o con una combinación equivalente que cumpla la misma legibilidad. Se verifica con los estados En vivo, Próximo y Resumen, tanto activos como inactivos.
+
+**RF-99 · P1.** El resumen de un partido finalizado debe ofrecer el mismo selector de tipo, selector condicional de jugador, espacio de momento seleccionado, análisis y lista de situaciones que la pestaña Resumen del Centro del Partido. La cabecera debe usar una ilustración profesional guardada como recurso local, sin depender de una URL externa. Se verifica cambiando los tres tipos, el jugador y el momento en un partido finalizado.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.

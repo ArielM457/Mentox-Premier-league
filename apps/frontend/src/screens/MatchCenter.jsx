@@ -331,10 +331,6 @@ function LiveMatch({ match }) {
     if (openTab) setTab('summary')
   }
 
-  function changeMode(mode) {
-    update(mode === 'professional_analyst' ? { mode, level: 'advanced', liveComments: true } : { mode })
-  }
-
   async function toggleFullscreen() {
     setActionError(null)
     try {
@@ -426,9 +422,6 @@ function LiveMatch({ match }) {
           <span>{simulating ? t.common.processing : simulationStarted ? (clock.playing ? t.match.playingState : t.match.pauseState) : t.match.liveExperienceCopy}</span>
         </div>
         <div className="live-toolbar-actions">
-          <div className="live-mode-switch" aria-label={t.match.viewMode} role="group">
-            {['casual', 'analyst', 'professional_analyst'].map((mode) => <button aria-pressed={preferences.mode === mode} className={preferences.mode === mode ? 'active' : ''} key={mode} onClick={() => changeMode(mode)} type="button">{t.modes[mode].name}</button>)}
-          </div>
           {!simulationStarted ? (
             <Button busy={simulating} busyLabel={t.common.processing} onClick={startSimulation} variant="lime"><Icon name="play" size={17} /> {t.match.startLive}</Button>
           ) : (
@@ -440,7 +433,22 @@ function LiveMatch({ match }) {
         </div>
       </div>
       {simulating && <LoadingScreen message={t.common.processing} compact />}
-      <Tabs items={TABS.map((key) => [key, t.match.tabs[key]])} value={activeTab} onChange={setTab} label={t.match.viewTabs} id="match-view" />
+      <div className={`match-tabs-row ${activeTab === 'match' ? 'with-agent-control' : ''}`}>
+        <Tabs items={TABS.map((key) => [key, t.match.tabs[key]])} value={activeTab} onChange={setTab} label={t.match.viewTabs} id="match-view" />
+        {activeTab === 'match' && (
+          <button
+            aria-controls="match-agent-panel"
+            aria-expanded={assistantOpen}
+            aria-label={assistantOpen ? t.match.closeAssistant : t.match.openAssistant}
+            className="match-agent-arrow"
+            onClick={() => setAssistantOpen((value) => !value)}
+            title={assistantOpen ? t.match.closeAssistant : t.match.openAssistant}
+            type="button"
+          >
+            <Icon name={assistantOpen ? 'arrow' : 'back'} size={18} />
+          </button>
+        )}
+      </div>
 
       <ErrorNotice message={actionError || live.error || tracking.error} onRetry={() => { setActionError(null); live.resync(); setSeekVersion((value) => value + 1) }} retryLabel={t.common.retry} />
 
@@ -478,11 +486,6 @@ function LiveMatch({ match }) {
                   <label className="view-switch">
                     <span>{t.match.liveCommentsToggle}</span>
                     <input checked={preferences.mode === 'professional_analyst' || preferences.liveComments} disabled={preferences.mode === 'professional_analyst'} onChange={(event) => update({ liveComments: event.target.checked })} type="checkbox" />
-                    <span aria-hidden="true" className="switch-track"><span /></span>
-                  </label>
-                  <label className="view-switch">
-                    <span><Icon name="spark" size={15} /> {t.match.assistantToggle}</span>
-                    <input aria-controls="match-agent-panel" checked={assistantOpen} onChange={(event) => setAssistantOpen(event.target.checked)} type="checkbox" />
                     <span aria-hidden="true" className="switch-track"><span /></span>
                   </label>
                   <Button

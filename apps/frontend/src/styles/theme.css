@@ -124,6 +124,9 @@
 :root[data-theme='dark'] .match-filters button.active,
 :root[data-theme='dark'] .header-language button.active,
 :root[data-theme='dark'] .match-tabs button.active { color: #fff; background: #6041ab; box-shadow: inset 0 0 0 1px #8f70df; }
+:root[data-theme='dark'] .match-filters button { color: #fff; }
+:root[data-theme='dark'] .match-filters button small { color: #fff; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.2); }
+:root[data-theme='dark'] .match-filters button.active small { color: #100e20; background: #fff; }
 :root[data-theme='dark'] .search-box input { color: #f5f3fb; }
 :root[data-theme='dark'] .search-box input::placeholder { color: #b7b1cc; }
 :root[data-theme='dark'] .recap-content > .match-score { color: #f5f3fb; background: #211d38; border-color: var(--line); }

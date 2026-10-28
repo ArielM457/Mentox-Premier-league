@@ -9,7 +9,7 @@ export const CONFIGURATION_STORAGE_KEYS = [
 ]
 
 export const DEFAULT_PREFERENCES = {
-  language: 'es',
+  language: 'en',
   theme: 'dark',
   mode: 'casual',
   level: 'normal',

@@ -16,6 +16,11 @@
 .match-tabs { margin: 16px 0; padding: 5px; display: flex; gap: 4px; background: #19162e; border-radius: 12px; overflow-x: auto; }
 .match-tabs button { flex: 1; min-width: max-content; padding: 11px 14px; color: #aaa5bd; background: transparent; border-radius: 9px; font-size: 12px; font-weight: 700; }
 .match-tabs button.active { color: var(--navy); background: var(--lavender); }
+.match-tabs-row { margin: 16px 0; }
+.match-tabs-row.with-agent-control { display: grid; grid-template-columns: minmax(0, 1fr) 46px; gap: 8px; align-items: center; }
+.match-tabs-row .match-tabs { margin: 0; }
+.match-agent-arrow { width: 46px; height: 46px; display: grid; place-items: center; color: var(--lime); background: #19162e; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; }
+.match-agent-arrow:hover, .match-agent-arrow:focus-visible { color: var(--navy); background: var(--lime); }
 .match-layout { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; }
 .match-layout.agent-closed { grid-template-columns: minmax(0, 1fr); }
 .pitch-column, .match-agent-rail { min-width: 0; }

@@ -1,0 +1,80 @@
+flowchart LR
+    events[Match Events and Control Signals]
+
+    subgraph preAgent[Deterministic Pre-Agent Pipeline]
+        direction LR
+        validate[Schema Validation]
+        order[Ordering and Deduplication]
+        metricUpdate[Metric Updates<br/>Every accepted event]
+        patternMatch[Play Pattern Matching]
+        classify{Routing Decision}
+    end
+
+    subgraph noAgent[No Agent Processing]
+        direction TB
+        rejected[Rejected or Duplicate<br/>Audit record]
+        metricsOnly[Metrics Only<br/>No narrative trigger]
+        metricsHub[[Azure Event Hubs<br/>match-metrics]]
+        state[(Match State and Metrics)]
+    end
+
+    subgraph agentPath[Important Event Processing]
+        direction LR
+        refiner[Context Refiner<br/>Only relevant events, metrics and preferences]
+        queue[[Azure Service Bus<br/>important-events]]
+        orchestrator[Agent Orchestrator<br/>Priority, TTL and idempotency]
+    end
+
+    subgraph specialists[Specialist Agents]
+        direction TB
+        danger[Danger Simulation Agent]
+        moment[Moment Selection Agent]
+        narrator[Narration Agent]
+        recap[Recap Agent]
+    end
+
+    verify[Evidence and Fact Verification]
+    insights[[Azure Event Hubs<br/>match-insights]]
+    delivery[Experience API<br/>REST and SSE]
+    ui[Live Match, Recap and Editorial UI]
+
+    events --> validate --> order --> metricUpdate --> patternMatch --> classify
+
+    classify -->|Rejected| rejected
+    classify -->|Metrics only| metricsOnly --> metricsHub --> state
+    metricUpdate --> state
+
+    classify -->|Immediate danger| refiner
+    classify -->|Moment candidate| refiner
+    classify -->|Dead-ball context| refiner
+    classify -->|Period or match recap| refiner
+
+    refiner --> queue --> orchestrator
+    orchestrator -->|danger_simulation| danger
+    orchestrator -->|moment_selector| moment
+    orchestrator -->|narrator| narrator
+    orchestrator -->|recap| recap
+
+    danger --> verify
+    moment --> verify
+    narrator --> verify
+    recap --> verify
+    state --> verify
+    verify --> insights --> delivery --> ui
+
+    classDef input fill:#172554,stroke:#60a5fa,color:#ffffff,stroke-width:2px
+    classDef deterministic fill:#0f766e,stroke:#5eead4,color:#ffffff,stroke-width:2px
+    classDef bypass fill:#334155,stroke:#cbd5e1,color:#ffffff,stroke-width:2px
+    classDef messaging fill:#1d4ed8,stroke:#93c5fd,color:#ffffff,stroke-width:2px
+    classDef orchestrate fill:#7e22ce,stroke:#e9d5ff,color:#ffffff,stroke-width:2px
+    classDef agent fill:#5b21b6,stroke:#c4b5fd,color:#ffffff,stroke-width:2px
+    classDef output fill:#065f46,stroke:#6ee7b7,color:#ffffff,stroke-width:2px
+
+    class events input
+    class validate,order,metricUpdate,patternMatch,classify deterministic
+    class rejected,metricsOnly bypass
+    class metricsHub,queue,insights messaging
+    class refiner,orchestrator orchestrate
+    class danger,moment,narrator,recap agent
+    class state,verify,delivery,ui output
+

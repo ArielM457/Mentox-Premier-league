@@ -4,17 +4,18 @@ import { api } from '../api/client.js'
 import { preferencesForMatch, usePreferences } from '../app/preferences.js'
 import { navigate, paths } from '../app/router.js'
 import { useCatalog } from '../hooks/useCatalog.js'
-import { formatMatchClock, momentIdOf } from '../lib/overlays.js'
+import { momentIdOf } from '../lib/overlays.js'
 import { recordExperience } from '../lib/experience.js'
+import { filterSummaryMoments } from '../lib/summaryMoments.js'
 import { AppShell } from '../components/layout/AppShell.jsx'
+import { InsightsPanel, MomentWorkspace } from '../components/match/LiveExperiencePanels.jsx'
+import { LiveSummarySelector } from '../components/match/LiveSummarySelector.jsx'
 import { MatchScore } from '../components/match/MatchScore.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice, LoadingCards } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
-import { PlayerIllustration } from '../components/ui/PlayerIllustration.jsx'
 
 const TOP = 3
-const SUMMARY_TYPES = ['short', 'extended', 'player_danger']
 
 export function Recap({ matchId }) {
   const { t, preferences, apiPreferences } = usePreferences()
@@ -28,6 +29,7 @@ export function Recap({ matchId }) {
   const [moments, setMoments] = useState(null)
   const [error, setError] = useState(null)
   const [summaryType, setSummaryType] = useState('short')
+  const [selectedMomentId, setSelectedMomentId] = useState(null)
   const matchPlayers = match?.metadata.players ?? []
   const preferredPlayer = matchPlayers.some((player) => player.player_id === preferences.favoritePlayerId)
     ? preferences.favoritePlayerId
@@ -36,6 +38,13 @@ export function Recap({ matchId }) {
   const selectedPlayerId = matchPlayers.some((player) => player.player_id === summaryPlayerId)
     ? summaryPlayerId
     : preferredPlayer
+  const summaryMoments = useMemo(() => filterSummaryMoments({
+    events: match?.events ?? [],
+    moments: moments ?? [],
+    playerId: selectedPlayerId,
+    type: summaryType,
+  }), [match?.events, moments, selectedPlayerId, summaryType])
+  const selectedMoment = summaryMoments.find((moment) => moment.message_id === selectedMomentId) ?? summaryMoments[0] ?? null
 
   useEffect(() => {
     if (!match) return undefined
@@ -63,20 +72,8 @@ export function Recap({ matchId }) {
     ])
       .then(([record, batch]) => {
         if (!active) return
-        const playerEventIds = new Set(
-          match.events.filter((event) => event.player_id === selectedPlayerId).map((event) => event.event_id),
-        )
-        const top = batch.overlays
-          .filter((o) => !o.suppressed && o.kind !== 'player_quiet')
-          .filter((o) => summaryType !== 'short' || o.kind === 'goal')
-          .filter((o) => summaryType !== 'player_danger' || (
-            ['goal', 'shot'].includes(o.kind) && o.source_event_ids.some((id) => playerEventIds.has(id))
-          ))
-          .sort((a, b) => b.priority - a.priority || a.video_time_ms - b.video_time_ms)
-          .slice(0, summaryType === 'extended' ? TOP : batch.overlays.length)
-          .sort((a, b) => a.video_time_ms - b.video_time_ms)
         setSummary(record)
-        setMoments(top)
+        setMoments(batch.overlays)
         setError(null)
       })
       .catch((err) => active && setError(err.message))
@@ -89,7 +86,7 @@ export function Recap({ matchId }) {
         <header className="page-header">
           <div>
             <span className="section-kicker">{t.recap.kicker}</span>
-            <h1>{t.recap.title(moments?.length ?? TOP)}</h1>
+            <h1>{t.recap.title(summaryMoments.length || TOP)}</h1>
           </div>
           {match && (
             <Button variant="ghost" onClick={() => navigate(paths.match(matchId))}>
@@ -105,35 +102,20 @@ export function Recap({ matchId }) {
         )}
 
         {match && (
-          <section className="summary-picker" aria-labelledby="summary-picker-title">
-            <div>
-              <span className="section-kicker">{t.recap.chooseKicker}</span>
-              <h2 id="summary-picker-title">{t.recap.chooseTitle}</h2>
-            </div>
-            <div className="summary-type-grid">
-              {SUMMARY_TYPES.map((type) => (
-                <button aria-pressed={summaryType === type} className={summaryType === type ? 'selected' : ''} key={type} onClick={() => setSummaryType(type)} type="button">
-                  <Icon name={type === 'short' ? 'ball' : type === 'extended' ? 'match' : 'user'} />
-                  <span><strong>{t.recap.types[type].name}</strong><small>{t.recap.types[type].description}</small></span>
-                </button>
-              ))}
-            </div>
-            {summaryType === 'player_danger' && (
-              <label className="summary-player-select">
-                <span>{t.recap.choosePlayer}</span>
-                <select value={selectedPlayerId} onChange={(event) => setSummaryPlayerId(event.target.value)}>
-                  {matchPlayers.map((player) => <option key={player.player_id} value={player.player_id}>{player.name}</option>)}
-                </select>
-              </label>
-            )}
-          </section>
+          <LiveSummarySelector
+            onPlayerChange={setSummaryPlayerId}
+            onTypeChange={setSummaryType}
+            playerId={selectedPlayerId}
+            players={matchPlayers}
+            type={summaryType}
+          />
         )}
 
         {summary && (
           <section className="recap-hero">
             <div className="recap-art">
-              <span className="celebration-number">{moments?.length ?? 0}</span>
-              <PlayerIllustration compact />
+              <img alt="" className="recap-professional-art" src="/images/match-recap-professional.png" />
+              <span className="celebration-number">{summaryMoments.length}</span>
             </div>
             <div>
               <span className="section-kicker">
@@ -155,27 +137,24 @@ export function Recap({ matchId }) {
           </section>
         )}
 
-        {moments && (
-          <section className="recap-moments">
-            <div className="section-heading">
-              <div>
-                <h2>{t.recap.top(moments.length)}</h2>
-              </div>
-              <span>{t.recap.select}</span>
-            </div>
-            <div className="recap-list">
-              {moments.map((m, index) => (
-                <button key={m.message_id} onClick={() => navigate(paths.moment(matchId, momentIdOf(m)))} type="button">
-                  <span className="moment-number">{index + 1}</span>
-                  <span className="moment-time">{formatMatchClock(m, t.match.period)}</span>
-                  <div>
-                    <strong>{m.headline}</strong>
-                    <small>{m.explanation}</small>
-                  </div>
-                  <Icon name="arrow" />
-                </button>
-              ))}
-            </div>
+        {moments && match && (
+          <section className="match-summary recap-analysis">
+            <MomentWorkspace
+              events={match.events}
+              matchId={matchId}
+              metadata={match.metadata}
+              moment={selectedMoment}
+              moments={summaryMoments}
+              onOpen={(moment) => navigate(paths.moment(matchId, momentIdOf(moment)))}
+              onSelect={(moment) => setSelectedMomentId(moment.message_id)}
+            />
+            <InsightsPanel
+              events={match.events}
+              metadata={match.metadata}
+              moments={summaryMoments}
+              onSelect={(moment) => setSelectedMomentId(moment.message_id)}
+              selectedId={selectedMoment?.message_id}
+            />
           </section>
         )}
       </section>

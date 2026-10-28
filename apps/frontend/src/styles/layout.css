@@ -44,9 +44,8 @@
 .profile-chip > span, .profile-intro > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: white; background: var(--violet); font-weight: 800; }
 .profile-chip strong, .profile-chip small { display: block; text-align: left; font-size: 12px; }
 .profile-chip small { color: var(--muted); }
-.header-language { padding: 4px; display: flex; gap: 4px; background: white; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 8px 25px rgba(21,19,41,.05); }
-.header-language button { width: 42px; height: 38px; color: var(--muted); background: transparent; border-radius: 999px; font-size: 11px; font-weight: 800; }
-.header-language button.active { color: white; background: var(--navy); }
+.header-language { padding: 4px; display: flex; background: white; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 8px 25px rgba(21,19,41,.05); }
+.header-language select { min-width: 150px; height: 38px; padding: 0 34px 0 13px; color: var(--text); background: transparent; border: 0; border-radius: 999px; font-size: 11px; font-weight: 800; }
 .search-box { height: 58px; padding: 0 18px; display: flex; align-items: center; gap: 12px; color: var(--muted); background: white; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 35px rgba(21,19,41,.04); }
 .search-box:focus-within { border-color: var(--violet); box-shadow: 0 0 0 4px rgba(130,87,245,.1); }
 .search-box input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; }
