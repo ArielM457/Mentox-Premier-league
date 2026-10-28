@@ -44,6 +44,10 @@ param(
     [ValidateRange(1, 32)]
     [int] $ReplaySpeed = 8,
 
+    # URL del proyecto de Supabase para validar las sesiones de los editores. Por defecto:
+    # $env:SUPABASE_URL o SUPABASE_URL de apps/backend/.env.
+    [string] $SupabaseUrl,
+
     # Carga el esquema y los datos ficticios en Supabase antes de la fase 2.
     [switch] $SeedDatabase,
 
@@ -266,6 +270,26 @@ else {
     if ($SeedDatabase) { throw '-SeedDatabase necesita la cadena de Supabase.' }
 }
 
+# La revisión editorial valida las sesiones de Supabase Auth del proyecto. La URL no es secreta.
+if (-not $SupabaseUrl) { $SupabaseUrl = $env:SUPABASE_URL }
+if (-not $SupabaseUrl) {
+    $backendEnv = Join-Path $RepoRoot 'apps/backend/.env'
+    if (Test-Path -LiteralPath $backendEnv) {
+        $line = Get-Content -LiteralPath $backendEnv | Where-Object { $_ -match '^\s*SUPABASE_URL\s*=' } | Select-Object -First 1
+        if ($line) { $SupabaseUrl = ($line -replace '^\s*SUPABASE_URL\s*=\s*', '').Trim().Trim('"', "'") }
+    }
+}
+if ($SupabaseUrl) {
+    if ($SupabaseUrl -notmatch '^https://[A-Za-z0-9.-]+/?$') {
+        throw 'SUPABASE_URL debe ser la URL del proyecto, por ejemplo https://<ref>.supabase.co'
+    }
+    $SupabaseUrl = $SupabaseUrl.TrimEnd('/')
+    Write-Host "Revisión editorial: valida las sesiones de $SupabaseUrl."
+}
+else {
+    Write-Warning 'Sin SUPABASE_URL: la revisión editorial de la API responderá 503.'
+}
+
 # ----- 4. Proveedores y grupo -------------------------------------------------
 Write-Step 'Registrando proveedores de recursos'
 foreach ($provider in $Providers) {
@@ -465,6 +489,7 @@ $appParameters = $baseParameters + @{
     apiImage       = $apiImage
     webImage       = $(if ($SkipWeb) { '' } else { $webImage })
     supabaseDbUrl  = $(if ($databaseUrl) { $databaseUrl } else { '' })
+    supabaseUrl    = $(if ($SupabaseUrl) { $SupabaseUrl } else { '' })
     apiMinReplicas = $(if ($ApiAlwaysOn) { 1 } else { 0 })
     workerReplicas = $(if ($WorkerOn) { 1 } else { 0 })
     replayMatchId  = $ReplayMatchId

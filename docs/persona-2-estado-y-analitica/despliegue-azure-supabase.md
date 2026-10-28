@@ -156,6 +156,7 @@ El script:
 | `-WorkerOn` | Deja encendido el procesador continuo |
 | `-ApiAlwaysOn` | Mantiene una réplica de la API para evitar el arranque en frío el día de la demo |
 | `-ReplayMatchId`, `-ReplaySpeed` | Partido y velocidad del trabajo `replay` |
+| `-SupabaseUrl` | URL del proyecto de Supabase con la que la API valida las sesiones de los editores. Por defecto usa `$env:SUPABASE_URL` o `SUPABASE_URL` de `apps/backend/.env`; sin ella, la revisión editorial responde `503` |
 | `-InfraOnly` | Solo la fase 1 |
 | `-Yes` | No pide confirmación |
 
@@ -219,6 +220,7 @@ uvicorn match_intelligence.main:app --app-dir apps/backend/src --reload
 | `ANALYTICS_ENGINE` | `provisional` (Persona 4) o `persona2` | `provisional`, para no cambiar las pruebas de Persona 4 |
 | `MATCH_SOURCE` | `synthetic` (generadores en memoria) o `supabase` | `synthetic` |
 | `SUPABASE_DB_URL` | Cadena del Session pooler | Sin valor |
+| `SUPABASE_URL` | URL del proyecto; la revisión editorial valida con ella las sesiones de los editores | Sin valor: la revisión responde `503` |
 
 La API lee los partidos al arrancar. Si vuelve a cargar los datos, reinicie la API. En Azure, cree una revisión nueva con `az containerapp update -n ca-mentoxp2-api -g rg-mentox-analytics --revision-suffix r<hora>`.
 

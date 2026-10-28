@@ -42,6 +42,9 @@ param webImage string = ''
 @secure()
 param supabaseDbUrl string = ''
 
+@description('URL del proyecto de Supabase (https://<ref>.supabase.co). La API valida con ella las sesiones de los editores; vacía, la revisión editorial responde 503.')
+param supabaseUrl string = ''
+
 @description('1 mantiene la API encendida (sin arranque en frío); 0 la apaga sin tráfico.')
 @minValue(0)
 @maxValue(1)
@@ -202,6 +205,13 @@ var databaseEnv = hasDatabase ? [
     secretRef: 'supabase-db-url'
   }
 ] : []
+// No es secreta: la API lee de ahí las claves públicas que firman las sesiones de Supabase Auth.
+var editorAuthEnv = empty(supabaseUrl) ? [] : [
+  {
+    name: 'SUPABASE_URL'
+    value: supabaseUrl
+  }
+]
 var azureEnv = [
   {
     name: 'AZURE_CLIENT_ID'
@@ -291,7 +301,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
               name: 'COMMUNITY_EVENT_HUB_CONSUMER_GROUP'
               value: community.outputs.communityConsumerGroup
             }
-          ], databaseEnv)
+          ], databaseEnv, editorAuthEnv)
           probes: [
             {
               // /matches carga los partidos (y su seguimiento) antes de recibir tráfico.
@@ -505,6 +515,7 @@ output replayJobName string = names.replay
 output apiUrl string = 'https://${apiFqdn}'
 output webUrl string = deployWeb ? 'https://${names.web}.${environment.properties.defaultDomain}' : ''
 output databaseConfigured bool = hasDatabase
+output editorAuthConfigured bool = !empty(supabaseUrl)
 output eventHubNamespaceName string = data.outputs.eventHubNamespaceName
 output eventHubFullyQualifiedNamespace string = data.outputs.eventHubFullyQualifiedNamespace
 output insightsEventHubName string = insights.outputs.insightsEventHubName

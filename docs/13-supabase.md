@@ -55,7 +55,7 @@ Reinicia el backend. Los errores temporales de escritura se registran, pero no d
 
 Aprobar o rechazar un resumen (`POST …/editorial/{draft_id}/review`) y confirmar o rechazar un recorte (`POST …/highlights/{clip_id}/review`) exigen una sesión de Supabase Auth con el rol `editor`. El backend comprueba la firma del token con las claves públicas del proyecto, además de su emisor, su audiencia y su vencimiento. Las claves se leen de `SUPABASE_JWKS_URL` o, si no está, de `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`.
 
-Quien revisa queda registrado con el identificador de usuario del token. La petición ya no envía un nombre. Sin sesión, la API responde `401`; con una cuenta sin el rol, `403`; y sin `SUPABASE_URL`, `503`.
+Quien revisa queda registrado con el identificador de usuario del token. La petición ya no envía un nombre. Sin sesión, la API responde `401`; con una cuenta sin el rol, `403`; y sin `SUPABASE_URL`, `503`. En Azure, `infra/azure/deploy-analytics.ps1` pasa `SUPABASE_URL` a la API: la toma de `-SupabaseUrl`, de `$env:SUPABASE_URL` o de `apps/backend/.env`.
 
 Para dar de alta a un editor:
 

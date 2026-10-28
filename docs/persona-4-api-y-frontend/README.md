@@ -105,7 +105,7 @@ Event Hubs solo transporta los eventos. Con `SUPABASE_ENABLED=true`, los resúme
 
 ## **Revisión editorial protegida**
 
-Aprobar o rechazar resúmenes y recortes exige una sesión de Supabase Auth con `app_metadata.role = "editor"`. La API comprueba la firma del token con las claves públicas del proyecto y registra como revisor el identificador de usuario del token, no un nombre enviado en la petición. Sin sesión responde `401`; con una cuenta sin el rol, `403`; y sin `SUPABASE_URL`, `503`. Las rutas de lectura, como la cola editorial y la publicación aprobada, siguen abiertas. El alta de editores y la forma de obtener la sesión para Postman están en [Persistencia en Supabase](../13-supabase.md).
+Aprobar o rechazar resúmenes y recortes exige una sesión de Supabase Auth con `app_metadata.role = "editor"`. La API comprueba la firma del token con las claves públicas del proyecto y registra como revisor el identificador de usuario del token, no un nombre enviado en la petición. Sin sesión responde `401`; con una cuenta sin el rol, `403`; y sin `SUPABASE_URL`, `503`. Las rutas de lectura, como la cola editorial y la publicación aprobada, siguen abiertas. En Azure, `deploy-analytics.ps1` pasa `SUPABASE_URL` a la API. El alta de editores y la forma de obtener la sesión para Postman están en [Persistencia en Supabase](../13-supabase.md).
 
 La interfaz actual no tiene pantalla de revisión, así que no pide iniciar sesión. Si se recupera esa pantalla, deberá iniciar sesión con Supabase Auth y enviar el token en `Authorization`, como ya hace `api.review` en `api/client.js`. **El equipo debe confirmar quiénes serán editores.**
 
@@ -200,9 +200,7 @@ La base remota no se migró: `SUPABASE_ENABLED` sigue en `false`, las claves act
 
 - **Sin vídeo real.** Se usa la línea de tiempo sintética. El reproductor ya acepta una URL de vídeo; falta decidir el vídeo permitido (decisión pendiente 4).
 - **Analítica provisional.** Narrativa ya admite Persona 3, pero algunas operaciones conservan respaldo determinista. Ver la decisión 6.
-- **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.
-- **Revisión editorial en Azure.** El despliegue todavía no define `SUPABASE_URL` para la API, así que allí la revisión responde `503` hasta configurarla.
-- **Partidos de la demo.** Hay tres: el corto finalizado de aceptación, el próximo partido analítico de dos tiempos y otro escenario analítico marcado en vivo para revisar el centro del partido con once jugadores por equipo. Los tres enfrentan a Aurora FC y Río Unido.
+- **Recortes sin archivo físico.** La versión local propone tiempos y permite revisión; todavía no corta ni sube vídeo a Blob Storage.- **Partidos de la demo.** Hay tres: el corto finalizado de aceptación, el próximo partido analítico de dos tiempos y otro escenario analítico marcado en vivo para revisar el centro del partido con once jugadores por equipo. Los tres enfrentan a Aurora FC y Río Unido.
 - **Persistencia opcional.** Con Supabase activo se recuperan resúmenes, decisiones, votos y mensajes. Los reportes de error todavía se conservan solo en memoria. Sin Supabase, toda la participación comunitaria vuelve al respaldo local en memoria.
 - **Diseño.** Implementado desde el Figma de Persona 5. Los escudos de Aurora FC y Río Unido son los de «Aurora Athletic» y «Riverside United» del diseño; si Persona 5 prepara escudos propios, solo cambia `data/branding.js`.
 - **Sin vídeo real.** La interfaz nueva usa el campo sintético; el reproductor de la primera versión aceptaba una URL de vídeo y puede recuperarse cuando el equipo elija el vídeo.
