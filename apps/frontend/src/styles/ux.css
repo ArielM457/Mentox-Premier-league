@@ -135,11 +135,9 @@ button:disabled { cursor: not-allowed; opacity: .6; }
 :root[data-theme] :is(.section-kicker, .section-heading > span, .section-heading button, .moment-time, .eyebrow, .point-number) { color: var(--violet); }
 :root[data-theme] .app-sidebar button.active { color: var(--text); background: var(--surface-soft); }
 :root[data-theme] .mobile-nav button.active { color: var(--violet); }
-:root[data-theme] .header-language button { color: var(--muted); }
-:root[data-theme] .header-language button.active { color: var(--text); background: var(--surface-soft); }
+:root[data-theme] .header-language select { color: var(--text); }
 :root[data-theme] .language-switch { background: var(--surface); border-color: var(--line); }
-:root[data-theme] .language-switch button { color: var(--muted); }
-:root[data-theme] .language-switch button.active { color: #fff; background: var(--action); }
+:root[data-theme] .language-switch select { color: var(--text); }
 :root[data-theme] :is(.match-score, .pitch-wrap, .assistant, .stats-panel, .event-feed, .latency-card, .moment-workspace, .tactical-panel, .insight-list, .commentary-stage, .announcer-panel, .moment-selector, .detail-pitch, .detail-insight) { color: var(--text); background: var(--surface); border: 1px solid var(--line); }
 .simulation-toolbar { background: var(--surface-soft); border-color: var(--line); color: var(--text); }
 .simulation-toolbar strong, .simulation-toolbar span { color: var(--text); }
@@ -321,10 +319,94 @@ button:disabled { cursor: not-allowed; opacity: .6; }
 .personal-note { color: var(--lime); font-size: 12px; background: rgba(216,255,101,.1); }
 .preference-summary { color: var(--text); background: var(--surface-soft); }
 .preference-summary small, .profile-intro p, .player-options small { font-size: 12px; color: var(--muted); }
+.preference-two-up-grid,
+.preference-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0 20px;
+}
+.preference-field-block { margin: 0; }
+.preference-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text);
+}
+.preference-field span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.preference-field select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 40px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-raised) var(--field-chevron) no-repeat right 12px center / 14px 14px;
+  color: var(--text);
+  font-weight: 700;
+}
+.preference-option-grid,
+.team-grid.compact-grid,
+.player-options,
+.profile-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.team-select,
+.player-options button,
+.profile-modes button,
+.language-options button {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 16px;
+  text-align: center;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  transition: border-color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+.team-select:hover,
+.player-options button:hover,
+.profile-modes button:hover,
+.language-options button:hover {
+  transform: translateY(-2px);
+  border-color: var(--violet);
+}
+.team-select img,
+.profile-club-logo,
+.player-options img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  border-radius: 14px;
+}
+.team-select strong,
+.player-options strong,
+.profile-modes strong,
+.language-options strong {
+  font-size: 14px;
+}
 :root[data-theme] :is(.team-select, .player-options button, .profile-modes button, .language-options button) { color: var(--text); background: var(--surface-raised); }
 :root[data-theme] :is(.team-select.selected, .player-options button.selected, .profile-modes button.selected, .language-options button.selected) { color: var(--text); background: var(--surface-soft); border-color: var(--violet); }
 .profile-modes small { font-size: 13px; line-height: 1.5; }
 .profile-modes .icon, .player-options .icon { color: var(--violet); }
+@media (max-width: 680px) {
+  .preference-config-grid,
+  .preference-two-up-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .analyst-comments-toggle, .analyst-comments-toggle.selected { color: var(--text); background: var(--surface-soft); border-color: var(--line); }
 .analyst-comments-toggle small { font-size: 13px; line-height: 1.5; }
 .switch-track { width: 48px; height: 28px; padding: 4px; border-radius: 20px; background: var(--muted); transition: background .2s; }

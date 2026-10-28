@@ -1,23 +1,17 @@
 import { usePreferences } from '../../app/preferences.js'
-
-const LANGUAGES = [['es', 'ES'], ['en', 'EN']]
+import { LANGUAGES } from '../../i18n/languages.js'
 
 // variant "landing" o "header" según el estilo del diseño en cada pantalla.
 export function LanguageSwitch({ variant = 'header' }) {
-  const { preferences, update } = usePreferences()
+  const { preferences, t, update } = usePreferences()
   return (
-    <div className={variant === 'landing' ? 'language-switch' : 'header-language'} role="group" aria-label="Idioma / Language">
-      {LANGUAGES.map(([value, label]) => (
-        <button
-          aria-pressed={preferences.language === value}
-          className={preferences.language === value ? 'active' : ''}
-          key={value}
-          onClick={() => update({ language: value })}
-          type="button"
-        >
-          {label}
-        </button>
-      ))}
-    </div>
+    <label className={variant === 'landing' ? 'language-switch' : 'header-language'}>
+      <span className="sr-only">{t.profile.language}</span>
+      <select aria-label={t.profile.language} onChange={(event) => update({ language: event.target.value })} value={preferences.language}>
+        {LANGUAGES.map(({ value, code, name }) => (
+          <option key={value} value={value}>{code} · {name}</option>
+        ))}
+      </select>
+    </label>
   )
 }

@@ -1,0 +1,96 @@
+flowchart LR
+    subgraph inputs[Live Inputs]
+        direction TB
+        matchFeed[Match Event Feed]
+        videoFeed[Live Video Feed]
+        preferences[Viewer Preferences]
+        editorialInput[Editorial and Community Actions]
+    end
+
+    subgraph ingestion[Ingestion and Synchronization]
+        direction TB
+        gateway[Azure API Management]
+        eventHub[[Azure Event Hubs<br/>Match and vision streams]]
+        videoIntel[Vision and Tracking Processing]
+        validation[Validation, ordering and deduplication]
+        sync[Video and Match Clock Synchronization]
+    end
+
+    subgraph core[Match Intelligence Core]
+        direction TB
+        state[Match State Engine<br/>Score, possession and timeline]
+        analytics[Analytics Engine<br/>Metrics, patterns and situations]
+        routing[Pre-Agent Routing<br/>Metrics-only or important event]
+        agentLayer[Agent Layer<br/>Narration, moments, questions and recaps]
+        presentation[Presentation Scheduler<br/>Priority, timing and personalization]
+    end
+
+    subgraph platform[Azure Data and Messaging]
+        direction TB
+        database[(Azure Database for PostgreSQL<br/>Matches, events, users and editorial data)]
+        storage[(Azure Blob Storage<br/>Video, observations and artifacts)]
+        serviceBus[[Azure Service Bus<br/>Durable important-event processing]]
+        insightsHub[[Azure Event Hubs<br/>Metrics and insights]]
+    end
+
+    subgraph delivery[Application Delivery]
+        direction TB
+        api[FastAPI Experience API]
+        realtime[Real-Time Delivery<br/>Server-Sent Events]
+        web[React Web Application]
+    end
+
+    subgraph experience[User Experience]
+        direction TB
+        onboarding[Experience Setup]
+        matchCenter[Match Center<br/>Match, recap, statistics and tactical view]
+        momentDetail[Moment Analysis]
+        community[Community and Editorial Review]
+        profile[My Experience]
+    end
+
+    matchFeed --> gateway --> eventHub
+    videoFeed --> videoIntel --> eventHub
+    eventHub --> validation --> sync --> state
+    preferences --> gateway
+    editorialInput --> gateway
+
+    state --> analytics --> routing
+    routing -->|Routine events| insightsHub
+    routing -->|Important events| serviceBus --> agentLayer
+    analytics --> agentLayer
+    preferences --> presentation
+    agentLayer --> presentation --> insightsHub
+
+    validation --> database
+    state <--> database
+    analytics <--> database
+    videoIntel <--> storage
+    agentLayer <--> database
+    editorialInput --> database
+
+    database --> api
+    storage --> api
+    insightsHub --> api --> realtime --> web
+    gateway --> api
+
+    web --> onboarding
+    web --> matchCenter
+    web --> momentDetail
+    web --> community
+    web --> profile
+
+    classDef input fill:#172554,stroke:#60a5fa,color:#ffffff,stroke-width:2px
+    classDef ingest fill:#0f766e,stroke:#5eead4,color:#ffffff,stroke-width:2px
+    classDef coreNode fill:#5b21b6,stroke:#c4b5fd,color:#ffffff,stroke-width:2px
+    classDef platformNode fill:#1d4ed8,stroke:#93c5fd,color:#ffffff,stroke-width:2px
+    classDef deliveryNode fill:#065f46,stroke:#6ee7b7,color:#ffffff,stroke-width:2px
+    classDef experienceNode fill:#9a3412,stroke:#fdba74,color:#ffffff,stroke-width:2px
+
+    class matchFeed,videoFeed,preferences,editorialInput input
+    class gateway,eventHub,videoIntel,validation,sync ingest
+    class state,analytics,routing,agentLayer,presentation coreNode
+    class database,storage,serviceBus,insightsHub platformNode
+    class api,realtime,web deliveryNode
+    class onboarding,matchCenter,momentDetail,community,profile experienceNode
+

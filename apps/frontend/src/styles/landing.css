@@ -6,8 +6,7 @@
 .landing-header { height: 92px; max-width: 1380px; margin: auto; padding: 0 5vw; display: flex; align-items: center; justify-content: space-between; }
 .landing-actions { display: flex; align-items: center; gap: 12px; }
 .language-switch { padding: 4px; display: flex; background: white; border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 6px 20px rgba(21,19,41,.05); }
-.language-switch button { width: 38px; height: 38px; color: var(--muted); background: transparent; border-radius: 50%; font-size: 11px; font-weight: 800; }
-.language-switch button.active { color: white; background: var(--navy); }
+.language-switch select { min-width: 150px; height: 38px; padding: 0 34px 0 13px; color: var(--text); background: transparent; border: 0; border-radius: 999px; font-size: 11px; font-weight: 800; }
 .desktop-nav { display: flex; gap: 8px; padding: 6px; background: rgba(255, 255, 255, .65); border-radius: 999px; backdrop-filter: blur(12px); }
 .desktop-nav a { padding: 10px 18px; color: var(--navy); text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 999px; }
 .desktop-nav a:hover, .desktop-nav a.active { background: var(--white); box-shadow: 0 4px 14px rgba(21, 19, 41, .08); }

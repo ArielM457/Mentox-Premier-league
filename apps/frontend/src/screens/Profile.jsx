@@ -21,13 +21,29 @@ export function Profile() {
   })
   const [saved, setSaved] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [editingSection, setEditingSection] = useState(null)
   const set = (changes) => {
     setSaved(false)
     setDraft((current) => ({ ...current, ...changes }))
   }
   const players = catalog?.players.filter((p) => !draft.favoriteTeamId || p.team_id === draft.favoriteTeamId) ?? []
-  const playerName = catalog?.players.find((p) => p.player_id === draft.favoritePlayerId)?.name ?? t.common.none
+  const selectedClub = catalog?.clubs.find((team) => team.team_id === draft.favoriteTeamId)
+  const selectedPlayer = catalog?.players.find((p) => p.player_id === draft.favoritePlayerId)
+  const selectedLanguage = LANGUAGES.find((item) => item.value === draft.language) ?? LANGUAGES[0]
+  const playerName = selectedPlayer?.name ?? t.common.none
   const invalidMode = draft.mode === 'player' && !draft.favoritePlayerId
+  const choose = (changes) => {
+    set(changes)
+    setEditingSection(null)
+  }
+  const sectionHeader = (section, title) => (
+    <div className="preference-block-heading">
+      <h3>{title}</h3>
+      <button onClick={() => setEditingSection(editingSection === section ? null : section)} type="button">
+        {editingSection === section ? copy.closeOptions : copy.change}
+      </button>
+    </div>
+  )
 
   function save() {
     if (invalidMode) return
@@ -81,100 +97,141 @@ export function Profile() {
             </span>
           </div>
 
-          <div className="preference-block">
-            <h3>{copy.language}</h3>
-            <div className="language-options">
-              {LANGUAGES.map(({ value, code, name }) => (
-                <button aria-pressed={draft.language === value} className={draft.language === value ? 'selected' : ''} key={value} onClick={() => set({ language: value })} type="button">
-                  <span>{code}</span>
-                  <strong>{name}</strong>
-                  {draft.language === value && <Icon name="check" size={16} />}
-                </button>
-              ))}
+          <div className="preference-config-grid">
+            <div className="preference-block preference-field-block">
+              <div className="preference-block-heading">
+                <h3>{copy.language}</h3>
+              </div>
+              <label className="preference-field">
+                <span>{copy.language}</span>
+                <select value={draft.language} onChange={(event) => choose({ language: event.target.value })}>
+                  {LANGUAGES.map(({ value, code, name }) => (
+                    <option key={value} value={value}>{code} · {name}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="preference-block preference-field-block">
+              <div className="preference-block-heading">
+                <h3>{copy.level}</h3>
+              </div>
+              <label className="preference-field">
+                <span>{copy.level}</span>
+                <select value={draft.level} onChange={(event) => choose({ level: event.target.value })}>
+                  {['simple', 'normal', 'advanced'].map((level) => (
+                    <option key={level} value={level}>{t.levels[level].name}</option>
+                  ))}
+                </select>
+              </label>
             </div>
           </div>
 
-          <div className="preference-block">
-            <h3>{copy.club}</h3>
-            <div className="team-grid compact-grid">
-              <button aria-pressed={!draft.favoriteTeamId} className={`team-select ${!draft.favoriteTeamId ? 'selected' : ''}`} onClick={() => set({ favoriteTeamId: '', favoritePlayerId: '' })} type="button">
-                <span className="profile-club-logo none-logo">—</span>
-                <strong>{t.common.none}</strong>
-              </button>
-              {catalog?.clubs.map((team) => {
-                const brand = teamBranding(team)
-                const selected = draft.favoriteTeamId === team.team_id
-                return (
-                  <button aria-pressed={selected} className={`team-select ${selected ? 'selected' : ''}`} key={team.team_id} onClick={() => set({ favoriteTeamId: team.team_id, favoritePlayerId: '' })} type="button">
-                    {brand.logo ? <img alt={t.onboarding.crest(team.name)} className="profile-club-logo" src={brand.logo} /> : <span className="profile-club-logo">{brand.short}</span>}
-                    <strong>{team.name}</strong>
+          <div className="preference-two-up-grid">
+            <div className="preference-block">
+              {sectionHeader('club', copy.club)}
+              {editingSection === 'club' ? (
+                <div className="team-grid compact-grid">
+                  <button aria-pressed={!draft.favoriteTeamId} className={`team-select ${!draft.favoriteTeamId ? 'selected' : ''}`} onClick={() => choose({ favoriteTeamId: '', favoritePlayerId: '' })} type="button">
+                    <span className="profile-club-logo none-logo">—</span>
+                    <strong>{t.common.none}</strong>
                   </button>
-                )
-              })}
+                  {catalog?.clubs.map((team) => {
+                    const brand = teamBranding(team)
+                    const selected = draft.favoriteTeamId === team.team_id
+                    return (
+                      <button aria-pressed={selected} className={`team-select ${selected ? 'selected' : ''}`} key={team.team_id} onClick={() => choose({ favoriteTeamId: team.team_id, favoritePlayerId: '' })} type="button">
+                        {brand.logo ? <img alt={t.onboarding.crest(team.name)} className="profile-club-logo" src={brand.logo} /> : <span className="profile-club-logo">{brand.short}</span>}
+                        <strong>{team.name}</strong>
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : selectedClub ? (
+                <div className="current-preference">{teamBranding(selectedClub).logo ? <img alt="" src={teamBranding(selectedClub).logo} /> : <span className="current-preference-code">{teamBranding(selectedClub).short}</span>}<div><strong>{selectedClub.name}</strong><small>{copy.selectedClub}</small></div><Icon name="check" size={17} /></div>
+              ) : (
+                <div className="current-preference"><span className="current-preference-code">—</span><div><strong>{t.common.none}</strong><small>{copy.noClub}</small></div></div>
+              )}
+            </div>
+
+            <div className="preference-block">
+              {sectionHeader('player', copy.player)}
+              {editingSection === 'player' ? (
+                <div className="player-options"><button aria-pressed={!draft.favoritePlayerId} className={!draft.favoritePlayerId ? 'selected' : ''} onClick={() => choose({ favoritePlayerId: '', mode: draft.mode === 'player' ? 'casual' : draft.mode })} type="button"><Icon name="user" /><strong>{t.common.none}</strong></button>
+                  {players.map((player) => (
+                    <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => choose({ favoritePlayerId: player.player_id })} type="button">
+                      <img alt="" src={playerPhoto(player.player_id)} />
+                      <div>
+                        <strong>{player.name}</strong>
+                        <small>
+                          {catalog.clubs.find((c) => c.team_id === player.team_id)?.name} · {t.common.shirt} {player.shirt_number ?? '—'}
+                        </small>
+                      </div>
+                      {draft.favoritePlayerId === player.player_id && <Icon name="check" size={16} />}
+                    </button>
+                  ))}
+                </div>
+              ) : selectedPlayer ? (
+                <div className="current-preference"><img alt="" src={playerPhoto(selectedPlayer.player_id)} /><div><strong>{selectedPlayer.name}</strong><small>{catalog?.clubs.find((team) => team.team_id === selectedPlayer.team_id)?.name} · {t.common.shirt} {selectedPlayer.shirt_number ?? '—'}</small></div><Icon name="check" size={17} /></div>
+              ) : (
+                <div className="current-preference"><span className="current-preference-code"><Icon name="user" size={18} /></span><div><strong>{t.common.none}</strong><small>{copy.noPlayer}</small></div></div>
+              )}
             </div>
           </div>
 
           <div className="preference-block">
-            <h3>{copy.player}</h3>
-            <div className="player-options"><button aria-pressed={!draft.favoritePlayerId} className={!draft.favoritePlayerId ? 'selected' : ''} onClick={() => set({ favoritePlayerId: '', mode: draft.mode === 'player' ? 'casual' : draft.mode })} type="button"><Icon name="user" /><strong>{t.common.none}</strong></button>
-              {players.map((player) => (
-                <button aria-pressed={draft.favoritePlayerId === player.player_id} className={draft.favoritePlayerId === player.player_id ? 'selected' : ''} key={player.player_id} onClick={() => set({ favoritePlayerId: player.player_id })} type="button">
-                  <img alt="" src={playerPhoto(player.player_id)} />
-                  <div>
-                    <strong>{player.name}</strong>
-                    <small>
-                      {catalog.clubs.find((c) => c.team_id === player.team_id)?.name} · {t.common.shirt} {player.shirt_number ?? '—'}
-                    </small>
-                  </div>
-                  {draft.favoritePlayerId === player.player_id && <Icon name="check" size={16} />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="preference-block">
-            <h3>{copy.mode}</h3>
-            <div className="profile-modes">
-              {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => (
-                <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} key={mode} onClick={() => set(mode === 'professional_analyst' ? { mode, level: 'advanced', liveComments: true } : { mode })} type="button">
-                  <Icon name={MODE_ART[mode].icon} />
-                  <span>
-                    <strong>{t.modes[mode].name}</strong>
-                    <small>{t.modes[mode].description}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
-            {invalidMode && <p className="form-warning" role="alert">{copy.playerNeeded}</p>}
-            {['analyst', 'professional_analyst'].includes(draft.mode) && (
-              <button
-                aria-checked={draft.mode === 'professional_analyst' || draft.liveComments}
-                role="switch"
-                className={`analyst-comments-toggle ${draft.mode === 'professional_analyst' || draft.liveComments ? 'selected' : ''}`}
-                disabled={draft.mode === 'professional_analyst'}
-                onClick={() => set({ liveComments: !draft.liveComments })}
-                type="button"
-              >
-                <Icon name="match" />
-                <span><strong>{copy.liveComments}</strong><small>{copy.liveCommentsCopy}</small></span>
-                <span className="switch-track" aria-hidden="true"><span /></span>
-              </button>
+            {sectionHeader('mode', copy.mode)}
+            {editingSection === 'mode' ? (
+              <>
+                <div className="profile-modes">
+                  {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => (
+                    <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} key={mode} onClick={() => choose(mode === 'professional_analyst' ? { mode, level: 'advanced', liveComments: true } : { mode })} type="button">
+                      <Icon name={MODE_ART[mode].icon} />
+                      <span>
+                        <strong>{t.modes[mode].name}</strong>
+                        <small>{t.modes[mode].description}</small>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {invalidMode && <p className="form-warning" role="alert">{copy.playerNeeded}</p>}
+                {['analyst', 'professional_analyst'].includes(draft.mode) && (
+                  <button
+                    aria-checked={draft.mode === 'professional_analyst' || draft.liveComments}
+                    role="switch"
+                    className={`analyst-comments-toggle ${draft.mode === 'professional_analyst' || draft.liveComments ? 'selected' : ''}`}
+                    disabled={draft.mode === 'professional_analyst'}
+                    onClick={() => set({ liveComments: !draft.liveComments })}
+                    type="button"
+                  >
+                    <Icon name="match" />
+                    <span><strong>{copy.liveComments}</strong><small>{copy.liveCommentsCopy}</small></span>
+                    <span className="switch-track" aria-hidden="true"><span /></span>
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="current-preference"><span className="current-preference-code"><Icon name={MODE_ART[draft.mode].icon} size={19} /></span><div><strong>{t.modes[draft.mode].name}</strong><small>{t.modes[draft.mode].description}</small></div><Icon name="check" size={17} /></div>
             )}
           </div>
 
           <div className="preference-block">
-            <h3>{copy.level}</h3>
-            <div className="profile-modes">
-              {['simple', 'normal', 'advanced'].map((level) => (
-                <button aria-pressed={draft.level === level} className={draft.level === level ? 'selected' : ''} key={level} onClick={() => set({ level })} type="button">
-                  <Icon name={LEVEL_ICONS[level]} />
-                  <span>
-                    <strong>{t.levels[level].name}</strong>
-                    <small>{t.levels[level].description}</small>
-                  </span>
-                </button>
-              ))}
-            </div>
+            {sectionHeader('level', copy.level)}
+            {editingSection === 'level' ? (
+              <div className="profile-modes">
+                {['simple', 'normal', 'advanced'].map((level) => (
+                  <button aria-pressed={draft.level === level} className={draft.level === level ? 'selected' : ''} key={level} onClick={() => choose({ level })} type="button">
+                    <Icon name={LEVEL_ICONS[level]} />
+                    <span>
+                      <strong>{t.levels[level].name}</strong>
+                      <small>{t.levels[level].description}</small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="current-preference"><span className="current-preference-code"><Icon name={LEVEL_ICONS[draft.level]} size={19} /></span><div><strong>{t.levels[draft.level].name}</strong><small>{t.levels[draft.level].description}</small></div><Icon name="check" size={17} /></div>
+            )}
           </div>
 
           <div className="save-row"><span className="save-note" role="status">{saved ? t.common.saved : t.profile.saveHint}</span>

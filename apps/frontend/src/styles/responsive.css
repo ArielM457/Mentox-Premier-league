@@ -29,7 +29,7 @@
   .landing-header { height: 76px; }
   .landing-header .desktop-nav { display: none; }
   .landing-actions > .btn { min-width: 44px; width: 44px; padding: 0; font-size: 0; }
-  .language-switch button { width: 34px; height: 34px; }
+  .language-switch select { min-width: 132px; height: 34px; }
   .hero { width: auto; margin: 4px 18px 0; padding: 30px 18px 0; grid-template-columns: 1fr; }
   .hero-copy { padding-bottom: 0; }
   .hero h1 { font-size: clamp(40px, 12vw, 54px); }
@@ -191,7 +191,7 @@
   .summary-type-grid { grid-template-columns: 1fr; }
   .recap-hero { grid-template-columns: 1fr; }
   .recap-art { height: 240px; }
-  .recap-art .player-illustration { width: 90%; margin-bottom: -44%; }
+  .recap-professional-art { object-position: 42% center; }
   .recap-hero > div:last-child { padding: 28px 22px; }
   .recap-list button { grid-template-columns: 35px 38px 1fr; padding: 12px; }
   .recap-list button > .icon { display: none; }

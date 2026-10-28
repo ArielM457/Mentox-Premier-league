@@ -22,14 +22,16 @@
 .recap-list.compact button { min-height: 72px; }
 .recap-hero { min-height: 350px; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; color: white; background: var(--navy); border-radius: 26px; overflow: hidden; }
 .recap-art { height: 100%; position: relative; display: grid; place-items: center; background: var(--violet); overflow: hidden; }
-.recap-art .player-illustration { width: 105%; margin: 0 0 -45% -20%; }
-.celebration-number { position: absolute; left: 10%; top: 5%; z-index: 0; color: var(--lime); font: 700 180px/1 "Space Grotesk"; opacity: .75; }
+.recap-professional-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.recap-art::after { position: absolute; inset: 0; content: ''; background: linear-gradient(90deg, rgba(21,19,41,.1), rgba(21,19,41,.46)); }
+.celebration-number { position: absolute; left: 8%; top: 5%; z-index: 1; color: var(--lime); font: 700 132px/1 "Space Grotesk"; opacity: .78; text-shadow: 0 8px 35px rgba(0,0,0,.4); }
 .recap-hero > div:last-child { padding: 45px; }
 .recap-hero .section-kicker { color: var(--lime); }
 .recap-hero h2 { margin: 12px 0; font-size: clamp(30px, 4vw, 48px); letter-spacing: -.05em; }
 .recap-hero p { color: #c7c3d3; line-height: 1.65; }
 .personal-note { padding: 7px 10px; display: inline-block; color: var(--lime); background: rgba(216,255,101,.1); border-radius: 7px; font-size: 10px; }
 .recap-moments { margin-top: 35px; }
+.recap-analysis { margin-top: 28px; display: grid; gap: 18px; }
 .recap-list { display: grid; gap: 10px; }
 .recap-list button { min-height: 84px; padding: 14px 20px; display: grid; grid-template-columns: 40px 50px 1fr auto; gap: 14px; align-items: center; color: var(--navy); background: white; border: 1px solid var(--line); border-radius: 16px; text-align: left; transition: transform 180ms, border 180ms; }
 .recap-list button:hover { transform: translateX(5px); border-color: var(--violet); }
@@ -51,6 +53,14 @@
 .preference-summary strong { color: white; font-size: 13px; }
 .preference-block { margin-top: 28px; }
 .preference-block h3 { font-size: 18px; }
+.preference-block-heading { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.preference-block-heading h3 { margin: 0; }
+.preference-block-heading button { padding: 8px 12px; color: var(--violet-light, var(--violet)); background: var(--surface-soft, var(--lavender)); border: 1px solid var(--line); border-radius: 9px; font-size: 11px; font-weight: 800; }
+.current-preference { min-height: 72px; padding: 12px 14px; display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 12px; color: var(--text); background: var(--surface-soft, var(--off-white)); border: 1px solid var(--line); border-radius: 14px; }
+.current-preference > img, .current-preference-code { width: 46px; height: 46px; display: grid; place-items: center; object-fit: contain; color: var(--navy); background: var(--lime); border-radius: 12px; font-size: 11px; font-weight: 900; }
+.current-preference strong, .current-preference small { display: block; }
+.current-preference small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+.current-preference > .icon:last-child { color: var(--violet-light, var(--violet)); }
 .language-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .language-options button { min-height: 58px; padding: 8px 14px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; color: var(--navy); background: var(--off-white); border: 1px solid var(--line); border-radius: 14px; text-align: left; }
 .language-options button.selected, .player-options button.selected { border: 2px solid var(--violet); background: #f1ebff; }
