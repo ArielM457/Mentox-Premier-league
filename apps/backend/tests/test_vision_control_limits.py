@@ -37,12 +37,15 @@ def test_advance_needs_the_current_generation_and_cannot_outrun_the_video(monkey
             assert simulator._position == 0
             valid = await post("advance", 1000, generation)
             assert simulator._position == 1000
+            # Avances pequeños seguidos no suman el margen: el límite se mide desde Play.
+            stepped = [await post("advance", at, generation) for at in (2000, 2500)]
             await post("seek", 1000)
             stale = await post("advance", 3500, generation)
 
         assert anonymous.status_code == 409 and "playback_generation" in anonymous.json()["detail"]
         assert ahead.status_code == 409 and "tiempo transcurrido" in ahead.json()["detail"]
         assert valid.status_code == 200
+        assert [response.status_code for response in stepped] == [200, 409]
         # Un paquete de antes del salto se ignora sin error, como antes.
         assert stale.status_code == 200 and simulator._position == 1000
 

@@ -32,7 +32,8 @@ class SimulatedVideo:
         self._session = None
         self._playing = False
         self._position = 0
-        self._position_at = time.monotonic()
+        # Punto de partida del límite de avance: solo lo fijan Play, Seek y Restart.
+        self._anchor = (0, time.monotonic())
         self._generation = 0
         self._delivered = set()
         self._routed = set()
@@ -99,7 +100,7 @@ class SimulatedVideo:
                 self._routed.clear()
                 self._pending.clear()
                 self._position, self._playing = 0, False
-                self._position_at = time.monotonic()
+                self._anchor = (0, time.monotonic())
                 self.phase = "ready"
                 return self.status()
             except Exception as error:
@@ -187,7 +188,7 @@ class SimulatedVideo:
             if action == "pause":
                 self._playing = False
             if action in {"seek", "restart", "play"}:
-                self._position, self._position_at = position, time.monotonic()
+                self._position, self._anchor = position, (position, time.monotonic())
                 if action == "play":
                     self._playing = True
                 elif action == "restart":
@@ -233,7 +234,7 @@ class SimulatedVideo:
                         self._delivered.add(observation.observation_id)
                         self._pending.pop(observation.observation_id, None)
                 if self._generation == current_generation:
-                    self._position, self._position_at = position, time.monotonic()
+                    self._position = position
                 self._observation_error = str(observation_error) if observation_error else None
                 if observation_error is not None:
                     raise RuntimeError(f"Observaciones pendientes de entrega: {observation_error}") from observation_error
@@ -254,8 +255,11 @@ class SimulatedVideo:
             return "El avance necesita playback_generation de la reproducción vigente"
         if generation != self._generation or not self._playing:
             return None
-        elapsed_ms = (time.monotonic() - self._position_at) * 1000
-        if position > self._position + elapsed_ms * MAX_PLAYBACK_SPEED + ADVANCE_SLACK_MS:
+        # Se mide desde el último Play o salto: si cada avance moviera el punto de partida,
+        # muchos avances seguidos sumarían el margen una y otra vez.
+        anchor_position, anchor_at = self._anchor
+        elapsed_ms = (time.monotonic() - anchor_at) * 1000
+        if position > anchor_position + elapsed_ms * MAX_PLAYBACK_SPEED + ADVANCE_SLACK_MS:
             return "El avance supera el tiempo transcurrido de la reproducción"
         return None
 
