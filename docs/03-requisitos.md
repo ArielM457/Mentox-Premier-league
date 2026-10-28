@@ -184,6 +184,8 @@ Cada punto describe una capacidad pequeña que puede verificarse. P0 indica lo n
 
 **RF-93 · P1.** Resumen debe usar un único desplegable compacto para elegir entre resumen corto, extendido y personalizado. Cada opción debe incluir su descripción. El jugador solo debe elegirse cuando el tipo sea personalizado. Debajo, “Momento seleccionado” debe permitir elegir entre los momentos filtrados: solo goles en el resumen corto, varias jugadas relevantes en el extendido y jugadas de peligro del jugador en el personalizado. La jugada elegida debe actualizar tanto el análisis como el resaltado de la lista inferior. Se verifica cambiando tipo, jugador y momento sin salir de Resumen.
 
+**RF-94 · P1.** En el paso Visualización de la configuración inicial, la tarjeta del modo seleccionado debe expandirse y explicar qué contenido estará disponible. Las tarjetas no seleccionadas deben conservar su tamaño normal. El flujo no debe repetir las elecciones en una sección adicional antes de finalizar. Se verifica seleccionando los cuatro modos, comparando sus detalles y terminando la configuración directamente.
+
 ## **Personalización**
 
 **RF-23 · P0.** El sistema debe ofrecer un modo de analista y uno casual con diferencias de contenido y nivel de detalle. Se verifica comparando el mismo momento en ambos modos.

@@ -8,7 +8,7 @@ import { Brand } from '../components/ui/Brand.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { ErrorNotice, LoadingScreen } from '../components/ui/Feedback.jsx'
 import { Icon } from '../components/ui/Icon.jsx'
-import { LANGUAGES, languageName } from '../i18n/languages.js'
+import { LANGUAGES } from '../i18n/languages.js'
 
 export function Onboarding() {
   const { t, preferences, update } = usePreferences()
@@ -24,7 +24,6 @@ export function Onboarding() {
   const set = (changes) => setDraft((current) => ({ ...current, ...changes }))
   const club = catalog?.clubs.find((team) => team.team_id === draft.favoriteTeamId)
   const players = catalog?.players.filter((player) => player.team_id === draft.favoriteTeamId) ?? []
-  const selectedPlayer = catalog?.players.find((player) => player.player_id === draft.favoritePlayerId)
 
   function finish() {
     const professionalDefaults = draft.mode === 'professional_analyst'
@@ -147,16 +146,25 @@ export function Onboarding() {
               <div className="visualization-modes four">
                 {['casual', 'analyst', 'professional_analyst', 'player'].map((mode) => {
                   const disabled = mode === 'player' && !draft.favoritePlayerId
+                  const selected = draft.mode === mode
                   return (
-                    <button aria-pressed={draft.mode === mode} className={draft.mode === mode ? 'selected' : ''} disabled={disabled} key={mode} onClick={() => set({ mode })} title={disabled ? t.profile.playerNeeded : undefined} type="button">
+                    <button aria-pressed={selected} className={selected ? 'selected expanded' : ''} disabled={disabled} key={mode} onClick={() => set({ mode })} title={disabled ? t.profile.playerNeeded : undefined} type="button">
                       <div>
                         <img alt="" src={MODE_ART[mode].image} />
                       </div>
                       <span>
                         <strong>{t.modes[mode].name}</strong>
                         <small>{disabled ? t.profile.playerNeeded : t.modes[mode].description}</small>
+                        {selected && !disabled && (
+                          <span className="mode-expanded-details">
+                            <em>{copy.modeIncludes}</em>
+                            {t.modes[mode].features.map((feature) => (
+                              <b key={feature}><Icon name="check" size={13} /> {feature}</b>
+                            ))}
+                          </span>
+                        )}
                       </span>
-                      {draft.mode === mode && (
+                      {selected && (
                         <i>
                           <Icon name="check" size={14} />
                         </i>
@@ -165,16 +173,6 @@ export function Onboarding() {
                   )
                 })}
               </div>
-              <section className="onboarding-selection-summary" aria-labelledby="experience-selection-title">
-                <h3 id="experience-selection-title">{copy.selectionTitle}</h3>
-                <p>{copy.selectionCopy}</p>
-                <div className="preference-summary four">
-                  <span><small>{t.profile.language}</small><strong>{languageName(draft.language)}</strong></span>
-                  <span><small>{t.profile.club}</small><strong>{club?.name ?? t.common.none}</strong></span>
-                  <span><small>{t.profile.player}</small><strong>{selectedPlayer?.name ?? t.common.none}</strong></span>
-                  <span><small>{t.profile.mode}</small><strong>{t.modes[draft.mode].name}</strong></span>
-                </div>
-              </section>
             </div>
           )}
 

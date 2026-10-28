@@ -14,6 +14,7 @@ La documentación distingue el alcance del reto, las decisiones del equipo y lo 
 - [Decisiones tomadas](07-decisiones-tomadas.md): tecnologías, arquitectura, agentes, datos e idiomas acordados.
 - [Formato de eventos](08-formato-de-eventos.md): contrato inicial para eventos y sincronización con vídeo.
 - [Investigación de métricas y herramientas](09-investigacion-metricas-y-herramientas.md): opciones compatibles con Python y límites de los datos.
+- [Sistema de diseño](sistema-de-diseno.md): paleta, tipografía, tokens, componentes y guía de uso visual del producto.
 - [Equipo de agentes](10-arquitectura-agentes.md): responsabilidades, autonomía, verificación y revisión antes de publicar.
 - [Plan de implementación de agentes por eventos](11-plan-implementacion-agentes-eventos.md): filtro, orquestación, simulación, resúmenes, escalado y pruebas de disponibilidad.
 - [Política de modelos de IA](12-politica-modelos-ia.md): asignación de modelos por demanda, búsqueda web, embeddings y criterios para cambiar de modelo.
